@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "id":        { "type": "keyword" },
+      "object_type": { "type": "keyword" }, 
+      "schema":    { "type": "keyword" },
+      "table":     { "type": "keyword" },
+      "column":    { "type": "keyword" },
+      "business_label": { "type": "keyword" },
+      "description": { "type": "text" },
+      "join_paths": { "type": "keyword" },
+      "sample_values": { "type": "keyword" },
+
+      "embedding": {
+        "type": "dense_vector",
+        "dims": 1024,
+        "index": true,
+        "similarity": "dot_product",
+        "index_options": { "type": "hnsw", "m": 32, "ef_construction": 128 }
+      }
+    }
+  }
+}

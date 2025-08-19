@@ -1,0 +1,20 @@
+{
+  "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+  "mappings": {
+    "properties": {
+      "process_id": { "type": "keyword" },
+      "name":       { "type": "text" },
+      "version":    { "type": "keyword" },
+      "tags":       { "type": "keyword" },
+      "owner":      { "type": "keyword" },
+      "content":    { "type": "text" },
+      "embedding": {
+        "type": "dense_vector",
+        "dims": 1024,
+        "index": true,
+        "similarity": "dot_product",
+        "index_options": { "type": "hnsw", "m": 32, "ef_construction": 128 }
+      }
+    }
+  }
+}

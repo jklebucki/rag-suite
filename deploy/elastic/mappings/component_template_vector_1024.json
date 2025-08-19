@@ -1,0 +1,21 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "embedding": {
+          "type": "dense_vector",
+          "dims": 1024,
+          "index": true,
+          "similarity": "dot_product",
+          "index_options": { "type": "hnsw", "m": 32, "ef_construction": 128 }
+        }
+      }
+    },
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    }
+  },
+  "version": 1,
+  "_meta": { "notes": "BGE-M3 1024D default vector field" }
+}
