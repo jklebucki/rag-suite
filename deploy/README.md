@@ -35,6 +35,3 @@ Embedding Service (e5-base — substitute to BGE-M3 when ready)
 Make sure to adjust any environment variables or volumes before moving to production.
 
 ---
-
-
-
