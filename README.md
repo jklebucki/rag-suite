@@ -1,11 +1,10 @@
 # RAG Suite
 
-[![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)][dotnet]
-[![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)][semantic-kernel]
-[![Elastic](https://img.shields.io/badge/Elasticsearch-orange?style=for-the-badge&logo=elasticsearch)][elasticsearch]
-[![BGE-M3 Embeddings](https://img.shields.io/badge/BGE--M3-1024D-green?style=for-the-badge)][bge-m3]
-[![Docker](https://img.shields.io/badge/Docker-blue?style=for-the-badge&logo=docker)][docker]
-
+![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)
+![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-orange?style=for-the-badge&logo=elasticsearch)
+![BGE-M3 Embeddings](https://img.shields.io/badge/BGE--M3-1024D-green?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-blue?style=for-the-badge&logo=docker)
 ---
 
 ## Project Goal
