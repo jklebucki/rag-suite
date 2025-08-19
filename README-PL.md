@@ -31,7 +31,7 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 
 ---
 
-## Przydatne źródła (dla Ciebie)
+## Przydatne źródła:
 
 - **[Vectors `dense_vector` docs & similarity options][1]**  
   Oficjalna dokumentacja Elasticsearch opisująca typ pola `dense_vector`, parametry takie jak `dims`, `index`, `similarity`, oraz użycie algorytmu HNSW do kNN.  
