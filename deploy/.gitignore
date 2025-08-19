@@ -1,0 +1,7 @@
+# Ignoruj dane środowiskowe i wolumeny
+elastic/data/
+elastic/logs/
+elastic/snapshots/
+**/.env
+**/*.env
+**/secrets/*

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RAG.Shared\RAG.Shared.csproj" />
+    <ProjectReference Include="..\RAG.Plugins\OracleSqlPlugin\OracleSqlPlugin.csproj" />
+    <ProjectReference Include="..\RAG.Plugins\IfsSopPlugin\IfsSopPlugin.csproj" />
+    <ProjectReference Include="..\RAG.Plugins\BizProcessPlugin\BizProcessPlugin.csproj" />
+    <ProjectReference Include="..\RAG.VectorStores\RAG.VectorStores.csproj" />
+    <ProjectReference Include="..\RAG.Connectors\Elastic\Elastic.csproj" />
+    <ProjectReference Include="..\RAG.Connectors\Files\Files.csproj" />
+    <ProjectReference Include="..\RAG.Security\RAG.Security.csproj" />
+    <ProjectReference Include="..\RAG.Telemetry\RAG.Telemetry.csproj" />
+  </ItemGroup>
+
+</Project>
