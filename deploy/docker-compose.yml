@@ -35,9 +35,41 @@ services:
     environment:
       - MODEL_ID=intfloat/multilingual-e5-base
     ports:
-      - "8080:80"
+      - "8580:80"
     command:
       - --model-id
       - "intfloat/multilingual-e5-base"
     depends_on:
       - elasticsearch
+
+  llm-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.2.0
+    container_name: llm-service
+    environment:
+      - MODEL_ID=microsoft/DialoGPT-medium
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+      - MAX_TOTAL_TOKENS=4096
+      - MAX_INPUT_LENGTH=3072
+      - MAX_BATCH_PREFILL_TOKENS=4096
+    ports:
+      - "8581:80"
+    volumes:
+      - llm_cache:/data
+    command:
+      - --model-id
+      - "microsoft/DialoGPT-medium"
+      - --port
+      - "80"
+      - --hostname
+      - "0.0.0.0"
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  llm_cache:

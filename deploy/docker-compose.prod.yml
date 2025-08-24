@@ -1,0 +1,253 @@
+version: '3.8'
+
+# Production Docker Compose Configuration for RAG Suite
+# This configuration includes additional security, monitoring, and performance optimizations
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: es-prod
+    environment:
+      - node.name=es-node-prod
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme123!}
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=basic
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config:/usr/share/elasticsearch/config:ro
+    networks:
+      - rag-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD:-changeme123!} http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 2g
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.3
+    container_name: kibana-prod
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme123!}
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    networks:
+      - rag-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+        reservations:
+          memory: 512m
+
+  embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    container_name: embedding-service-prod
+    environment:
+      - MODEL_ID=intfloat/multilingual-e5-base
+      - MAX_CONCURRENT_REQUESTS=512
+      - MAX_BATCH_TOKENS=16384
+    ports:
+      - "8580:80"
+    volumes:
+      - embedding_cache:/data
+    command:
+      - --model-id
+      - "intfloat/multilingual-e5-base"
+      - --port
+      - "80"
+      - --hostname
+      - "0.0.0.0"
+      - --max-concurrent-requests
+      - "512"
+    networks:
+      - rag-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 1g
+
+  llm-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.2.0
+    container_name: llm-service-prod
+    environment:
+      - MODEL_ID=${LLM_MODEL_ID:-microsoft/DialoGPT-medium}
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+      - MAX_TOTAL_TOKENS=${MAX_TOTAL_TOKENS:-4096}
+      - MAX_INPUT_LENGTH=${MAX_INPUT_LENGTH:-3072}
+      - MAX_BATCH_PREFILL_TOKENS=4096
+      - MAX_BATCH_TOTAL_TOKENS=8192
+      - WAITING_SERVED_RATIO=1.2
+      - MAX_WAITING_TOKENS=20
+    ports:
+      - "8581:80"
+    volumes:
+      - llm_cache:/data
+    command:
+      - --model-id
+      - "${LLM_MODEL_ID:-microsoft/DialoGPT-medium}"
+      - --port
+      - "80"
+      - --hostname
+      - "0.0.0.0"
+      - --max-total-tokens
+      - "${MAX_TOTAL_TOKENS:-4096}"
+      - --max-input-length
+      - "${MAX_INPUT_LENGTH:-3072}"
+    networks:
+      - rag-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 2g
+
+  # Optional: Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: redis-prod
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rag-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+        reservations:
+          memory: 512m
+
+  # Optional: Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-prod
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - rag-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  # Optional: Grafana for monitoring dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - rag-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Optional: Log aggregation with Fluentd
+  fluentd:
+    image: fluent/fluentd:v1.16-1
+    container_name: fluentd-prod
+    volumes:
+      - ./logging/fluent.conf:/fluentd/etc/fluent.conf:ro
+      - /var/log:/var/log:ro
+    networks:
+      - rag-network
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    restart: unless-stopped
+
+networks:
+  rag-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  elasticsearch_data:
+    driver: local
+  kibana_data:
+    driver: local
+  embedding_cache:
+    driver: local
+  llm_cache:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# Health check script can be added
+# healthcheck:
+#   test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+#   interval: 30s
+#   timeout: 10s
+#   retries: 3
+#   start_period: 40s

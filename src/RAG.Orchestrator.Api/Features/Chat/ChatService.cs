@@ -1,5 +1,7 @@
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Search;
+using System.Text;
+using System.Text.Json;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -12,14 +14,117 @@ public interface IChatService
     Task<bool> DeleteSessionAsync(string sessionId, CancellationToken cancellationToken = default);
 }
 
+public interface ILlmService
+{
+    Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default);
+    Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
+}
+
+public class LlmService : ILlmService
+{
+    private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<LlmService> _logger;
+
+    public LlmService(HttpClient httpClient, IConfiguration configuration, ILogger<LlmService> logger)
+    {
+        _httpClient = httpClient;
+        _configuration = configuration;
+        _logger = logger;
+        
+        var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:8581";
+        _httpClient.BaseAddress = new Uri(baseUrl);
+    }
+
+    public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 4096);
+            var temperature = _configuration.GetValue<double>("Services:LlmService:Temperature", 0.7);
+            var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
+
+            var request = new
+            {
+                inputs = prompt,
+                parameters = new
+                {
+                    max_new_tokens = maxTokens,
+                    temperature = temperature,
+                    top_p = topP,
+                    do_sample = true,
+                    return_full_text = false
+                }
+            };
+
+            var json = JsonSerializer.Serialize(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("/generate", content, cancellationToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("LLM service returned error: {StatusCode}", response.StatusCode);
+                return "Przepraszam, wystąpił problem z generowaniem odpowiedzi. Spróbuj ponownie.";
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(responseJson);
+            
+            if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
+            {
+                return generatedText.GetString() ?? "Nie udało się wygenerować odpowiedzi.";
+            }
+
+            _logger.LogWarning("Unexpected response format from LLM service");
+            return "Otrzymano niepoprawną odpowiedź z serwisu LLM.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating response from LLM service");
+            return "Wystąpił błąd podczas generowania odpowiedzi. Spróbuj ponownie.";
+        }
+    }
+
+    public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("/health", cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+
 public class ChatService : IChatService
 {
-    private static readonly List<ChatSession> _mockSessions = new();
-    private static readonly Dictionary<string, List<ChatMessage>> _mockMessages = new();
+    private static readonly List<ChatSession> _sessions = new();
+    private static readonly Dictionary<string, List<ChatMessage>> _messages = new();
+    
+    private readonly ILlmService _llmService;
+    private readonly ISearchService _searchService;
+    private readonly ILogger<ChatService> _logger;
+    private readonly IConfiguration _configuration;
+
+    public ChatService(
+        ILlmService llmService, 
+        ISearchService searchService, 
+        ILogger<ChatService> logger,
+        IConfiguration configuration)
+    {
+        _llmService = llmService;
+        _searchService = searchService;
+        _logger = logger;
+        _configuration = configuration;
+    }
 
     public Task<ChatSession[]> GetSessionsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(_mockSessions.ToArray());
+        return Task.FromResult(_sessions.ToArray());
     }
 
     public Task<ChatSession> CreateSessionAsync(CreateSessionRequest request, CancellationToken cancellationToken = default)
@@ -27,32 +132,38 @@ public class ChatService : IChatService
         var sessionId = Guid.NewGuid().ToString();
         var session = new ChatSession(
             sessionId,
-            request.Title ?? "New Chat",
+            request.Title ?? "Nowa rozmowa",
             Array.Empty<ChatMessage>(),
             DateTime.Now,
             DateTime.Now
         );
         
-        _mockSessions.Add(session);
-        _mockMessages[sessionId] = new List<ChatMessage>();
+        _sessions.Add(session);
+        _messages[sessionId] = new List<ChatMessage>();
         
         return Task.FromResult(session);
     }
 
     public Task<ChatSession?> GetSessionAsync(string sessionId, CancellationToken cancellationToken = default)
     {
-        var session = _mockSessions.FirstOrDefault(s => s.Id == sessionId);
+        var session = _sessions.FirstOrDefault(s => s.Id == sessionId);
         if (session == null) return Task.FromResult<ChatSession?>(null);
         
-        var messages = _mockMessages.GetValueOrDefault(sessionId, new List<ChatMessage>());
+        var messages = _messages.GetValueOrDefault(sessionId, new List<ChatMessage>());
         var sessionWithMessages = session with { Messages = messages.ToArray() };
         return Task.FromResult<ChatSession?>(sessionWithMessages);
     }
 
-    public Task<ChatMessage> SendMessageAsync(string sessionId, ChatRequest request, CancellationToken cancellationToken = default)
+    public async Task<ChatMessage> SendMessageAsync(string sessionId, ChatRequest request, CancellationToken cancellationToken = default)
     {
-        if (!_mockMessages.ContainsKey(sessionId))
+        if (!_messages.ContainsKey(sessionId))
             throw new ArgumentException("Session not found", nameof(sessionId));
+
+        var maxMessageLength = _configuration.GetValue<int>("Chat:MaxMessageLength", 2000);
+        if (request.Message.Length > maxMessageLength)
+        {
+            throw new ArgumentException($"Message too long. Maximum length is {maxMessageLength} characters.");
+        }
 
         // Add user message
         var userMessage = new ChatMessage(
@@ -61,76 +172,101 @@ public class ChatService : IChatService
             request.Message,
             DateTime.Now
         );
-        _mockMessages[sessionId].Add(userMessage);
+        _messages[sessionId].Add(userMessage);
 
-        // Generate mock AI response
-        var aiResponse = GenerateMockResponse(request.Message);
-        var aiMessage = new ChatMessage(
-            Guid.NewGuid().ToString(),
-            "assistant",
-            aiResponse.Content,
-            DateTime.Now.AddSeconds(2),
-            aiResponse.Sources
-        );
-        _mockMessages[sessionId].Add(aiMessage);
-
-        // Update session timestamp
-        var sessionIndex = _mockSessions.FindIndex(s => s.Id == sessionId);
-        if (sessionIndex >= 0)
+        try
         {
-            _mockSessions[sessionIndex] = _mockSessions[sessionIndex] with { UpdatedAt = DateTime.Now };
-        }
+            // Search for relevant context
+            var searchResults = await _searchService.SearchAsync(new SearchRequest(
+                request.Message,
+                Filters: null,
+                Limit: 3,
+                Offset: 0
+            ), cancellationToken);
 
-        return Task.FromResult(aiMessage);
+            // Build context-aware prompt
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, _messages[sessionId]);
+
+            // Generate AI response
+            var aiResponseContent = await _llmService.GenerateResponseAsync(prompt, cancellationToken);
+
+            var aiMessage = new ChatMessage(
+                Guid.NewGuid().ToString(),
+                "assistant",
+                aiResponseContent,
+                DateTime.Now,
+                searchResults.Results.Length > 0 ? searchResults.Results : null
+            );
+            
+            _messages[sessionId].Add(aiMessage);
+
+            // Update session timestamp
+            var sessionIndex = _sessions.FindIndex(s => s.Id == sessionId);
+            if (sessionIndex >= 0)
+            {
+                _sessions[sessionIndex] = _sessions[sessionIndex] with { UpdatedAt = DateTime.Now };
+            }
+
+            return aiMessage;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating AI response for session {SessionId}", sessionId);
+            
+            var errorMessage = new ChatMessage(
+                Guid.NewGuid().ToString(),
+                "assistant",
+                "Przepraszam, wystąpił problem podczas generowania odpowiedzi. Spróbuj ponownie za chwilę.",
+                DateTime.Now
+            );
+            
+            _messages[sessionId].Add(errorMessage);
+            return errorMessage;
+        }
     }
 
     public Task<bool> DeleteSessionAsync(string sessionId, CancellationToken cancellationToken = default)
     {
-        var removed = _mockSessions.RemoveAll(s => s.Id == sessionId) > 0;
-        _mockMessages.Remove(sessionId);
+        var removed = _sessions.RemoveAll(s => s.Id == sessionId) > 0;
+        _messages.Remove(sessionId);
         return Task.FromResult(removed);
     }
 
-    private static (string Content, SearchResult[]? Sources) GenerateMockResponse(string userMessage)
+    private static string BuildContextualPrompt(string userMessage, SearchResult[] searchResults, List<ChatMessage> conversationHistory)
     {
-        var lowerMessage = userMessage.ToLower();
+        var promptBuilder = new StringBuilder();
         
-        if (lowerMessage.Contains("oracle") || lowerMessage.Contains("database"))
+        promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.");
+        promptBuilder.AppendLine();
+        
+        // Add context from search results
+        if (searchResults.Length > 0)
         {
-            return (
-                "Based on the Oracle database documentation, I can help you with schema design and query optimization. The current schema includes 15 tables with relationships optimized for RAG applications. Would you like me to explain specific table structures or relationships?",
-                new SearchResult[]
-                {
-                    new("1", "Oracle Database Schema Guide", "Comprehensive guide...", 0.95, "oracle", "schema", new Dictionary<string, object>(), DateTime.Now.AddDays(-10), DateTime.Now.AddDays(-5))
-                }
-            );
+            promptBuilder.AppendLine("Kontekst z bazy wiedzy:");
+            foreach (var result in searchResults.Take(3))
+            {
+                promptBuilder.AppendLine($"- {result.Title}: {result.Content.Substring(0, Math.Min(200, result.Content.Length))}...");
+            }
+            promptBuilder.AppendLine();
         }
         
-        if (lowerMessage.Contains("ifs") || lowerMessage.Contains("user"))
+        // Add recent conversation history
+        var recentMessages = conversationHistory.TakeLast(6).ToList();
+        if (recentMessages.Count > 1)
         {
-            return (
-                "According to the IFS Standard Operating Procedures, user management follows a structured approach with role-based access control. The latest version 2.1 includes enhanced security features and automated provisioning workflows.",
-                new SearchResult[]
-                {
-                    new("2", "IFS SOP Document - User Management", "Standard Operating Procedure...", 0.87, "ifs", "sop", new Dictionary<string, object>(), DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-2))
-                }
-            );
+            promptBuilder.AppendLine("Historia rozmowy:");
+            foreach (var msg in recentMessages.TakeLast(4))
+            {
+                var role = msg.Role == "user" ? "Użytkownik" : "Asystent";
+                promptBuilder.AppendLine($"{role}: {msg.Content}");
+            }
+            promptBuilder.AppendLine();
         }
         
-        if (lowerMessage.Contains("process") || lowerMessage.Contains("automation"))
-        {
-            return (
-                "Business process automation can be implemented using workflow engines and approval systems. The guidelines recommend starting with medium complexity processes and gradually scaling up. Would you like specific implementation examples?",
-                new SearchResult[]
-                {
-                    new("3", "Business Process Automation Guidelines", "Guidelines for implementing...", 0.82, "files", "process", new Dictionary<string, object>(), DateTime.Now.AddDays(-7), DateTime.Now.AddDays(-1))
-                }
-            );
-        }
+        promptBuilder.AppendLine($"Aktualne pytanie użytkownika: {userMessage}");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine("Odpowiedź:");
         
-        return (
-            "I understand your question. Based on the available knowledge base, I can provide information about Oracle databases, IFS systems, and business processes. Could you please be more specific about what you'd like to know?",
-            null
-        );
+        return promptBuilder.ToString();
     }
 }

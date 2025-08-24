@@ -9,11 +9,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        // Register HTTP clients
+        services.AddHttpClient<ILlmService, LlmService>();
+        
         // Register all feature services
         services.AddScoped<ISearchService, SearchService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<ILlmService, LlmService>();
 
         return services;
     }

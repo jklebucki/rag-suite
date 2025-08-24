@@ -63,6 +63,20 @@ public static class ChatEndpoints
         .WithSummary("Delete a chat session")
         .WithDescription("Delete a chat session and all its messages");
 
+        group.MapGet("/health", async (ILlmService llmService) =>
+        {
+            var isHealthy = await llmService.IsHealthyAsync();
+            var status = new
+            {
+                LlmService = isHealthy ? "Healthy" : "Unhealthy",
+                Timestamp = DateTime.UtcNow
+            };
+            return status.ToApiResponse();
+        })
+        .WithName("ChatHealthCheck")
+        .WithSummary("Check chat service health")
+        .WithDescription("Check the health status of the LLM service");
+
         return endpoints;
     }
 }
