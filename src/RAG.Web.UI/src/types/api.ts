@@ -42,6 +42,21 @@ export interface SearchResponse {
   query: string
 }
 
+// Document Detail Types
+export interface DocumentDetailResponse {
+  id: string
+  title: string
+  content: string
+  fullContent?: string
+  score: number
+  source: string
+  documentType: string
+  metadata: Record<string, any>
+  createdAt: Date
+  updatedAt: Date
+  relatedDocuments?: SearchResult[]
+}
+
 // Chat Types
 export interface ChatMessage {
   id: string

@@ -33,3 +33,17 @@ public record SearchResponse(
     int Took,
     string Query
 );
+
+public record DocumentDetail(
+    string Id,
+    string Title,
+    string Content,
+    string? FullContent,
+    double Score,
+    string Source,
+    string DocumentType,
+    Dictionary<string, object> Metadata,
+    DateTime CreatedAt,
+    DateTime UpdatedAt,
+    SearchResult[]? RelatedDocuments = null
+);

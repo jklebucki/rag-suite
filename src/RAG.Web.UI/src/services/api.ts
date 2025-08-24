@@ -3,6 +3,7 @@ import type {
   ApiResponse,
   SearchQuery,
   SearchResponse,
+  DocumentDetailResponse,
   ChatRequest,
   ChatMessage,
   ChatSession,
@@ -53,6 +54,11 @@ class ApiClient {
   // Search
   async search(query: SearchQuery): Promise<SearchResponse> {
     const response: AxiosResponse<ApiResponse<SearchResponse>> = await this.client.post('/search', query)
+    return response.data.data
+  }
+
+  async getDocumentDetails(documentId: string): Promise<DocumentDetailResponse> {
+    const response: AxiosResponse<ApiResponse<DocumentDetailResponse>> = await this.client.get(`/search/documents/${documentId}`)
     return response.data.data
   }
 

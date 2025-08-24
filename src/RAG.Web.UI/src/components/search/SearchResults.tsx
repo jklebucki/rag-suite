@@ -1,5 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Download, Search } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
+import { DocumentDetail } from './DocumentDetail'
+import { useDocumentDetail } from './hooks/useDocumentDetail'
 import type { SearchResult } from '@/types'
 
 interface SearchResultsProps {
@@ -15,7 +18,19 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ searchResults, isLoading, error, hasSearched, onExport }: SearchResultsProps) {
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
+  const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
+
   console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
+  
+  const renderError = (err: unknown) => {
+    if (!err) return null
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg m-6">
+        <p className="text-red-700">Error loading document details. Please try again.</p>
+      </div>
+    )
+  }
   
   if (isLoading && hasSearched) {
     return (
@@ -72,7 +87,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 
       <div className="divide-y divide-gray-200">
         {searchResults.results.map((result) => (
-          <SearchResultItem key={result.id} result={result} />
+          <SearchResultItem 
+            key={result.id} 
+            result={result} 
+            onViewDetails={() => setSelectedDocumentId(result.id)}
+          />
         ))}
       </div>
 
@@ -82,15 +101,37 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
           <p>No results found for your search query.</p>
         </div>
       )}
+
+      {/* Document Detail Modal */}
+      <Modal 
+        isOpen={!!selectedDocumentId} 
+        onClose={() => setSelectedDocumentId(null)}
+        title="Document Details"
+        size="xl"
+      >
+        {isLoadingDetail && (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading document details...</p>
+          </div>
+        )}
+        
+        {renderError(detailError)}
+        
+        {documentDetail && (
+          <DocumentDetail document={documentDetail} />
+        )}
+      </Modal>
     </div>
   )
 }
 
 interface SearchResultItemProps {
   result: SearchResult
+  onViewDetails: () => void
 }
 
-function SearchResultItem({ result }: SearchResultItemProps) {
+function SearchResultItem({ result, onViewDetails }: SearchResultItemProps) {
   const formatScore = (score: number) => Math.round(score * 100)
 
   return (
@@ -116,7 +157,10 @@ function SearchResultItem({ result }: SearchResultItemProps) {
           <span>{result.source}</span>
           <span>{new Date(result.updatedAt).toLocaleDateString()}</span>
         </div>
-        <button className="text-primary-600 hover:text-primary-700 font-medium">
+        <button 
+          onClick={onViewDetails}
+          className="text-primary-600 hover:text-primary-700 font-medium"
+        >
           View Details
         </button>
       </div>
