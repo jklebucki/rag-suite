@@ -85,3 +85,10 @@ export interface UsageStats {
   topQueries: string[]
   pluginUsage: Record<string, number>
 }
+
+export interface PerformanceMetrics {
+  timestamp: Date
+  responseTime: number
+  activeSessions: number
+  endpoint: string
+}

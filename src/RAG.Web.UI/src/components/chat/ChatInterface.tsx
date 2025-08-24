@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Send, Plus, Trash2, Bot, User, Loader2 } from 'lucide-react'
 import { apiClient } from '@/services/api'
-import type { ChatMessage } from '@/types'
+import type { ChatMessage, ChatRequest } from '@/types'
 
 export function ChatInterface() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
@@ -26,8 +26,8 @@ export function ChatInterface() {
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: (request: { message: string; sessionId?: string }) =>
-      apiClient.sendMessage(request),
+    mutationFn: ({ sessionId, request }: { sessionId: string; request: ChatRequest }) =>
+      apiClient.sendMessage(sessionId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
       setMessage('')
@@ -75,8 +75,11 @@ export function ChatInterface() {
     }
 
     sendMessageMutation.mutate({
-      message: message.trim(),
-      sessionId,
+      sessionId: sessionId!,
+      request: {
+        message: message.trim(),
+        useRag: true,
+      },
     })
   }
 
