@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Features.Analytics;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Analytics;
 
@@ -17,7 +18,7 @@ public static class AnalyticsEndpoints
         {
             var filter = new AnalyticsFilter(startDate, endDate, endpoint);
             var stats = await analyticsService.GetUsageStatsAsync(filter);
-            return Results.Ok(stats);
+            return stats.ToApiResponse();
         })
         .WithName("GetUsageStats")
         .WithSummary("Get usage statistics")
@@ -30,7 +31,7 @@ public static class AnalyticsEndpoints
         {
             var filter = new AnalyticsFilter(startDate, endDate, endpoint);
             var metrics = await analyticsService.GetPerformanceMetricsAsync(filter);
-            return Results.Ok(metrics);
+            return metrics.ToApiResponse();
         })
         .WithName("GetPerformanceMetrics")
         .WithSummary("Get performance metrics")

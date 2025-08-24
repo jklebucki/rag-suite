@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -13,7 +14,7 @@ public static class ChatEndpoints
         group.MapGet("/sessions", async (IChatService chatService) =>
         {
             var sessions = await chatService.GetSessionsAsync();
-            return Results.Ok(sessions);
+            return sessions.ToApiResponse();
         })
         .WithName("GetChatSessions")
         .WithSummary("Get all chat sessions")
@@ -22,7 +23,7 @@ public static class ChatEndpoints
         group.MapPost("/sessions", async (CreateSessionRequest request, IChatService chatService) =>
         {
             var session = await chatService.CreateSessionAsync(request);
-            return Results.Created($"/api/chat/sessions/{session.Id}", session);
+            return session.ToApiCreatedResponse($"/api/chat/sessions/{session.Id}");
         })
         .WithName("CreateChatSession")
         .WithSummary("Create a new chat session")
@@ -31,7 +32,7 @@ public static class ChatEndpoints
         group.MapGet("/sessions/{sessionId}", async (string sessionId, IChatService chatService) =>
         {
             var session = await chatService.GetSessionAsync(sessionId);
-            return session != null ? Results.Ok(session) : Results.NotFound();
+            return session != null ? session.ToApiResponse() : ApiResponseExtensions.ToApiNotFoundResponse<ChatSession>();
         })
         .WithName("GetChatSession")
         .WithSummary("Get a specific chat session")
@@ -42,11 +43,11 @@ public static class ChatEndpoints
             try
             {
                 var message = await chatService.SendMessageAsync(sessionId, request);
-                return Results.Ok(message);
+                return message.ToApiResponse();
             }
             catch (ArgumentException)
             {
-                return Results.NotFound();
+                return ApiResponseExtensions.ToApiNotFoundResponse<ChatMessage>("Session not found");
             }
         })
         .WithName("SendMessage")
@@ -56,7 +57,7 @@ public static class ChatEndpoints
         group.MapDelete("/sessions/{sessionId}", async (string sessionId, IChatService chatService) =>
         {
             var deleted = await chatService.DeleteSessionAsync(sessionId);
-            return deleted ? Results.NoContent() : Results.NotFound();
+            return deleted ? Results.NoContent() : ApiResponseExtensions.ToApiNotFoundResponse<object>("Session not found");
         })
         .WithName("DeleteChatSession")
         .WithSummary("Delete a chat session")

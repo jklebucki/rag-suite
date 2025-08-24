@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Features.Plugins;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Plugins;
 
@@ -13,7 +14,7 @@ public static class PluginEndpoints
         group.MapGet("/", async (IPluginService pluginService) =>
         {
             var plugins = await pluginService.GetPluginsAsync();
-            return Results.Ok(plugins);
+            return plugins.ToApiResponse();
         })
         .WithName("GetPlugins")
         .WithSummary("Get all plugins")
@@ -22,7 +23,7 @@ public static class PluginEndpoints
         group.MapGet("/{pluginId}", async (string pluginId, IPluginService pluginService) =>
         {
             var plugin = await pluginService.GetPluginAsync(pluginId);
-            return plugin != null ? Results.Ok(plugin) : Results.NotFound();
+            return plugin != null ? plugin.ToApiResponse() : ApiResponseExtensions.ToApiNotFoundResponse<PluginInfo>();
         })
         .WithName("GetPlugin")
         .WithSummary("Get a specific plugin")
