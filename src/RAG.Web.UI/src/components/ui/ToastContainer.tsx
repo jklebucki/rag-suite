@@ -17,20 +17,22 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onRemoveToast }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-4 pointer-events-none">
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          id={toast.id}
-          type={toast.type}
-          title={toast.title}
-          message={toast.message}
-          isVisible={true}
-          onClose={() => onRemoveToast(toast.id)}
-          autoClose={toast.autoClose}
-          duration={toast.duration}
-        />
-      ))}
+    <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 w-full max-w-sm lg:max-w-md xl:max-w-lg pointer-events-none">
+      <div className="space-y-4 flex flex-col-reverse">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            id={toast.id}
+            type={toast.type}
+            title={toast.title}
+            message={toast.message}
+            isVisible={true}
+            onClose={() => onRemoveToast(toast.id)}
+            autoClose={toast.autoClose}
+            duration={toast.duration}
+          />
+        ))}
+      </div>
     </div>
   )
 }
