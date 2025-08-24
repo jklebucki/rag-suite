@@ -1,4 +1,6 @@
 using RAG.Orchestrator.Api.Features.Search;
+using System.Text.Json;
+using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
@@ -10,220 +12,188 @@ public interface ISearchService
 
 public class SearchService : ISearchService
 {
-    public Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default)
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<SearchService> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly string _esUrl;
+    private readonly string _esUsername;
+    private readonly string _esPassword;
+    private readonly string _indexName = "rag_knowledge_base";
+
+    public SearchService(HttpClient httpClient, ILogger<SearchService> logger, IConfiguration configuration)
     {
-        // Mock data - replace with actual implementation
-        var results = new SearchResult[]
-        {
-            new("1", "Oracle Database Schema Guide", 
-                "Comprehensive guide to Oracle database schema design and best practices for RAG applications...", 
-                0.95, "oracle", "schema", 
-                new Dictionary<string, object> { {"table_count", 15}, {"size_mb", 250} }, 
-                DateTime.Now.AddDays(-10), DateTime.Now.AddDays(-5)),
-            
-            new("2", "IFS SOP Document - User Management", 
-                "Standard Operating Procedure for user management within IFS system including role assignments...", 
-                0.87, "ifs", "sop", 
-                new Dictionary<string, object> { {"version", "2.1"}, {"department", "IT"} }, 
-                DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-2)),
-            
-            new("3", "Business Process Automation Guidelines", 
-                "Guidelines for implementing business process automation using workflow engines and approval systems...", 
-                0.82, "files", "process", 
-                new Dictionary<string, object> { {"category", "automation"}, {"complexity", "medium"} }, 
-                DateTime.Now.AddDays(-7), DateTime.Now.AddDays(-1))
-        };
-
-        var filteredResults = results.Where(r => 
-            r.Title.Contains(request.Query, StringComparison.OrdinalIgnoreCase) ||
-            r.Content.Contains(request.Query, StringComparison.OrdinalIgnoreCase)
-        ).ToArray();
-
-        var response = new SearchResponse(filteredResults, filteredResults.Length, 45, request.Query);
-        return Task.FromResult(response);
+        _httpClient = httpClient;
+        _logger = logger;
+        _configuration = configuration;
+        _esUrl = configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
+        _esUsername = configuration["Services:Elasticsearch:Username"] ?? "elastic";
+        _esPassword = configuration["Services:Elasticsearch:Password"] ?? "changeme";
+        
+        // Configure HTTP client for Elasticsearch
+        var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_esUsername}:{_esPassword}"));
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
     }
 
-    public Task<DocumentDetail> GetDocumentByIdAsync(string documentId, CancellationToken cancellationToken = default)
+    public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default)
     {
-        // Mock data - replace with actual implementation
-        var documents = new Dictionary<string, DocumentDetail>
+        try
         {
-            ["1"] = new("1", "Oracle Database Schema Guide", 
-                "Comprehensive guide to Oracle database schema design and best practices for RAG applications...",
-                @"# Oracle Database Schema Guide
+            var searchQuery = new
+            {
+                query = new
+                {
+                    multi_match = new
+                    {
+                        query = request.Query,
+                        fields = new[] { "title^2", "content", "category", "tags" },
+                        type = "best_fields",
+                        fuzziness = "AUTO"
+                    }
+                },
+                size = request.Limit,
+                from = request.Offset,
+                _source = new[] { "title", "content", "category", "tags", "created_at" },
+                highlight = new
+                {
+                    fields = new
+                    {
+                        title = new { },
+                        content = new { fragment_size = 150, number_of_fragments = 3 }
+                    }
+                }
+            };
 
-## Overview
-This comprehensive guide covers Oracle database schema design and best practices specifically tailored for Retrieval-Augmented Generation (RAG) applications.
+            var json = JsonSerializer.Serialize(searchQuery);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-## Schema Design Principles
-1. **Normalization**: Follow 3NF rules while considering denormalization for performance
-2. **Indexing Strategy**: Create appropriate indexes for vector search and metadata filtering
-3. **Partitioning**: Use range or hash partitioning for large datasets
+            var response = await _httpClient.PostAsync($"{_esUrl}/{_indexName}/_search", content, cancellationToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Elasticsearch search failed with status {StatusCode}", response.StatusCode);
+                return new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Query);
+            }
 
-## RAG-Specific Considerations
-- Vector storage optimization
-- Metadata indexing for efficient filtering
-- Full-text search integration
-- Temporal data handling for document versioning
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(responseJson);
+            
+            var hits = doc.RootElement.GetProperty("hits");
+            var totalHits = hits.GetProperty("total").GetProperty("value").GetInt32();
+            var took = doc.RootElement.GetProperty("took").GetInt32();
+            
+            var results = new List<SearchResult>();
+            
+            foreach (var hit in hits.GetProperty("hits").EnumerateArray())
+            {
+                var source = hit.GetProperty("_source");
+                var score = hit.GetProperty("_score").GetSingle();
+                var id = hit.GetProperty("_id").GetString() ?? "";
+                
+                var title = source.GetProperty("title").GetString() ?? "";
+                var docContent = source.GetProperty("content").GetString() ?? "";
+                var category = source.TryGetProperty("category", out var categoryProp) ? categoryProp.GetString() ?? "" : "";
+                var type = source.TryGetProperty("tags", out var tagsProp) && tagsProp.ValueKind == JsonValueKind.Array 
+                    ? string.Join(", ", tagsProp.EnumerateArray().Select(t => t.GetString())) : "";
+                
+                var createdAt = source.TryGetProperty("created_at", out var createdProp) 
+                    ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+                    : DateTime.Now;
 
-## Best Practices
-- Use appropriate data types for vectors
-- Implement proper security measures
-- Consider backup and recovery strategies
-- Monitor performance metrics regularly
+                var metadata = new Dictionary<string, object>
+                {
+                    { "category", category },
+                    { "score", score },
+                    { "index", _indexName }
+                };
 
-## Implementation Examples
-[Code examples and detailed implementation guidelines would follow...]",
-                0.95, "oracle", "schema", 
-                new Dictionary<string, object> 
-                { 
-                    {"table_count", 15}, 
-                    {"size_mb", 250},
-                    {"version", "1.2"},
-                    {"author", "Database Team"},
-                    {"complexity", "advanced"}
-                }, 
-                DateTime.Now.AddDays(-10), DateTime.Now.AddDays(-5)),
+                // Add highlights if available
+                if (hit.TryGetProperty("highlight", out var highlight))
+                {
+                    var highlightText = new List<string>();
+                    if (highlight.TryGetProperty("content", out var contentHighlight))
+                    {
+                        foreach (var fragment in contentHighlight.EnumerateArray())
+                        {
+                            highlightText.Add(fragment.GetString() ?? "");
+                        }
+                    }
+                    if (highlightText.Any())
+                    {
+                        metadata["highlights"] = string.Join(" ... ", highlightText);
+                    }
+                }
 
-            ["2"] = new("2", "IFS SOP Document - User Management", 
-                "Standard Operating Procedure for user management within IFS system including role assignments...",
-                @"# IFS SOP Document - User Management
+                results.Add(new SearchResult(
+                    id, title, docContent, score, category, type, metadata, createdAt, DateTime.Now
+                ));
+            }
 
-## Purpose
-This Standard Operating Procedure (SOP) defines the process for managing users within the IFS (Industrial and Financial Systems) environment.
-
-## Scope
-This procedure applies to all IT personnel responsible for user account management and system administrators.
-
-## Responsibilities
-- **IT Administrator**: Account creation and deletion
-- **Department Managers**: User access approval
-- **HR Department**: Employment status updates
-
-## Procedure
-### User Account Creation
-1. Receive authorized request form
-2. Verify employment status with HR
-3. Create user account with appropriate permissions
-4. Send credentials via secure channel
-5. Document account creation in system log
-
-### Role Assignments
-1. Review job role requirements
-2. Map to appropriate IFS roles
-3. Apply role-based access controls
-4. Test access permissions
-5. Document role assignments
-
-## Security Considerations
-- Password complexity requirements
-- Multi-factor authentication setup
-- Regular access reviews
-- Segregation of duties compliance
-
-## Monitoring and Auditing
-- Monthly access reviews
-- Quarterly security assessments
-- Annual compliance audits
-- Real-time monitoring alerts",
-                0.87, "ifs", "sop", 
-                new Dictionary<string, object> 
-                { 
-                    {"version", "2.1"}, 
-                    {"department", "IT"},
-                    {"classification", "internal"},
-                    {"review_date", "2024-12-01"},
-                    {"approver", "IT Manager"}
-                }, 
-                DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-2)),
-
-            ["3"] = new("3", "Business Process Automation Guidelines", 
-                "Guidelines for implementing business process automation using workflow engines and approval systems...",
-                @"# Business Process Automation Guidelines
-
-## Introduction
-This document provides comprehensive guidelines for implementing business process automation within our organization.
-
-## Automation Framework
-Our automation framework consists of:
-- **Workflow Engine**: Central orchestration component
-- **Integration Layer**: API and service connectors
-- **Approval Systems**: Human-in-the-loop processes
-- **Monitoring Dashboard**: Real-time process visibility
-
-## Process Categories
-### Category 1: Fully Automated
-- Document processing
-- Data validation
-- Report generation
-- Notification systems
-
-### Category 2: Semi-Automated
-- Purchase approvals
-- Employee onboarding
-- Contract reviews
-- Quality assessments
-
-### Category 3: Human-Supervised
-- Strategic decisions
-- Exception handling
-- Complex approvals
-- Audit processes
-
-## Implementation Steps
-1. **Process Analysis**
-   - Map current state
-   - Identify bottlenecks
-   - Define success metrics
-
-2. **Design Phase**
-   - Create workflow diagrams
-   - Define decision points
-   - Plan integration points
-
-3. **Development**
-   - Configure workflow engine
-   - Develop custom components
-   - Create monitoring dashboards
-
-4. **Testing**
-   - Unit testing
-   - Integration testing
-   - User acceptance testing
-
-5. **Deployment**
-   - Staged rollout
-   - User training
-   - Go-live support
-
-## Best Practices
-- Start with simple processes
-- Maintain human oversight
-- Regular process reviews
-- Continuous improvement mindset
-
-## Tools and Technologies
-- Workflow Engine: Custom .NET solution
-- Database: Oracle 19c
-- Integration: REST APIs
-- Monitoring: Application Insights",
-                0.82, "files", "process", 
-                new Dictionary<string, object> 
-                { 
-                    {"category", "automation"}, 
-                    {"complexity", "medium"},
-                    {"estimated_hours", 120},
-                    {"priority", "high"},
-                    {"stakeholders", new[] {"IT", "Operations", "Finance"}}
-                }, 
-                DateTime.Now.AddDays(-7), DateTime.Now.AddDays(-1))
-        };
-
-        if (!documents.TryGetValue(documentId, out var document))
-        {
-            throw new KeyNotFoundException($"Document with ID '{documentId}' not found");
+            return new SearchResponse(results.ToArray(), totalHits, took, request.Query);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching Elasticsearch for query: {Query}", request.Query);
+            return new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Query);
+        }
+    }
 
-        return Task.FromResult(document);
+    public async Task<DocumentDetail> GetDocumentByIdAsync(string documentId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_esUrl}/{_indexName}/_doc/{documentId}", cancellationToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new KeyNotFoundException($"Document with ID '{documentId}' not found");
+                }
+                _logger.LogError("Elasticsearch get document failed with status {StatusCode}", response.StatusCode);
+                throw new InvalidOperationException($"Failed to retrieve document: {response.StatusCode}");
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(responseJson);
+            
+            var source = doc.RootElement.GetProperty("_source");
+            var id = doc.RootElement.GetProperty("_id").GetString() ?? documentId;
+            
+            var title = source.GetProperty("title").GetString() ?? "";
+            var content = source.GetProperty("content").GetString() ?? "";
+            var category = source.TryGetProperty("category", out var categoryProp) ? categoryProp.GetString() ?? "" : "";
+            var type = source.TryGetProperty("tags", out var tagsProp) && tagsProp.ValueKind == JsonValueKind.Array 
+                ? string.Join(", ", tagsProp.EnumerateArray().Select(t => t.GetString())) : "";
+            
+            var createdAt = source.TryGetProperty("created_at", out var createdProp) 
+                ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+                : DateTime.Now;
+
+            var metadata = new Dictionary<string, object>
+            {
+                { "category", category },
+                { "index", _indexName },
+                { "document_id", id }
+            };
+
+            // Add all source fields to metadata
+            foreach (var property in source.EnumerateObject())
+            {
+                if (property.Name != "title" && property.Name != "content" && property.Name != "created_at")
+                {
+                    metadata[property.Name] = property.Value.ToString();
+                }
+            }
+
+            return new DocumentDetail(
+                id, title, content, content, // Using content as both summary and full content
+                1.0, category, type, metadata, createdAt, DateTime.Now
+            );
+        }
+        catch (Exception ex) when (!(ex is KeyNotFoundException))
+        {
+            _logger.LogError(ex, "Error retrieving document {DocumentId} from Elasticsearch", documentId);
+            throw new InvalidOperationException($"Failed to retrieve document: {ex.Message}", ex);
+        }
     }
 }

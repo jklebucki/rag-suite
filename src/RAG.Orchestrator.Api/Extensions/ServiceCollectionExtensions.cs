@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     {
         // Register HTTP clients
         services.AddHttpClient<ILlmService, LlmService>();
+        services.AddHttpClient<ISearchService, SearchService>();
         
         // Register all feature services
         services.AddScoped<ISearchService, SearchService>();
