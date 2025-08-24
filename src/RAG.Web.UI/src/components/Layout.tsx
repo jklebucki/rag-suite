@@ -61,12 +61,20 @@ export function Layout({ children }: LayoutProps) {
       <div className="pl-64">
         {/* Top bar */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <button className="p-2 rounded-lg hover:bg-gray-100 lg:hidden">
+          <button
+            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+            aria-label="Open menu"
+            title="Open menu"
+          >
             <Menu className="h-5 w-5" />
           </button>
 
           <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-lg hover:bg-gray-100">
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100"
+              title="User menu"
+              aria-label="User menu"
+            >
               <User className="h-5 w-5" />
             </button>
           </div>
