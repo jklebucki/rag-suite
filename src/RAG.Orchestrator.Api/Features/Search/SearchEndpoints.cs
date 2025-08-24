@@ -20,6 +20,16 @@ public static class SearchEndpoints
         .WithSummary("Search documents")
         .WithDescription("Search for documents in the knowledge base using natural language queries");
 
+        group.MapGet("/", async (string query, int? limit, int? offset, ISearchService searchService) =>
+        {
+            var request = new SearchRequest(query, null, limit ?? 10, offset ?? 0);
+            var response = await searchService.SearchAsync(request);
+            return response.ToApiResponse();
+        })
+        .WithName("SearchDocumentsGet")
+        .WithSummary("Search documents (GET)")
+        .WithDescription("Search for documents using query parameters");
+
         group.MapGet("/documents/{id}", async (string id, ISearchService searchService) =>
         {
             var response = await searchService.GetDocumentByIdAsync(id);

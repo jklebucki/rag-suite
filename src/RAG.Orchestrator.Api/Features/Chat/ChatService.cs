@@ -40,29 +40,55 @@ public class LlmService : ILlmService
     {
         try
         {
-            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 1024);
+            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 200);
             var temperature = _configuration.GetValue<double>("Services:LlmService:Temperature", 0.7);
-            var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
+            var model = _configuration.GetValue<string>("Services:LlmService:Model", "qwen2:0.5b");
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
 
-            var request = new
+            object request;
+            string endpoint;
+
+            if (isOllama)
             {
-                inputs = prompt,
-                parameters = new
+                // Ollama API format
+                request = new
                 {
-                    max_new_tokens = maxTokens,
-                    temperature = temperature,
-                    top_p = topP,
-                    do_sample = true,
-                    return_full_text = false
-                }
-            };
+                    model = model,
+                    prompt = prompt,
+                    stream = false,
+                    options = new
+                    {
+                        temperature = temperature,
+                        num_predict = maxTokens
+                    }
+                };
+                endpoint = "/api/generate";
+            }
+            else
+            {
+                // TGI API format
+                var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
+                request = new
+                {
+                    inputs = prompt,
+                    parameters = new
+                    {
+                        max_new_tokens = maxTokens,
+                        temperature = temperature,
+                        top_p = topP,
+                        do_sample = true,
+                        return_full_text = false
+                    }
+                };
+                endpoint = "/generate";
+            }
 
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             _logger.LogDebug("Sending request to LLM service: {Json}", json);
             
-            var response = await _httpClient.PostAsync("/generate", content, cancellationToken);
+            var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -76,9 +102,27 @@ public class LlmService : ILlmService
             
             using var doc = JsonDocument.Parse(responseJson);
             
-            if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
+            string? result = null;
+            
+            if (isOllama)
             {
-                var result = generatedText.GetString() ?? "Nie udało się wygenerować odpowiedzi.";
+                // Ollama response format
+                if (doc.RootElement.TryGetProperty("response", out var ollamaResponse))
+                {
+                    result = ollamaResponse.GetString();
+                }
+            }
+            else
+            {
+                // TGI response format
+                if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
+                {
+                    result = generatedText.GetString();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(result))
+            {
                 _logger.LogDebug("Extracted generated text: {GeneratedText}", result);
                 return result;
             }
@@ -97,7 +141,10 @@ public class LlmService : ILlmService
     {
         try
         {
-            var response = await _httpClient.GetAsync("/health", cancellationToken);
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            var endpoint = isOllama ? "/api/tags" : "/health";
+            
+            var response = await _httpClient.GetAsync(endpoint, cancellationToken);
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)

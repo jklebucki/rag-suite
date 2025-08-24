@@ -1,0 +1,32 @@
+# Polityki Firmowe - Przykład
+
+## Polityka Bezpieczeństwa IT
+
+### 1. Hasła
+- Minimalna długość: 12 znaków
+- Wymagane: wielkie i małe litery, cyfry, znaki specjalne
+- Zmiana co 90 dni
+- Zakaz używania poprzednich 12 haseł
+
+### 2. Dostęp do Systemów
+- Uwierzytelnianie dwuskładnikowe obowiązkowe
+- Dostęp na zasadzie najmniejszych uprawnień
+- Regularne audyty dostępu
+
+### 3. Bezpieczeństwo Danych
+- Szyfrowanie danych w ruchu i spoczynku
+- Klasyfikacja danych (publiczne, wewnętrzne, poufne, tajne)
+- Backup codziennie, test odtwarzania miesięcznie
+
+## Polityka Pracy Zdalnej
+
+### Wymagania Techniczne
+- VPN do połączenia z siecią firmową
+- Antywirus aktualny na urządzeniu
+- Automatyczne blokowanie ekranu po 10 min
+
+### Bezpieczeństwo
+- Zakaz pracy w miejscach publicznych z danymi poufnymi
+- Używanie słuchawek podczas rozmów biznesowych
+- Zabezpieczenie fizyczne urządzenia
+
