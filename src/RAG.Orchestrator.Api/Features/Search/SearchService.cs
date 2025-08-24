@@ -18,7 +18,7 @@ public class SearchService : ISearchService
     private readonly string _esUrl;
     private readonly string _esUsername;
     private readonly string _esPassword;
-    private readonly string _indexName = "rag_knowledge_base";
+    private readonly string _indexName = "rag_documents";
 
     public SearchService(HttpClient httpClient, ILogger<SearchService> logger, IConfiguration configuration)
     {
@@ -45,19 +45,19 @@ public class SearchService : ISearchService
                     multi_match = new
                     {
                         query = request.Query,
-                        fields = new[] { "title^2", "content", "category", "tags" },
+                        fields = new[] { "fileName^2", "content", "fileType" },
                         type = "best_fields",
                         fuzziness = "AUTO"
                     }
                 },
                 size = request.Limit,
                 from = request.Offset,
-                _source = new[] { "title", "content", "category", "tags", "created_at" },
+                _source = new[] { "fileName", "content", "fileType", "chunkIndex", "documentId", "createdAt" },
                 highlight = new
                 {
                     fields = new
                     {
-                        title = new { },
+                        fileName = new { },
                         content = new { fragment_size = 150, number_of_fragments = 3 }
                     }
                 }
@@ -89,13 +89,12 @@ public class SearchService : ISearchService
                 var score = hit.GetProperty("_score").GetSingle();
                 var id = hit.GetProperty("_id").GetString() ?? "";
                 
-                var title = source.GetProperty("title").GetString() ?? "";
-                var docContent = source.GetProperty("content").GetString() ?? "";
-                var category = source.TryGetProperty("category", out var categoryProp) ? categoryProp.GetString() ?? "" : "";
-                var type = source.TryGetProperty("tags", out var tagsProp) && tagsProp.ValueKind == JsonValueKind.Array 
-                    ? string.Join(", ", tagsProp.EnumerateArray().Select(t => t.GetString())) : "";
+                var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
+                var docContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
+                var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
+                var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
                 
-                var createdAt = source.TryGetProperty("created_at", out var createdProp) 
+                var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
                     ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
                     : DateTime.Now;
 
@@ -159,13 +158,12 @@ public class SearchService : ISearchService
             var source = doc.RootElement.GetProperty("_source");
             var id = doc.RootElement.GetProperty("_id").GetString() ?? documentId;
             
-            var title = source.GetProperty("title").GetString() ?? "";
-            var content = source.GetProperty("content").GetString() ?? "";
-            var category = source.TryGetProperty("category", out var categoryProp) ? categoryProp.GetString() ?? "" : "";
-            var type = source.TryGetProperty("tags", out var tagsProp) && tagsProp.ValueKind == JsonValueKind.Array 
-                ? string.Join(", ", tagsProp.EnumerateArray().Select(t => t.GetString())) : "";
+            var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
+            var content = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
+            var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
+            var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
             
-            var createdAt = source.TryGetProperty("created_at", out var createdProp) 
+            var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
                 ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
                 : DateTime.Now;
 
@@ -179,7 +177,7 @@ public class SearchService : ISearchService
             // Add all source fields to metadata
             foreach (var property in source.EnumerateObject())
             {
-                if (property.Name != "title" && property.Name != "content" && property.Name != "created_at")
+                if (property.Name != "fileName" && property.Name != "content" && property.Name != "createdAt")
                 {
                     metadata[property.Name] = property.Value.ToString();
                 }
