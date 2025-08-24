@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
+import { useToastContext } from '@/contexts/ToastContext'
 import type { ChatRequest } from '@/types'
 
 export function useChat() {
@@ -10,6 +11,7 @@ export function useChat() {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
+  const { showError, showSuccess } = useToastContext()
 
   // Get chat sessions
   const { data: sessions = [] } = useQuery({
@@ -33,6 +35,11 @@ export function useChat() {
       setMessage('')
       setIsTyping(false)
     },
+    onError: (error) => {
+      console.error('Failed to send message:', error)
+      showError('Failed to send message', 'Please check your connection and try again')
+      setIsTyping(false)
+    },
   })
 
   // Create new session mutation
@@ -42,9 +49,11 @@ export function useChat() {
       console.log('Session created:', newSession)
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setCurrentSessionId(newSession.id)
+      showSuccess('Chat session created', 'New conversation started successfully')
     },
     onError: (error) => {
       console.error('Failed to create session:', error)
+      showError('Failed to create chat session', 'Please try again later')
     },
   })
 
@@ -56,6 +65,11 @@ export function useChat() {
       if (currentSessionId && deleteSessionMutation.variables === currentSessionId) {
         setCurrentSessionId(null)
       }
+      showSuccess('Chat session deleted', 'Conversation has been removed successfully')
+    },
+    onError: (error) => {
+      console.error('Failed to delete session:', error)
+      showError('Failed to delete chat session', 'Please try again later')
     },
   })
 

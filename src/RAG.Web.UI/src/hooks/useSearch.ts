@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
+import { useToastContext } from '@/contexts/ToastContext'
 
 export function useSearch() {
   const [query, setQuery] = useState('')
@@ -11,6 +12,7 @@ export function useSearch() {
   })
   const [isAdvancedMode, setIsAdvancedMode] = useState(false)
   const [hasSearched, setHasSearched] = useState(false) // Track if user has initiated search
+  const { showError, showSuccess } = useToastContext()
 
   const hasFilters = () => {
     return filters.documentType || filters.source || filters.dateRange
@@ -101,6 +103,10 @@ export function useSearch() {
       a.download = `search-results-${new Date().toISOString().split('T')[0]}.csv`
       a.click()
       window.URL.revokeObjectURL(url)
+      
+      showSuccess('Search results exported', `Downloaded ${searchResults.results.length} results as CSV`)
+    } else {
+      showError('Export failed', 'No search results to export')
     }
   }
 

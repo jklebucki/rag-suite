@@ -1,7 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { apiClient } from '@/services/api'
+import { useToastContext } from '@/contexts/ToastContext'
 
 export function useDashboard() {
+  const { showError } = useToastContext()
+  
   // Get usage statistics
   const { data: stats, isLoading: isStatsLoading, error: statsError } = useQuery({
     queryKey: ['usage-stats'],
@@ -14,6 +18,19 @@ export function useDashboard() {
     queryKey: ['plugins'],
     queryFn: () => apiClient.getPlugins(),
   })
+
+  // Show error notifications
+  useEffect(() => {
+    if (statsError) {
+      showError('Failed to load usage statistics', 'Dashboard data may be incomplete')
+    }
+  }, [statsError, showError])
+
+  useEffect(() => {
+    if (pluginsError) {
+      showError('Failed to load plugins data', 'Plugin information may be unavailable')
+    }
+  }, [pluginsError, showError])
 
   // Computed values
   const activePlugins = plugins?.filter(p => p.enabled) || []
