@@ -1,0 +1,63 @@
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: es
+    environment:
+      - node.name=es-node
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=changeme
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:changeme http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.3
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  # Ollama for ARM64/Apple Silicon compatibility
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-service
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+
+  # Text embeddings using sentence-transformers (ARM64 compatible)
+  embedding-service:
+    image: python:3.11-slim
+    container_name: embedding-service
+    ports:
+      - "8580:8580"
+    volumes:
+      - ./embedding-service:/app
+    working_dir: /app
+    command: >
+      sh -c "
+        pip install sentence-transformers flask flask-cors torch &&
+        python app.py
+      "
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

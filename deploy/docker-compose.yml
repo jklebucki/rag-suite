@@ -32,25 +32,29 @@ services:
   embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     container_name: embedding-service
+    volumes:
+      - embedding-data:/data
+    platform: linux/amd64
     environment:
-      - MODEL_ID=intfloat/multilingual-e5-base
+      - MODEL_ID=sentence-transformers/all-MiniLM-L6-v2
     ports:
       - "8580:80"
     command:
       - --model-id
-      - "intfloat/multilingual-e5-base"
+      - "sentence-transformers/all-MiniLM-L6-v2"
     depends_on:
       - elasticsearch
 
   llm-service:
     image: ghcr.io/huggingface/text-generation-inference:2.2.0
     container_name: llm-service
+    platform: linux/amd64
     environment:
-      - MODEL_ID=microsoft/DialoGPT-medium
+      - MODEL_ID=gpt2
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
-      - MAX_TOTAL_TOKENS=4096
-      - MAX_INPUT_LENGTH=3072
-      - MAX_BATCH_PREFILL_TOKENS=4096
+      - MAX_TOTAL_TOKENS=1024
+      - MAX_INPUT_LENGTH=768
+      - MAX_BATCH_PREFILL_TOKENS=1024
     ports:
       - "8581:80"
     volumes:
@@ -73,3 +77,4 @@ services:
 
 volumes:
   llm_cache:
+  embedding-data:

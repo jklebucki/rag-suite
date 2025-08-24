@@ -46,6 +46,7 @@ show_help() {
     echo "  build-api     Build and run the Orchestrator API"
     echo "  build-ui      Build and run the Web UI"
     echo "  monitor       Start monitoring dashboard"
+    echo "  config        Change environment configuration"
     echo "  help          Show this help message"
     echo
     echo "Services: elasticsearch, kibana, embedding-service, llm-service"
@@ -105,6 +106,20 @@ restart_services() {
 show_status() {
     print_status "RAG Suite Services Status:"
     cd ../deploy
+    
+    # Show current environment configuration
+    if [ -f ".env" ]; then
+        echo
+        echo "Current Configuration:"
+        if grep -q "LLM_MODEL_ID" .env; then
+            model=$(grep "LLM_MODEL_ID" .env | cut -d'=' -f2)
+            llm_memory=$(grep "LLM_MAX_MEMORY" .env | cut -d'=' -f2 2>/dev/null || echo "4g")
+            es_memory=$(grep "ES_JAVA_OPTS" .env | grep -o 'Xmx[0-9]*[gm]' | cut -d'x' -f2 || echo "2g")
+            echo "  • LLM Model: $model"
+            echo "  • LLM Memory: $llm_memory"
+            echo "  • Elasticsearch Memory: $es_memory"
+        fi
+    fi
     
     echo
     echo "Container Status:"
@@ -277,6 +292,100 @@ monitor_resources() {
     done
 }
 
+change_config() {
+    print_status "Environment Configuration Manager"
+    cd ../deploy
+    
+    echo
+    echo "Available configurations:"
+    echo "  1) local      - Minimal RAM (4GB total)  - DialoGPT-small"
+    echo "  2) development- Balanced dev (8GB total) - DialoGPT-medium"
+    echo "  3) default    - Standard (9GB total)     - DialoGPT-medium"
+    echo "  4) production - Full power (14GB total)  - DialoGPT-large"
+    echo "  5) custom     - Edit current configuration"
+    echo "  6) show       - Show current configuration"
+    echo
+    
+    if [ -f ".env" ]; then
+        current_model=$(grep "LLM_MODEL_ID" .env | cut -d'=' -f2 2>/dev/null || echo "unknown")
+        current_llm_mem=$(grep "LLM_MAX_MEMORY" .env | cut -d'=' -f2 2>/dev/null || echo "unknown")
+        current_es_mem=$(grep "ES_JAVA_OPTS" .env | grep -o 'Xmx[0-9]*[gm]' | cut -d'x' -f2 2>/dev/null || echo "unknown")
+        echo "Current: Model=$current_model, LLM RAM=$current_llm_mem, ES RAM=$current_es_mem"
+    fi
+    
+    echo
+    read -p "Choose configuration (1-6): " -n 1 -r
+    echo
+    
+    case $REPLY in
+        1)
+            if [ -f ".env.local" ]; then
+                cp .env.local .env
+                print_success "Switched to local configuration"
+            else
+                print_error ".env.local not found"
+            fi
+            ;;
+        2)
+            if [ -f ".env.development" ]; then
+                cp .env.development .env
+                print_success "Switched to development configuration"
+            else
+                print_error ".env.development not found"
+            fi
+            ;;
+        3)
+            if [ -f ".env.template" ]; then
+                cp .env.template .env
+                print_success "Switched to default configuration"
+            else
+                print_error ".env.template not found"
+            fi
+            ;;
+        4)
+            if [ -f ".env.production" ]; then
+                cp .env.production .env
+                print_warning "Switched to production configuration"
+                print_warning "Remember to update passwords and secrets!"
+            else
+                print_error ".env.production not found"
+            fi
+            ;;
+        5)
+            if command -v nano >/dev/null 2>&1; then
+                nano .env
+            elif command -v vim >/dev/null 2>&1; then
+                vim .env
+            else
+                print_status "Opening .env in default editor..."
+                ${EDITOR:-vi} .env
+            fi
+            ;;
+        6)
+            if [ -f ".env" ]; then
+                echo
+                echo "Current configuration (.env):"
+                echo "================================"
+                grep -E "^[A-Z].*=" .env | head -20
+            else
+                print_error "No .env file found"
+            fi
+            ;;
+        *)
+            print_error "Invalid choice"
+            ;;
+    esac
+    
+    if [[ $REPLY =~ ^[1-4]$ ]]; then
+        echo
+        read -p "Restart services with new configuration? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            restart_services
+        fi
+    fi
+}
+
 # Main script logic
 case "$1" in
     setup)
@@ -311,6 +420,9 @@ case "$1" in
         ;;
     monitor)
         monitor_resources
+        ;;
+    config)
+        change_config
         ;;
     help|--help|-h)
         show_help

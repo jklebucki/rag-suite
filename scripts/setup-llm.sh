@@ -91,32 +91,43 @@ setup_environment() {
     ENV_FILE="../deploy/.env"
     
     if [ ! -f "$ENV_FILE" ]; then
-        cat > "$ENV_FILE" << EOF
-# RAG Suite Environment Configuration
-
-# Elasticsearch Configuration
-ELASTIC_PASSWORD=changeme
-ES_JAVA_OPTS=-Xms1g -Xmx1g
-
-# Hugging Face Token (optional, for accessing gated models)
-# Get your token from: https://huggingface.co/settings/tokens
-HF_TOKEN=
-
-# LLM Configuration
-LLM_MODEL_ID=microsoft/DialoGPT-medium
-MAX_TOTAL_TOKENS=4096
-MAX_INPUT_LENGTH=3072
-
-# API Configuration
-ORCHESTRATOR_API_URL=http://localhost:7107
-ELASTICSEARCH_URL=http://localhost:9200
-EMBEDDING_SERVICE_URL=http://localhost:8580
-LLM_SERVICE_URL=http://localhost:8581
-EOF
+        # Check if user wants a specific environment
+        if [ -f "../deploy/.env.development" ]; then
+            print_status "Found development environment template"
+            read -p "Use development environment? (Y/n): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Nn]$ ]]; then
+                cp "../deploy/.env.template" "$ENV_FILE"
+                print_warning "Using template - please customize $ENV_FILE"
+            else
+                cp "../deploy/.env.development" "$ENV_FILE"
+                print_success "Using development environment configuration"
+            fi
+        else
+            cp "../deploy/.env.template" "$ENV_FILE"
+            print_warning "Created $ENV_FILE from template - please customize it"
+        fi
+        
         print_success "Environment file created at $ENV_FILE"
-        print_warning "Please review and update the .env file with your specific configuration"
+        print_warning "Review and update the .env file with your specific configuration"
+        echo "Available configurations:"
+        echo "  • .env.local - Minimal RAM usage (4GB total)"
+        echo "  • .env.development - Balanced for development (8GB total)"  
+        echo "  • .env - Default balanced setup (9GB total)"
+        echo "  • .env.production - Full performance (14GB total)"
     else
         print_success "Environment file already exists"
+        
+        # Show current model and memory settings
+        if grep -q "LLM_MODEL_ID" "$ENV_FILE"; then
+            model=$(grep "LLM_MODEL_ID" "$ENV_FILE" | cut -d'=' -f2)
+            memory=$(grep "LLM_MAX_MEMORY" "$ENV_FILE" | cut -d'=' -f2 || echo "not set")
+            es_memory=$(grep "ES_JAVA_OPTS" "$ENV_FILE" | cut -d'=' -f2 || echo "not set")
+            print_status "Current configuration:"
+            echo "  • LLM Model: $model"
+            echo "  • LLM Memory: $memory" 
+            echo "  • Elasticsearch Memory: $es_memory"
+        fi
     fi
 }
 

@@ -9,17 +9,34 @@ cd scripts
 # 2. Uruchom pełną konfigurację środowiska
 ./rag-manager.sh setup
 
-# 3. Sprawdź status
+# 3. (Opcjonalnie) Wybierz konfigurację środowiska
+./rag-manager.sh config
+
+# 4. Sprawdź status
 ./rag-manager.sh status
 
-# 4. Uruchom API (w nowym terminalu)
+# 5. Uruchom API (w nowym terminalu)
 ./rag-manager.sh build-api
 
-# 5. Uruchom frontend (w nowym terminalu)
+# 6. Uruchom frontend (w nowym terminalu)
 ./rag-manager.sh build-ui
 
-# 6. Przetestuj integrację
+# 7. Przetestuj integrację
 ./rag-manager.sh test
+```
+
+## 📁 Dostępne konfiguracje środowiska
+
+| Plik | RAM | Model LLM | Przeznaczenie |
+|------|-----|-----------|---------------|
+| `.env.local` | 4GB | DialoGPT-small | Szybkie testy |
+| `.env.development` | 8GB | DialoGPT-medium | Development |
+| `.env` | 9GB | DialoGPT-medium | Standard (16GB) |
+| `.env.production` | 14GB | DialoGPT-large | Produkcja |
+
+### Zmiana konfiguracji:
+```bash
+./rag-manager.sh config
 ```
 
 ## 📁 Dodane pliki
@@ -59,6 +76,7 @@ cd scripts
 ### Zarządzanie aplikacją
 - `build-api` - Buduj i uruchom API
 - `build-ui` - Buduj i uruchom frontend
+- `config` - Zmień konfigurację środowiska
 
 ### Diagnostyka
 - `test` - Uruchom testy integracji
