@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
@@ -13,7 +14,7 @@ public static class SearchEndpoints
         group.MapPost("/", async (SearchRequest request, ISearchService searchService) =>
         {
             var response = await searchService.SearchAsync(request);
-            return Results.Ok(response);
+            return response.ToApiResponse();
         })
         .WithName("SearchDocuments")
         .WithSummary("Search documents")

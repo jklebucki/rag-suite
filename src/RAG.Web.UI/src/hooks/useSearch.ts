@@ -32,7 +32,13 @@ export function useSearch() {
           limit: 20,
         })
         console.log('🔍 Search results:', result)
-        return result
+        // Ensure we always return a valid SearchResponse object
+        return result || {
+          results: [],
+          total: 0,
+          took: 0,
+          query: query
+        }
       } catch (error) {
         console.error('🔍 Search error:', error)
         throw error
