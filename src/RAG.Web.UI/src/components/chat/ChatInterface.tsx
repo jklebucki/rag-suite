@@ -139,6 +139,7 @@ export function ChatInterface() {
                     handleDeleteSession(session.id)
                   }}
                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-100 text-red-600 transition-opacity"
+                  title="Delete chat session"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
