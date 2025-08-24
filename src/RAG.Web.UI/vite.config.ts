@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': './src',
+      '@': '/Users/jklebucki/Projects/rag-suite/src/RAG.Web.UI/src',
     },
   },
   server: {
