@@ -7,6 +7,7 @@ export function useChat() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
 
@@ -92,9 +93,18 @@ export function useChat() {
   }
 
   const handleDeleteSession = (sessionId: string) => {
-    if (confirm('Are you sure you want to delete this chat session?')) {
-      deleteSessionMutation.mutate(sessionId)
+    setSessionToDelete(sessionId)
+  }
+
+  const confirmDeleteSession = () => {
+    if (sessionToDelete) {
+      deleteSessionMutation.mutate(sessionToDelete)
+      setSessionToDelete(null)
     }
+  }
+
+  const cancelDeleteSession = () => {
+    setSessionToDelete(null)
   }
 
   // Auto-scroll to bottom
@@ -108,6 +118,7 @@ export function useChat() {
     message,
     isTyping,
     messagesEndRef,
+    sessionToDelete,
     
     // Data
     sessions,
@@ -122,6 +133,8 @@ export function useChat() {
     handleSendMessage,
     handleNewSession,
     handleDeleteSession,
+    confirmDeleteSession,
+    cancelDeleteSession,
     setMessage,
     setCurrentSessionId,
   }

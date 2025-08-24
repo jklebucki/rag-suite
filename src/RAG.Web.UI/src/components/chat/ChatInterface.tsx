@@ -3,6 +3,7 @@ import { Bot, User, Loader2 } from 'lucide-react'
 import { useChat } from '@/hooks/useChat'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { ChatMessage } from '@/types'
 
 export function ChatInterface() {
@@ -11,13 +12,17 @@ export function ChatInterface() {
     message,
     isTyping,
     messagesEndRef,
+    sessionToDelete,
     sessions,
     currentSession,
     sendMessageMutation,
     createSessionMutation,
+    deleteSessionMutation,
     handleSendMessage,
     handleNewSession,
     handleDeleteSession,
+    confirmDeleteSession,
+    cancelDeleteSession,
     setMessage,
     setCurrentSessionId,
   } = useChat()
@@ -84,6 +89,19 @@ export function ChatInterface() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!sessionToDelete}
+        onClose={cancelDeleteSession}
+        onConfirm={confirmDeleteSession}
+        title="Delete Chat Session"
+        message="Are you sure you want to delete this chat session? This action cannot be undone and all messages in this conversation will be permanently lost."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={deleteSessionMutation.isPending}
+      />
     </div>
   )
 }
