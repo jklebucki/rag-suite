@@ -10,12 +10,13 @@ export function useSearch() {
     dateRange: '',
   })
   const [isAdvancedMode, setIsAdvancedMode] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false) // Track if user has initiated search
 
   const hasFilters = () => {
     return filters.documentType || filters.source || filters.dateRange
   }
 
-  // Search query
+  // Search query - only enabled after user clicks search
   const {
     data: searchResults,
     isLoading,
@@ -23,16 +24,36 @@ export function useSearch() {
     refetch,
   } = useQuery({
     queryKey: ['search', query, filters],
-    queryFn: () => apiClient.search({
-      query,
-      limit: 20,
-    }),
-    enabled: query.length > 0,
+    queryFn: async () => {
+      console.log('🔍 Searching for:', query)
+      try {
+        const result = await apiClient.search({
+          query,
+          limit: 20,
+        })
+        console.log('🔍 Search results:', result)
+        return result
+      } catch (error) {
+        console.error('🔍 Search error:', error)
+        throw error
+      }
+    },
+    enabled: false, // Never auto-execute, only manual refetch
   })
+
+  const handleQueryChange = (newQuery: string) => {
+    setQuery(newQuery)
+    // Reset search state when query is cleared
+    if (!newQuery.trim()) {
+      setHasSearched(false)
+    }
+  }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('🔍 Handle search triggered, query:', query)
     if (query.trim()) {
+      setHasSearched(true)
       refetch()
     }
   }
@@ -82,6 +103,7 @@ export function useSearch() {
     query,
     filters,
     isAdvancedMode,
+    hasSearched,
     
     // Data
     searchResults,
@@ -89,7 +111,7 @@ export function useSearch() {
     error,
     
     // Actions
-    setQuery,
+    setQuery: handleQueryChange,
     setIsAdvancedMode,
     handleSearch,
     handleFilterChange,

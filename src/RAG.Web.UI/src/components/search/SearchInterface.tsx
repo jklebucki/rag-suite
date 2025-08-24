@@ -8,6 +8,7 @@ export function SearchInterface() {
     query,
     filters,
     isAdvancedMode,
+    hasSearched,
     searchResults,
     isLoading,
     error,
@@ -34,6 +35,7 @@ export function SearchInterface() {
         searchResults={searchResults}
         isLoading={isLoading}
         error={error}
+        hasSearched={hasSearched}
         onExport={exportResults}
       />
     </div>

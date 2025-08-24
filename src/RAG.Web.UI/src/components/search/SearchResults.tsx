@@ -10,11 +10,14 @@ interface SearchResultsProps {
   }
   isLoading: boolean
   error: any
+  hasSearched: boolean
   onExport: () => void
 }
 
-export function SearchResults({ searchResults, isLoading, error, onExport }: SearchResultsProps) {
-  if (isLoading) {
+export function SearchResults({ searchResults, isLoading, error, hasSearched, onExport }: SearchResultsProps) {
+  console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
+  
+  if (isLoading && hasSearched) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
@@ -23,10 +26,27 @@ export function SearchResults({ searchResults, isLoading, error, onExport }: Sea
     )
   }
 
-  if (error) {
+  if (error && hasSearched) {
+    console.error('🔍 Search error in component:', error)
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <p className="text-red-700">Error occurred while searching. Please try again.</p>
+        <details className="mt-2">
+          <summary className="cursor-pointer text-sm">Error details</summary>
+          <pre className="text-xs mt-1 text-red-600">{JSON.stringify(error, null, 2)}</pre>
+        </details>
+      </div>
+    )
+  }
+
+  if (!hasSearched) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border p-8">
+        <div className="text-center text-gray-500">
+          <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to Search</h3>
+          <p>Enter your search query and click the search button to find relevant documents.</p>
+        </div>
       </div>
     )
   }
