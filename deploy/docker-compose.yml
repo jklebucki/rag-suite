@@ -9,8 +9,11 @@ services:
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=changeme
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
     ports:
       - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD-SHELL", "curl -s -u elastic:changeme http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
       interval: 30s
@@ -46,35 +49,47 @@ services:
       - elasticsearch
 
   llm-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.2.0
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0
     container_name: llm-service
+    volumes:
+      - llm-data:/data
     platform: linux/amd64
     environment:
       - MODEL_ID=gpt2
-      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
-      - MAX_TOTAL_TOKENS=1024
-      - MAX_INPUT_LENGTH=768
-      - MAX_BATCH_PREFILL_TOKENS=1024
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
     ports:
       - "8581:80"
-    volumes:
-      - llm_cache:/data
     command:
       - --model-id
-      - "microsoft/DialoGPT-medium"
-      - --port
-      - "80"
-      - --hostname
-      - "0.0.0.0"
+      - "gpt2"
+      - --max-input-length
+      - "512"
+      - --max-total-tokens
+      - "1024"
+    depends_on:
+      - elasticsearch
+
+  ollama-service:
+    image: ollama/ollama:latest
+    container_name: ollama-service
+    platform: linux/arm64  # Apple Silicon optimized
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
     depends_on:
       - elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 120s
 
 volumes:
-  llm_cache:
+  elasticsearch-data:
+  ollama_data:
   embedding-data:
+  llm-data:

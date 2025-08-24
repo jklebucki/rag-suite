@@ -40,7 +40,7 @@ public class LlmService : ILlmService
     {
         try
         {
-            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 4096);
+            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 1024);
             var temperature = _configuration.GetValue<double>("Services:LlmService:Temperature", 0.7);
             var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
 
@@ -60,29 +60,36 @@ public class LlmService : ILlmService
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            _logger.LogDebug("Sending request to LLM service: {Json}", json);
+            
             var response = await _httpClient.PostAsync("/generate", content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("LLM service returned error: {StatusCode}", response.StatusCode);
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("LLM service returned error: {StatusCode}, Content: {ErrorContent}", response.StatusCode, errorContent);
                 return "Przepraszam, wystąpił problem z generowaniem odpowiedzi. Spróbuj ponownie.";
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogDebug("Received response from LLM service: {ResponseJson}", responseJson);
+            
             using var doc = JsonDocument.Parse(responseJson);
             
             if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
             {
-                return generatedText.GetString() ?? "Nie udało się wygenerować odpowiedzi.";
+                var result = generatedText.GetString() ?? "Nie udało się wygenerować odpowiedzi.";
+                _logger.LogDebug("Extracted generated text: {GeneratedText}", result);
+                return result;
             }
 
-            _logger.LogWarning("Unexpected response format from LLM service");
+            _logger.LogWarning("Unexpected response format from LLM service. Response: {ResponseJson}", responseJson);
             return "Otrzymano niepoprawną odpowiedź z serwisu LLM.";
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating response from LLM service");
-            return "Wystąpił błąd podczas generowania odpowiedzi. Spróbuj ponownie.";
+            _logger.LogError(ex, "Error calling LLM service");
+            return "Wystąpił błąd podczas komunikacji z serwisem LLM.";
         }
     }
 
@@ -93,8 +100,9 @@ public class LlmService : ILlmService
             var response = await _httpClient.GetAsync("/health", cancellationToken);
             return response.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Health check failed for LLM service");
             return false;
         }
     }
