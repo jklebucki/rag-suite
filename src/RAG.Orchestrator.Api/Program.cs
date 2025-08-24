@@ -12,6 +12,13 @@ builder.Services
     .AddSwaggerDocumentation()
     .AddCorsPolicy();
 
+// Configure HTTPS redirection
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 7108; // Port HTTPS z launchSettings.json
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -25,8 +32,11 @@ if (app.Environment.IsDevelopment())
     });
     app.UseCors("AllowFrontend");
 }
-
-app.UseHttpsRedirection();
+else
+{
+    // Użyj HTTPS redirection tylko w środowisku produkcyjnym
+    app.UseHttpsRedirection();
+}
 
 // Map feature endpoints
 app.MapSearchEndpoints();
