@@ -1,30 +1,40 @@
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
 import {
   MessageSquare,
   Search,
   Activity,
   Zap
 } from 'lucide-react'
-import { apiClient } from '@/services/api'
+import { useDashboard } from '@/hooks/useDashboard'
 import { StatsCard } from './StatsCard'
 import { TopQueries } from './TopQueries'
 import { PluginsStatus } from './PluginsStatus'
 import { SystemHealth } from './SystemHealth'
 
 export function Dashboard() {
-  const { data: stats } = useQuery({
-    queryKey: ['usage-stats'],
-    queryFn: () => apiClient.getUsageStats(),
-    refetchInterval: 30000, // Refresh every 30 seconds
-  })
+  const {
+    stats,
+    plugins,
+    statsCards,
+    isLoading,
+    hasError,
+  } = useDashboard()
 
-  const { data: plugins } = useQuery({
-    queryKey: ['plugins'],
-    queryFn: () => apiClient.getPlugins(),
-  })
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
 
-  const activePlugins = plugins?.filter(p => p.enabled) || []
+  if (hasError) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Error loading dashboard data</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -37,34 +47,19 @@ export function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title="Total Queries"
-          value={stats?.totalQueries?.toLocaleString() || '0'}
-          icon={Search}
-          trend="+12%"
-          trendUp={true}
-        />
-        <StatsCard
-          title="Chat Sessions"
-          value={stats?.totalSessions?.toLocaleString() || '0'}
-          icon={MessageSquare}
-          trend="+8%"
-          trendUp={true}
-        />
-        <StatsCard
-          title="Avg Response Time"
-          value={`${stats?.avgResponseTime || 0}ms`}
-          icon={Zap}
-          trend="-5%"
-          trendUp={true}
-        />
-        <StatsCard
-          title="Active Plugins"
-          value={activePlugins.length.toString()}
-          icon={Activity}
-          trend={`${plugins?.length || 0} total`}
-          trendUp={null}
-        />
+        {statsCards.map((card, index) => {
+          const icons = [Search, MessageSquare, Zap, Activity]
+          return (
+            <StatsCard
+              key={card.title}
+              title={card.title}
+              value={card.value}
+              icon={icons[index]}
+              trend={card.trend}
+              trendUp={card.trendUp}
+            />
+          )
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
