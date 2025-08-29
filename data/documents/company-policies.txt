@@ -29,4 +29,3 @@
 - Zakaz pracy w miejscach publicznych z danymi poufnymi
 - Używanie słuchawek podczas rozmów biznesowych
 - Zabezpieczenie fizyczne urządzenia
-

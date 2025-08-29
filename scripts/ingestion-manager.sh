@@ -2,7 +2,9 @@
 
 # RAG Ingestion Management Script
 
-PROJECT_ROOT="/Users/jklebucki/Projects/rag-suite"
+# Get script directory and project root in a cross-platform way
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 INGESTION_PROJECT="$PROJECT_ROOT/src/RAG.Ingestion.Worker"
 DOCUMENTS_PATH="$PROJECT_ROOT/data/documents"
 

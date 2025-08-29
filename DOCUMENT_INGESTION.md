@@ -19,7 +19,7 @@ System automatycznie rozpoznaje i przetwarza:
 
 Dodaj pliki do folderu:
 ```
-/Users/jklebucki/Projects/rag-suite/data/documents/
+<project-root>/data/documents/
 ```
 
 ### 3. Automatyczne przetwarzanie
@@ -27,11 +27,14 @@ Dodaj pliki do folderu:
 Po dodaniu plików uruchom ingestion worker:
 
 ```bash
-# Build i uruchom worker
-/Users/jklebucki/Projects/rag-suite/scripts/ingestion-manager.sh run
+# Na Linux/macOS:
+./scripts/ingestion-manager.sh run
+
+# Na Windows:
+.\scripts\ingestion-manager.ps1 -Command run
 
 # Albo manualnie:
-cd /Users/jklebucki/Projects/rag-suite/src/RAG.Ingestion.Worker
+cd src/RAG.Ingestion.Worker
 dotnet run
 ```
 

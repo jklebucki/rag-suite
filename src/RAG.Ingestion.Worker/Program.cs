@@ -4,12 +4,20 @@ using RAG.Connectors.Files;
 using RAG.Ingestion.Worker;
 using RAG.Ingestion.Worker.Models;
 using RAG.Ingestion.Worker.Services;
+using RAG.Shared;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 // Configure settings
 var ingestionSettings = new IngestionSettings();
 builder.Configuration.GetSection("Ingestion").Bind(ingestionSettings);
+
+// Use PathHelper to resolve the documents path
+if (!string.IsNullOrEmpty(ingestionSettings.DocumentsPath))
+{
+    ingestionSettings.DocumentsPath = PathHelper.GetDocumentsPath(builder.Configuration);
+}
+
 builder.Services.AddSingleton(ingestionSettings);
 
 // Configure Elasticsearch with authentication
@@ -32,5 +40,4 @@ builder.Services.AddTransient<IDocumentIngestionService, DocumentIngestionServic
 builder.Services.AddHostedService<Worker>();
 
 var host = builder.Build();
-host.Run();
 host.Run();

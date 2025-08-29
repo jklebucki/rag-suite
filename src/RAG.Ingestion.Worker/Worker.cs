@@ -1,5 +1,6 @@
 using RAG.Ingestion.Worker.Models;
 using RAG.Ingestion.Worker.Services;
+using RAG.Shared;
 
 namespace RAG.Ingestion.Worker;
 
@@ -21,7 +22,13 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("RAG Ingestion Worker starting...");
+        _logger.LogInformation("RAG Ingestion Worker starting on {OS}...", PathHelper.GetOSName());
+
+        // Normalize and ensure documents path exists
+        var documentsPath = PathHelper.NormalizePath(_settings.DocumentsPath);
+        PathHelper.EnsureDirectoryExists(documentsPath);
+        
+        _logger.LogInformation("Using documents path: {DocumentsPath}", documentsPath);
 
         // Initialize index
         var initialized = await _ingestionService.InitializeIndexAsync();
@@ -32,10 +39,10 @@ public class Worker : BackgroundService
         }
 
         // Process documents on startup if configured
-        if (_settings.ProcessOnStartup && Directory.Exists(_settings.DocumentsPath))
+        if (_settings.ProcessOnStartup && Directory.Exists(documentsPath))
         {
-            _logger.LogInformation("Processing documents on startup from: {DocumentsPath}", _settings.DocumentsPath);
-            var processed = await _ingestionService.ProcessDirectoryAsync(_settings.DocumentsPath, recursive: true);
+            _logger.LogInformation("Processing documents on startup from: {DocumentsPath}", documentsPath);
+            var processed = await _ingestionService.ProcessDirectoryAsync(documentsPath, recursive: true);
             _logger.LogInformation("Processed {Count} documents on startup", processed);
         }
 
@@ -47,7 +54,7 @@ public class Worker : BackgroundService
                 _logger.LogInformation("Worker running at: {Time}", DateTimeOffset.Now);
                 
                 // Check for new documents periodically
-                if (Directory.Exists(_settings.DocumentsPath))
+                if (Directory.Exists(documentsPath))
                 {
                     var currentCount = await _ingestionService.GetIndexedDocumentCountAsync();
                     _logger.LogInformation("Current indexed document count: {Count}", currentCount);
