@@ -6,6 +6,13 @@ using RAG.Orchestrator.Api.Features.Search;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel for longer timeouts
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
+});
+
 // Add services to the container
 builder.Services
     .AddApplicationServices()

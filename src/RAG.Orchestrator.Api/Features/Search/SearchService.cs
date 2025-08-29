@@ -32,6 +32,10 @@ public class SearchService : ISearchService
         // Configure HTTP client for Elasticsearch
         var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_esUsername}:{_esPassword}"));
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+        
+        // Set timeout for Elasticsearch requests (default to 10 minutes)
+        var timeoutMinutes = configuration.GetValue<int>("Services:Elasticsearch:TimeoutMinutes", 10);
+        _httpClient.Timeout = TimeSpan.FromMinutes(timeoutMinutes);
     }
 
     public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default)

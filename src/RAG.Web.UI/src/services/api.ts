@@ -18,7 +18,7 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: '/api',
-      timeout: 30000,
+      timeout: 600000, // 10 minutes
       headers: {
         'Content-Type': 'application/json',
       },
@@ -116,7 +116,7 @@ class ApiClient {
     if (filters?.startDate) params.append('startDate', filters.startDate.toISOString())
     if (filters?.endDate) params.append('endDate', filters.endDate.toISOString())
     if (filters?.endpoint) params.append('endpoint', filters.endpoint)
-    
+
     const response: AxiosResponse<ApiResponse<UsageStats>> = await this.client.get(`/analytics/usage?${params}`)
     return response.data.data
   }
@@ -130,7 +130,7 @@ class ApiClient {
     if (filters?.startDate) params.append('startDate', filters.startDate.toISOString())
     if (filters?.endDate) params.append('endDate', filters.endDate.toISOString())
     if (filters?.endpoint) params.append('endpoint', filters.endpoint)
-    
+
     const response: AxiosResponse<ApiResponse<PerformanceMetrics[]>> = await this.client.get(`/analytics/performance?${params}`)
     return response.data.data
   }

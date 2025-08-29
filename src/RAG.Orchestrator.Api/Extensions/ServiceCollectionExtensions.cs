@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Register HTTP clients
+        // Register HTTP clients - timeout is configured individually in each service
         services.AddHttpClient<ILlmService, LlmService>();
         services.AddHttpClient<ISearchService, SearchService>();
         
