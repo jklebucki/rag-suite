@@ -1,41 +1,23 @@
-using RAG.Orchestrator.Api.Features.Analytics;
-using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Features.Plugins;
-using RAG.Orchestrator.Api.Features.Search;
-using RAG.Orchestrator.Api.Features.Health;
+using Microsoft.OpenApi.Models;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-    {
-        // Register HTTP clients - timeout is configured individually in each service
-        services.AddHttpClient<ILlmService, LlmService>();
-        services.AddHttpClient<ISearchService, SearchService>();
-        services.AddHttpClient(); // Register generic HttpClient factory
-        
-        // Register all feature services
-        services.AddScoped<ISearchService, SearchService>();
-        services.AddScoped<IChatService, ChatService>();
-        services.AddScoped<IPluginService, PluginService>();
-        services.AddScoped<IAnalyticsService, AnalyticsService>();
-        services.AddScoped<ILlmService, LlmService>();
-        services.AddScoped<IHealthAggregator, HealthAggregator>();
-
-        return services;
-    }
-
     public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new()
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "RAG Orchestrator API",
-                Version = "v1",
-                Description = "A comprehensive API for managing RAG (Retrieval-Augmented Generation) operations including search, chat, plugins, and analytics."
+                Version = "v2.0",
+                Description = "RAG API with Semantic Kernel integration",
+                Contact = new OpenApiContact
+                {
+                    Name = "RAG Suite Team"
+                }
             });
         });
 
@@ -48,10 +30,14 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials();
+                policy.WithOrigins(
+                    "http://localhost:5173", // Vite dev server
+                    "http://localhost:3000", // React dev server
+                    "http://localhost:8080"  // Alternative dev server
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
             });
         });
 

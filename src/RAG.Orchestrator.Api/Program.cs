@@ -1,32 +1,12 @@
 using RAG.Orchestrator.Api.Extensions;
-using RAG.Orchestrator.Api.Features.Analytics;
-using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Features.Plugins;
-using RAG.Orchestrator.Api.Features.Search;
-using RAG.Orchestrator.Api.Features.Health;
-using RAG.Orchestrator.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Kestrel for longer timeouts
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
-    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
-});
-
 // Add services to the container
-builder.Services
-    .AddApplicationServices()
-    .AddSwaggerDocumentation()
-    .AddCorsPolicy();
-
-// Configure HTTPS redirection
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-    options.HttpsPort = 7108; // Port HTTPS z launchSettings.json
-});
+builder.Services.AddSemanticKernel();
+builder.Services.AddSwaggerDocumentation();
+builder.Services.AddCorsPolicy();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -37,28 +17,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "RAG Orchestrator API v1");
-        options.RoutePrefix = string.Empty; // Serve Swagger UI at the app's root
+        options.RoutePrefix = string.Empty;
     });
     app.UseCors("AllowFrontend");
 }
-else
-{
-    // Użyj HTTPS redirection tylko w środowisku produkcyjnym
-    app.UseHttpsRedirection();
-}
 
-// Map feature endpoints
-app.MapSearchEndpoints();
-app.MapChatEndpoints();
-app.MapPluginEndpoints();
-app.MapAnalyticsEndpoints();
-app.MapHealthEndpoints();
+app.MapControllers();
 
-// Health check endpoint
-app.MapGet("/health", () => new { Status = "Healthy", Timestamp = DateTime.UtcNow }.ToApiResponse())
-   .WithName("HealthCheck")
-   .WithTags("Health")
-   .WithSummary("Health check endpoint")
-   .WithDescription("Returns the health status of the API");
+// Simple health endpoint
+app.MapGet("/health", () => new { 
+    Status = "Healthy", 
+    Timestamp = DateTime.UtcNow,
+    Version = "2.0.0-semantic-kernel-demo"
+});
 
 app.Run();
