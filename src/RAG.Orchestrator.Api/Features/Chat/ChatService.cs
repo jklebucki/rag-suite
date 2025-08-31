@@ -18,6 +18,7 @@ public interface ILlmService
 {
     Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default);
     Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
+    Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default);
 }
 
 public class LlmService : ILlmService
@@ -145,16 +146,65 @@ public class LlmService : ILlmService
     {
         try
         {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(3)); // bardzo krótki timeout dla health check
+            
             var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
             var endpoint = isOllama ? "/api/tags" : "/health";
             
-            var response = await _httpClient.GetAsync(endpoint, cancellationToken);
+            var response = await _httpClient.GetAsync(endpoint, cts.Token);
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Health check failed for LLM service");
             return false;
+        }
+    }
+
+    public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
+    {
+        var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+        try
+        {
+            if (isOllama)
+            {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(3)); // bardzo szybki timeout dla dashboard
+                var response = await _httpClient.GetAsync("/api/tags", cts.Token);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Failed to retrieve Ollama tags. Status: {StatusCode}", response.StatusCode);
+                    return Array.Empty<string>();
+                }
+                var json = await response.Content.ReadAsStringAsync(cts.Token);
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("models", out var modelsArray))
+                {
+                    var list = new List<string>();
+                    foreach (var m in modelsArray.EnumerateArray())
+                    {
+                        if (m.TryGetProperty("name", out var nameProp))
+                        {
+                            var name = nameProp.GetString();
+                            if (!string.IsNullOrWhiteSpace(name)) list.Add(name!);
+                        }
+                    }
+                    return list.Distinct().OrderBy(n => n).ToArray();
+                }
+                return Array.Empty<string>();
+            }
+            else
+            {
+                // For non-Ollama (e.g. TGI) return configured model only
+                var model = _configuration.GetValue<string>("Services:LlmService:Model", "unknown-model") ?? "unknown-model";
+                return new[] { model };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving available models from LLM service");
+            return Array.Empty<string>();
         }
     }
 }

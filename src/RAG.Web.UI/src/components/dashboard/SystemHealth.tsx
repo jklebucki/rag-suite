@@ -1,5 +1,6 @@
 import React from 'react'
-import { Activity } from 'lucide-react'
+import { Activity, Brain } from 'lucide-react'
+import type { SystemHealthResponse } from '@/types'
 
 interface HealthMetricProps {
   label: string
@@ -25,11 +26,15 @@ function HealthMetric({ label, status, value }: HealthMetricProps) {
   )
 }
 
-interface SystemHealthProps {
-  stats?: any // Accept any stats object for now
-}
+interface SystemHealthProps { systemHealth?: SystemHealthResponse }
 
-export function SystemHealth({ stats }: SystemHealthProps) {
+export function SystemHealth({ systemHealth }: SystemHealthProps) {
+  const api = systemHealth?.api
+  const es = systemHealth?.elasticsearch
+  const vector = systemHealth?.vectorStore
+  const llm = systemHealth?.llm
+  const models: string[] = (llm?.details?.models) || []
+
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">
       <div className="flex items-center justify-between mb-4">
@@ -39,20 +44,42 @@ export function SystemHealth({ stats }: SystemHealthProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <HealthMetric
-          label="API Status"
-          status={stats?.apiStatus?.status || 'healthy'}
-          value={stats?.apiStatus?.value || '99.9% uptime'}
+          label="API"
+          status={(api?.status as any) || 'healthy'}
+          value={api?.message || 'Running'}
         />
         <HealthMetric
           label="Elasticsearch"
-          status={stats?.elasticsearchStatus?.status || 'healthy'}
-          value={stats?.elasticsearchStatus?.value || 'All indices green'}
+          status={(es?.status as any) || 'healthy'}
+          value={es?.message || 'Cluster OK'}
         />
         <HealthMetric
           label="Vector Store"
-          status={stats?.vectorStoreStatus?.status || 'healthy'}
-          value={stats?.vectorStoreStatus?.value || '1.2M documents'}
+          status={(vector?.status as any) || 'healthy'}
+          value={vector?.message || 'Operational'}
         />
+      </div>
+
+      <div className="mt-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Brain className="h-4 w-4 text-gray-500" />
+          <h3 className="text-sm font-semibold text-gray-700">LLM Service</h3>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${llm?.status === 'healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {llm?.status || 'unknown'}
+          </div>
+          {models.length > 0 && (
+            <div className="text-xs text-gray-600 flex flex-wrap gap-2">
+              {models.map(m => (
+                <span key={m} className="px-2 py-0.5 bg-gray-100 rounded border text-gray-700">{m}</span>
+              ))}
+            </div>
+          )}
+          {models.length === 0 && (
+            <span className="text-xs text-gray-500">Brak dostępnych modeli</span>
+          )}
+        </div>
       </div>
     </div>
   )

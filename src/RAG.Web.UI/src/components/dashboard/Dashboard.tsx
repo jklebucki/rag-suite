@@ -15,6 +15,7 @@ export function Dashboard() {
   const {
     stats,
     plugins,
+    systemHealth,
     statsCards,
     isLoading,
     hasError,
@@ -74,7 +75,7 @@ export function Dashboard() {
       </div>
 
       {/* System Health */}
-      <SystemHealth stats={stats} />
+  <SystemHealth systemHealth={systemHealth} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Health;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtensions
         // Register HTTP clients - timeout is configured individually in each service
         services.AddHttpClient<ILlmService, LlmService>();
         services.AddHttpClient<ISearchService, SearchService>();
+        services.AddHttpClient(); // Register generic HttpClient factory
         
         // Register all feature services
         services.AddScoped<ISearchService, SearchService>();
@@ -19,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<ILlmService, LlmService>();
+        services.AddScoped<IHealthAggregator, HealthAggregator>();
 
         return services;
     }
@@ -45,7 +48,7 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:5173")
+                policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials();

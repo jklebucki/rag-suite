@@ -107,3 +107,19 @@ export interface PerformanceMetrics {
   activeSessions: number
   endpoint: string
 }
+
+// Health Types
+export interface ServiceStatus {
+  name: string
+  status: 'healthy' | 'warning' | 'error' | string
+  message?: string
+  details?: any
+}
+
+export interface SystemHealthResponse {
+  api: ServiceStatus
+  llm: ServiceStatus & { details?: { models?: string[] } }
+  elasticsearch: ServiceStatus
+  vectorStore: ServiceStatus
+  timestamp: Date
+}

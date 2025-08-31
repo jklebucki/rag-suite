@@ -19,6 +19,13 @@ export function useDashboard() {
     queryFn: () => apiClient.getPlugins(),
   })
 
+  // Get system health (LLM models etc.)
+  const { data: systemHealth, isLoading: isHealthLoading, error: healthError } = useQuery({
+    queryKey: ['system-health'],
+    queryFn: () => apiClient.getSystemHealth(),
+    refetchInterval: 15000, // refresh every 15s for near-real-time status
+  })
+
   // Show error notifications
   useEffect(() => {
     if (statsError) {
@@ -32,10 +39,16 @@ export function useDashboard() {
     }
   }, [pluginsError, showError])
 
+  useEffect(() => {
+    if (healthError) {
+      showError('Failed to load system health', 'Health information may be stale')
+    }
+  }, [healthError, showError])
+
   // Computed values
   const activePlugins = plugins?.filter(p => p.enabled) || []
-  const isLoading = isStatsLoading || isPluginsLoading
-  const hasError = statsError || pluginsError
+  const isLoading = isStatsLoading || isPluginsLoading || isHealthLoading
+  const hasError = statsError || pluginsError || healthError
 
   // Stats card data
   const statsCards = [
@@ -69,6 +82,7 @@ export function useDashboard() {
     // Raw data
     stats,
     plugins,
+  systemHealth,
     
     // Computed data
     activePlugins,
@@ -78,10 +92,12 @@ export function useDashboard() {
     isLoading,
     isStatsLoading,
     isPluginsLoading,
+  isHealthLoading,
     
     // Error states
     hasError,
     statsError,
     pluginsError,
+  healthError,
   }
 }

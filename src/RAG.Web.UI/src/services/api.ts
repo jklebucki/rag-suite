@@ -10,6 +10,7 @@ import type {
   PluginInfo,
   UsageStats,
   PerformanceMetrics
+  , SystemHealthResponse
 } from '@/types'
 
 class ApiClient {
@@ -138,6 +139,11 @@ class ApiClient {
   // Health check
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     const response: AxiosResponse<ApiResponse<{ status: string; timestamp: Date }>> = await this.client.get('/health')
+    return response.data.data
+  }
+
+  async getSystemHealth(): Promise<SystemHealthResponse> {
+    const response: AxiosResponse<ApiResponse<SystemHealthResponse>> = await this.client.get('/healthz/system')
     return response.data.data
   }
 }
