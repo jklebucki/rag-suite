@@ -30,7 +30,7 @@ public class HealthAggregator : IHealthAggregator
     public async Task<SystemHealthResponse> GetSystemHealthAsync(CancellationToken cancellationToken = default)
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(TimeSpan.FromSeconds(5)); // maksymalny timeout dla całego health check
+        cts.CancelAfter(TimeSpan.FromSeconds(5)); // maximum timeout for entire health check
         
         var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
 
@@ -46,7 +46,7 @@ public class HealthAggregator : IHealthAggregator
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(TimeSpan.FromSeconds(3)); // bardzo krótki timeout dla health check
+            cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
             
             var healthy = await _llmService.IsHealthyAsync(cts.Token);
             var models = Array.Empty<string>();
@@ -77,7 +77,7 @@ public class HealthAggregator : IHealthAggregator
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(TimeSpan.FromSeconds(2)); // bardzo krótki timeout dla health check
+            cts.CancelAfter(TimeSpan.FromSeconds(2)); // very short timeout for health check
             var client = _httpClientFactory.CreateClient();
             
             // Add basic authentication if credentials are provided

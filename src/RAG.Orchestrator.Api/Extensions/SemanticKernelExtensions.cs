@@ -15,11 +15,11 @@ public static class SemanticKernelExtensions
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             
-            // Pobierz ustawienia z appsettings.json
+            // Get settings from appsettings.json
             var llmUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:11434";
             var model = configuration["Services:LlmService:Model"] ?? "llama3.1:8b";
             
-            // Tworzenie kernela z konfiguracją z appsettings
+            // Creating kernel with configuration from appsettings
             var kernelBuilder = Kernel.CreateBuilder();
             kernelBuilder.AddOllamaChatCompletion(model, new Uri(llmUrl));
             

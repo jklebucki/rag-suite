@@ -54,14 +54,14 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
         
-        // Add HttpClient for LLM service (używany przez HealthAggregator)
+        // Add HttpClient for LLM service (used by HealthAggregator)
         services.AddHttpClient<ILlmService, LlmService>();
         
         // Add HttpClient for SearchService
         services.AddHttpClient<ISearchService, SearchService>();
         
         // Register feature services
-        // ChatService używa teraz Kernel zamiast ILlmService
+        // ChatService now uses Kernel instead of ILlmService
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ISearchService, SearchService>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();

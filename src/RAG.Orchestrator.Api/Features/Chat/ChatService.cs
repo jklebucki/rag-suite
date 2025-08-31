@@ -148,7 +148,7 @@ public class LlmService : ILlmService
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(TimeSpan.FromSeconds(3)); // bardzo krótki timeout dla health check
+            cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
             
             var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
             var endpoint = isOllama ? "/api/tags" : "/health";
@@ -171,7 +171,7 @@ public class LlmService : ILlmService
             if (isOllama)
             {
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(TimeSpan.FromSeconds(3)); // bardzo szybki timeout dla dashboard
+                cts.CancelAfter(TimeSpan.FromSeconds(3)); // very fast timeout for dashboard
                 var response = await _httpClient.GetAsync("/api/tags", cts.Token);
                 if (!response.IsSuccessStatusCode)
                 {
