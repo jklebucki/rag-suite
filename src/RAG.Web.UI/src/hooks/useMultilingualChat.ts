@@ -31,12 +31,15 @@ export function useMultilingualChat() {
 
   // Send multilingual message mutation
   const sendMultilingualMessageMutation = useMutation({
-    mutationFn: ({ sessionId, request }: { sessionId: string; request: MultilingualChatRequest }) =>
-      apiClient.sendMultilingualMessage(sessionId, request),
+    mutationFn: ({ sessionId, request }: { sessionId: string; request: MultilingualChatRequest }) => {
+      console.log('Calling sendMultilingualMessage API with:', { sessionId, request })
+      return apiClient.sendMultilingualMessage(sessionId, request)
+    },
     onSuccess: (response) => {
+      console.log('sendMultilingualMessage success:', response)
       setLastResponse(response)
+      // Refresh the entire session to get the real messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
-      setMessage('')
       setIsTyping(false)
       
       // Show language detection info if available
@@ -86,22 +89,59 @@ export function useMultilingualChat() {
     },
   })
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || !currentSessionId) return
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault()
+    }
+    
+    console.log('handleSendMessage called', { message: message.trim(), currentSessionId, isTyping })
+    
+    if (!message.trim()) {
+      console.log('Message is empty, aborting')
+      return
+    }
+    
+    if (!currentSessionId) {
+      console.log('No current session, aborting')
+      return
+    }
 
+    const userMessage = message.trim()
+    const messageTimestamp = new Date()
+    
+    // Create temporary user message to show immediately
+    const tempUserMessage: ChatMessage = {
+      id: `temp-${Date.now()}`,
+      content: userMessage,
+      role: 'user',
+      timestamp: messageTimestamp
+    }
+
+    // Add user message to local state immediately
+    queryClient.setQueryData(['chat-session', currentSessionId], (oldData: ChatSession | undefined) => {
+      if (!oldData) return oldData
+      return {
+        ...oldData,
+        messages: [...oldData.messages, tempUserMessage]
+      }
+    })
+
+    console.log('Setting isTyping to true')
     setIsTyping(true)
+    setMessage('') // Clear input immediately
     
     const request: MultilingualChatRequest = {
-      message: message.trim(),
+      message: userMessage,
       language: currentLanguage,
       responseLanguage: currentLanguage,
       enableTranslation: true,
       metadata: {
         uiLanguage: currentLanguage,
-        timestamp: new Date().toISOString()
+        timestamp: messageTimestamp.toISOString()
       }
     }
 
+    console.log('Sending multilingual message:', request)
     sendMultilingualMessageMutation.mutate({ sessionId: currentSessionId, request })
   }
 
@@ -141,7 +181,9 @@ export function useMultilingualChat() {
 
   // Set first session as current if none selected
   useEffect(() => {
+    console.log('Session selection effect:', { currentSessionId, sessionsLength: sessions.length, sessions })
     if (!currentSessionId && sessions.length > 0) {
+      console.log('Setting first session as current:', sessions[0].id)
       setCurrentSessionId(sessions[0].id)
     }
   }, [sessions, currentSessionId])

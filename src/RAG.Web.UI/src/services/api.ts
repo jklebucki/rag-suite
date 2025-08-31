@@ -105,8 +105,15 @@ class ApiClient {
 
   // Multilingual Chat
   async sendMultilingualMessage(sessionId: string, request: MultilingualChatRequest): Promise<MultilingualChatResponse> {
-    const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(`/chat/sessions/${sessionId}/messages/multilingual`, request)
-    return response.data.data
+    console.log(`Calling API: POST /api/chat/sessions/${sessionId}/messages/multilingual`, request)
+    try {
+      const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(`/chat/sessions/${sessionId}/messages/multilingual`, request)
+      console.log('API response received:', response.data)
+      return response.data.data
+    } catch (error) {
+      console.error('API call failed:', error)
+      throw error
+    }
   }
 
   async getChatSessions(): Promise<ChatSession[]> {
