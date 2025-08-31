@@ -15,11 +15,20 @@ import type {
 
 class ApiClient {
   private client: AxiosInstance
+  private healthClient: AxiosInstance
 
   constructor() {
     this.client = axios.create({
       baseURL: '/api',
       timeout: 600000, // 10 minutes
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    // Separate client for health endpoints without /api prefix
+    this.healthClient = axios.create({
+      timeout: 10000, // 10 seconds for health checks
       headers: {
         'Content-Type': 'application/json',
       },
@@ -138,12 +147,12 @@ class ApiClient {
 
   // Health check
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
-    const response: AxiosResponse<ApiResponse<{ status: string; timestamp: Date }>> = await this.client.get('/health')
+    const response: AxiosResponse<ApiResponse<{ status: string; timestamp: Date }>> = await this.healthClient.get('/health')
     return response.data.data
   }
 
   async getSystemHealth(): Promise<SystemHealthResponse> {
-    const response: AxiosResponse<ApiResponse<SystemHealthResponse>> = await this.client.get('/healthz/system')
+    const response: AxiosResponse<ApiResponse<SystemHealthResponse>> = await this.healthClient.get('/healthz/system')
     return response.data.data
   }
 }
