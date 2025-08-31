@@ -1,4 +1,9 @@
 using Microsoft.OpenApi.Models;
+using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Health;
+using RAG.Orchestrator.Api.Features.Plugins;
+using RAG.Orchestrator.Api.Features.Analytics;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
@@ -41,6 +46,28 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        return services;
+    }
+
+    public static IServiceCollection AddFeatureServices(this IServiceCollection services)
+    {
+        // Add HttpClient factory
+        services.AddHttpClient();
+        
+        // Add HttpClient for LLM service (używany przez HealthAggregator)
+        services.AddHttpClient<ILlmService, LlmService>();
+        
+        // Add HttpClient for SearchService
+        services.AddHttpClient<ISearchService, SearchService>();
+        
+        // Register feature services
+        // ChatService używa teraz Kernel zamiast ILlmService
+        services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<ISearchService, SearchService>();
+        services.AddScoped<IHealthAggregator, HealthAggregator>();
+        services.AddScoped<IPluginService, PluginService>();
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
+        
         return services;
     }
 }

@@ -2,6 +2,7 @@ using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Search;
 using System.Text;
 using System.Text.Json;
+using Microsoft.SemanticKernel;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -33,7 +34,7 @@ public class LlmService : ILlmService
         _configuration = configuration;
         _logger = logger;
         
-        var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:8581";
+        var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:11434";
         _httpClient.BaseAddress = new Uri(baseUrl);
         
         // Set timeout from configuration (default to 10 minutes)
@@ -214,18 +215,18 @@ public class ChatService : IChatService
     private static readonly List<ChatSession> _sessions = new();
     private static readonly Dictionary<string, List<ChatMessage>> _messages = new();
     
-    private readonly ILlmService _llmService;
+    private readonly Kernel _kernel;
     private readonly ISearchService _searchService;
     private readonly ILogger<ChatService> _logger;
     private readonly IConfiguration _configuration;
 
     public ChatService(
-        ILlmService llmService, 
+        Kernel kernel,
         ISearchService searchService, 
         ILogger<ChatService> logger,
         IConfiguration configuration)
     {
-        _llmService = llmService;
+        _kernel = kernel;
         _searchService = searchService;
         _logger = logger;
         _configuration = configuration;
@@ -296,8 +297,9 @@ public class ChatService : IChatService
             // Build context-aware prompt
             var prompt = BuildContextualPrompt(request.Message, searchResults.Results, _messages[sessionId]);
 
-            // Generate AI response
-            var aiResponseContent = await _llmService.GenerateResponseAsync(prompt, cancellationToken);
+            // Generate AI response using Semantic Kernel
+            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+            var aiResponseContent = aiResponse.GetValue<string>() ?? "Przepraszam, nie udało się wygenerować odpowiedzi.";
 
             var aiMessage = new ChatMessage(
                 Guid.NewGuid().ToString(),
@@ -346,24 +348,27 @@ public class ChatService : IChatService
         var promptBuilder = new StringBuilder();
         
         promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.");
+        promptBuilder.AppendLine("Wykorzystuj kontekst z bazy wiedzy i historię rozmowy, aby udzielić dokładnej i przydatnej odpowiedzi.");
         promptBuilder.AppendLine();
         
         // Add context from search results
         if (searchResults.Length > 0)
         {
-            promptBuilder.AppendLine("Kontekst z bazy wiedzy:");
+            promptBuilder.AppendLine("=== KONTEKST Z BAZY WIEDZY ===");
             foreach (var result in searchResults.Take(3))
             {
-                promptBuilder.AppendLine($"- {result.Title}: {result.Content.Substring(0, Math.Min(200, result.Content.Length))}...");
+                promptBuilder.AppendLine($"Dokument: {result.Title}");
+                promptBuilder.AppendLine($"Treść: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                promptBuilder.AppendLine($"Źródło: {result.Source}");
+                promptBuilder.AppendLine();
             }
-            promptBuilder.AppendLine();
         }
         
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(6).ToList();
         if (recentMessages.Count > 1)
         {
-            promptBuilder.AppendLine("Historia rozmowy:");
+            promptBuilder.AppendLine("=== HISTORIA ROZMOWY ===");
             foreach (var msg in recentMessages.TakeLast(4))
             {
                 var role = msg.Role == "user" ? "Użytkownik" : "Asystent";
@@ -372,7 +377,15 @@ public class ChatService : IChatService
             promptBuilder.AppendLine();
         }
         
-        promptBuilder.AppendLine($"Aktualne pytanie użytkownika: {userMessage}");
+        promptBuilder.AppendLine("=== AKTUALNE PYTANIE ===");
+        promptBuilder.AppendLine(userMessage);
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine("=== INSTRUKCJE ===");
+        promptBuilder.AppendLine("- Odpowiadaj w języku polskim");
+        promptBuilder.AppendLine("- Bazuj na kontekście z bazy wiedzy, jeśli jest dostępny");
+        promptBuilder.AppendLine("- Uwzględnij historię rozmowy dla spójności");
+        promptBuilder.AppendLine("- Jeśli nie masz informacji w kontekście, powiedz o tym szczerze");
+        promptBuilder.AppendLine("- Bądź konkretny i pomocny");
         promptBuilder.AppendLine();
         promptBuilder.AppendLine("Odpowiedź:");
         
