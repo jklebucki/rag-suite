@@ -14,6 +14,16 @@ export interface SearchQuery {
   offset?: number
 }
 
+// Multilingual Search Types
+export interface MultilingualSearchQuery {
+  query: string
+  language?: string
+  resultLanguage?: string
+  maxResults?: number
+  enableCrossLanguageSearch?: boolean
+  filters?: Record<string, any>
+}
+
 export interface SearchFilters {
   documentType?: string[]
   dateRange?: {
@@ -33,6 +43,10 @@ export interface SearchResult {
   metadata: Record<string, any>
   createdAt: Date
   updatedAt: Date
+  // Multilingual fields
+  originalLanguage?: string
+  wasTranslated?: boolean
+  translationConfidence?: number
 }
 
 export interface SearchResponse {
@@ -40,6 +54,11 @@ export interface SearchResponse {
   total: number
   took: number
   query: string
+  // Multilingual fields
+  detectedLanguage?: string
+  resultLanguage?: string
+  processingTimeMs?: number
+  usedCrossLanguageSearch?: boolean
 }
 
 // Document Detail Types
@@ -80,6 +99,28 @@ export interface ChatRequest {
   sessionId?: string
   useRag?: boolean
   context?: string[]
+}
+
+// Multilingual Chat Types
+export interface MultilingualChatRequest {
+  message: string
+  sessionId?: string
+  language?: string
+  responseLanguage?: string
+  enableTranslation?: boolean
+  metadata?: Record<string, any>
+}
+
+export interface MultilingualChatResponse {
+  response: string
+  sessionId?: string
+  detectedLanguage: string
+  responseLanguage: string
+  wasTranslated: boolean
+  translationConfidence?: number
+  sources?: string[]
+  processingTimeMs: number
+  metadata?: Record<string, any>
 }
 
 // Plugin Types

@@ -1,0 +1,45 @@
+{
+  "system_prompts": {
+    "rag_assistant": "You are an intelligent AI assistant for the RAG Suite system. Respond in English, professionally and helpfully.",
+    "context_instruction": "Use context from the knowledge base and conversation history to provide accurate and useful responses.",
+    "knowledge_base_context": "=== KNOWLEDGE BASE CONTEXT ===",
+    "conversation_history": "=== CONVERSATION HISTORY ===",
+    "current_question": "=== CURRENT QUESTION ===",
+    "response": "Response:",
+    "document": "Document",
+    "content": "Content",
+    "source": "Source",
+    "translation_note": "Note: Response was translated from {0} to {1}"
+  },
+  "ui_labels": {
+    "knowledge_base_context": "=== KNOWLEDGE BASE CONTEXT ===",
+    "conversation_history": "=== CONVERSATION HISTORY ===",
+    "current_question": "=== CURRENT QUESTION ===",
+    "instructions": "=== INSTRUCTIONS ===",
+    "response_prompt": "Response:",
+    "user": "User",
+    "assistant": "Assistant",
+    "document": "Document",
+    "content": "Content",
+    "source": "Source",
+    "translated_from": "Translated from {0} to {1}"
+  },
+  "instructions": {
+    "respond_in_language": "Respond in English language",
+    "use_knowledge_base": "Base your response on knowledge base context if available",
+    "consider_history": "Consider conversation history for consistency",
+    "be_honest": "If you don't have information in context, say so honestly",
+    "be_helpful": "Be specific and helpful"
+  },
+  "error_messages": {
+    "generation_failed": "I'm sorry, there was a problem generating the response. Please try again in a moment.",
+    "session_not_found": "Session not found",
+    "message_too_long": "Message is too long. Maximum length is {0} characters.",
+    "translation_failed": "Failed to translate text",
+    "language_not_supported": "Language {0} is not supported"
+  },
+  "session_labels": {
+    "new_conversation": "New Conversation",
+    "untitled_session": "Untitled Session"
+  }
+}

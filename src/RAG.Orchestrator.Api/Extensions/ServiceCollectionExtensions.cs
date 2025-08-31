@@ -18,12 +18,15 @@ public static class ServiceCollectionExtensions
             {
                 Title = "RAG Orchestrator API",
                 Version = "v2.0",
-                Description = "RAG API with Semantic Kernel integration",
+                Description = "RAG API with Semantic Kernel integration and multilingual support",
                 Contact = new OpenApiContact
                 {
                     Name = "RAG Suite Team"
                 }
             });
+            
+            // Resolve type conflicts by using full names
+            options.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
         });
 
         return services;

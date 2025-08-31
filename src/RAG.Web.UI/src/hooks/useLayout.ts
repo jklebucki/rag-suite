@@ -6,15 +6,17 @@ import {
   BarChart3,
   Settings,
 } from 'lucide-react'
+import { useI18n } from '@/contexts/I18nContext'
 
 export function useLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const location = useLocation()
+  const { t } = useI18n()
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: BarChart3 },
-    { name: 'Chat', href: '/chat', icon: MessageSquare },
-    { name: 'Search', href: '/search', icon: Search },
+    { name: t('nav.dashboard'), href: '/', icon: BarChart3 },
+    { name: t('nav.chat'), href: '/chat', icon: MessageSquare },
+    { name: t('nav.search'), href: '/search', icon: Search },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Search, Filter } from 'lucide-react'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface SearchFormProps {
   query: string
@@ -13,6 +14,7 @@ interface SearchFormProps {
   onToggleAdvanced: () => void
   onSearch: (e: React.FormEvent) => void
   onFilterChange: (filterType: string, value: string) => void
+  onClear?: () => void
 }
 
 export function SearchForm({
@@ -23,11 +25,12 @@ export function SearchForm({
   onToggleAdvanced,
   onSearch,
   onFilterChange,
+  onClear,
 }: SearchFormProps) {
+  const { t } = useI18n()
+  
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Search Knowledge Base</h1>
-
       <form onSubmit={onSearch} className="space-y-4">
         <div className="flex gap-2">
           <div className="relative flex-1">
@@ -36,7 +39,7 @@ export function SearchForm({
               type="text"
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
-              placeholder="Search documents, processes, schemas..."
+              placeholder={t('search.input.placeholder')}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
@@ -46,15 +49,24 @@ export function SearchForm({
             className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
           >
             <Filter className="h-5 w-5" />
-            Filters
+            {t('search.filters.title')}
           </button>
           <button
             type="submit"
             disabled={!query.trim()}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Search
+            {t('search.button')}
           </button>
+          {onClear && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         {isAdvancedMode && (

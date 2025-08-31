@@ -1,0 +1,45 @@
+{
+  "system_prompts": {
+    "rag_assistant": "Intelligens mesterséges intelligencia asszisztens vagy a RAG Suite rendszerhez. Válaszolj magyarul, szakszerűen és segítőkészen.",
+    "context_instruction": "Használd a tudásbázis kontextusát és a beszélgetés történetét pontos és hasznos válaszok adásához.",
+    "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
+    "conversation_history": "=== BESZÉLGETÉS TÖRTÉNETE ===",
+    "current_question": "=== JELENLEGI KÉRDÉS ===",
+    "response": "Válasz:",
+    "document": "Dokumentum",
+    "content": "Tartalom",
+    "source": "Forrás",
+    "translation_note": "Megjegyzés: A válasz lefordítva {0} nyelvről {1} nyelvre"
+  },
+  "ui_labels": {
+    "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
+    "conversation_history": "=== BESZÉLGETÉS TÖRTÉNETE ===",
+    "current_question": "=== JELENLEGI KÉRDÉS ===",
+    "instructions": "=== UTASÍTÁSOK ===",
+    "response_prompt": "Válasz:",
+    "user": "Felhasználó",
+    "assistant": "Asszisztens",
+    "document": "Dokumentum",
+    "content": "Tartalom",
+    "source": "Forrás",
+    "translated_from": "Lefordítva {0} nyelvről {1} nyelvre"
+  },
+  "instructions": {
+    "respond_in_language": "Válaszolj magyar nyelven",
+    "use_knowledge_base": "Alapozd a válaszodat a tudásbázis kontextusára, ha elérhető",
+    "consider_history": "Vedd figyelembe a beszélgetés történetét a konzisztencia érdekében",
+    "be_honest": "Ha nincs információd a kontextusban, mondd el őszintén",
+    "be_helpful": "Légy konkrét és segítőkész"
+  },
+  "error_messages": {
+    "generation_failed": "Sajnálom, probléma volt a válasz generálásakor. Kérlek, próbáld újra egy pillanat múlva.",
+    "session_not_found": "A munkamenet nem található",
+    "message_too_long": "Az üzenet túl hosszú. A maximális hossz {0} karakter.",
+    "translation_failed": "A szöveg fordítása sikertelen",
+    "language_not_supported": "A(z) {0} nyelv nem támogatott"
+  },
+  "session_labels": {
+    "new_conversation": "Új Beszélgetés",
+    "untitled_session": "Névtelen Munkamenet"
+  }
+}

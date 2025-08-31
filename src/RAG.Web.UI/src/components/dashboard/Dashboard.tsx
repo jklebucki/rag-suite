@@ -6,12 +6,14 @@ import {
   Zap
 } from 'lucide-react'
 import { useDashboard } from '@/hooks/useDashboard'
+import { useI18n } from '@/contexts/I18nContext'
 import { StatsCard } from './StatsCard'
 import { TopQueries } from './TopQueries'
 import { PluginsStatus } from './PluginsStatus'
 import { SystemHealth } from './SystemHealth'
 
 export function Dashboard() {
+  const { t } = useI18n()
   const {
     stats,
     plugins,
@@ -32,7 +34,7 @@ export function Dashboard() {
   if (hasError) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Error loading dashboard data</p>
+        <p className="text-gray-500">{t('common.error')}</p>
       </div>
     )
   }
@@ -40,9 +42,9 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
         <p className="text-gray-600 mt-1">
-          Overview of your RAG Suite system performance and usage
+          {t('dashboard.subtitle')}
         </p>
       </div>
 

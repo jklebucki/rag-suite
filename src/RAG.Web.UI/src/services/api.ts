@@ -3,9 +3,12 @@ import type {
   ApiResponse,
   SearchQuery,
   SearchResponse,
+  MultilingualSearchQuery,
   DocumentDetailResponse,
   ChatRequest,
   ChatMessage,
+  MultilingualChatRequest,
+  MultilingualChatResponse,
   ChatSession,
   PluginInfo,
   UsageStats,
@@ -67,6 +70,28 @@ class ApiClient {
     return response.data.data
   }
 
+  // Multilingual Search (extends basic search with language context)
+  async searchMultilingual(query: MultilingualSearchQuery): Promise<SearchResponse> {
+    // For now, use basic search endpoint but include language in metadata
+    const searchQuery: SearchQuery = {
+      query: query.query,
+      limit: query.maxResults || 10,
+      filters: query.filters as any
+    }
+    
+    // Add language headers for future API enhancement
+    const headers: Record<string, string> = {}
+    if (query.language) {
+      headers['Accept-Language'] = query.language
+    }
+    if (query.resultLanguage) {
+      headers['X-Response-Language'] = query.resultLanguage
+    }
+    
+    const response: AxiosResponse<ApiResponse<SearchResponse>> = await this.client.post('/search', searchQuery, { headers })
+    return response.data.data
+  }
+
   async getDocumentDetails(documentId: string): Promise<DocumentDetailResponse> {
     const response: AxiosResponse<ApiResponse<DocumentDetailResponse>> = await this.client.get(`/search/documents/${documentId}`)
     return response.data.data
@@ -75,6 +100,12 @@ class ApiClient {
   // Chat
   async sendMessage(sessionId: string, request: ChatRequest): Promise<ChatMessage> {
     const response: AxiosResponse<ApiResponse<ChatMessage>> = await this.client.post(`/chat/sessions/${sessionId}/messages`, request)
+    return response.data.data
+  }
+
+  // Multilingual Chat
+  async sendMultilingualMessage(sessionId: string, request: MultilingualChatRequest): Promise<MultilingualChatResponse> {
+    const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(`/chat/sessions/${sessionId}/messages/multilingual`, request)
     return response.data.data
   }
 

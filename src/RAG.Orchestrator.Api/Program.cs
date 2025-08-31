@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddSemanticKernel();
+builder.Services.AddLocalization(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddCorsPolicy();
 builder.Services.AddControllers();
@@ -22,11 +23,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "RAG Orchestrator API v1");
-        options.RoutePrefix = string.Empty;
-    });
+    app.UseSwaggerUI();
     app.UseCors("AllowFrontend");
 }
 

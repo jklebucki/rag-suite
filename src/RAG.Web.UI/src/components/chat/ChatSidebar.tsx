@@ -1,5 +1,6 @@
 import React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
+import { useI18n } from '@/contexts/I18nContext'
 import type { ChatSession } from '@/types'
 
 interface ChatSidebarProps {
@@ -19,6 +20,8 @@ export function ChatSidebar({
   onDeleteSession,
   isCreatingSession,
 }: ChatSidebarProps) {
+  const { t } = useI18n()
+  
   return (
     <div className="w-80 border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
@@ -28,7 +31,7 @@ export function ChatSidebar({
           className="w-full btn-primary flex items-center justify-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          New Chat
+          {t('chat.new_session')}
         </button>
       </div>
 
@@ -46,7 +49,7 @@ export function ChatSidebar({
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {session.title || 'New Chat'}
+                  {session.title || t('chat.new_session')}
                 </p>
                 <p className="text-xs text-gray-500">
                   {new Date(session.updatedAt).toLocaleDateString()}
@@ -58,7 +61,7 @@ export function ChatSidebar({
                   onDeleteSession(session.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-100 text-red-600 transition-opacity"
-                title="Delete chat session"
+                title={t('common.delete')}
               >
                 <Trash2 className="h-4 w-4" />
               </button>

@@ -54,6 +54,22 @@ public static class ChatEndpoints
         .WithSummary("Send a message in a chat session")
         .WithDescription("Send a message to a chat session and receive an AI response");
 
+        group.MapPost("/sessions/{sessionId}/messages/multilingual", async (string sessionId, Models.MultilingualChatRequest request, IChatService chatService) =>
+        {
+            try
+            {
+                var response = await chatService.SendMultilingualMessageAsync(sessionId, request);
+                return response.ToApiResponse();
+            }
+            catch (ArgumentException)
+            {
+                return ApiResponseExtensions.ToApiNotFoundResponse<Models.MultilingualChatResponse>("Session not found");
+            }
+        })
+        .WithName("SendMultilingualMessage")
+        .WithSummary("Send a multilingual message in a chat session")
+        .WithDescription("Send a message with language detection, translation, and localized response generation");
+
         group.MapDelete("/sessions/{sessionId}", async (string sessionId, IChatService chatService) =>
         {
             var deleted = await chatService.DeleteSessionAsync(sessionId);

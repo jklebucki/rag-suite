@@ -1,12 +1,14 @@
 import React from 'react'
 import { Bot, User, Loader2 } from 'lucide-react'
-import { useChat } from '@/hooks/useChat'
+import { useMultilingualChat } from '@/hooks/useMultilingualChat'
+import { useI18n } from '@/contexts/I18nContext'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { ChatMessage } from '@/types'
 
 export function ChatInterface() {
+  const { t, language: currentLanguage } = useI18n()
   const {
     currentSessionId,
     message,
@@ -15,6 +17,8 @@ export function ChatInterface() {
     sessionToDelete,
     sessions,
     currentSession,
+    lastMessageLanguage,
+    translationStatus,
     sendMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
@@ -25,7 +29,36 @@ export function ChatInterface() {
     cancelDeleteSession,
     setMessage,
     setCurrentSessionId,
-  } = useChat()
+  } = useMultilingualChat()
+
+  // Format timestamp as YYYY-MM-DD HH:mm:ss
+  const formatTimestamp = (timestamp: Date | string) => {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
+    return date.toISOString().slice(0, 19).replace('T', ' ')
+  }
+
+  // Format timestamp for relative time (e.g., "2 minutes ago")
+  const formatRelativeTime = (timestamp: Date | string) => {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
+    const now = new Date()
+    const diffInMs = now.getTime() - date.getTime()
+    const diffInSeconds = Math.floor(diffInMs / 1000)
+    const diffInMinutes = Math.floor(diffInSeconds / 60)
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    const diffInDays = Math.floor(diffInHours / 24)
+
+    if (diffInSeconds < 60) {
+      return 'just now'
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`
+    } else if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`
+    } else {
+      return formatTimestamp(date)
+    }
+  }
 
   return (
     <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -45,16 +78,59 @@ export function ChatInterface() {
           <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {currentSession.messages.map((msg) => (
-                <ChatMessageItem key={msg.id} message={msg} />
+              {currentSession.messages.map((msg: ChatMessage) => (
+                <div key={msg.id} className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-100' : 'bg-primary-100'}`}>
+                    {msg.role === 'user' ? (
+                      <User className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <Bot className="h-5 w-5 text-primary-600" />
+                    )}
+                  </div>
+                  <div className={`max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-4`}>
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    
+                    {/* Timestamp */}
+                    <div 
+                      className={`mt-2 text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'} cursor-help`}
+                      title={`Sent at ${formatTimestamp(msg.timestamp)}`}
+                    >
+                      <span className="font-medium">{formatRelativeTime(msg.timestamp)}</span>
+                      <span className="ml-2 opacity-75">{formatTimestamp(msg.timestamp)}</span>
+                    </div>
+                    
+                    {/* Language detection info */}
+                    {lastMessageLanguage && msg.id === currentSession.messages[currentSession.messages.length - 1]?.id && (
+                      <div className="mt-1 text-xs opacity-75">
+                        {lastMessageLanguage !== currentLanguage && (
+                          <span className={msg.role === 'user' ? 'text-blue-200' : 'text-blue-600'}>
+                            Detected: {lastMessageLanguage} • Response: {currentLanguage}
+                          </span>
+                        )}
+                        {translationStatus === 'translated' && (
+                          <span className={`ml-2 ${msg.role === 'user' ? 'text-green-200' : 'text-green-600'}`}>
+                            ✓ Translated
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
               {isTyping && (
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-full bg-primary-100">
                     <Bot className="h-5 w-5 text-primary-600" />
                   </div>
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  <div className="bg-gray-100 rounded-lg p-4 min-w-[100px]">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary-600" />
+                      <span className="text-sm text-gray-600">Assistant is typing...</span>
+                    </div>
+                    <div className="mt-1 text-xs text-gray-500">
+                      <span className="font-medium">now</span>
+                      <span className="ml-2 opacity-75">{formatTimestamp(new Date())}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -74,16 +150,16 @@ export function ChatInterface() {
             <div className="text-center">
               <Bot className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Welcome to RAG Suite Chat
+                {t('chat.title')}
               </h3>
               <p className="text-gray-600 mb-6 max-w-md">
-                Start a new conversation or select an existing chat session to continue.
+                {t('chat.subtitle')}
               </p>
               <button
                 onClick={handleNewSession}
                 className="btn-primary"
               >
-                Start New Chat
+                {t('chat.new_session')}
               </button>
             </div>
           </div>
@@ -95,10 +171,10 @@ export function ChatInterface() {
         isOpen={!!sessionToDelete}
         onClose={cancelDeleteSession}
         onConfirm={confirmDeleteSession}
-        title="Delete Chat Session"
-        message="Are you sure you want to delete this chat session? This action cannot be undone and all messages in this conversation will be permanently lost."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('chat.sessions')}
+        message={t('chat.no_sessions')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         variant="danger"
         isLoading={deleteSessionMutation.isPending}
       />
@@ -112,6 +188,7 @@ interface ChatMessageItemProps {
 
 function ChatMessageItem({ message }: ChatMessageItemProps) {
   const isUser = message.role === 'user'
+  const { t } = useI18n()
 
   return (
     <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -134,7 +211,7 @@ function ChatMessageItem({ message }: ChatMessageItemProps) {
 
         {message.sources && message.sources.length > 0 && (
           <div className="mt-2 text-xs text-gray-500">
-            <p className="font-medium mb-1">Sources:</p>
+            <p className="font-medium mb-1">{t('chat.sources')}:</p>
             <div className="space-y-1">
               {message.sources.slice(0, 3).map((source, index) => (
                 <div key={index} className="flex items-center gap-2">

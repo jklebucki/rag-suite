@@ -26,4 +26,4 @@ public record ChatRequest(
     string[]? Context = null
 );
 
-public record CreateSessionRequest(string? Title = null);
+public record CreateSessionRequest(string? Title = null, string? Language = null);

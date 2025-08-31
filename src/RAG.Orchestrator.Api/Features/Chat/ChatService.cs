@@ -1,5 +1,7 @@
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Localization;
+using RAG.Orchestrator.Api.Models;
 using System.Text;
 using System.Text.Json;
 using Microsoft.SemanticKernel;
@@ -12,6 +14,7 @@ public interface IChatService
     Task<ChatSession> CreateSessionAsync(CreateSessionRequest request, CancellationToken cancellationToken = default);
     Task<ChatSession?> GetSessionAsync(string sessionId, CancellationToken cancellationToken = default);
     Task<ChatMessage> SendMessageAsync(string sessionId, ChatRequest request, CancellationToken cancellationToken = default);
+    Task<Models.MultilingualChatResponse> SendMultilingualMessageAsync(string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteSessionAsync(string sessionId, CancellationToken cancellationToken = default);
 }
 
@@ -100,7 +103,7 @@ public class LlmService : ILlmService
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogError("LLM service returned error: {StatusCode}, Content: {ErrorContent}", response.StatusCode, errorContent);
-                return "Przepraszam, wystąpił problem z generowaniem odpowiedzi. Spróbuj ponownie.";
+                return "Sorry, there was a problem generating the response. Please try again.";
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -139,7 +142,7 @@ public class LlmService : ILlmService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling LLM service");
-            return "Wystąpił błąd podczas komunikacji z serwisem LLM.";
+            return "Error occurred during LLM service communication.";
         }
     }
 
@@ -217,17 +220,20 @@ public class ChatService : IChatService
     
     private readonly Kernel _kernel;
     private readonly ISearchService _searchService;
+    private readonly ILanguageService _languageService;
     private readonly ILogger<ChatService> _logger;
     private readonly IConfiguration _configuration;
 
     public ChatService(
         Kernel kernel,
-        ISearchService searchService, 
+        ISearchService searchService,
+        ILanguageService languageService,
         ILogger<ChatService> logger,
         IConfiguration configuration)
     {
         _kernel = kernel;
         _searchService = searchService;
+        _languageService = languageService;
         _logger = logger;
         _configuration = configuration;
     }
@@ -240,9 +246,13 @@ public class ChatService : IChatService
     public Task<ChatSession> CreateSessionAsync(CreateSessionRequest request, CancellationToken cancellationToken = default)
     {
         var sessionId = Guid.NewGuid().ToString();
+        var language = request.Language ?? _languageService.GetDefaultLanguage();
+        var normalizedLanguage = _languageService.NormalizeLanguage(language);
+        var sessionTitle = request.Title ?? _languageService.GetLocalizedString("session_labels", "new_conversation", normalizedLanguage);
+        
         var session = new ChatSession(
             sessionId,
-            request.Title ?? "Nowa rozmowa",
+            sessionTitle,
             Array.Empty<ChatMessage>(),
             DateTime.Now,
             DateTime.Now
@@ -287,7 +297,7 @@ public class ChatService : IChatService
         try
         {
             // Search for relevant context
-            var searchResults = await _searchService.SearchAsync(new SearchRequest(
+            var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null,
                 Limit: 3,
@@ -299,7 +309,8 @@ public class ChatService : IChatService
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ?? "Przepraszam, nie udało się wygenerować odpowiedzi.";
+            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+                _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
 
             var aiMessage = new ChatMessage(
                 Guid.NewGuid().ToString(),
@@ -327,12 +338,150 @@ public class ChatService : IChatService
             var errorMessage = new ChatMessage(
                 Guid.NewGuid().ToString(),
                 "assistant",
-                "Przepraszam, wystąpił problem podczas generowania odpowiedzi. Spróbuj ponownie za chwilę.",
+                _languageService.GetLocalizedErrorMessage("processing_error", _languageService.GetDefaultLanguage()),
                 DateTime.Now
             );
             
             _messages[sessionId].Add(errorMessage);
             return errorMessage;
+        }
+    }
+
+    public async Task<Models.MultilingualChatResponse> SendMultilingualMessageAsync(string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        if (!_messages.ContainsKey(sessionId))
+            throw new ArgumentException("Session not found", nameof(sessionId));
+
+        var maxMessageLength = _configuration.GetValue<int>("Chat:MaxMessageLength", 2000);
+        if (request.Message.Length > maxMessageLength)
+        {
+            throw new ArgumentException($"Message too long. Maximum length is {maxMessageLength} characters.");
+        }
+
+        // Detect message language if not provided
+        var detectedLanguage = string.IsNullOrEmpty(request.Language) 
+            ? _languageService.DetectLanguage(request.Message)
+            : _languageService.NormalizeLanguage(request.Language);
+
+        var responseLanguage = string.IsNullOrEmpty(request.ResponseLanguage)
+            ? detectedLanguage
+            : _languageService.NormalizeLanguage(request.ResponseLanguage);
+
+        try
+        {
+            // Add user message
+            var userMessage = new ChatMessage(
+                Guid.NewGuid().ToString(),
+                "user",
+                request.Message,
+                DateTime.Now
+            );
+            _messages[sessionId].Add(userMessage);
+
+            // Search for relevant context with language consideration
+            var searchRequest = new Features.Search.SearchRequest(
+                request.Message,
+                Filters: null, // TODO: Map metadata to SearchFilters if needed
+                Limit: 3,
+                Offset: 0
+            );
+
+            var searchResults = await _searchService.SearchAsync(searchRequest, cancellationToken);
+
+            // Build multilingual context-aware prompt
+            var prompt = BuildMultilingualContextualPrompt(
+                request.Message, 
+                searchResults.Results, 
+                _messages[sessionId], 
+                detectedLanguage, 
+                responseLanguage
+            );
+
+            // Generate AI response using Semantic Kernel
+            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+                _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
+
+            // Translate response if needed
+            var wasTranslated = false;
+            double? translationConfidence = null;
+            
+            if (request.EnableTranslation && detectedLanguage != responseLanguage)
+            {
+                try
+                {
+                    var translationResult = await _languageService.TranslateWithConfidenceAsync(
+                        aiResponseContent, detectedLanguage, responseLanguage, cancellationToken);
+                    
+                    aiResponseContent = translationResult.TranslatedText;
+                    wasTranslated = true;
+                    translationConfidence = translationResult.Confidence;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Translation failed, using original response");
+                }
+            }
+
+            var aiMessage = new ChatMessage(
+                Guid.NewGuid().ToString(),
+                "assistant",
+                aiResponseContent,
+                DateTime.Now,
+                searchResults.Results.Length > 0 ? searchResults.Results : null
+            );
+            
+            _messages[sessionId].Add(aiMessage);
+
+            // Update session timestamp
+            var sessionIndex = _sessions.FindIndex(s => s.Id == sessionId);
+            if (sessionIndex >= 0)
+            {
+                _sessions[sessionIndex] = _sessions[sessionIndex] with { UpdatedAt = DateTime.Now };
+            }
+
+            stopwatch.Stop();
+
+            return new Models.MultilingualChatResponse
+            {
+                Response = aiResponseContent,
+                SessionId = sessionId,
+                DetectedLanguage = detectedLanguage,
+                ResponseLanguage = responseLanguage,
+                WasTranslated = wasTranslated,
+                TranslationConfidence = translationConfidence,
+                Sources = searchResults.Results.Length > 0 
+                    ? searchResults.Results.Select(r => r.Source).ToList() 
+                    : null,
+                ProcessingTimeMs = stopwatch.ElapsedMilliseconds,
+                Metadata = new Dictionary<string, object>
+                {
+                    ["searchResultsCount"] = searchResults.Results.Length,
+                    ["enabledTranslation"] = request.EnableTranslation
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating multilingual AI response for session {SessionId}", sessionId);
+            
+            stopwatch.Stop();
+            
+            return new Models.MultilingualChatResponse
+            {
+                Response = _languageService.GetLocalizedErrorMessage("processing_error", responseLanguage),
+                SessionId = sessionId,
+                DetectedLanguage = detectedLanguage,
+                ResponseLanguage = responseLanguage,
+                ProcessingTimeMs = stopwatch.ElapsedMilliseconds,
+                Metadata = new Dictionary<string, object>
+                {
+                    ["error"] = true,
+                    ["errorMessage"] = ex.Message
+                }
+            };
         }
     }
 
@@ -343,7 +492,7 @@ public class ChatService : IChatService
         return Task.FromResult(removed);
     }
 
-    private static string BuildContextualPrompt(string userMessage, SearchResult[] searchResults, List<ChatMessage> conversationHistory)
+    private static string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory)
     {
         var promptBuilder = new StringBuilder();
         
@@ -388,6 +537,80 @@ public class ChatService : IChatService
         promptBuilder.AppendLine("- Bądź konkretny i pomocny");
         promptBuilder.AppendLine();
         promptBuilder.AppendLine("Odpowiedź:");
+        
+        return promptBuilder.ToString();
+    }
+    
+    private string BuildMultilingualContextualPrompt(
+        string userMessage, 
+        Features.Search.SearchResult[] searchResults, 
+        List<ChatMessage> conversationHistory,
+        string detectedLanguage,
+        string responseLanguage)
+    {
+        var promptBuilder = new StringBuilder();
+        
+        // Get localized system prompt and instructions
+        var systemPrompt = _languageService.GetLocalizedSystemPrompt("rag_assistant", responseLanguage);
+        var instructions = _languageService.GetLocalizedInstructions(responseLanguage);
+        
+        promptBuilder.AppendLine(systemPrompt);
+        promptBuilder.AppendLine(instructions);
+        promptBuilder.AppendLine();
+        
+        // Add context from search results with translation note if needed
+        if (searchResults.Length > 0)
+        {
+            var contextLabel = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage);
+            promptBuilder.AppendLine($"=== {contextLabel} ===");
+            
+            foreach (var result in searchResults.Take(3))
+            {
+                var titleLabel = _languageService.GetLocalizedString("system_prompts", "document", responseLanguage);
+                var contentLabel = _languageService.GetLocalizedString("system_prompts", "content", responseLanguage);
+                var sourceLabel = _languageService.GetLocalizedString("system_prompts", "source", responseLanguage);
+                
+                promptBuilder.AppendLine($"{titleLabel}: {result.Title}");
+                promptBuilder.AppendLine($"{contentLabel}: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                promptBuilder.AppendLine($"{sourceLabel}: {result.Source}");
+                promptBuilder.AppendLine();
+            }
+        }
+        
+        // Add recent conversation history
+        var recentMessages = conversationHistory.TakeLast(6).ToList();
+        if (recentMessages.Count > 1)
+        {
+            var historyLabel = _languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage);
+            promptBuilder.AppendLine($"=== {historyLabel} ===");
+            
+            var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
+            var assistantLabel = _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
+            
+            foreach (var msg in recentMessages.TakeLast(4))
+            {
+                var role = msg.Role == "user" ? userLabel : assistantLabel;
+                promptBuilder.AppendLine($"{role}: {msg.Content}");
+            }
+            promptBuilder.AppendLine();
+        }
+        
+        // Add current question
+        var questionLabel = _languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage);
+        promptBuilder.AppendLine($"=== {questionLabel} ===");
+        promptBuilder.AppendLine(userMessage);
+        promptBuilder.AppendLine();
+        
+        // Add language-specific note if translation is involved
+        if (detectedLanguage != responseLanguage)
+        {
+            var translationNote = _languageService.GetLocalizedString("system_prompts", "translation_note", responseLanguage);
+            promptBuilder.AppendLine($"[{translationNote}: {detectedLanguage} → {responseLanguage}]");
+            promptBuilder.AppendLine();
+        }
+        
+        var responseLabel = _languageService.GetLocalizedString("system_prompts", "response", responseLanguage);
+        promptBuilder.AppendLine($"{responseLabel}:");
         
         return promptBuilder.ToString();
     }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Download, Search } from 'lucide-react'
+import { useI18n } from '@/contexts/I18nContext'
 import { Modal } from '@/components/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from './hooks/useDocumentDetail'
@@ -18,6 +19,7 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ searchResults, isLoading, error, hasSearched, onExport }: SearchResultsProps) {
+  const { t } = useI18n()
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
   const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
 
@@ -27,7 +29,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     if (!err) return null
     return (
       <div className="p-6 bg-red-50 border border-red-200 rounded-lg m-6">
-        <p className="text-red-700">Error loading document details. Please try again.</p>
+        <p className="text-red-700">{t('search.error')}</p>
       </div>
     )
   }
@@ -36,7 +38,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Searching...</p>
+        <p className="mt-4 text-gray-600">{t('search.loading')}</p>
       </div>
     )
   }
@@ -45,7 +47,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     console.error('🔍 Search error in component:', error)
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700">Error occurred while searching. Please try again.</p>
+        <p className="text-red-700">{t('search.error')}</p>
         <details className="mt-2">
           <summary className="cursor-pointer text-sm">Error details</summary>
           <pre className="text-xs mt-1 text-red-600">{JSON.stringify(error, null, 2)}</pre>
@@ -59,8 +61,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       <div className="bg-white rounded-lg shadow-sm border p-8">
         <div className="text-center text-gray-500">
           <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to Search</h3>
-          <p>Enter your search query and click the search button to find relevant documents.</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('search.title')}</h3>
+          <p>{t('search.subtitle')}</p>
         </div>
       </div>
     )
@@ -74,9 +76,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Search Results</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('search.results')}</h2>
           <p className="text-sm text-gray-600">
-            Found {searchResults.total} results in {searchResults.took}ms
+            {t('search.results')} {searchResults.total} {t('search.results')} in {searchResults.took}ms
           </p>
         </div>
         <button onClick={onExport} className="btn-secondary flex items-center gap-2">
@@ -98,7 +100,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       {searchResults.results.length === 0 && (
         <div className="p-8 text-center text-gray-500">
           <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <p>No results found for your search query.</p>
+          <p>{t('search.no_results')}</p>
         </div>
       )}
 
