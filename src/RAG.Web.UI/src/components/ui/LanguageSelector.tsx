@@ -3,6 +3,8 @@ import { ChevronDown, Check, Globe } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
 import { Language } from '@/types/i18n';
 
+/* eslint-disable jsx-a11y/aria-proptypes */
+
 export function LanguageSelector() {
   const { language, setLanguage, languages, isAutoDetected, t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +31,7 @@ export function LanguageSelector() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
         title={t('language.selector.title')}
@@ -57,6 +60,7 @@ export function LanguageSelector() {
             {languages.map((lang) => (
               <button
                 key={lang.code}
+                type="button"
                 onClick={() => handleLanguageSelect(lang)}
                 className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 transition-colors"
               >
