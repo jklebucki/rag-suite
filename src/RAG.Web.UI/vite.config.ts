@@ -18,6 +18,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/healthz': {
+        target: 'http://localhost:7107',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/health': {
+        target: 'http://localhost:7107',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   build: {

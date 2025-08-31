@@ -4,6 +4,7 @@ using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
+using RAG.Orchestrator.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ app.MapAnalyticsEndpoints();
 app.MapHealthEndpoints();
 
 // Health check endpoint
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
+app.MapGet("/health", () => new { Status = "Healthy", Timestamp = DateTime.UtcNow }.ToApiResponse())
    .WithName("HealthCheck")
    .WithTags("Health")
    .WithSummary("Health check endpoint")

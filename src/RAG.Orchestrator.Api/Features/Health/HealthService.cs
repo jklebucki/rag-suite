@@ -71,11 +71,22 @@ public class HealthAggregator : IHealthAggregator
     private async Task<ServiceStatus> GetElasticsearchStatusAsync(CancellationToken ct)
     {
         var url = _configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
+        var username = _configuration["Services:Elasticsearch:Username"];
+        var password = _configuration["Services:Elasticsearch:Password"];
+        
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             cts.CancelAfter(TimeSpan.FromSeconds(2)); // bardzo krótki timeout dla health check
             var client = _httpClientFactory.CreateClient();
+            
+            // Add basic authentication if credentials are provided
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{username}:{password}"));
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+            }
+            
             var response = await client.GetAsync(url, cts.Token);
             if (!response.IsSuccessStatusCode)
             {
