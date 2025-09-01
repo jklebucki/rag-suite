@@ -11,8 +11,29 @@ public static class HealthEndpoints
 
         group.MapGet("/system", async (IHealthAggregator aggregator) =>
         {
-            var health = await aggregator.GetSystemHealthAsync();
-            return health.ToApiResponse();
+            try
+            {
+                var health = await aggregator.GetSystemHealthAsync();
+                return health.ToApiResponse();
+            }
+            catch (Exception ex)
+            {
+                // Return error response instead of crashing
+                var errorResponse = new
+                {
+                    Status = "Error",
+                    Message = ex.Message,
+                    Timestamp = DateTime.UtcNow,
+                    Services = new
+                    {
+                        Api = "healthy", // if this code runs, API is up
+                        Llm = "error",
+                        Elasticsearch = "error", 
+                        VectorStore = "unknown"
+                    }
+                };
+                return Results.Json(errorResponse, statusCode: 503);
+            }
         })
         .WithName("SystemHealth")
         .WithSummary("Aggregated system health status")

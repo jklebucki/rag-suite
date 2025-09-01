@@ -39,10 +39,23 @@ app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 
 // Simple health endpoint
-app.MapGet("/health", () => new { 
-    Status = "Healthy", 
-    Timestamp = DateTime.UtcNow,
-    Version = "2.0.0-semantic-kernel"
+app.MapGet("/health", (HttpContext context) => {
+    try 
+    {
+        return Results.Ok(new { 
+            Status = "Healthy", 
+            Timestamp = DateTime.UtcNow,
+            Version = "2.0.0-semantic-kernel"
+        });
+    }
+    catch
+    {
+        return Results.Json(new { 
+            Status = "Error", 
+            Timestamp = DateTime.UtcNow,
+            Version = "2.0.0-semantic-kernel"
+        }, statusCode: 503);
+    }
 });
 
 app.Run();

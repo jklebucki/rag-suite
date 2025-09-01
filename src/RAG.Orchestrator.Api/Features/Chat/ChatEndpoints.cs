@@ -81,13 +81,26 @@ public static class ChatEndpoints
 
         group.MapGet("/health", async (ILlmService llmService) =>
         {
-            var isHealthy = await llmService.IsHealthyAsync();
-            var status = new
+            try
             {
-                LlmService = isHealthy ? "Healthy" : "Unhealthy",
-                Timestamp = DateTime.UtcNow
-            };
-            return status.ToApiResponse();
+                var isHealthy = await llmService.IsHealthyAsync();
+                var status = new
+                {
+                    LlmService = isHealthy ? "Healthy" : "Unhealthy",
+                    Timestamp = DateTime.UtcNow
+                };
+                return status.ToApiResponse();
+            }
+            catch (Exception ex)
+            {
+                var status = new
+                {
+                    LlmService = "Error",
+                    Error = ex.Message,
+                    Timestamp = DateTime.UtcNow
+                };
+                return Results.Json(status, statusCode: 503);
+            }
         })
         .WithName("ChatHealthCheck")
         .WithSummary("Check chat service health")

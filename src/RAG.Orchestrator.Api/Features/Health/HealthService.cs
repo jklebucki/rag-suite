@@ -29,16 +29,33 @@ public class HealthAggregator : IHealthAggregator
 
     public async Task<SystemHealthResponse> GetSystemHealthAsync(CancellationToken cancellationToken = default)
     {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(TimeSpan.FromSeconds(5)); // maximum timeout for entire health check
-        
-        var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(5)); // maximum timeout for entire health check
+            
+            var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
 
-        var llmStatus = await GetLlmStatusAsync(cts.Token);
-        var esStatus = await GetElasticsearchStatusAsync(cts.Token);
-        var vectorStatus = await GetVectorStoreStatusAsync(cts.Token);
+            var llmStatus = await GetLlmStatusAsync(cts.Token);
+            var esStatus = await GetElasticsearchStatusAsync(cts.Token);
+            var vectorStatus = await GetVectorStoreStatusAsync(cts.Token);
 
-        return new SystemHealthResponse(apiStatus, llmStatus, esStatus, vectorStatus, DateTime.UtcNow);
+            return new SystemHealthResponse(apiStatus, llmStatus, esStatus, vectorStatus, DateTime.UtcNow);
+        }
+        catch (Exception ex)
+        {
+            // Fallback response if everything fails
+            var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
+            var errorStatus = new ServiceStatus("unknown", "error", ex.Message);
+            
+            try
+            {
+                _logger.LogError(ex, "System health check failed completely");
+            }
+            catch { /* Ignore logging errors */ }
+            
+            return new SystemHealthResponse(apiStatus, errorStatus, errorStatus, errorStatus, DateTime.UtcNow);
+        }
     }
 
     private async Task<ServiceStatus> GetLlmStatusAsync(CancellationToken ct)
@@ -58,12 +75,20 @@ public class HealthAggregator : IHealthAggregator
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("LLM health check timed out");
+            try
+            {
+                _logger.LogWarning("LLM health check timed out");
+            }
+            catch { /* Ignore logging errors */ }
             return new ServiceStatus("llm", "error", "Service timeout");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "LLM health check failed");
+            try
+            {
+                _logger.LogError(ex, "LLM health check failed");
+            }
+            catch { /* Ignore logging errors */ }
             return new ServiceStatus("llm", "error", ex.Message);
         }
     }
@@ -99,12 +124,25 @@ public class HealthAggregator : IHealthAggregator
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("Elasticsearch health check timed out");
+            try
+            {
+                _logger.LogWarning("Elasticsearch health check timed out");
+            }
+            catch { /* Ignore logging errors */ }
             return new ServiceStatus("elasticsearch", "error", "Service timeout");
+        }
+        catch (HttpRequestException)
+        {
+            // Connection issues are expected when Elasticsearch is down
+            return new ServiceStatus("elasticsearch", "error", "Connection refused");
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Elasticsearch health check failed");
+            try
+            {
+                _logger.LogWarning(ex, "Elasticsearch health check failed");
+            }
+            catch { /* Ignore logging errors */ }
             return new ServiceStatus("elasticsearch", "error", ex.Message);
         }
     }

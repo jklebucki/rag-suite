@@ -159,9 +159,26 @@ public class LlmService : ILlmService
             var response = await _httpClient.GetAsync(endpoint, cts.Token);
             return response.IsSuccessStatusCode;
         }
+        catch (OperationCanceledException)
+        {
+            // Don't log cancellation as error, just return false
+            return false;
+        }
+        catch (HttpRequestException)
+        {
+            // Connection issues are expected when service is down
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Health check failed for LLM service");
+            try
+            {
+                _logger.LogError(ex, "Health check failed for LLM service");
+            }
+            catch
+            {
+                // If logging fails, ignore it to prevent crash
+            }
             return false;
         }
     }
