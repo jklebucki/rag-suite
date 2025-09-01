@@ -36,6 +36,7 @@ export function useMultilingualChat() {
       console.log('Calling sendMultilingualMessage API with:', { sessionId, request })
       return apiClient.sendMultilingualMessage(sessionId, request)
     },
+    retry: false, // 🆕 No retry to prevent double sending
     onSuccess: (response) => {
       console.log('sendMultilingualMessage success:', response)
       setLastResponse(response)
@@ -110,6 +111,12 @@ export function useMultilingualChat() {
     
     if (!currentSessionId) {
       console.log('No current session, aborting')
+      return
+    }
+
+    // 🆕 Prevent double sending when already sending
+    if (isTyping || sendMultilingualMessageMutation.isPending) {
+      console.log('Already sending message, aborting')
       return
     }
 

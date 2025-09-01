@@ -13,17 +13,15 @@ const queryClient = new QueryClient({
       retry: 3, // Number of retries
     },
     mutations: {
-      retry: 1, // Less retries for mutations
+      retry: 0, // 🆕 No retry for mutations to prevent double sending
     },
   },
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </React.StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </QueryClientProvider>,
 )
