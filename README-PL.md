@@ -1,6 +1,8 @@
 # RAG Suite
 
 ![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)
+![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-orange?style=for-the-badge&logo=elasticsearch)
 ![BGE-M3 Embeddings](https://img.shields.io/badge/BGE--M3-1024D-green?style=for-the-badge)
@@ -14,6 +16,7 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 
 | Folder | Zawartość i przeznaczenie |
 |--------|---------------------------|
+| `src/RAG.Web.UI` | Nowoczesny frontend React TypeScript z interfejsem chat i dashboard |
 | `src/RAG.Orchestrator.Api` | Główne API — Minimal API .NET, orkiestruje agenty i zapytania RAG |
 | `src/RAG.Ingestion.Worker` | Worker do ekstrakcji metadata z Oracle i dokumentów SOP/BPMN |
 | `src/RAG.Shared` | Wspólne biblioteki, typy DTO, modele, helpery |
@@ -28,6 +31,66 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 | `deploy/systemd` | Pliki serwisów systemd dla API i Workerów |
 | `docs/` | Dokumentacja architektury, prompty, runbooks |
 | `scripts/` | Skrypty pomocnicze: seed, migracje, testy, CI/CD itp. |
+
+---
+
+## Kluczowe komponenty
+
+### 🌐 RAG.Web.UI - Aplikacja frontendowa
+
+Nowoczesny frontend React TypeScript oferujący:
+
+* **🚀 Nowoczesny stack**: React 18 + TypeScript + Vite + Tailwind CSS
+* **💬 Interaktywny chat**: Interfejs chat z obsługą RAG i wielojęzyczności
+* **🔍 Zaawansowane wyszukiwanie**: Wyszukiwanie full-text i semantyczne z filtrami
+* **📊 Dashboard**: Metryki systemu, analityka i monitoring użycia
+* **🔌 Zarządzanie pluginami**: Monitorowanie i zarządzanie pluginami RAG
+* **👤 Autoryzacja użytkowników**: Logowanie JWT z dostępem opartym na rolach
+* **📱 Responsywny design**: Bezproblemowa praca na desktop i mobile
+
+### 🛡️ RAG.Security - Autoryzacja i uwierzytelnienie
+
+Kompletna infrastruktura bezpieczeństwa z:
+
+* **🔐 Autoryzacja JWT**: Bezpieczne uwierzytelnienie oparte na tokenach
+* **👥 Zarządzanie użytkownikami**: Rejestracja, logowanie, zarządzanie profilem
+* **🎭 Dostęp oparty na rolach**: Role User, PowerUser, Admin
+* **📊 Baza SQLite**: Lokalne przechowywanie użytkowników i ról
+* **🔄 Odświeżanie tokenów**: Bezpieczny mechanizm odnowy tokenów
+
+### 🤖 RAG.Orchestrator.Api - Główny backend
+
+Główne API orkiestrujące system RAG:
+
+* **🧠 Integracja Semantic Kernel**: Generowanie odpowiedzi AI
+* **💬 Sesje chat per użytkownik**: Izolowane sesje chat dla każdego użytkownika
+* **🌍 Obsługa wielojęzyczności**: Auto-detekcja i tłumaczenie
+* **🔍 Wyszukiwanie wektorowe**: Embeddingi BGE-M3 z Elasticsearch
+* **📊 Analityka**: Śledzenie użycia i monitoring wydajności
+
+---
+
+## Szybki start
+
+1. **Uruchom usługi backendowe**:
+   ```bash
+   cd deploy && docker-compose up -d
+   ```
+
+2. **Uruchom API**:
+   ```bash
+   cd src/RAG.Orchestrator.Api && dotnet run
+   ```
+
+3. **Uruchom frontend**:
+   ```bash
+   cd src/RAG.Web.UI && npm install && npm run dev
+   ```
+
+4. **Dostęp do aplikacji**:
+   - Frontend: http://localhost:3000
+   - API: http://localhost:7107
+   - Domyślne dane logowania administratora: `admin@example.com` / `AdminPassword123!`
 
 ---
 

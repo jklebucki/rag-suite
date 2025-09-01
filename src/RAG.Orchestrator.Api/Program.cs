@@ -4,10 +4,13 @@ using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
+using RAG.Security.Extensions;
+using RAG.Security.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
+builder.Services.AddRAGSecurity(builder.Configuration);
 builder.Services.AddSemanticKernel();
 builder.Services.AddLocalization(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
@@ -19,6 +22,9 @@ builder.Services.AddFeatureServices();
 
 var app = builder.Build();
 
+// Ensure database is created
+await app.Services.EnsureSecurityDatabaseCreatedAsync();
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -29,10 +35,16 @@ if (app.Environment.IsDevelopment())
 // Enable CORS for all environments (needed for direct API access)
 app.UseCors("AllowFrontend");
 
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseUserContext();
+app.UseAuthorization();
+
 app.MapControllers();
 
 // Map feature endpoints
 app.MapChatEndpoints();
+app.MapUserChatEndpoints();
 app.MapSearchEndpoints();
 app.MapHealthEndpoints();
 app.MapPluginEndpoints();

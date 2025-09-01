@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.24.0-alpha" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RAG.Security\RAG.Security.csproj" />
+  </ItemGroup>
+
 </Project>
