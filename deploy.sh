@@ -156,23 +156,57 @@ if [ "$NODE_AVAILABLE" = true ]; then
     fi
 
     if [ "$NODE_AVAILABLE" = true ]; then
-        # Build aplikacji React
-        echo -e "${YELLOW}Budowanie aplikacji React...${NC}"
-        if npm run build; then
-            if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
-                # Wyczyść stary build
-                rm -rf ../../build/web/*
-                # Kopiowanie build do głównego katalogu build
-                cp -r dist/* ../../build/web/
-                echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
-                echo -e "${GREEN}✓ Pliki skopiowane do build/web${NC}"
+        # Sprawdź czy Node.js jest z snap (ma ograniczenia katalogów)
+        if command -v snap >/dev/null 2>&1 && snap list node >/dev/null 2>&1; then
+            echo -e "${YELLOW}⚠ Wykryto Node.js z snap - budowanie w /tmp${NC}"
+            TEMP_BUILD_DIR="/tmp/rag-ui-build-$$"
+            mkdir -p "$TEMP_BUILD_DIR"
+            
+            # Kopiuj źródła do temp
+            cp -r . "$TEMP_BUILD_DIR/"
+            cd "$TEMP_BUILD_DIR"
+            
+            # Build aplikacji React w temp
+            echo -e "${YELLOW}Budowanie aplikacji React w /tmp...${NC}"
+            if npm install && npm run build; then
+                if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
+                    # Wyczyść stary build
+                    rm -rf /var/www/rag-suite/build/web/*
+                    # Kopiowanie build do głównego katalogu build
+                    cp -r dist/* /var/www/rag-suite/build/web/
+                    echo -e "${GREEN}✓ React app zbudowana pomyślnie (przez /tmp)${NC}"
+                    echo -e "${GREEN}✓ Pliki skopiowane do build/web${NC}"
+                else
+                    echo -e "${YELLOW}⚠ Katalog dist jest pusty lub nie istnieje${NC}"
+                    echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
+                fi
             else
-                echo -e "${YELLOW}⚠ Katalog dist jest pusty lub nie istnieje${NC}"
+                echo -e "${YELLOW}⚠ Błąd budowania React app w /tmp${NC}"
                 echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
             fi
+            
+            # Wyczyść temp
+            cd /var/www/rag-suite/src/RAG.Web.UI
+            rm -rf "$TEMP_BUILD_DIR"
         else
-            echo -e "${YELLOW}⚠ Błąd budowania React app${NC}"
-            echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
+            # Build aplikacji React normalnie
+            echo -e "${YELLOW}Budowanie aplikacji React...${NC}"
+            if npm run build; then
+                if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
+                    # Wyczyść stary build
+                    rm -rf ../../build/web/*
+                    # Kopiowanie build do głównego katalogu build
+                    cp -r dist/* ../../build/web/
+                    echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
+                    echo -e "${GREEN}✓ Pliki skopiowane do build/web${NC}"
+                else
+                    echo -e "${YELLOW}⚠ Katalog dist jest pusty lub nie istnieje${NC}"
+                    echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
+                fi
+            else
+                echo -e "${YELLOW}⚠ Błąd budowania React app${NC}"
+                echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
+            fi
         fi
     else
         echo -e "${YELLOW}⚠ Node.js niedostępny - używam podstawowego index.html${NC}"

@@ -54,7 +54,14 @@ echo -e "${BLUE}[2/7] Instalacja Node.js i NPM...${NC}"
 
 # Check if Node.js is already installed
 if command -v node &> /dev/null && command -v npm &> /dev/null; then
-    echo -e "${GREEN}✓ Node.js $(node --version) i NPM $(npm --version) już zainstalowane${NC}"
+    # Sprawdź czy Node.js jest z snap
+    if command -v snap >/dev/null 2>&1 && snap list node >/dev/null 2>&1; then
+        echo -e "${YELLOW}⚠ Node.js $(node --version) zainstalowany przez snap${NC}"
+        echo -e "${YELLOW}Snap ma ograniczenia dla katalogów poza /home${NC}"
+        echo -e "${YELLOW}Deploy script użyje obejścia przez /tmp${NC}"
+    else
+        echo -e "${GREEN}✓ Node.js $(node --version) i NPM $(npm --version) już zainstalowane${NC}"
+    fi
 else
     echo -e "${YELLOW}Próba instalacji Node.js...${NC}"
     
@@ -70,6 +77,11 @@ else
         # Try installing from default Ubuntu repositories
         if apt-get install -y nodejs npm; then
             echo -e "${GREEN}✓ Node.js zainstalowany z domyślnych repozytoriów${NC}"
+            
+            # Sprawdź czy zainstalował się przez snap
+            if command -v snap >/dev/null 2>&1 && snap list node >/dev/null 2>&1; then
+                echo -e "${YELLOW}⚠ Node.js zainstalowany przez snap - może mieć ograniczenia katalogów${NC}"
+            fi
         else
             echo -e "${YELLOW}⚠ Nie udało się zainstalować Node.js${NC}"
             echo -e "${YELLOW}Możesz kontynuować bez Node.js lub zainstalować go ręcznie później${NC}"
