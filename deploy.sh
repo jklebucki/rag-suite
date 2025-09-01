@@ -1,31 +1,7 @@
 #!/bin/bash
 
 # RAG Suite Deployment Script
-# Aktualizuje kod z git, buduje aplikację .NET i React, wdraecho -e "${BLUE}[6/8] Budowanie aplikacji React...${NC}"
-
-# Sprawdź czy Node.js jest dostępny
-if ! command -v node &> /dev/null; then
-    echo -e "${RED}✗ Node.js nie jest zainstalowany. Uruchom najpierw production-setup.sh${NC}"
-    exit 1
-fi
-
-if ! command -v npm &> /dev/null; then
-    echo -e "${RED}✗ npm nie jest dostępny. Sprawdź instalację Node.js${NC}"
-    exit 1
-fi
-
-echo -e "${BLUE}Używam Node.js $(node --version) i npm $(npm --version)${NC}"
-
-cd src/RAG.Web.UI
-
-# Sprawdź czy node_modules istnieje
-if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}Instalowanie zależności npm...${NC}"
-    npm install
-else
-    echo -e "${YELLOW}Aktualizowanie zależności npm...${NC}"
-    npm install
-ficję
+# Aktualizuje kod z git, buduje aplikację .NET i React, wdraża na serwer
 
 set -e
 
@@ -57,16 +33,14 @@ fi
 
 # Sprawdź czy katalog aplikacji istnieje
 if [ ! -d "$APP_DIR" ]; then
-   echo -e "${RED}Katalog aplikacji $APP_DIR nie istnieje!${NC}"
-   echo -e "${RED}Najpierw uruchom production-setup.sh${NC}"
-   exit 1
+    echo -e "${RED}Katalog aplikacji nie istnieje: $APP_DIR${NC}"
+    echo -e "${YELLOW}Uruchom najpierw: production-setup.sh${NC}"
+    exit 1
 fi
-
-cd $APP_DIR
 
 echo -e "${BLUE}[1/8] Zatrzymywanie serwisów...${NC}"
 
-# Zatrzymaj API jeśli działa
+# Zatrzymaj serwis RAG API
 if systemctl is-active --quiet rag-api; then
     echo -e "${YELLOW}Zatrzymywanie RAG API...${NC}"
     systemctl stop rag-api
@@ -75,59 +49,68 @@ fi
 
 echo -e "${BLUE}[2/8] Aktualizacja kodu z Git...${NC}"
 
-# Sprawdź status git
-echo -e "${YELLOW}Status git przed aktualizacją:${NC}"
-git status --porcelain
+cd $APP_DIR
 
-# Zapisz lokalne zmiany jeśli istnieją
+# Sprawdź czy są uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
-    echo -e "${YELLOW}Zapisywanie lokalnych zmian...${NC}"
-    git stash push -m "Auto-stash before deployment $(date)"
+    echo -e "${YELLOW}⚠ Wykryto niezapisane zmiany, wykonywanie stash...${NC}"
+    git stash
 fi
 
-# Pobierz najnowsze zmiany
-echo -e "${YELLOW}Pobieranie zmian z repozytorium...${NC}"
+# Aktualizuj kod
 git fetch origin
 git checkout $GIT_BRANCH
 git pull origin $GIT_BRANCH
 
-echo -e "${GREEN}✓ Kod zaktualizowany pomyślnie${NC}"
-
 echo -e "${BLUE}[3/8] Przygotowanie katalogów build...${NC}"
 
 # Usuń stary build
-rm -rf build
+if [ -d "build" ]; then
+    rm -rf build
+fi
+
+# Utwórz strukturę build
 mkdir -p build/api
 mkdir -p build/web
 
 echo -e "${BLUE}[4/8] Budowanie aplikacji .NET API...${NC}"
 
+# Przejdź do katalogu API
 cd src/RAG.Orchestrator.Api
 
 # Restore packages
 echo -e "${YELLOW}Przywracanie pakietów NuGet...${NC}"
 dotnet restore
 
-# Build w trybie Release
-echo -e "${YELLOW}Budowanie API w trybie Release...${NC}"
-dotnet build --configuration Release --no-restore
+# Zbuduj aplikację w trybie Release
+echo -e "${YELLOW}Budowanie aplikacji .NET...${NC}"
+dotnet publish -c Release -o ../../build/api
 
-# Publish do katalogu build
-echo -e "${YELLOW}Publikowanie API...${NC}"
-dotnet publish --configuration Release --no-build --output "../../build/api"
-
-cd ../../
-
-if [ -f "build/api/RAG.Orchestrator.Api.dll" ]; then
-    echo -e "${GREEN}✓ API zbudowane pomyślnie${NC}"
+# Sprawdź czy build się powiódł
+if [ -f "../../build/api/RAG.Orchestrator.Api.dll" ]; then
+    echo -e "${GREEN}✓ Aplikacja .NET zbudowana pomyślnie${NC}"
 else
-    echo -e "${RED}✗ Błąd podczas budowania API${NC}"
+    echo -e "${RED}✗ Błąd budowania aplikacji .NET${NC}"
     exit 1
 fi
 
 echo -e "${BLUE}[5/8] Budowanie aplikacji React (Web.UI)...${NC}"
 
-cd src/RAG.Web.UI
+# Przejdź do katalogu React
+cd ../RAG.Web.UI
+
+# Sprawdź czy Node.js jest dostępny
+if ! command -v node &> /dev/null; then
+    echo -e "${RED}✗ Node.js nie jest zainstalowany. Uruchom najpierw production-setup.sh${NC}"
+    exit 1
+fi
+
+if ! command -v npm &> /dev/null; then
+    echo -e "${RED}✗ npm nie jest dostępny. Sprawdź instalację Node.js${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}Używam Node.js $(node --version) i npm $(npm --version)${NC}"
 
 # Sprawdź czy node_modules istnieje
 if [ ! -d "node_modules" ]; then
@@ -147,169 +130,120 @@ if [ -d "dist" ]; then
     cp -r dist/* ../../build/web/
     echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
 else
-    echo -e "${RED}✗ Błąd podczas budowania React app${NC}"
+    echo -e "${RED}✗ Błąd budowania React app - brak katalogu dist${NC}"
     exit 1
 fi
 
-cd ../../
-
 echo -e "${BLUE}[6/8] Konfiguracja produkcyjna...${NC}"
 
-# Tworzenie appsettings.Production.json jeśli nie istnieje
+# Przejdź z powrotem do głównego katalogu
+cd ../..
+
+# Sprawdź czy istnieje plik konfiguracyjny
 if [ ! -f "build/api/appsettings.Production.json" ]; then
-    echo -e "${YELLOW}Tworzenie appsettings.Production.json...${NC}"
-    cat > build/api/appsettings.Production.json << EOF
+    echo -e "${YELLOW}Tworzenie domyślnego pliku konfiguracyjnego...${NC}"
+    cat > build/api/appsettings.Production.json << 'EOF'
 {
   "Logging": {
     "LogLevel": {
       "Default": "Information",
-      "Microsoft.AspNetCore": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
-    },
-    "Console": {
-      "FormatterName": "json"
-    },
-    "File": {
-      "Path": "/var/log/rag-suite/app.log",
-      "RollingInterval": "Day",
-      "RetainedFileCountLimit": 30
+      "Microsoft.AspNetCore": "Warning"
     }
   },
-  "AllowedHosts": "asystent.ad.citronex.pl,localhost",
-  "Kestrel": {
-    "Endpoints": {
-      "Http": {
-        "Url": "http://localhost:5000"
-      }
-    },
-    "Limits": {
-      "MaxConcurrentConnections": 100,
-      "MaxConcurrentUpgradedConnections": 100,
-      "MaxRequestBodySize": 30000000
-    }
-  },
+  "AllowedHosts": "*",
   "ConnectionStrings": {
-    "ElasticSearch": "http://elasticsearch.ad.citronex.pl:9200"
+    "ElasticSearch": "http://localhost:9200"
   },
   "LLM": {
-    "Provider": "Ollama",
-    "BaseUrl": "http://llm.ad.citronex.pl:11434",
-    "Model": "llama3.1:8b",
-    "Timeout": "00:05:00"
+    "ApiUrl": "http://localhost:11434",
+    "Model": "llama3.1",
+    "Temperature": 0.7,
+    "MaxTokens": 2000
   },
-  "CORS": {
+  "RagSettings": {
+    "ChunkSize": 1000,
+    "ChunkOverlap": 200,
+    "MaxResults": 10
+  },
+  "Security": {
     "AllowedOrigins": [
+      "http://localhost:3000",
       "http://asystent.ad.citronex.pl",
       "https://asystent.ad.citronex.pl"
     ]
-  },
-  "Security": {
-    "RequireHttps": false,
-    "EnableRateLimiting": true,
-    "MaxRequestsPerMinute": 60
   }
 }
 EOF
+    echo -e "${GREEN}✓ Utworzono domyślny plik konfiguracyjny${NC}"
 else
-    echo -e "${GREEN}✓ appsettings.Production.json już istnieje${NC}"
+    echo -e "${GREEN}✓ Plik konfiguracyjny już istnieje${NC}"
 fi
-
-# Tworzenie web.config dla IIS (jeśli potrzebne w przyszłości)
-cat > build/web/web.config << EOF
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <system.webServer>
-    <rewrite>
-      <rules>
-        <rule name="React Routes" stopProcessing="true">
-          <match url=".*" />
-          <conditions logicalGrouping="MatchAll">
-            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
-            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
-            <add input="{REQUEST_URI}" pattern="^/(api)" negate="true" />
-          </conditions>
-          <action type="Rewrite" url="/" />
-        </rule>
-      </rules>
-    </rewrite>
-    <staticContent>
-      <mimeMap fileExtension=".json" mimeType="application/json" />
-    </staticContent>
-  </system.webServer>
-</configuration>
-EOF
 
 echo -e "${BLUE}[7/8] Ustawianie uprawnień...${NC}"
 
-# Ustaw właściciela wszystkich plików
-chown -R $APP_USER:$APP_USER $APP_DIR
+# Ustaw właściciela na www-data
+chown -R $APP_USER:$APP_USER build/
 
-# Ustaw odpowiednie uprawnienia
-chmod -R 755 $APP_DIR
-chmod +x build/api/RAG.Orchestrator.Api
+# Ustaw uprawnienia dla plików API
+find build/api -type f -exec chmod 644 {} \;
+find build/api -type d -exec chmod 755 {} \;
 
-# Specjalne uprawnienia dla plików web
+# Ustaw uprawnienia wykonania dla głównego pliku API
+chmod +x build/api/RAG.Orchestrator.Api.dll
+
+# Ustaw uprawnienia dla plików Web
 find build/web -type f -exec chmod 644 {} \;
 find build/web -type d -exec chmod 755 {} \;
 
-# Uprawnienia dla logów
-mkdir -p /var/log/rag-suite
-chown -R $APP_USER:$APP_USER /var/log/rag-suite
-chmod -R 755 /var/log/rag-suite
+echo -e "${GREEN}✓ Uprawnienia ustawione dla $APP_USER${NC}"
 
 echo -e "${BLUE}[8/8] Uruchamianie serwisów...${NC}"
 
-# Przeładuj konfigurację systemd
+# Uruchom serwis RAG API
 systemctl daemon-reload
-
-# Uruchom API
-echo -e "${YELLOW}Uruchamianie RAG API...${NC}"
+systemctl enable rag-api
 systemctl start rag-api
 
-# Sprawdź czy API się uruchomił
+# Sprawdź czy serwis startuje poprawnie
 sleep 3
 if systemctl is-active --quiet rag-api; then
     echo -e "${GREEN}✓ RAG API uruchomiony pomyślnie${NC}"
 else
-    echo -e "${RED}✗ Problem z uruchomieniem RAG API${NC}"
-    echo -e "${YELLOW}Logi serwisu:${NC}"
-    journalctl -u rag-api --no-pager -n 20
+    echo -e "${RED}✗ Błąd uruchamiania RAG API${NC}"
+    echo -e "${YELLOW}Sprawdź logi: sudo journalctl -u rag-api -f${NC}"
     exit 1
 fi
 
-# Przeładuj nginx (dla nowych plików statycznych)
-echo -e "${YELLOW}Przeładowywanie Nginx...${NC}"
-systemctl reload nginx
-
+# Sprawdź czy nginx działa
 if systemctl is-active --quiet nginx; then
-    echo -e "${GREEN}✓ Nginx przeładowany pomyślnie${NC}"
+    echo -e "${GREEN}✓ Nginx działa${NC}"
+    systemctl reload nginx
 else
-    echo -e "${RED}✗ Problem z Nginx${NC}"
-    systemctl status nginx --no-pager
-    exit 1
-fi
-
-# Test połączenia z API
-echo -e "${YELLOW}Testowanie API...${NC}"
-sleep 3
-
-# Sprawdź podstawowy health check
-if curl -f -s http://localhost:5000/health > /dev/null; then
-    echo -e "${GREEN}✓ API Health Check - OK${NC}"
-    
-    # Sprawdź system health jeśli dostępny
-    if curl -f -s http://localhost:5000/healthz/system > /dev/null; then
-        echo -e "${GREEN}✓ System Health Check - OK${NC}"
+    echo -e "${YELLOW}Uruchamianie Nginx...${NC}"
+    systemctl start nginx
+    if systemctl is-active --quiet nginx; then
+        echo -e "${GREEN}✓ Nginx uruchomiony${NC}"
+    else
+        echo -e "${RED}✗ Błąd uruchamiania Nginx${NC}"
+        exit 1
     fi
-else
-    echo -e "${YELLOW}⚠ API może jeszcze się uruchamiać lub wystąpił problem${NC}"
-    echo -e "${YELLOW}Sprawdzanie logów...${NC}"
-    journalctl -u rag-api --no-pager -n 10
 fi
 
-# Test czy strona główna odpowiada
+echo -e "${BLUE}[TEST] Sprawdzanie połączenia...${NC}"
+
+# Test API
+echo -n -e "${YELLOW}Test API (http://localhost:5000/health)... ${NC}"
+if curl -f -s http://localhost:5000/health > /dev/null; then
+    echo -e "${GREEN}✓ OK${NC}"
+else
+    echo -e "${RED}✗ FAIL${NC}"
+    echo -e "${YELLOW}⚠ API może potrzebować więcej czasu na uruchomienie${NC}"
+fi
+
+# Test proxy Nginx do API
+echo -n -e "${YELLOW}Test proxy Nginx (http://localhost/health)... ${NC}"
 if curl -f -s -I http://localhost/health > /dev/null; then
-    echo -e "${GREEN}✓ Nginx proxy do API - OK${NC}"
+    echo -e "${GREEN}✓ OK${NC}"
 else
     echo -e "${YELLOW}⚠ Problem z proxy Nginx do API${NC}"
 fi
@@ -349,3 +283,4 @@ echo "- Commit: $(git rev-parse --short HEAD)"
 echo "- Data: $(date)"
 echo "- API Size: $(du -sh build/api | cut -f1)"
 echo "- Web Size: $(du -sh build/web | cut -f1)"
+echo
