@@ -52,16 +52,37 @@ fi
 
 echo -e "${BLUE}[2/7] Instalacja Node.js i NPM...${NC}"
 
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-apt-get install -y nodejs
-
-# Verify installation
-if node --version && npm --version; then
-    echo -e "${GREEN}✓ Node.js i NPM zainstalowane pomyślnie${NC}"
+# Check if Node.js is already installed
+if command -v node &> /dev/null && command -v npm &> /dev/null; then
+    echo -e "${GREEN}✓ Node.js $(node --version) i NPM $(npm --version) już zainstalowane${NC}"
 else
-    echo -e "${RED}✗ Błąd instalacji Node.js${NC}"
-    exit 1
+    echo -e "${YELLOW}Próba instalacji Node.js...${NC}"
+    
+    # Install Node.js (may fail on older systems)
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    
+    if apt-get install -y nodejs; then
+        echo -e "${GREEN}✓ Node.js zainstalowany pomyślnie${NC}"
+    else
+        echo -e "${YELLOW}⚠ Błąd instalacji Node.js z NodeSource repository${NC}"
+        echo -e "${YELLOW}Próba instalacji z domyślnych repozytoriów Ubuntu...${NC}"
+        
+        # Try installing from default Ubuntu repositories
+        if apt-get install -y nodejs npm; then
+            echo -e "${GREEN}✓ Node.js zainstalowany z domyślnych repozytoriów${NC}"
+        else
+            echo -e "${YELLOW}⚠ Nie udało się zainstalować Node.js${NC}"
+            echo -e "${YELLOW}Możesz kontynuować bez Node.js lub zainstalować go ręcznie później${NC}"
+            echo -e "${YELLOW}Komenda: sudo apt-get install nodejs npm${NC}"
+        fi
+    fi
+    
+    # Verify installation (non-blocking)
+    if command -v node &> /dev/null && command -v npm &> /dev/null; then
+        echo -e "${GREEN}✓ Node.js $(node --version) i NPM $(npm --version) dostępne${NC}"
+    else
+        echo -e "${YELLOW}⚠ Node.js nie jest dostępny - niektóre funkcje mogą być ograniczone${NC}"
+    fi
 fi
 
 echo -e "${BLUE}[3/7] Instalacja i konfiguracja Nginx...${NC}"
@@ -186,8 +207,16 @@ systemctl enable rag-api
 # Check installed versions
 echo -e "${YELLOW}Zainstalowane wersje:${NC}"
 echo "- .NET: $(dotnet --version)"
-echo "- Node.js: $(node --version)"
-echo "- NPM: $(npm --version)"
+if command -v node &> /dev/null; then
+    echo "- Node.js: $(node --version)"
+else
+    echo "- Node.js: nie zainstalowany"
+fi
+if command -v npm &> /dev/null; then
+    echo "- NPM: $(npm --version)"
+else
+    echo "- NPM: nie zainstalowany"
+fi
 echo "- Nginx: $(nginx -v 2>&1 | cut -d: -f2 | cut -d/ -f2)"
 
 echo ""

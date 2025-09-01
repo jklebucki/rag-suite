@@ -100,44 +100,47 @@ echo -e "${BLUE}[5/8] Budowanie aplikacji React (Web.UI)...${NC}"
 cd ../RAG.Web.UI
 
 # Sprawdź czy Node.js jest dostępny
-if ! command -v node &> /dev/null; then
-    echo -e "${RED}✗ Node.js nie jest zainstalowany. Uruchom najpierw production-setup.sh${NC}"
-    exit 1
-fi
-
-if ! command -v npm &> /dev/null; then
-    echo -e "${RED}✗ npm nie jest dostępny. Sprawdź instalację Node.js${NC}"
-    exit 1
-fi
-
-echo -e "${BLUE}Używam Node.js $(node --version) i npm $(npm --version)${NC}"
-
-# Sprawdź czy node_modules istnieje
-if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}Instalowanie zależności npm...${NC}"
-    npm install
+NODE_AVAILABLE=false
+if command -v node &> /dev/null && command -v npm &> /dev/null; then
+    NODE_AVAILABLE=true
+    echo -e "${BLUE}Używam Node.js $(node --version) i npm $(npm --version)${NC}"
 else
-    echo -e "${YELLOW}Aktualizowanie zależności npm...${NC}"
-    npm install
+    echo -e "${YELLOW}⚠ Node.js lub npm nie jest dostępny - pomijam budowanie Web UI${NC}"
+    echo -e "${YELLOW}Web UI nie będzie dostępne. API będzie działać normalnie.${NC}"
 fi
 
-# Build aplikacji React
-echo -e "${YELLOW}Budowanie aplikacji React...${NC}"
-npm run build
+if [ "$NODE_AVAILABLE" = true ]; then
+    # Sprawdź czy node_modules istnieje
+    if [ ! -d "node_modules" ]; then
+        echo -e "${YELLOW}Instalowanie zależności npm...${NC}"
+        if ! npm install; then
+            echo -e "${YELLOW}⚠ Błąd instalacji npm - pomijam budowanie Web UI${NC}"
+            NODE_AVAILABLE=false
+        fi
+    else
+        echo -e "${YELLOW}Aktualizowanie zależności npm...${NC}"
+        if ! npm install; then
+            echo -e "${YELLOW}⚠ Błąd aktualizacji npm - próbuję budować z istniejącymi zależnościami${NC}"
+        fi
+    fi
 
-# Kopiowanie build do głównego katalogu build
-if [ -d "dist" ]; then
-    cp -r dist/* ../../build/web/
-    echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
-else
-    echo -e "${RED}✗ Błąd budowania React app - brak katalogu dist${NC}"
-    exit 1
+    if [ "$NODE_AVAILABLE" = true ]; then
+        # Build aplikacji React
+        echo -e "${YELLOW}Budowanie aplikacji React...${NC}"
+        if npm run build && [ -d "dist" ]; then
+            # Kopiowanie build do głównego katalogu build
+            cp -r dist/* ../../build/web/
+            echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
+        else
+            echo -e "${YELLOW}⚠ Błąd budowania React app - pomijam Web UI${NC}"
+        fi
+    fi
 fi
-
-echo -e "${BLUE}[6/8] Konfiguracja produkcyjna...${NC}"
 
 # Przejdź z powrotem do głównego katalogu
 cd ../..
+
+echo -e "${BLUE}[6/8] Konfiguracja produkcyjna...${NC}"
 
 # Sprawdź czy istnieje plik konfiguracyjny
 if [ ! -f "build/api/appsettings.Production.json" ]; then
