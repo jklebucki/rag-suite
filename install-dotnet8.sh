@@ -153,9 +153,18 @@ case $UBUNTU_VERSION in
         echo -e "${CYAN}Pobieranie .NET install script...${NC}"
         curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 8.0 --install-dir /usr/share/dotnet
         
-        # Dodaj do PATH jeśli nie ma
+        # Dodaj do PATH jeśli nie ma - bezpieczne dodanie
         if ! echo $PATH | grep -q "/usr/share/dotnet"; then
-            echo 'export PATH=$PATH:/usr/share/dotnet' >> /etc/environment
+            # Sprawdź czy /etc/environment istnieje i ma PATH
+            if [ -f "/etc/environment" ] && grep -q "^PATH=" /etc/environment; then
+                # Jeśli istnieje PATH w /etc/environment, dodaj do niego
+                if ! grep -q "/usr/share/dotnet" /etc/environment; then
+                    sed -i 's|PATH="\(.*\)"|PATH="\1:/usr/share/dotnet"|' /etc/environment
+                fi
+            else
+                # Jeśli nie ma PATH w /etc/environment, utwórz bezpieczny
+                echo 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/share/dotnet"' >> /etc/environment
+            fi
             export PATH=$PATH:/usr/share/dotnet
         fi
         
@@ -187,10 +196,23 @@ if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; the
         # Fallback - manual install script
         curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 8.0 --install-dir /usr/share/dotnet
         
-        # Dodaj do PATH globalnie
+        # Dodaj do PATH globalnie - bezpieczne dodanie
         if ! echo $PATH | grep -q "/usr/share/dotnet"; then
-            echo 'export PATH=$PATH:/usr/share/dotnet' >> /etc/environment
-            echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /etc/environment
+            # Sprawdź czy /etc/environment istnieje i ma PATH
+            if [ -f "/etc/environment" ] && grep -q "^PATH=" /etc/environment; then
+                # Jeśli istnieje PATH w /etc/environment, dodaj do niego dotnet
+                if ! grep -q "/usr/share/dotnet" /etc/environment; then
+                    sed -i 's|PATH="\(.*\)"|PATH="\1:/usr/share/dotnet"|' /etc/environment
+                fi
+                # Dodaj DOTNET_ROOT jeśli go nie ma
+                if ! grep -q "DOTNET_ROOT" /etc/environment; then
+                    echo 'DOTNET_ROOT="/usr/share/dotnet"' >> /etc/environment
+                fi
+            else
+                # Jeśli nie ma PATH w /etc/environment, utwórz bezpieczny
+                echo 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/share/dotnet"' >> /etc/environment
+                echo 'DOTNET_ROOT="/usr/share/dotnet"' >> /etc/environment
+            fi
             export PATH=$PATH:/usr/share/dotnet
             export DOTNET_ROOT=/usr/share/dotnet
         fi
