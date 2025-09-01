@@ -40,7 +40,7 @@ app.MapAnalyticsEndpoints();
 app.MapGet("/health", () => new { 
     Status = "Healthy", 
     Timestamp = DateTime.UtcNow,
-    Version = "2.0.0-semantic-kernel-demo"
+    Version = "2.0.0-semantic-kernel"
 });
 
 app.Run();
