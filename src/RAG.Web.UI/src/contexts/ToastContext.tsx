@@ -4,6 +4,7 @@ import { ToastContainer } from '@/components/ui/ToastContainer'
 import type { ToastType } from '@/components/ui/Toast'
 
 interface ToastContextType {
+  addToast: (options: { type: ToastType; title: string; message?: string }) => string
   showSuccess: (title: string, message?: string, options?: { autoClose?: boolean; duration?: number }) => string
   showError: (title: string, message?: string, options?: { autoClose?: boolean; duration?: number }) => string
   showWarning: (title: string, message?: string, options?: { autoClose?: boolean; duration?: number }) => string
@@ -21,6 +22,7 @@ interface ToastProviderProps {
 export function ToastProvider({ children }: ToastProviderProps) {
   const { 
     toasts, 
+    addToast: originalAddToast,
     removeToast, 
     clearToasts, 
     showSuccess, 
@@ -29,7 +31,12 @@ export function ToastProvider({ children }: ToastProviderProps) {
     showInfo 
   } = useToast()
 
+  const addToast = (options: { type: ToastType; title: string; message?: string }) => {
+    return originalAddToast(options.type, options.title, options.message)
+  }
+
   const contextValue: ToastContextType = {
+    addToast,
     showSuccess,
     showError,
     showWarning,
@@ -53,3 +60,5 @@ export function useToastContext() {
   }
   return context
 }
+
+export { useToastContext as useToast }

@@ -120,6 +120,78 @@ export interface TranslationKeys {
   'language.auto_detect': string;
   'language.change_success': string;
   'language.auto_detected': string;
+
+  // Authentication
+  'auth.login.title': string;
+  'auth.login.subtitle': string;
+  'auth.login.sign_in': string;
+  'auth.logout': string;
+  'auth.login.signing_in': string;
+  'auth.login.remember_me': string;
+  'auth.login.forgot_password': string;
+  'auth.login.no_account': string;
+  'auth.login.sign_up': string;
+  'auth.login.success_title': string;
+  'auth.login.success_message': string;
+
+  'auth.register.title': string;
+  'auth.register.subtitle': string;
+  'auth.register.sign_up': string;
+  'auth.register.signing_up': string;
+  'auth.register.accept_terms': string;
+  'auth.register.have_account': string;
+  'auth.register.sign_in': string;
+  'auth.register.success_title': string;
+  'auth.register.success_message': string;
+
+  'auth.reset.title': string;
+  'auth.reset.subtitle': string;
+  'auth.reset.send_instructions': string;
+  'auth.reset.sending': string;
+  'auth.reset.back_to_login': string;
+  'auth.reset.success_title': string;
+  'auth.reset.success_message': string;
+
+  'auth.change_password.title': string;
+  'auth.change_password.subtitle': string;
+  'auth.change_password.change': string;
+  'auth.change_password.changing': string;
+  'auth.change_password.success_title': string;
+  'auth.change_password.success_message': string;
+
+  'auth.fields.email': string;
+  'auth.fields.password': string;
+  'auth.fields.confirm_password': string;
+  'auth.fields.current_password': string;
+  'auth.fields.new_password': string;
+  'auth.fields.first_name': string;
+  'auth.fields.last_name': string;
+  'auth.fields.username': string;
+
+  'auth.placeholders.email': string;
+  'auth.placeholders.password': string;
+  'auth.placeholders.confirm_password': string;
+  'auth.placeholders.current_password': string;
+  'auth.placeholders.new_password': string;
+  'auth.placeholders.first_name': string;
+  'auth.placeholders.last_name': string;
+  'auth.placeholders.username': string;
+
+  'auth.validation.email_required': string;
+  'auth.validation.email_invalid': string;
+  'auth.validation.password_required': string;
+  'auth.validation.password_min_length': string;
+  'auth.validation.password_mismatch': string;
+  'auth.validation.first_name_required': string;
+  'auth.validation.last_name_required': string;
+  'auth.validation.username_required': string;
+  'auth.validation.username_min_length': string;
+  'auth.validation.terms_required': string;
+
+  'auth.logout.title': string;
+  'auth.logout.confirm': string;
+  'auth.logout.signing_out': string;
+  'auth.logout.success': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;

@@ -3,20 +3,69 @@ import { Layout } from '@/components/Layout'
 import { Dashboard } from '@/components/dashboard/Dashboard'
 import { ChatInterface } from '@/components/chat/ChatInterface'
 import { SearchInterface } from '@/components/search/SearchInterface'
+import { LoginForm, RegisterForm, ResetPasswordForm, ProtectedRoute, AuthRoute } from '@/components/auth'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 function App() {
   return (
     <I18nProvider>
       <ToastProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/chat" element={<ChatInterface />} />
-            <Route path="/search" element={<SearchInterface />} />
-          </Routes>
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <Routes>
+              <Route 
+                path="/" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/chat" 
+                element={
+                  <ProtectedRoute>
+                    <ChatInterface />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/search" 
+                element={
+                  <ProtectedRoute>
+                    <SearchInterface />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/login" 
+                element={
+                  <AuthRoute>
+                    <LoginForm />
+                  </AuthRoute>
+                } 
+              />
+              <Route 
+                path="/register" 
+                element={
+                  <AuthRoute>
+                    <RegisterForm />
+                  </AuthRoute>
+                } 
+              />
+              <Route 
+                path="/reset-password" 
+                element={
+                  <AuthRoute>
+                    <ResetPasswordForm />
+                  </AuthRoute>
+                } 
+              />
+            </Routes>
+          </Layout>
+        </AuthProvider>
       </ToastProvider>
     </I18nProvider>
   )
