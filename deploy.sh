@@ -73,6 +73,37 @@ fi
 mkdir -p build/api
 mkdir -p build/web
 
+# Utwórz podstawowy index.html jeśli Web UI nie będzie zbudowane
+cat > build/web/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Suite</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .status { padding: 20px; background: #f0f0f0; border-radius: 8px; margin: 20px 0; }
+        .api-link { color: #007acc; text-decoration: none; }
+        .api-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAG Suite</h1>
+        <div class="status">
+            <h2>API Status</h2>
+            <p>Web UI is not available (Node.js required for building)</p>
+            <p>API is running at: <a href="/api" class="api-link">API Endpoint</a></p>
+            <p>Health check: <a href="/health" class="api-link">Health Check</a></p>
+        </div>
+        <p>To build the full Web UI, install Node.js and run the deployment script again.</p>
+    </div>
+</body>
+</html>
+EOF
+
 echo -e "${BLUE}[4/8] Budowanie aplikacji .NET API...${NC}"
 
 # Przejdź do katalogu API
@@ -127,20 +158,48 @@ if [ "$NODE_AVAILABLE" = true ]; then
     if [ "$NODE_AVAILABLE" = true ]; then
         # Build aplikacji React
         echo -e "${YELLOW}Budowanie aplikacji React...${NC}"
-        if npm run build && [ -d "dist" ]; then
-            # Kopiowanie build do głównego katalogu build
-            cp -r dist/* ../../build/web/
-            echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
+        if npm run build; then
+            if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
+                # Wyczyść stary build
+                rm -rf ../../build/web/*
+                # Kopiowanie build do głównego katalogu build
+                cp -r dist/* ../../build/web/
+                echo -e "${GREEN}✓ React app zbudowana pomyślnie${NC}"
+                echo -e "${GREEN}✓ Pliki skopiowane do build/web${NC}"
+            else
+                echo -e "${YELLOW}⚠ Katalog dist jest pusty lub nie istnieje${NC}"
+                echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
+            fi
         else
-            echo -e "${YELLOW}⚠ Błąd budowania React app - pomijam Web UI${NC}"
+            echo -e "${YELLOW}⚠ Błąd budowania React app${NC}"
+            echo -e "${YELLOW}Zachowuję podstawowy index.html${NC}"
         fi
+    else
+        echo -e "${YELLOW}⚠ Node.js niedostępny - używam podstawowego index.html${NC}"
     fi
 fi
 
 # Przejdź z powrotem do głównego katalogu
 cd ../..
 
-echo -e "${BLUE}[6/8] Konfiguracja produkcyjna...${NC}"
+# Sprawdź rezultat budowania Web UI
+echo -e "${BLUE}[6/8] Sprawdzanie Web UI...${NC}"
+if [ -f "build/web/index.html" ]; then
+    WEB_SIZE=$(du -sh build/web 2>/dev/null | cut -f1)
+    FILE_COUNT=$(find build/web -type f | wc -l | tr -d ' ')
+    echo -e "${GREEN}✓ Web UI dostępne (${FILE_COUNT} plików, ${WEB_SIZE})${NC}"
+    
+    # Sprawdź czy to pełny build czy podstawowy
+    if grep -q "Web UI is not available" build/web/index.html; then
+        echo -e "${YELLOW}⚠ Używa podstawowego index.html (Node.js wymagany dla pełnego UI)${NC}"
+    else
+        echo -e "${GREEN}✓ Pełny build React UI${NC}"
+    fi
+else
+    echo -e "${RED}✗ Brak pliku index.html w build/web${NC}"
+fi
+
+echo -e "${BLUE}[7/8] Konfiguracja produkcyjna...${NC}"
 
 # Sprawdź czy istnieje plik konfiguracyjny
 if [ ! -f "build/api/appsettings.Production.json" ]; then
@@ -182,7 +241,7 @@ else
     echo -e "${GREEN}✓ Plik konfiguracyjny już istnieje${NC}"
 fi
 
-echo -e "${BLUE}[7/8] Ustawianie uprawnień...${NC}"
+echo -e "${BLUE}[8/9] Ustawianie uprawnień...${NC}"
 
 # Ustaw właściciela na www-data
 chown -R $APP_USER:$APP_USER build/
@@ -200,7 +259,7 @@ find build/web -type d -exec chmod 755 {} \;
 
 echo -e "${GREEN}✓ Uprawnienia ustawione dla $APP_USER${NC}"
 
-echo -e "${BLUE}[8/8] Uruchamianie serwisów...${NC}"
+echo -e "${BLUE}[9/9] Uruchamianie serwisów...${NC}"
 
 # Uruchom serwis RAG API
 systemctl daemon-reload
