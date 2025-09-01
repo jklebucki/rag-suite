@@ -33,125 +33,15 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-echo -e "${BLUE}[1/4] Generowanie konfiguracji HTTP (port 80)...${NC}"
-
-# Create HTTP configuration (redirect to HTTPS or serve directly)
-cat > /etc/nginx/sites-available/$APP_NAME << 'EOF'
-# RAG Suite - HTTP Configuration
-server {
-    listen 80;
-    listen [::]:80;
-    server_name asystent.ad.citronex.pl www.asystent.ad.citronex.pl;
-    
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Root directory for React app
-    root /var/www/rag-suite/build/web;
-    index index.html;
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_comp_level 6;
-    gzip_types
-        application/javascript
-        application/json
-        application/xml
-        text/css
-        text/javascript
-        text/plain
-        text/xml
-        image/svg+xml;
-
-    # Block sensitive files
-    location ~* \.(env|log|conf|ini|sh|bak|backup|sql)$ {
-        deny all;
-        return 404;
-    }
-
-    # API proxy to .NET backend
-    location /api/ {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection keep-alive;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        proxy_connect_timeout 30s;
-        proxy_send_timeout 30s;
-        proxy_read_timeout 30s;
-    }
-
-    # Health endpoints proxy
-    location /health {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        access_log off;
-    }
-
-    location /healthz/ {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Static assets with caching
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        add_header Vary "Accept-Encoding";
-    }
-
-    # React app - handle client-side routing
-    location / {
-        try_files $uri $uri/ /index.html;
-        
-        # HTML files - no cache
-        location ~* \.html$ {
-            expires 5m;
-            add_header Cache-Control "public, no-cache";
-        }
-    }
-
-    # Security monitoring endpoint (local only)
-    location /nginx-status {
-        stub_status on;
-        access_log off;
-        allow 127.0.0.1;
-        allow 10.0.0.0/8;
-        allow 172.16.0.0/12;
-        allow 192.168.0.0/16;
-        deny all;
-    }
-}
-EOF
-
-echo -e "${GREEN}✓ Konfiguracja HTTP utworzona${NC}"
-
-echo -e "${BLUE}[2/4] Sprawdzanie certyfikatów SSL...${NC}"
+echo -e "${BLUE}[1/4] Sprawdzanie certyfikatów SSL...${NC}"
 
 # Check if SSL certificates exist
 if [ -f "$SSL_CERT_PATH" ] && [ -f "$SSL_KEY_PATH" ]; then
     echo -e "${GREEN}✓ Certyfikaty SSL znalezione${NC}"
+    echo -e "${BLUE}[2/4] Generowanie konfiguracji HTTPS + przekierowanie HTTP...${NC}"
     
-    echo -e "${BLUE}[3/4] Dodawanie konfiguracji HTTPS...${NC}"
-    
-    # Add HTTPS configuration
-    cat >> /etc/nginx/sites-available/$APP_NAME << EOF
-
+    # Create HTTPS configuration with HTTP redirect
+    cat > /etc/nginx/sites-available/$APP_NAME << EOF
 # RAG Suite - HTTPS Configuration
 server {
     listen 443 ssl http2;
@@ -274,15 +164,124 @@ server {
 }
 EOF
 
-    echo -e "${GREEN}✓ Konfiguracja HTTPS dodana${NC}"
+    echo -e "${GREEN}✓ Konfiguracja HTTPS utworzona${NC}"
     echo -e "${GREEN}✓ Przekierowanie HTTP → HTTPS skonfigurowane${NC}"
+
 else
-    echo -e "${YELLOW}⚠ Certyfikaty SSL nie znalezione - tylko HTTP${NC}"
+    echo -e "${YELLOW}⚠ Certyfikaty SSL nie znalezione - konfiguracja HTTP${NC}"
     echo -e "${YELLOW}Lokalizacja: $SSL_CERT_PATH${NC}"
     echo -e "${YELLOW}Lokalizacja: $SSL_KEY_PATH${NC}"
+    
+    echo -e "${BLUE}[2/4] Generowanie konfiguracji HTTP (port 80)...${NC}"
+    
+    # Create HTTP-only configuration
+    cat > /etc/nginx/sites-available/$APP_NAME << 'EOF'
+# RAG Suite - HTTP Configuration
+server {
+    listen 80;
+    listen [::]:80;
+    server_name asystent.ad.citronex.pl www.asystent.ad.citronex.pl;
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Root directory for React app
+    root /var/www/rag-suite/build/web;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types
+        application/javascript
+        application/json
+        application/xml
+        text/css
+        text/javascript
+        text/plain
+        text/xml
+        image/svg+xml;
+
+    # Block sensitive files
+    location ~* \.(env|log|conf|ini|sh|bak|backup|sql)$ {
+        deny all;
+        return 404;
+    }
+
+    # API proxy to .NET backend
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
+    }
+
+    # Health endpoints proxy
+    location /health {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        access_log off;
+    }
+
+    location /healthz/ {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Static assets with caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary "Accept-Encoding";
+    }
+
+    # React app - handle client-side routing
+    location / {
+        try_files $uri $uri/ /index.html;
+        
+        # HTML files - no cache
+        location ~* \.html$ {
+            expires 5m;
+            add_header Cache-Control "public, no-cache";
+        }
+    }
+
+    # Security monitoring endpoint (local only)
+    location /nginx-status {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        allow 10.0.0.0/8;
+        allow 172.16.0.0/12;
+        allow 192.168.0.0/16;
+        deny all;
+    }
+}
+EOF
+
+    echo -e "${GREEN}✓ Konfiguracja HTTP utworzona${NC}"
 fi
 
-echo -e "${BLUE}[4/4] Aktywacja konfiguracji...${NC}"
+echo -e "${BLUE}[3/4] Aktywacja konfiguracji...${NC}"
 
 # Remove default site if exists
 if [ -f /etc/nginx/sites-enabled/default ]; then
