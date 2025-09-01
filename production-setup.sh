@@ -11,9 +11,9 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Zmienne konfiguracyjne
+NC='\033[0m' # No    # Health check endpoints
+    location /health {
+        proxy_pass http://localhost:$API_PORT/health;ienne konfiguracyjne
 APP_NAME="rag-suite"
 APP_USER="www-data"
 APP_DIR="/var/www/rag-suite"
@@ -240,7 +240,7 @@ server {
     gzip_vary on;
     gzip_min_length 1024;
     gzip_comp_level 6;
-    gzip_proxied expired no-cache no-store private must-revalidate auth;
+    gzip_proxied any;
     gzip_types
         application/atom+xml
         application/geo+json
@@ -263,13 +263,10 @@ server {
         text/xml;
 
     # Rate limiting for API
-    limit_req_zone \$binary_remote_addr zone=api:10m rate=10r/s;
-    limit_req_zone \$binary_remote_addr zone=general:10m rate=30r/s;
-
+    # Note: limit_req_zone must be moved to http context, not server context
+    
     # API proxy with rate limiting
     location /api/ {
-        limit_req zone=api burst=20 nodelay;
-        
         proxy_pass http://localhost:$API_PORT/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
@@ -329,19 +326,19 @@ server {
     }
 
     # Block access to sensitive files
-    location ~* \.(sql|log|conf|ini|sh|bak|backup|old|tmp)$ {
+    location ~* \.(sql|log|conf|ini|sh|bak|backup|old|tmp)\$ {
         deny all;
         return 404;
     }
 
     # Static assets with long cache
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif)$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif)\$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
         add_header Vary "Accept-Encoding";
         
         # CORS for fonts
-        location ~* \.(woff|woff2|ttf|eot)$ {
+        location ~* \.(woff|woff2|ttf|eot)\$ {
             add_header Access-Control-Allow-Origin "*";
             expires 1y;
             add_header Cache-Control "public, immutable";
@@ -350,14 +347,12 @@ server {
 
     # React app - wszystkie pozostałe ścieżki
     location / {
-        limit_req zone=general burst=50 nodelay;
-        
         try_files \$uri \$uri/ /index.html;
         
         # Cache dla HTML
-        location ~* \.html$ {
+        location ~* \.html\$ {
             expires 5m;
-            add_header Cache-Control "public, must-revalidate";
+            add_header Cache-Control "public, no-cache";
         }
         
         # Security dla index.html
