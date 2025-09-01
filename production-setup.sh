@@ -85,6 +85,23 @@ if ! command -v dotnet &> /dev/null; then
     rm packages-microsoft-prod.deb
     apt update
     apt install -y dotnet-sdk-8.0
+elif ! dotnet --list-sdks 2>/dev/null | grep -q "8\.0\."; then
+    echo -e "${YELLOW}.NET jest zainstalowany, ale brak wersji 8.0 - dodawanie .NET 8 SDK...${NC}"
+    current_version=$(dotnet --version 2>/dev/null || echo "nieznana")
+    echo -e "${CYAN}Obecna wersja: $current_version${NC}"
+    
+    # Użyj dedykowanego skryptu instalacji .NET 8
+    if [ -f "./install-dotnet8.sh" ]; then
+        echo -e "${CYAN}Używanie dedykowanego skryptu instalacji .NET 8...${NC}"
+        ./install-dotnet8.sh
+    else
+        # Fallback - podstawowa instalacja
+        wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb 2>/dev/null || true
+        dpkg -i packages-microsoft-prod.deb 2>/dev/null || true
+        rm packages-microsoft-prod.deb 2>/dev/null || true
+        apt update
+        apt install -y dotnet-sdk-8.0
+    fi
 fi
 
 # Sprawdź czy Node.js jest zainstalowany

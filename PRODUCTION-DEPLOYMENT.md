@@ -177,11 +177,14 @@ Skrypt deployment/aktualizacji - używany do aktualizacji
 ### `ssl-setup.sh`
 Skrypt konfiguracji SSL/HTTPS z istniejącymi certyfikatami wildcard *.ad.citronex.pl
 
-### `fix-nodejs.sh`
-Skrypt naprawy problemów z Node.js na różnych wersjach Ubuntu (szczególnie 18.04)
+### `install-dotnet8.sh`
+Bezpieczna instalacja .NET 8 SDK z autodetekcją wersji Ubuntu - nie usuwa istniejących wersji .NET
 
-### `health-check.sh`
-Kompleksowy test wszystkich komponentów aplikacji
+### `install-nodejs-alternative.sh`
+Skrypt instalacji Node.js przez Snap dla Ubuntu 18.04 (rozwiązuje problemy z libc6)
+
+### `diagnose.sh`
+Kompleksowa diagnostyka problemów i sugerowanie rozwiązań
 
 ## Monitoring i zarządzanie
 
@@ -189,7 +192,14 @@ Kompleksowy test wszystkich komponentów aplikacji
 
 ```bash
 cd /var/www/rag-suite
-sudo ./health-check.sh
+sudo ./diagnose.sh
+```
+
+### Instalacja .NET 8 (jeśli brakuje)
+
+```bash
+cd /var/www/rag-suite
+sudo ./install-dotnet8.sh
 ```
 
 ### Sprawdzanie statusu

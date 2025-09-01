@@ -97,6 +97,13 @@ fi
 if [[ ! " ${available_tools[@]} " =~ " dotnet " ]]; then
     problems+=(".NET SDK nie jest zainstalowany")
     solutions+=("sudo ./production-setup.sh  # Uruchom pełną konfigurację")
+elif command -v dotnet &> /dev/null; then
+    # Sprawdź czy .NET 8 jest dostępny
+    if ! dotnet --list-sdks 2>/dev/null | grep -q "8\.0\."; then
+        problems+=(".NET 8 SDK nie jest zainstalowany (wymagany dla aplikacji)")
+        current_dotnet=$(dotnet --version 2>/dev/null || echo "nieznana")
+        solutions+=("sudo ./install-dotnet8.sh  # Zainstaluj .NET 8 SDK (obecna wersja: $current_dotnet)")
+    fi
 fi
 
 # Problem z nginx
