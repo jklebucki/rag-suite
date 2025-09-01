@@ -19,6 +19,7 @@ export function ChatInterface() {
     currentSession,
     lastMessageLanguage,
     translationStatus,
+    documentsAvailable,
     sendMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
@@ -134,6 +135,26 @@ export function ChatInterface() {
                   </div>
                 </div>
               )}
+              
+              {/* Documents unavailable notice */}
+              {!documentsAvailable && currentSession && currentSession.messages.length > 0 && (
+                <div className="flex items-start gap-3 opacity-90">
+                  <div className="p-2 rounded-full bg-orange-100">
+                    <Bot className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-3xl">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium text-orange-800">
+                        {t('chat.documents_unavailable')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-orange-700">
+                      {t('chat.documents_unavailable_message')}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
 

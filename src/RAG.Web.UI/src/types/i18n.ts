@@ -89,6 +89,10 @@ export interface TranslationKeys {
   'chat.processing_time': string;
   'chat.sources': string;
 
+  // Document database status
+  'chat.documents_unavailable': string;
+  'chat.documents_unavailable_message': string;
+
   // Search
   'search.title': string;
   'search.subtitle': string;

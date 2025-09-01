@@ -405,7 +405,18 @@ public class ChatService : IChatService
                 Offset: 0
             );
 
-            var searchResults = await _searchService.SearchAsync(searchRequest, cancellationToken);
+            Features.Search.SearchResponse searchResults;
+            bool documentsAvailable = true;
+            try
+            {
+                searchResults = await _searchService.SearchAsync(searchRequest, cancellationToken);
+            }
+            catch (Features.Search.ElasticsearchUnavailableException ex)
+            {
+                _logger.LogWarning(ex, "Document database unavailable, proceeding without context");
+                documentsAvailable = false;
+                searchResults = new Features.Search.SearchResponse(Array.Empty<Features.Search.SearchResult>(), 0, 0, request.Message);
+            }
 
             // Build multilingual context-aware prompt
             var prompt = BuildMultilingualContextualPrompt(
@@ -413,7 +424,8 @@ public class ChatService : IChatService
                 searchResults.Results, 
                 _messages[sessionId], 
                 detectedLanguage, 
-                responseLanguage
+                responseLanguage,
+                documentsAvailable
             );
 
             // Generate AI response using Semantic Kernel
@@ -469,15 +481,11 @@ public class ChatService : IChatService
                 ResponseLanguage = responseLanguage,
                 WasTranslated = wasTranslated,
                 TranslationConfidence = translationConfidence,
-                Sources = searchResults.Results.Length > 0 
+                Sources = searchResults.Results.Length > 0 && documentsAvailable
                     ? searchResults.Results.Select(r => r.Source).ToList() 
                     : null,
                 ProcessingTimeMs = stopwatch.ElapsedMilliseconds,
-                Metadata = new Dictionary<string, object>
-                {
-                    ["searchResultsCount"] = searchResults.Results.Length,
-                    ["enabledTranslation"] = request.EnableTranslation
-                }
+                Metadata = GetResponseMetadata(searchResults.Results.Length, request.EnableTranslation, documentsAvailable, responseLanguage)
             };
         }
         catch (Exception ex)
@@ -563,7 +571,8 @@ public class ChatService : IChatService
         Features.Search.SearchResult[] searchResults, 
         List<ChatMessage> conversationHistory,
         string detectedLanguage,
-        string responseLanguage)
+        string responseLanguage,
+        bool documentsAvailable = true)
     {
         var promptBuilder = new StringBuilder();
         
@@ -576,7 +585,7 @@ public class ChatService : IChatService
         promptBuilder.AppendLine();
         
         // Add context from search results with translation note if needed
-        if (searchResults.Length > 0)
+        if (documentsAvailable && searchResults.Length > 0)
         {
             var contextLabel = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage);
             promptBuilder.AppendLine($"=== {contextLabel} ===");
@@ -592,6 +601,15 @@ public class ChatService : IChatService
                 promptBuilder.AppendLine($"{sourceLabel}: {result.Source}");
                 promptBuilder.AppendLine();
             }
+        }
+        else if (!documentsAvailable)
+        {
+            // Add note about document database unavailability
+            var unavailableNote = _languageService.GetLocalizedString("system_prompts", "documents_unavailable", responseLanguage) 
+                ?? "Note: The document database is currently unavailable. Responses will be generated without reference documents.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(unavailableNote);
+            promptBuilder.AppendLine();
         }
         
         // Add recent conversation history
@@ -630,5 +648,24 @@ public class ChatService : IChatService
         promptBuilder.AppendLine($"{responseLabel}:");
         
         return promptBuilder.ToString();
+    }
+
+    private Dictionary<string, object> GetResponseMetadata(int searchResultsCount, bool enabledTranslation, bool documentsAvailable, string responseLanguage)
+    {
+        var metadata = new Dictionary<string, object>
+        {
+            ["searchResultsCount"] = searchResultsCount,
+            ["enabledTranslation"] = enabledTranslation,
+            ["documentsAvailable"] = documentsAvailable
+        };
+
+        if (!documentsAvailable)
+        {
+            var unavailableMessage = _languageService.GetLocalizedString("error_messages", "documents_unavailable", responseLanguage) 
+                ?? "Document database is currently unavailable";
+            metadata["databaseUnavailableMessage"] = unavailableMessage;
+        }
+
+        return metadata;
     }
 }

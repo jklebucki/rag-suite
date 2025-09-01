@@ -4,6 +4,12 @@ using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
+public class ElasticsearchUnavailableException : Exception
+{
+    public ElasticsearchUnavailableException(string message) : base(message) { }
+    public ElasticsearchUnavailableException(string message, Exception innerException) : base(message, innerException) { }
+}
+
 public interface ISearchService
 {
     Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default);
@@ -42,6 +48,9 @@ public class SearchService : ISearchService
     {
         try
         {
+            // First check if Elasticsearch is available
+            await CheckElasticsearchHealth(cancellationToken);
+            
             var searchQuery = new
             {
                 query = new
@@ -75,7 +84,7 @@ public class SearchService : ISearchService
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Elasticsearch search failed with status {StatusCode}", response.StatusCode);
-                return new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Query);
+                return CreateUnavailableResponse(request.Query);
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -136,14 +145,42 @@ public class SearchService : ISearchService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error searching Elasticsearch for query: {Query}", request.Query);
-            return new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Query);
+            return CreateUnavailableResponse(request.Query);
         }
+    }
+
+    private async Task CheckElasticsearchHealth(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(5)); // Quick health check
+            
+            var response = await _httpClient.GetAsync($"{_esUrl}/", cts.Token);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Elasticsearch health check failed with status: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Elasticsearch is unavailable");
+            throw new ElasticsearchUnavailableException("Document database is currently unavailable", ex);
+        }
+    }
+
+    private static SearchResponse CreateUnavailableResponse(string query)
+    {
+        return new SearchResponse(Array.Empty<SearchResult>(), 0, 0, query);
     }
 
     public async Task<DocumentDetail> GetDocumentByIdAsync(string documentId, CancellationToken cancellationToken = default)
     {
         try
         {
+            // Check Elasticsearch availability first
+            await CheckElasticsearchHealth(cancellationToken);
+            
             var response = await _httpClient.GetAsync($"{_esUrl}/{_indexName}/_doc/{documentId}", cancellationToken);
             
             if (!response.IsSuccessStatusCode)
@@ -191,6 +228,10 @@ public class SearchService : ISearchService
                 id, title, content, content, // Using content as both summary and full content
                 1.0, category, type, metadata, createdAt, DateTime.Now
             );
+        }
+        catch (ElasticsearchUnavailableException)
+        {
+            throw; // Re-throw to let caller handle
         }
         catch (Exception ex) when (!(ex is KeyNotFoundException))
         {

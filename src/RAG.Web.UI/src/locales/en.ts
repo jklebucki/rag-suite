@@ -72,6 +72,10 @@ export const en: TranslationKeys = {
   'chat.processing_time': 'Processing time',
   'chat.sources': 'Sources',
 
+  // Document database status
+  'chat.documents_unavailable': 'Document database unavailable',
+  'chat.documents_unavailable_message': 'The document database is currently unavailable. Responses are generated without document context.',
+
   // Search
   'search.title': 'Document Search',
   'search.subtitle': 'Search through your knowledge base',

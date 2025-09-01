@@ -11,6 +11,7 @@ export function useMultilingualChat() {
   const [isTyping, setIsTyping] = useState(false)
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const [lastResponse, setLastResponse] = useState<MultilingualChatResponse | null>(null)
+  const [documentsAvailable, setDocumentsAvailable] = useState<boolean>(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
@@ -38,6 +39,12 @@ export function useMultilingualChat() {
     onSuccess: (response) => {
       console.log('sendMultilingualMessage success:', response)
       setLastResponse(response)
+      
+      // Check if documents are available from metadata
+      if (response.metadata && response.metadata.documentsAvailable !== undefined) {
+        setDocumentsAvailable(response.metadata.documentsAvailable as boolean)
+      }
+      
       // Refresh the entire session to get the real messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
       setIsTyping(false)
@@ -204,6 +211,7 @@ export function useMultilingualChat() {
     // Multilingual specific data
     lastMessageLanguage: lastResponse?.detectedLanguage,
     translationStatus: lastResponse?.wasTranslated ? 'translated' : 'original',
+    documentsAvailable,
     
     // Mutations for compatibility with ChatInterface
     sendMessageMutation: sendMultilingualMessageMutation,

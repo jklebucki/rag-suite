@@ -71,7 +71,11 @@ export const nl: TranslationKeys = {
   'chat.translated_from': 'Vertaald van',
   'chat.processing_time': 'Verwerkingstijd',
   'chat.sources': 'Bronnen',
-  
+
+  // Document database status
+  'chat.documents_unavailable': 'Documenten database niet beschikbaar',
+  'chat.documents_unavailable_message': 'De documenten database is momenteel niet beschikbaar. Antwoorden worden gegenereerd zonder document context.',
+
   // Search
   'search.title': 'Document Zoeken',
   'search.subtitle': 'Zoek door uw kennisbank',
