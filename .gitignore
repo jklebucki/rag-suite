@@ -35,3 +35,5 @@ Thumbs.db
 *.secrets.json
 appsettings.Local.json
 appsettings.Development.local.json
+# Build output for production deployment
+build/
