@@ -77,13 +77,17 @@ case $UBUNTU_VERSION in
         
         # Instaluj dependencies
         apt-get update
-        apt-get install -y wget apt-transport-https software-properties-common
+        apt-get install -y wget apt-transport-https software-properties-common gpg
         
-        # Dodaj Microsoft repository
+        # Pobierz Microsoft signing key i repozytorium - poprawna metoda dla Ubuntu 18.04
         wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
         mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        
+        # Dodaj Microsoft repository - używamy bezpośrednio prod.list
         wget -q https://packages.microsoft.com/config/ubuntu/18.04/prod.list
         mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        chown root:root /etc/apt/sources.list.d/microsoft-prod.list
         
         check_command "Dodano repozytorium Microsoft dla Ubuntu 18.04"
         ;;
@@ -93,13 +97,16 @@ case $UBUNTU_VERSION in
         
         # Instaluj dependencies
         apt-get update
-        apt-get install -y wget apt-transport-https software-properties-common
+        apt-get install -y wget apt-transport-https software-properties-common gpg
         
-        # Dodaj Microsoft repository
+        # Podobna konfiguracja jak dla 18.04
         wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
         mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        
         wget -q https://packages.microsoft.com/config/ubuntu/20.04/prod.list
         mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        chown root:root /etc/apt/sources.list.d/microsoft-prod.list
         
         check_command "Dodano repozytorium Microsoft dla Ubuntu 20.04"
         ;;
@@ -109,20 +116,34 @@ case $UBUNTU_VERSION in
         
         # Instaluj dependencies
         apt-get update
-        apt-get install -y wget apt-transport-https software-properties-common
+        apt-get install -y wget apt-transport-https software-properties-common gpg
         
-        # Dodaj Microsoft repository
-        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
-        mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
-        
+        # Dla nowszych wersji Ubuntu - Microsoft już nie wspiera 24.04+, ale 22.04 jeszcze tak
         if [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+            # Ubuntu 22.04 może używać Microsoft repo
+            wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
+            mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+            chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+            
             wget -q https://packages.microsoft.com/config/ubuntu/22.04/prod.list
+            mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+            chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+            
+            check_command "Dodano repozytorium Microsoft dla Ubuntu 22.04"
         else
-            wget -q https://packages.microsoft.com/config/ubuntu/24.04/prod.list
+            # Ubuntu 24.04+ - próbuj Ubuntu backports lub wbudowany feed
+            echo -e "${CYAN}Ubuntu 24.04+ - próba instalacji z Ubuntu feeds...${NC}"
+            
+            # Sprawdź czy dotnet-sdk-8.0 jest dostępny w Ubuntu feeds
+            if apt-cache search dotnet-sdk-8.0 | grep -q "dotnet-sdk-8.0"; then
+                echo -e "${GREEN}✓ .NET 8 SDK dostępny w Ubuntu feeds${NC}"
+            else
+                echo -e "${YELLOW}Dodawanie Ubuntu .NET backports repository...${NC}"
+                apt-get install -y software-properties-common
+                add-apt-repository -y ppa:dotnet/backports
+                apt-get update
+            fi
         fi
-        mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-        
-        check_command "Dodano repozytorium Microsoft dla Ubuntu $UBUNTU_VERSION"
         ;;
         
     *)
@@ -157,8 +178,41 @@ check_command "Aktualizacja listy pakietów"
 
 # Zainstaluj .NET 8 SDK
 echo -e "${CYAN}Instalacja .NET 8 SDK...${NC}"
-apt-get install -y dotnet-sdk-8.0
-check_command "Instalacja .NET 8 SDK"
+
+# Dla Ubuntu 18.04 i 20.04 - dodaj fallback w przypadku problemów z Microsoft repo
+if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; then
+    if ! apt-get install -y dotnet-sdk-8.0; then
+        echo -e "${YELLOW}Instalacja przez Microsoft repository nie powiodła się. Próbuję .NET install script...${NC}"
+        
+        # Fallback - manual install script
+        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 8.0 --install-dir /usr/share/dotnet
+        
+        # Dodaj do PATH globalnie
+        if ! echo $PATH | grep -q "/usr/share/dotnet"; then
+            echo 'export PATH=$PATH:/usr/share/dotnet' >> /etc/environment
+            echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /etc/environment
+            export PATH=$PATH:/usr/share/dotnet
+            export DOTNET_ROOT=/usr/share/dotnet
+        fi
+        
+        # Stwórz symlink dla dotnet command
+        ln -sf /usr/share/dotnet/dotnet /usr/local/bin/dotnet
+        
+        # Sprawdź czy działa
+        if dotnet --version &>/dev/null; then
+            echo -e "${GREEN}✓ .NET 8 zainstalowany przez install script${NC}"
+        else
+            echo -e "${RED}✗ Instalacja nie powiodła się${NC}"
+            exit 1
+        fi
+    else
+        check_command "Instalacja .NET 8 SDK przez Microsoft repository"
+    fi
+else
+    # Dla nowszych wersji Ubuntu
+    apt-get install -y dotnet-sdk-8.0
+    check_command "Instalacja .NET 8 SDK"
+fi
 
 # Sprawdź instalację
 echo

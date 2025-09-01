@@ -80,11 +80,35 @@ apt install -y nginx systemd curl wget
 # Sprawdź czy .NET 8 jest zainstalowany
 if ! command -v dotnet &> /dev/null; then
     echo -e "${YELLOW}Instalacja .NET 8 SDK...${NC}"
-    wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-    dpkg -i packages-microsoft-prod.deb
-    rm packages-microsoft-prod.deb
-    apt update
-    apt install -y dotnet-sdk-8.0
+    
+    # Sprawdź wersję Ubuntu dla właściwej konfiguracji Microsoft repo
+    UBUNTU_VERSION=$(lsb_release -rs)
+    
+    if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; then
+        # Ubuntu 18.04/20.04 - musi używać Microsoft repository
+        echo -e "${CYAN}Ubuntu $UBUNTU_VERSION - konfiguracja Microsoft repository...${NC}"
+        
+        apt-get install -y wget apt-transport-https software-properties-common gpg
+        
+        # Poprawna konfiguracja Microsoft repo dla starszych Ubuntu
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
+        mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        
+        wget -q https://packages.microsoft.com/config/ubuntu/$UBUNTU_VERSION/prod.list
+        mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+        
+        apt update
+        apt install -y dotnet-sdk-8.0
+    else
+        # Ubuntu 22.04+ - standardowa metoda
+        wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
+        apt update
+        apt install -y dotnet-sdk-8.0
+    fi
 elif ! dotnet --list-sdks 2>/dev/null | grep -q "8\.0\."; then
     echo -e "${YELLOW}.NET jest zainstalowany, ale brak wersji 8.0 - dodawanie .NET 8 SDK...${NC}"
     current_version=$(dotnet --version 2>/dev/null || echo "nieznana")
@@ -95,12 +119,31 @@ elif ! dotnet --list-sdks 2>/dev/null | grep -q "8\.0\."; then
         echo -e "${CYAN}Używanie dedykowanego skryptu instalacji .NET 8...${NC}"
         ./install-dotnet8.sh
     else
-        # Fallback - podstawowa instalacja
-        wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb 2>/dev/null || true
-        dpkg -i packages-microsoft-prod.deb 2>/dev/null || true
-        rm packages-microsoft-prod.deb 2>/dev/null || true
-        apt update
-        apt install -y dotnet-sdk-8.0
+        # Fallback - podstawowa instalacja z poprawną konfiguracją
+        UBUNTU_VERSION=$(lsb_release -rs)
+        
+        if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; then
+            # Konfiguracja Microsoft repo dla starszych Ubuntu
+            apt-get install -y wget apt-transport-https software-properties-common gpg
+            
+            wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
+            mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+            chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+            
+            wget -q https://packages.microsoft.com/config/ubuntu/$UBUNTU_VERSION/prod.list
+            mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+            chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+            
+            apt update
+            apt install -y dotnet-sdk-8.0
+        else
+            # Standardowa metoda dla nowszych Ubuntu
+            wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb 2>/dev/null || true
+            dpkg -i packages-microsoft-prod.deb 2>/dev/null || true
+            rm packages-microsoft-prod.deb 2>/dev/null || true
+            apt update
+            apt install -y dotnet-sdk-8.0
+        fi
     fi
 fi
 
