@@ -59,11 +59,17 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
         
-        // Add HttpClient for LLM service (used by HealthAggregator)
-        services.AddHttpClient<ILlmService, LlmService>();
+        // Add HttpClient for LLM service (used by HealthAggregator) with SHORT timeout for health checks
+        services.AddHttpClient<ILlmService, LlmService>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30); // Short timeout for health operations
+        });
         
-        // Add HttpClient for SearchService
-        services.AddHttpClient<ISearchService, SearchService>();
+        // Add HttpClient for SearchService with reasonable timeout
+        services.AddHttpClient<ISearchService, SearchService>(client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(2); // Reasonable timeout for search operations
+        });
         
         // Register feature services
         // ChatService now uses Kernel instead of ILlmService

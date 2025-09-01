@@ -23,15 +23,15 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: '/api',
-      timeout: 600000, // 10 minutes
+      timeout: 900000, // 15 minutes for chat operations (matches backend Chat:RequestTimeoutMinutes)
       headers: {
         'Content-Type': 'application/json',
       },
     })
     
-    // Separate client for health endpoints without /api prefix
+    // Separate client for health endpoints with SHORT timeout
     this.healthClient = axios.create({
-      timeout: 10000, // 10 seconds for health checks
+      timeout: 5000, // 5 seconds for health checks
       headers: {
         'Content-Type': 'application/json',
       },
@@ -107,7 +107,11 @@ class ApiClient {
   async sendMultilingualMessage(sessionId: string, request: MultilingualChatRequest): Promise<MultilingualChatResponse> {
     console.log(`Calling API: POST /api/chat/sessions/${sessionId}/messages/multilingual`, request)
     try {
-      const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(`/chat/sessions/${sessionId}/messages/multilingual`, request)
+      // Uses main client timeout (15 minutes configured in constructor)
+      const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(
+        `/chat/sessions/${sessionId}/messages/multilingual`, 
+        request
+      )
       console.log('API response received:', response.data)
       return response.data.data
     } catch (error) {

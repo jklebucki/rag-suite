@@ -40,9 +40,8 @@ public class LlmService : ILlmService
         var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:11434";
         _httpClient.BaseAddress = new Uri(baseUrl);
         
-        // Set timeout from configuration (default to 10 minutes)
-        var timeoutMinutes = configuration.GetValue<int>("Services:LlmService:TimeoutMinutes", 10);
-        _httpClient.Timeout = TimeSpan.FromMinutes(timeoutMinutes);
+        // HttpClient timeout is now configured in ServiceCollectionExtensions for health operations
+        // Chat operations use Semantic Kernel with different timeout configuration
     }
 
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
