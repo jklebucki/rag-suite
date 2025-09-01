@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
+import { useI18n } from '@/contexts/I18nContext'
+import { formatDate } from '@/utils/date'
 
 export function useSearch() {
   const [query, setQuery] = useState('')
@@ -13,6 +15,7 @@ export function useSearch() {
   const [isAdvancedMode, setIsAdvancedMode] = useState(false)
   const [hasSearched, setHasSearched] = useState(false) // Track if user has initiated search
   const { showError, showSuccess } = useToastContext()
+  const { language } = useI18n()
 
   const hasFilters = () => {
     return filters.documentType || filters.source || filters.dateRange
@@ -92,7 +95,7 @@ export function useSearch() {
           result.documentType,
           result.source,
           Math.round(result.score * 100) + '%',
-          new Date(result.updatedAt).toLocaleDateString()
+          formatDate(result.updatedAt, language)
         ])
       ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
 

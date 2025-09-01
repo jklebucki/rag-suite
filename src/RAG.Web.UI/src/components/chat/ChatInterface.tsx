@@ -5,6 +5,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import type { ChatMessage } from '@/types'
 
 export function ChatInterface() {
@@ -31,35 +32,6 @@ export function ChatInterface() {
     setMessage,
     setCurrentSessionId,
   } = useMultilingualChat()
-
-  // Format timestamp as YYYY-MM-DD HH:mm:ss
-  const formatTimestamp = (timestamp: Date | string) => {
-    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
-    return date.toISOString().slice(0, 19).replace('T', ' ')
-  }
-
-  // Format timestamp for relative time (e.g., "2 minutes ago")
-  const formatRelativeTime = (timestamp: Date | string) => {
-    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
-    const now = new Date()
-    const diffInMs = now.getTime() - date.getTime()
-    const diffInSeconds = Math.floor(diffInMs / 1000)
-    const diffInMinutes = Math.floor(diffInSeconds / 60)
-    const diffInHours = Math.floor(diffInMinutes / 60)
-    const diffInDays = Math.floor(diffInHours / 24)
-
-    if (diffInSeconds < 60) {
-      return 'just now'
-    } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`
-    } else if (diffInHours < 24) {
-      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`
-    } else if (diffInDays < 7) {
-      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`
-    } else {
-      return formatTimestamp(date)
-    }
-  }
 
   return (
     <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -94,10 +66,10 @@ export function ChatInterface() {
                     {/* Timestamp */}
                     <div 
                       className={`mt-2 text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'} cursor-help`}
-                      title={`Sent at ${formatTimestamp(msg.timestamp)}`}
+                      title={`Sent at ${formatDateTime(msg.timestamp, currentLanguage)}`}
                     >
-                      <span className="font-medium">{formatRelativeTime(msg.timestamp)}</span>
-                      <span className="ml-2 opacity-75">{formatTimestamp(msg.timestamp)}</span>
+                      <span className="font-medium">{formatRelativeTime(msg.timestamp, currentLanguage)}</span>
+                      <span className="ml-2 opacity-75">{formatDateTime(msg.timestamp, currentLanguage)}</span>
                     </div>
                     
                     {/* Language detection info */}
@@ -130,7 +102,7 @@ export function ChatInterface() {
                     </div>
                     <div className="mt-1 text-xs text-gray-500">
                       <span className="font-medium">now</span>
-                      <span className="ml-2 opacity-75">{formatTimestamp(new Date())}</span>
+                      <span className="ml-2 opacity-75">{formatDateTime(new Date(), currentLanguage)}</span>
                     </div>
                   </div>
                 </div>
@@ -199,63 +171,6 @@ export function ChatInterface() {
         variant="danger"
         isLoading={deleteSessionMutation.isPending}
       />
-    </div>
-  )
-}
-
-interface ChatMessageItemProps {
-  message: ChatMessage
-}
-
-function ChatMessageItem({ message }: ChatMessageItemProps) {
-  const isUser = message.role === 'user'
-  const { t } = useI18n()
-
-  return (
-    <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      {!isUser && (
-        <div className="p-2 rounded-full bg-primary-100 flex-shrink-0">
-          <Bot className="h-5 w-5 text-primary-600" />
-        </div>
-      )}
-
-      <div className={`max-w-3xl ${isUser ? 'order-1' : ''}`}>
-        <div
-          className={`rounded-lg p-4 ${
-            isUser
-              ? 'bg-primary-500 text-white'
-              : 'bg-gray-100 text-gray-900'
-          }`}
-        >
-          <p className="whitespace-pre-wrap">{message.content}</p>
-        </div>
-
-        {message.sources && message.sources.length > 0 && (
-          <div className="mt-2 text-xs text-gray-500">
-            <p className="font-medium mb-1">{t('chat.sources')}:</p>
-            <div className="space-y-1">
-              {message.sources.slice(0, 3).map((source, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className="w-4 h-4 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs">
-                    {index + 1}
-                  </span>
-                  <span className="truncate">{source.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <p className="text-xs text-gray-500 mt-2">
-          {new Date(message.timestamp).toLocaleTimeString()}
-        </p>
-      </div>
-
-      {isUser && (
-        <div className="p-2 rounded-full bg-gray-100 flex-shrink-0">
-          <User className="h-5 w-5 text-gray-600" />
-        </div>
-      )}
     </div>
   )
 }

@@ -1,5 +1,7 @@
 import React from 'react'
 import { Calendar, FileText, Database, Tag, Hash } from 'lucide-react'
+import { useI18n } from '@/contexts/I18nContext'
+import { formatDateTime } from '@/utils/date'
 import type { SearchResult } from '@/types'
 
 interface DocumentDetailProps {
@@ -8,6 +10,7 @@ interface DocumentDetailProps {
 
 export function DocumentDetail({ document }: DocumentDetailProps) {
   const formatScore = (score: number) => Math.round(score * 100)
+  const { language } = useI18n()
 
   return (
     <div className="p-6 space-y-6">
@@ -81,7 +84,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
             Created
           </h4>
           <p className="text-gray-600">
-            {new Date(document.createdAt).toLocaleString()}
+            {formatDateTime(document.createdAt, language)}
           </p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
@@ -90,7 +93,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
             Last Updated
           </h4>
           <p className="text-gray-600">
-            {new Date(document.updatedAt).toLocaleString()}
+            {formatDateTime(document.updatedAt, language)}
           </p>
         </div>
       </div>

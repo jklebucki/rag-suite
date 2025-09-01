@@ -4,6 +4,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { Modal } from '@/components/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from './hooks/useDocumentDetail'
+import { formatDate } from '@/utils/date'
 import type { SearchResult } from '@/types'
 
 interface SearchResultsProps {
@@ -19,7 +20,7 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ searchResults, isLoading, error, hasSearched, onExport }: SearchResultsProps) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
   const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
 
@@ -93,6 +94,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
             key={result.id} 
             result={result} 
             onViewDetails={() => setSelectedDocumentId(result.id)}
+            language={language}
           />
         ))}
       </div>
@@ -131,9 +133,10 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 interface SearchResultItemProps {
   result: SearchResult
   onViewDetails: () => void
+  language: import('@/types/i18n').LanguageCode
 }
 
-function SearchResultItem({ result, onViewDetails }: SearchResultItemProps) {
+function SearchResultItem({ result, onViewDetails, language }: SearchResultItemProps) {
   const formatScore = (score: number) => Math.round(score * 100)
 
   return (
@@ -157,7 +160,7 @@ function SearchResultItem({ result, onViewDetails }: SearchResultItemProps) {
             {result.documentType}
           </span>
           <span>{result.source}</span>
-          <span>{new Date(result.updatedAt).toLocaleDateString()}</span>
+          <span>{formatDate(result.updatedAt, language)}</span>
         </div>
         <button 
           onClick={onViewDetails}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
+import { formatDateTime } from '@/utils/date'
 import type { ChatSession } from '@/types'
 
 interface ChatSidebarProps {
@@ -20,7 +21,7 @@ export function ChatSidebar({
   onDeleteSession,
   isCreatingSession,
 }: ChatSidebarProps) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   
   return (
     <div className="w-80 border-r border-gray-200 flex flex-col">
@@ -49,10 +50,10 @@ export function ChatSidebar({
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {session.title || t('chat.new_session')}
+                  {session.title || t('chat.new_conversation')}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {new Date(session.updatedAt).toLocaleDateString()}
+                  {formatDateTime(session.updatedAt, language)}
                 </p>
               </div>
               <button
