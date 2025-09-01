@@ -24,9 +24,17 @@ curl -sSL https://raw.githubusercontent.com/jklebucki/rag-suite/main/quick-insta
 - Otwarte porty 80 i 443 w firewall
 - Dostęp do internetu
 
-## 🔧 Po instalacji
+## � Diagnoza problemów
 
-### Sprawdź status
+**Nie wiesz co się dzieje? Użyj:**
+```bash
+cd /var/www/rag-suite
+sudo ./diagnose.sh
+```
+
+## 🛠️ Częste problemy
+
+### Aplikacja nie działa
 ```bash
 sudo systemctl status rag-api nginx
 ```

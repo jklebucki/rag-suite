@@ -89,19 +89,22 @@ fi
 
 # Sprawdź czy Node.js jest zainstalowany
 if ! command -v node &> /dev/null; then
-    echo -e "${YELLOW}Instalacja Node.js 18 LTS (kompatybilna z Ubuntu 18.04)...${NC}"
+    echo -e "${YELLOW}Instalacja Node.js LTS (kompatybilna z Ubuntu 18.04)...${NC}"
     
     # Sprawdź wersję Ubuntu
     UBUNTU_VERSION=$(lsb_release -rs)
     if [[ "$UBUNTU_VERSION" == "18.04" ]]; then
-        echo -e "${BLUE}Wykryto Ubuntu 18.04 - instalacja Node.js 18 LTS${NC}"
+        echo -e "${BLUE}Wykryto Ubuntu 18.04 - instalacja Node.js 16 LTS${NC}"
+        curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+    elif [[ "$UBUNTU_VERSION" == "20.04" ]]; then
+        echo -e "${BLUE}Wykryto Ubuntu 20.04 - instalacja Node.js 18 LTS${NC}"
         curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    elif [[ "$UBUNTU_VERSION" == "20.04" ]] || [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+    elif [[ "$UBUNTU_VERSION" == "22.04" ]] || [[ "$UBUNTU_VERSION" == "24.04" ]]; then
         echo -e "${BLUE}Wykryto Ubuntu $UBUNTU_VERSION - instalacja Node.js 20${NC}"
         curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     else
-        echo -e "${YELLOW}Nieznana wersja Ubuntu ($UBUNTU_VERSION) - próba instalacji Node.js 18 LTS${NC}"
-        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+        echo -e "${YELLOW}Nieznana wersja Ubuntu ($UBUNTU_VERSION) - próba instalacji Node.js 16 LTS${NC}"
+        curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
     fi
     
     apt install -y nodejs

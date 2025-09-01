@@ -299,15 +299,28 @@ sudo tar --exclude='/var/www/rag-suite/.git' \
 
 ## Rozwiązywanie problemów
 
-### Problem z Node.js na Ubuntu 18.04
+### Node.js nie działa (Ubuntu 18.04)
 
-Jeśli widzisz błąd: `nodejs : Depends: libc6 (>= 2.28) but 2.27-3ubuntu1.6 is to be installed`
+**Problem**: `nodejs : Depends: libc6 (>= 2.28) but 2.27-3ubuntu1.6 is to be installed`
 
-**Rozwiązanie:** Użyj skryptu naprawy Node.js
-
+**Rozwiązanie 1 - Automatyczna naprawa:**
 ```bash
 cd /var/www/rag-suite
 sudo ./fix-nodejs.sh
+```
+
+**Rozwiązanie 2 - Alternatywna instalacja:**
+```bash
+cd /var/www/rag-suite
+sudo ./install-nodejs-alternative.sh
+```
+
+**Rozwiązanie 3 - Manualna instalacja przez Snap:**
+```bash
+sudo apt remove nodejs npm
+sudo snap install node --classic --channel=16/stable
+sudo ln -sf /snap/bin/node /usr/local/bin/node
+sudo ln -sf /snap/bin/npm /usr/local/bin/npm
 ```
 
 ### Inne częste problemy

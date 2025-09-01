@@ -63,13 +63,34 @@ echo -e "${BLUE}[3/4] Instalacja odpowiedniej wersji Node.js...${NC}"
 
 # Wybierz odpowiednią wersję Node.js na podstawie Ubuntu
 if [[ "$UBUNTU_VERSION" == "18.04" ]]; then
-    echo -e "${BLUE}Ubuntu 18.04 - instalacja Node.js 16 LTS (najbardziej stabilna dla tej wersji)${NC}"
+    echo -e "${BLUE}Ubuntu 18.04 - próba instalacji Node.js 16 LTS${NC}"
     
-    # Dodaj repozytorium Node.js 16
+    # Próba instalacji Node.js 16
     curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
     
-    # Zainstaluj Node.js
-    apt install -y nodejs
+    if apt install -y nodejs; then
+        echo -e "${GREEN}✓ Node.js 16 zainstalowany pomyślnie${NC}"
+    else
+        echo -e "${YELLOW}Node.js 16 niekompatybilny - próba alternatywnej instalacji przez Snap${NC}"
+        
+        # Zainstaluj snapd jeśli nie ma
+        if ! command -v snap &> /dev/null; then
+            apt update
+            apt install -y snapd
+            systemctl enable snapd
+            systemctl start snapd
+            sleep 5
+        fi
+        
+        # Zainstaluj Node.js przez snap
+        snap install node --classic --channel=16/stable
+        
+        # Utworz linki symboliczne
+        ln -sf /snap/bin/node /usr/local/bin/node
+        ln -sf /snap/bin/npm /usr/local/bin/npm
+        
+        echo -e "${GREEN}✓ Node.js zainstalowany przez Snap${NC}"
+    fi
     
 elif [[ "$UBUNTU_VERSION" == "20.04" ]]; then
     echo -e "${BLUE}Ubuntu 20.04 - instalacja Node.js 18 LTS${NC}"
@@ -82,9 +103,25 @@ elif [[ "$UBUNTU_VERSION" == "22.04" ]] || [[ "$UBUNTU_VERSION" == "24.04" ]]; t
     apt install -y nodejs
     
 else
-    echo -e "${YELLOW}Nieznana/nieobsługiwana wersja Ubuntu - próba z Node.js 16 LTS${NC}"
+    echo -e "${YELLOW}Nieznana/nieobsługiwana wersja Ubuntu - próba z Node.js 16 LTS (najbardziej kompatybilna)${NC}"
     curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-    apt install -y nodejs
+    
+    if ! apt install -y nodejs; then
+        echo -e "${YELLOW}NodeSource niekompatybilny - próba instalacji przez Snap${NC}"
+        
+        # Snap fallback
+        if ! command -v snap &> /dev/null; then
+            apt update
+            apt install -y snapd
+            systemctl enable snapd
+            systemctl start snapd
+            sleep 5
+        fi
+        
+        snap install node --classic --channel=16/stable
+        ln -sf /snap/bin/node /usr/local/bin/node
+        ln -sf /snap/bin/npm /usr/local/bin/npm
+    fi
 fi
 
 echo -e "${BLUE}[4/4] Weryfikacja instalacji...${NC}"
