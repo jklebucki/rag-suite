@@ -24,8 +24,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("AllowFrontend");
 }
+
+// Enable CORS for all environments (needed for direct API access)
+app.UseCors("AllowFrontend");
 
 app.MapControllers();
 
