@@ -103,8 +103,8 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_cache_bypass \$http_upgrade;
         proxy_connect_timeout 30s;
-        proxy_send_timeout 30s;
-        proxy_read_timeout 30s;
+        proxy_send_timeout 900s;
+        proxy_read_timeout 900s;
     }
 
     # Health endpoints proxy
@@ -225,8 +225,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
         proxy_connect_timeout 30s;
-        proxy_send_timeout 30s;
-        proxy_read_timeout 30s;
+        proxy_send_timeout 900s;
+        proxy_read_timeout 900s;
     }
 
     # Health endpoints proxy
