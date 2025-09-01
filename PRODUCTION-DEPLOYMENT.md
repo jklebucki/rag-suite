@@ -177,7 +177,20 @@ Skrypt deployment/aktualizacji - używany do aktualizacji
 ### `ssl-setup.sh`
 Skrypt konfiguracji SSL/HTTPS z istniejącymi certyfikatami wildcard *.ad.citronex.pl
 
+### `fix-nodejs.sh`
+Skrypt naprawy problemów z Node.js na różnych wersjach Ubuntu (szczególnie 18.04)
+
+### `health-check.sh`
+Kompleksowy test wszystkich komponentów aplikacji
+
 ## Monitoring i zarządzanie
+
+### Szybki test aplikacji
+
+```bash
+cd /var/www/rag-suite
+sudo ./health-check.sh
+```
 
 ### Sprawdzanie statusu
 
@@ -282,4 +295,55 @@ sudo tar --exclude='/var/www/rag-suite/.git' \
   --exclude='/var/www/rag-suite/build' \
   -czf rag-suite-app-$(date +%Y%m%d).tar.gz \
   /var/www/rag-suite
+```
+
+## Rozwiązywanie problemów
+
+### Problem z Node.js na Ubuntu 18.04
+
+Jeśli widzisz błąd: `nodejs : Depends: libc6 (>= 2.28) but 2.27-3ubuntu1.6 is to be installed`
+
+**Rozwiązanie:** Użyj skryptu naprawy Node.js
+
+```bash
+cd /var/www/rag-suite
+sudo ./fix-nodejs.sh
+```
+
+### Inne częste problemy
+
+#### Aplikacja nie startuje
+```bash
+# Sprawdź status serwisu
+sudo systemctl status rag-api
+
+# Sprawdź logi
+sudo journalctl -u rag-api -f
+```
+
+#### Nginx zwraca błąd 502
+```bash
+# Sprawdź czy API działa
+curl http://localhost:5000/health
+
+# Sprawdź logi Nginx
+sudo tail -f /var/log/nginx/error.log
+```
+
+#### Build React nie działa
+```bash
+# Sprawdź wersję Node.js
+node --version
+
+# Jeśli problem z zależnościami
+cd /var/www/rag-suite/src/RAG.Web.UI
+sudo rm -rf node_modules package-lock.json
+sudo npm install
+```
+
+#### Problemy z uprawnieniami
+```bash
+# Napraw uprawnienia
+sudo chown -R www-data:www-data /var/www/rag-suite/build
+sudo chmod -R 755 /var/www/rag-suite/build
 ```

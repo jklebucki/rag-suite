@@ -89,9 +89,31 @@ fi
 
 # Sprawdź czy Node.js jest zainstalowany
 if ! command -v node &> /dev/null; then
-    echo -e "${YELLOW}Instalacja Node.js 20...${NC}"
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    echo -e "${YELLOW}Instalacja Node.js 18 LTS (kompatybilna z Ubuntu 18.04)...${NC}"
+    
+    # Sprawdź wersję Ubuntu
+    UBUNTU_VERSION=$(lsb_release -rs)
+    if [[ "$UBUNTU_VERSION" == "18.04" ]]; then
+        echo -e "${BLUE}Wykryto Ubuntu 18.04 - instalacja Node.js 18 LTS${NC}"
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    elif [[ "$UBUNTU_VERSION" == "20.04" ]] || [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+        echo -e "${BLUE}Wykryto Ubuntu $UBUNTU_VERSION - instalacja Node.js 20${NC}"
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    else
+        echo -e "${YELLOW}Nieznana wersja Ubuntu ($UBUNTU_VERSION) - próba instalacji Node.js 18 LTS${NC}"
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    fi
+    
     apt install -y nodejs
+    
+    # Sprawdź czy instalacja się powiodła
+    if command -v node &> /dev/null; then
+        echo -e "${GREEN}✓ Node.js $(node --version) zainstalowany pomyślnie${NC}"
+        echo -e "${GREEN}✓ npm $(npm --version) dostępny${NC}"
+    else
+        echo -e "${RED}✗ Błąd instalacji Node.js${NC}"
+        exit 1
+    fi
 fi
 
 echo -e "${BLUE}[3/7] Tworzenie serwisu systemd dla RAG API...${NC}"

@@ -1,7 +1,31 @@
 #!/bin/bash
 
 # RAG Suite Deployment Script
-# Aktualizuje kod z git, buduje aplikację .NET i React, wdraża na produkcję
+# Aktualizuje kod z git, buduje aplikację .NET i React, wdraecho -e "${BLUE}[6/8] Budowanie aplikacji React...${NC}"
+
+# Sprawdź czy Node.js jest dostępny
+if ! command -v node &> /dev/null; then
+    echo -e "${RED}✗ Node.js nie jest zainstalowany. Uruchom najpierw production-setup.sh${NC}"
+    exit 1
+fi
+
+if ! command -v npm &> /dev/null; then
+    echo -e "${RED}✗ npm nie jest dostępny. Sprawdź instalację Node.js${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}Używam Node.js $(node --version) i npm $(npm --version)${NC}"
+
+cd src/RAG.Web.UI
+
+# Sprawdź czy node_modules istnieje
+if [ ! -d "node_modules" ]; then
+    echo -e "${YELLOW}Instalowanie zależności npm...${NC}"
+    npm install
+else
+    echo -e "${YELLOW}Aktualizowanie zależności npm...${NC}"
+    npm install
+ficję
 
 set -e
 

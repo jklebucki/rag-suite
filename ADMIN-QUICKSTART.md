@@ -87,8 +87,14 @@ sudo systemctl reload nginx
 
 ### SSL nie działa
 ```bash
-sudo certbot certificates
-sudo certbot renew --dry-run
+sudo systemctl status nginx
+sudo nginx -t
+```
+
+### Node.js nie działa (Ubuntu 18.04)
+```bash
+cd /var/www/rag-suite
+sudo ./fix-nodejs.sh
 ```
 
 ## 📞 Wsparcie
