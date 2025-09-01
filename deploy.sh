@@ -247,19 +247,29 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
     }
   },
   "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "ElasticSearch": "http://localhost:9200"
+  "Services": {
+    "Elasticsearch": {
+      "Url": "http://localhost:9200",
+      "Username": "elastic",
+      "Password": "changeme",
+      "TimeoutMinutes": 10
+    },
+    "EmbeddingService": {
+      "Url": "http://localhost:8580"
+    },
+    "LlmService": {
+      "Url": "http://192.168.21.12:11434",
+      "MaxTokens": 300,
+      "Temperature": 0.7,
+      "Model": "llama3.1:8b",
+      "IsOllama": true,
+      "TimeoutMinutes": 10
+    }
   },
-  "LLM": {
-    "ApiUrl": "http://localhost:11434",
-    "Model": "llama3.1",
-    "Temperature": 0.7,
-    "MaxTokens": 2000
-  },
-  "RagSettings": {
-    "ChunkSize": 1000,
-    "ChunkOverlap": 200,
-    "MaxResults": 10
+  "Chat": {
+    "MaxMessageLength": 2000,
+    "MaxMessagesPerSession": 100,
+    "SessionTimeoutMinutes": 60
   },
   "Security": {
     "AllowedOrigins": [
@@ -295,20 +305,39 @@ echo -e "${GREEN}✓ Uprawnienia ustawione dla $APP_USER${NC}"
 
 echo -e "${BLUE}[9/9] Uruchamianie serwisów...${NC}"
 
-# Uruchom serwis RAG API
+# Przeładuj konfigurację systemd
 systemctl daemon-reload
+
+# Sprawdź czy serwis był już uruchomiony
+WAS_RUNNING=false
+if systemctl is-active --quiet rag-api; then
+    WAS_RUNNING=true
+fi
+
+# Uruchom serwis RAG API
 systemctl enable rag-api
+echo -e "${YELLOW}Uruchamianie RAG API (timeout 60s)...${NC}"
 systemctl start rag-api
 
-# Sprawdź czy serwis startuje poprawnie
-sleep 3
-if systemctl is-active --quiet rag-api; then
-    echo -e "${GREEN}✓ RAG API uruchomiony pomyślnie${NC}"
-else
-    echo -e "${RED}✗ Błąd uruchamiania RAG API${NC}"
-    echo -e "${YELLOW}Sprawdź logi: sudo journalctl -u rag-api -f${NC}"
-    exit 1
-fi
+# Sprawdź czy serwis startuje poprawnie (z większym timeout)
+echo -e "${YELLOW}Oczekiwanie na uruchomienie serwisu...${NC}"
+for i in {1..12}; do
+    sleep 5
+    if systemctl is-active --quiet rag-api; then
+        echo -e "${GREEN}✓ RAG API uruchomiony pomyślnie (${i}x5s)${NC}"
+        break
+    else
+        echo -n "."
+        if [ $i -eq 12 ]; then
+            echo ""
+            echo -e "${RED}✗ Timeout uruchamiania RAG API${NC}"
+            echo -e "${YELLOW}Status serwisu:${NC}"
+            systemctl status rag-api --no-pager -l
+            echo -e "${YELLOW}Sprawdź logi: sudo journalctl -u rag-api -f${NC}"
+            exit 1
+        fi
+    fi
+done
 
 # Sprawdź czy nginx działa
 if systemctl is-active --quiet nginx; then

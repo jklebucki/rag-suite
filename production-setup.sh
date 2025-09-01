@@ -123,13 +123,14 @@ Description=RAG Suite API
 After=network.target
 
 [Service]
-Type=notify
+Type=simple
 User=$APP_USER
 Group=$APP_USER
 WorkingDirectory=$APP_DIR/build/api
 ExecStart=/usr/bin/dotnet RAG.Orchestrator.Api.dll
 Restart=always
 RestartSec=10
+TimeoutStartSec=60
 TimeoutStopSec=30
 SyslogIdentifier=rag-api
 Environment=ASPNETCORE_ENVIRONMENT=Production
