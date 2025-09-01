@@ -23,6 +23,20 @@ export function ChatSidebar({
 }: ChatSidebarProps) {
   const { t, language } = useI18n()
   
+  // Helper function to check if title is a default conversation title
+  const isDefaultTitle = (title: string | null | undefined): boolean => {
+    if (!title) return true
+    // Check for common default titles that should be localized
+    const defaultTitles = [
+      'New Conversation',
+      'Nowa rozmowa', 
+      'Conversație nouă',
+      'Új beszélgetés',
+      'Nieuw gesprek'
+    ]
+    return defaultTitles.includes(title)
+  }
+  
   return (
     <div className="w-80 border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
@@ -50,7 +64,10 @@ export function ChatSidebar({
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {session.title || t('chat.new_conversation')}
+                  {isDefaultTitle(session.title) 
+                    ? t('chat.new_conversation')
+                    : session.title
+                  }
                 </p>
                 <p className="text-xs text-gray-500">
                   {formatDateTime(session.updatedAt, language)}
