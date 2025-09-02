@@ -33,16 +33,20 @@ const initialState: AuthState = {
 }
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
+  console.debug('🔄 Auth reducer action:', action.type, 'payload' in action ? action.payload : 'no payload')
+  
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload }
     case 'SET_USER':
-      return { 
+      const newState = { 
         ...state, 
         user: action.payload,
         isAuthenticated: !!action.payload,
         loading: false 
       }
+      console.debug('🔄 SET_USER new state:', { isAuthenticated: newState.isAuthenticated, loading: newState.loading })
+      return newState
     case 'SET_TOKEN':
       return { ...state, token: action.payload }
     case 'SET_REFRESH_TOKEN':
@@ -50,6 +54,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false }
     case 'LOGOUT':
+      console.debug('🔄 LOGOUT action')
       return { 
         ...initialState, 
         loading: false 
@@ -91,58 +96,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { storeAuthData, clearAuthData } = useAuthStorage(handleStorageLogin, handleStorageLogout)
   const { performTokenRefresh } = useTokenRefresh(state.isAuthenticated, handleTokenRefresh, handleLogout)
 
-  // Initialize auth state
+  // Initialize auth state - simplified and more reliable approach
   useEffect(() => {
-    const initializeAuth = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true })
+    const initializeAuth = () => {
+      console.debug('🔐 Auth initialization started (synchronous)')
       
       try {
-        // Check if user is authenticated based on stored tokens
-        if (authService.isAuthenticated()) {
+        // Synchronous check of localStorage - no async calls here
+        const hasValidAuth = authService.isAuthenticated()
+        
+        if (hasValidAuth) {
           const token = authService.getToken()
           const refreshToken = authService.getRefreshToken()
           const userData = authService.getUser()
           
-          if (token && userData) {
-            // Set initial state from localStorage
-            dispatch({ type: 'SET_TOKEN', payload: token })
-            dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
-            dispatch({ type: 'SET_USER', payload: userData })
-            
-            // Verify with server in background
-            try {
-              const user = await authService.getCurrentUser()
-              if (user) {
-                // Update user data if it changed
-                dispatch({ type: 'SET_USER', payload: user })
-              } else {
-                // Server doesn't recognize the token
-                await logout()
-              }
-            } catch (error) {
-              console.warn('Failed to verify user on init, will try token refresh:', error)
-              // Try to refresh token if verification fails
-              performTokenRefresh()
-            }
-          } else {
-            // Incomplete auth data
-            clearAuthData()
-            dispatch({ type: 'LOGOUT' })
-          }
+          console.debug('🔐 Valid auth found, setting state immediately')
+          
+          // Set state immediately - this should prevent login redirect
+          dispatch({ type: 'SET_TOKEN', payload: token })
+          dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
+          dispatch({ type: 'SET_USER', payload: userData })
+          // Loading is automatically set to false in SET_USER action
+          
+          // Schedule background verification (don't block initial render)
+          setTimeout(() => {
+            verifyAuthInBackground()
+          }, 500)
         } else {
-          // Not authenticated or token expired
-          clearAuthData()
+          console.debug('🔐 No valid auth found')
           dispatch({ type: 'LOGOUT' })
         }
       } catch (error) {
-        console.error('Auth initialization failed:', error)
-        clearAuthData()
+        console.error('🔐 Auth initialization failed:', error)
         dispatch({ type: 'LOGOUT' })
       }
     }
+    
+    const verifyAuthInBackground = async () => {
+      try {
+        console.debug('🔐 Background auth verification started')
+        const user = await authService.getCurrentUser()
+        if (user) {
+          console.debug('🔐 Background verification successful')
+          dispatch({ type: 'SET_USER', payload: user })
+        } else {
+          console.warn('🔐 Background verification failed - server rejected token')
+          // Try refresh instead of immediate logout
+          performTokenRefresh()
+        }
+      } catch (error) {
+        console.warn('🔐 Background verification error:', error)
+        // Try refresh instead of immediate logout
+        performTokenRefresh()
+      }
+    }
 
+    // Run initialization immediately (synchronously)
     initializeAuth()
-  }, [clearAuthData, performTokenRefresh])
+  }, [performTokenRefresh])
 
   const login = async (credentials: LoginRequest): Promise<boolean> => {
     dispatch({ type: 'SET_LOADING', payload: true })

@@ -41,14 +41,18 @@ class AuthService {
           originalRequest._retry = true
 
           try {
+            console.debug('🔄 Attempting token refresh due to 401 error')
             const refreshed = await this.refreshToken()
             if (refreshed) {
+              console.debug('🔄 Token refresh successful, retrying request')
               originalRequest.headers.Authorization = `Bearer ${this.getToken()}`
               return this.client(originalRequest)
             }
           } catch (refreshError) {
-            this.logout()
-            window.location.href = '/login'
+            console.warn('🔄 Token refresh failed in interceptor:', refreshError)
+            this.clearStorage()
+            // Don't force navigation here - let React Router handle it
+            // The auth context will detect the missing token and redirect appropriately
           }
         }
 
@@ -58,12 +62,21 @@ class AuthService {
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
+    console.debug('🔐 Login attempt with credentials:', { email: credentials.email })
+    
     const response = await this.client.post<LoginResponse>('/login', credentials)
     const loginData = response.data
+    
+    console.debug('🔐 Login response received:', {
+      hasToken: !!loginData.token,
+      hasRefreshToken: !!loginData.refreshToken,
+      hasUser: !!loginData.user,
+      user: loginData.user
+    })
 
-    // Store tokens and user data
-    this.setTokens(loginData.token, loginData.refreshToken)
-    this.setUser(loginData.user)
+    // NOTE: Do NOT store tokens here - let AuthContext handle storage
+    // This prevents double storage and race conditions
+    console.debug('🔐 Login successful, returning data to AuthContext for storage')
 
     return loginData
   }
@@ -108,11 +121,14 @@ class AuthService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
+      console.debug('🔑 Getting current user from server')
       const response = await this.client.get<ApiResponse<User>>('/me')
       const user = response.data.data
+      console.debug('🔑 Current user received:', user)
       this.setUser(user)
       return user
     } catch (error) {
+      console.warn('🔑 Failed to get current user:', error)
       return null
     }
   }
@@ -128,7 +144,9 @@ class AuthService {
   // Token management with proper storage handling
   getToken(): string | null {
     try {
-      return localStorage.getItem('auth_token')
+      const token = localStorage.getItem('auth_token')
+      console.debug('🔑 Retrieved token from localStorage:', { hasToken: !!token })
+      return token
     } catch (error) {
       console.warn('Failed to access localStorage for token:', error)
       return null
@@ -137,7 +155,9 @@ class AuthService {
 
   getRefreshToken(): string | null {
     try {
-      return localStorage.getItem('refresh_token')
+      const refreshToken = localStorage.getItem('refresh_token')
+      console.debug('🔑 Retrieved refresh token from localStorage:', { hasRefreshToken: !!refreshToken })
+      return refreshToken
     } catch (error) {
       console.warn('Failed to access localStorage for refresh token:', error)
       return null
@@ -147,7 +167,9 @@ class AuthService {
   getUser(): User | null {
     try {
       const userData = localStorage.getItem('user_data')
-      return userData ? JSON.parse(userData) : null
+      const user = userData ? JSON.parse(userData) : null
+      console.debug('🔑 Retrieved user from localStorage:', { hasUser: !!user, user })
+      return user
     } catch (error) {
       console.warn('Failed to parse user data from localStorage:', error)
       return null
@@ -156,22 +178,36 @@ class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getToken()
-    if (!token) return false
+    console.debug('🔑 Checking authentication:', { hasToken: !!token })
+    
+    if (!token) {
+      console.debug('🔑 No token found')
+      return false
+    }
 
     try {
       // Validate token expiry
       const payload = JSON.parse(atob(token.split('.')[1]))
       const isExpired = payload.exp * 1000 <= Date.now()
       
+      console.debug('🔑 Token validation:', {
+        exp: payload.exp,
+        expTime: new Date(payload.exp * 1000),
+        now: new Date(),
+        isExpired
+      })
+      
       if (isExpired) {
         // Token expired, clear storage
+        console.warn('🔑 Token expired, clearing storage')
         this.clearStorage()
         return false
       }
       
+      console.debug('🔑 Token is valid')
       return true
     } catch (error) {
-      console.warn('Invalid token format:', error)
+      console.warn('🔑 Invalid token format:', error)
       this.clearStorage()
       return false
     }
@@ -205,6 +241,7 @@ class AuthService {
 
   private setTokens(accessToken: string, refreshToken: string): void {
     try {
+      console.debug('🔑 Storing tokens in localStorage')
       localStorage.setItem('auth_token', accessToken)
       localStorage.setItem('refresh_token', refreshToken)
       // Dispatch storage event for cross-tab synchronization
@@ -213,6 +250,7 @@ class AuthService {
         newValue: accessToken,
         storageArea: localStorage
       }))
+      console.debug('🔑 Tokens stored successfully')
     } catch (error) {
       console.error('Failed to store tokens:', error)
     }
@@ -220,6 +258,7 @@ class AuthService {
 
   private setUser(user: User): void {
     try {
+      console.debug('🔑 Storing user data in localStorage:', user)
       localStorage.setItem('user_data', JSON.stringify(user))
     } catch (error) {
       console.error('Failed to store user data:', error)
@@ -228,6 +267,7 @@ class AuthService {
 
   private clearStorage(): void {
     try {
+      console.debug('🔑 Clearing auth storage')
       localStorage.removeItem('auth_token')
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user_data')
@@ -237,6 +277,7 @@ class AuthService {
         newValue: null,
         storageArea: localStorage
       }))
+      console.debug('🔑 Auth storage cleared')
     } catch (error) {
       console.error('Failed to clear storage:', error)
     }

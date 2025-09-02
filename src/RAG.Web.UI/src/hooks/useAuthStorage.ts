@@ -59,17 +59,28 @@ export const useAuthStorage = (
 
   // Function to safely store auth data
   const storeAuthData = useCallback((token: string, refreshToken: string, user: any) => {
+    console.debug('🔐 storeAuthData called with:', { hasToken: !!token, hasRefreshToken: !!refreshToken, hasUser: !!user })
+    
     try {
       localStorage.setItem('auth_token', token)
       localStorage.setItem('refresh_token', refreshToken)
       localStorage.setItem('user_data', JSON.stringify(user))
       
+      console.debug('🔐 Data stored in localStorage successfully')
+      
       // Dispatch custom event for same-tab updates
       window.dispatchEvent(new CustomEvent('authStateChanged', {
         detail: { type: 'login', token, refreshToken, user }
       }))
+      
+      // Verify storage worked
+      console.debug('🔐 Verification - localStorage now contains:', {
+        token: localStorage.getItem('auth_token') ? 'EXISTS' : 'MISSING',
+        refreshToken: localStorage.getItem('refresh_token') ? 'EXISTS' : 'MISSING',
+        userData: localStorage.getItem('user_data') ? 'EXISTS' : 'MISSING'
+      })
     } catch (error) {
-      console.error('Failed to store auth data:', error)
+      console.error('🔐 Failed to store auth data:', error)
       throw new Error('Failed to persist authentication data')
     }
   }, [])
