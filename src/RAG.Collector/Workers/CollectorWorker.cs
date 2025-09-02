@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 using RAG.Collector.Config;
 using RAG.Collector.Enumerators;
+using RAG.Collector.ContentExtractors;
+using RAG.Collector.Models;
 
 namespace RAG.Collector.Workers;
 
@@ -101,10 +104,13 @@ public class CollectorWorker : BackgroundService
                         processedFiles, totalFiles, (double)processedFiles / totalFiles * 100, rate);
                 }
 
-                // TODO: Process individual file (extract, chunk, embed, index)
+                // Extract content from file
+                await ExtractContentAsync(fileItem, cancellationToken);
+                
                 var aclGroupsText = fileItem.AclGroups.Count > 0 ? $"[{string.Join(", ", fileItem.AclGroups)}]" : "[]";
-                _logger.LogInformation("Found file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups})", 
-                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText);
+                var contentText = fileItem.IsContentExtracted ? $", Content: {fileItem.ExtractedContent?.Length ?? 0} chars" : ", Content: extraction failed";
+                _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo})", 
+                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText, contentText);
                 
                 // Simulate processing time
                 await Task.Delay(10, cancellationToken);
@@ -121,6 +127,47 @@ public class CollectorWorker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during file enumeration");
+        }
+    }
+
+    /// <summary>
+    /// Extracts content from a file item
+    /// </summary>
+    private async Task ExtractContentAsync(FileItem fileItem, CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogDebug("Extracting content from file: {FilePath}", fileItem.Path);
+
+            using var scope = _serviceProvider.CreateScope();
+            var contentExtractionService = scope.ServiceProvider.GetRequiredService<ContentExtractionService>();
+            
+            var result = await contentExtractionService.ExtractContentAsync(fileItem.Path, cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                fileItem.ExtractedContent = result.Content;
+                fileItem.ContentMetadata = result.Metadata;
+                fileItem.IsContentExtracted = true;
+                
+                _logger.LogDebug("Successfully extracted {CharCount} characters from {FilePath}", 
+                    result.Content.Length, fileItem.Path);
+            }
+            else
+            {
+                fileItem.ContentExtractionError = result.ErrorMessage;
+                fileItem.IsContentExtracted = false;
+                
+                _logger.LogWarning("Content extraction failed for {FilePath}: {ErrorMessage}", 
+                    fileItem.Path, result.ErrorMessage);
+            }
+        }
+        catch (Exception ex)
+        {
+            fileItem.ContentExtractionError = ex.Message;
+            fileItem.IsContentExtracted = false;
+            
+            _logger.LogError(ex, "Unexpected error during content extraction from {FilePath}", fileItem.Path);
         }
     }
 

@@ -1,0 +1,14 @@
+# Test PDF Content
+
+This is a sample document that could be converted to PDF for testing content extraction.
+
+## Section 1
+This section contains some basic text that should be extracted by our PDF extractor.
+
+## Section 2
+This section contains additional content with:
+- Bullet points
+- Multiple lines
+- Various text formatting
+
+The PDF extractor should be able to extract all this text content properly.

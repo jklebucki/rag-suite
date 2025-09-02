@@ -2,6 +2,7 @@ using RAG.Collector.Config;
 using RAG.Collector.Workers;
 using RAG.Collector.Enumerators;
 using RAG.Collector.Acl;
+using RAG.Collector.ContentExtractors;
 using Serilog;
 
 // Configure Serilog
@@ -37,6 +38,12 @@ try
     // Register services
     builder.Services.AddScoped<IFileEnumerator, FileEnumerator>();
     builder.Services.AddScoped<IAclResolver, NtfsAclResolver>();
+    
+    // Register content extractors
+    builder.Services.AddScoped<IContentExtractor, PlainTextExtractor>();
+    builder.Services.AddScoped<IContentExtractor, PdfExtractor>();
+    builder.Services.AddScoped<IContentExtractor, OfficeDocumentExtractor>();
+    builder.Services.AddScoped<ContentExtractionService>();
 
     // Register the main worker
     builder.Services.AddHostedService<CollectorWorker>();

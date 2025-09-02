@@ -50,9 +50,30 @@ public class FileItem
     /// </summary>
     public List<string> AclGroups { get; set; } = new();
 
+    /// <summary>
+    /// Extracted content from the file (null if not yet extracted)
+    /// </summary>
+    public string? ExtractedContent { get; set; }
+
+    /// <summary>
+    /// Content extraction metadata
+    /// </summary>
+    public Dictionary<string, string> ContentMetadata { get; set; } = new();
+
+    /// <summary>
+    /// Whether content extraction was successful
+    /// </summary>
+    public bool IsContentExtracted { get; set; }
+
+    /// <summary>
+    /// Error message if content extraction failed
+    /// </summary>
+    public string? ContentExtractionError { get; set; }
+
     public override string ToString()
     {
-        var groupsText = AclGroups.Count > 0 ? $", Groups: [{string.Join(", ", AclGroups)}]" : ", Groups: []";
-        return $"FileItem {{ Path: {Path}, Extension: {Extension}, Size: {Size:N0} bytes, LastWrite: {LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC{groupsText} }}";
+        var groupsText = AclGroups.Count > 0 ? $"[{string.Join(", ", AclGroups)}]" : "[]";
+        var contentText = IsContentExtracted ? $", Content: {ExtractedContent?.Length ?? 0} chars" : ", Content: not extracted";
+        return $"FileItem {{ Path: {Path}, Extension: {Extension}, Size: {Size:N0} bytes, LastWrite: {LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC, Groups: {groupsText}{contentText} }}";
     }
 }

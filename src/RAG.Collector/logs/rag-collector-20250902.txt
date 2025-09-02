@@ -298,3 +298,63 @@ System.InvalidOperationException: Invalid configuration. See logs for details.
 2025-09-02 21:55:17.121 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:55:17.1217180+02:00"
 2025-09-02 21:55:28.256 +02:00 [INF] Application is shutting down...
 2025-09-02 21:55:28.261 +02:00 [INF] RAG Collector is stopping
+2025-09-02 22:05:20.731 +02:00 [INF] Starting RAG Collector service
+2025-09-02 22:05:20.863 +02:00 [FTL] Application terminated unexpectedly
+System.AggregateException: Some services are not able to be constructed (Error while validating the service descriptor 'ServiceType: Microsoft.Extensions.Hosting.IHostedService Lifetime: Singleton ImplementationType: RAG.Collector.Workers.CollectorWorker': Cannot consume scoped service 'RAG.Collector.ContentExtractors.ContentExtractionService' from singleton 'Microsoft.Extensions.Hosting.IHostedService'.)
+ ---> System.InvalidOperationException: Error while validating the service descriptor 'ServiceType: Microsoft.Extensions.Hosting.IHostedService Lifetime: Singleton ImplementationType: RAG.Collector.Workers.CollectorWorker': Cannot consume scoped service 'RAG.Collector.ContentExtractors.ContentExtractionService' from singleton 'Microsoft.Extensions.Hosting.IHostedService'.
+ ---> System.InvalidOperationException: Cannot consume scoped service 'RAG.Collector.ContentExtractors.ContentExtractionService' from singleton 'Microsoft.Extensions.Hosting.IHostedService'.
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteValidator.VisitScopeCache(ServiceCallSite scopedCallSite, CallSiteValidatorState state)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteValidator.VisitConstructor(ConstructorCallSite constructorCallSite, CallSiteValidatorState state)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSiteMain(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteValidator.VisitRootCache(ServiceCallSite singletonCallSite, CallSiteValidatorState state)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteValidator.ValidateCallSite(ServiceCallSite callSite)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.OnCreate(ServiceCallSite callSite)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.ValidateService(ServiceDescriptor descriptor)
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.ValidateService(ServiceDescriptor descriptor)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider..ctor(ICollection`1 serviceDescriptors, ServiceProviderOptions options)
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider..ctor(ICollection`1 serviceDescriptors, ServiceProviderOptions options)
+   at Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.BuildServiceProvider(IServiceCollection services, ServiceProviderOptions options)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.<>c__DisplayClass12_0.<.ctor>b__0()
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Program.cs:line 51
+2025-09-02 22:07:30.446 +02:00 [INF] Starting RAG Collector service
+2025-09-02 22:07:30.585 +02:00 [INF] Configuration validation successful
+2025-09-02 22:07:30.586 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 22:07:30.594 +02:00 [INF] RAG Collector started
+2025-09-02 22:07:30.596 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs
+2025-09-02 22:07:30.597 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 22:07:30.597 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 22:07:30.597 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 22:07:30.597 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 22:07:30.597 +02:00 [INF] Starting document collection cycle at "2025-09-02T22:07:30.5978710+02:00"
+2025-09-02 22:07:30.600 +02:00 [INF] Starting file enumeration...
+2025-09-02 22:07:30.601 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 22:07:30.602 +02:00 [INF] Found 4 files to process
+2025-09-02 22:07:30.602 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 22:07:30.602 +02:00 [INF] Hosting environment: Development
+2025-09-02 22:07:30.602 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 22:07:30.602 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 22:07:30.606 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:07:30.607 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:07:30.610 +02:00 [INF] Processed file: sample-pdf.txt (405 bytes, .txt, Modified: 2025-09-02 20:02:28, ACL: [], Content: 405 chars)
+2025-09-02 22:07:30.623 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:07:30.623 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:07:30.624 +02:00 [INF] Processed file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44, ACL: [], Content: 157 chars)
+2025-09-02 22:07:30.635 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:07:30.636 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:07:30.636 +02:00 [INF] Processed file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 329 chars)
+2025-09-02 22:07:30.648 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:07:30.648 +02:00 [INF] Progress: 4/4 files (100.0%) - 86.8 files/sec
+2025-09-02 22:07:30.648 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:07:30.649 +02:00 [INF] Processed file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 230 chars)
+2025-09-02 22:07:30.660 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 4 matching files
+2025-09-02 22:07:30.660 +02:00 [INF] Enumerating files in folder: \\server\share\docs
+2025-09-02 22:07:30.660 +02:00 [WRN] Source folder does not exist: \\server\share\docs
+2025-09-02 22:07:30.660 +02:00 [INF] File enumeration completed: 4 files in 00:00
+2025-09-02 22:07:30.660 +02:00 [INF] Document collection cycle completed at "2025-09-02T22:07:30.6608570+02:00"
+2025-09-02 22:08:02.413 +02:00 [INF] Application is shutting down...
+2025-09-02 22:08:02.417 +02:00 [INF] RAG Collector is stopping
