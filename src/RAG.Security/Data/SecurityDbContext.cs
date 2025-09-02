@@ -15,14 +15,45 @@ public class SecurityDbContext : IdentityDbContext<User, Role, string, UserClaim
     {
         base.OnModelCreating(builder);
 
-        // Configure table names
-        builder.Entity<User>().ToTable("Users");
-        builder.Entity<Role>().ToTable("Roles");
-        builder.Entity<UserRole>().ToTable("UserRoles");
-        builder.Entity<UserClaim>().ToTable("UserClaims");
-        builder.Entity<RoleClaim>().ToTable("RoleClaims");
-        builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
-        builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+        // Configure PostgreSQL naming convention (lowercase with underscores)
+        foreach (var entity in builder.Model.GetEntityTypes())
+        {
+            // Convert table names to lowercase with underscores
+            entity.SetTableName(entity.GetTableName()?.ToSnakeCase());
+
+            // Convert column names to lowercase with underscores
+            foreach (var property in entity.GetProperties())
+            {
+                property.SetColumnName(property.GetColumnName().ToSnakeCase());
+            }
+
+            // Convert key names to lowercase with underscores
+            foreach (var key in entity.GetKeys())
+            {
+                key.SetName(key.GetName()?.ToSnakeCase());
+            }
+
+            // Convert foreign key names to lowercase with underscores
+            foreach (var foreignKey in entity.GetForeignKeys())
+            {
+                foreignKey.SetConstraintName(foreignKey.GetConstraintName()?.ToSnakeCase());
+            }
+
+            // Convert index names to lowercase with underscores
+            foreach (var index in entity.GetIndexes())
+            {
+                index.SetDatabaseName(index.GetDatabaseName()?.ToSnakeCase());
+            }
+        }
+
+        // Configure table names explicitly for clarity
+        builder.Entity<User>().ToTable("users");
+        builder.Entity<Role>().ToTable("roles");
+        builder.Entity<UserRole>().ToTable("user_roles");
+        builder.Entity<UserClaim>().ToTable("user_claims");
+        builder.Entity<RoleClaim>().ToTable("role_claims");
+        builder.Entity<IdentityUserLogin<string>>().ToTable("user_logins");
+        builder.Entity<IdentityUserToken<string>>().ToTable("user_tokens");
 
         // Configure User entity
         builder.Entity<User>(entity =>
@@ -91,5 +122,32 @@ public class SecurityDbContext : IdentityDbContext<User, Role, string, UserClaim
         }).ToArray();
 
         builder.Entity<Role>().HasData(roles);
+    }
+}
+
+public static class StringExtensions
+{
+    public static string ToSnakeCase(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        var result = new System.Text.StringBuilder();
+        result.Append(char.ToLowerInvariant(input[0]));
+
+        for (int i = 1; i < input.Length; i++)
+        {
+            if (char.IsUpper(input[i]))
+            {
+                result.Append('_');
+                result.Append(char.ToLowerInvariant(input[i]));
+            }
+            else
+            {
+                result.Append(input[i]);
+            }
+        }
+
+        return result.ToString();
     }
 }
