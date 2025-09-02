@@ -8,7 +8,7 @@ set -e
 CONTAINER_NAME="rag-suite-postgres"
 POSTGRES_DB="rag-suite"
 POSTGRES_USER="postgres"
-DATA_DIR="/opt/rag-suite/postgresql"
+DATA_DIR="/var/lib/rag-suite/postgresql"
 
 case "${1:-status}" in
     "start")

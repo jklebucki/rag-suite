@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# PostgreSQL Docker Container Setup Script for RAG Suite
-# This script creates and runs a PostgreSQL container with persistent volume
-# Following Ubuntu/Linux best practices for data storage
+# PostgreSQL Docker Container Setup Script for RAG Suite (Volume-only version)
+# This script creates and runs a PostgreSQL container using only Docker volumes
+# For systems where filesystem is read-only or mount points are restricted
 
 set -e
 
@@ -13,14 +13,10 @@ POSTGRES_DB="rag-suite"
 POSTGRES_USER="postgres"
 POSTGRES_PASSWORD="postgres"
 POSTGRES_PORT="5432"
-
-# Data directory following Ubuntu best practices
-# Using /var/lib which is standard for application data and always writable
-DATA_DIR="/var/lib/rag-suite/postgresql"
 VOLUME_NAME="rag-suite-postgres-data"
 
-echo "🐘 Setting up PostgreSQL container for RAG Suite"
-echo "================================================="
+echo "🐘 Setting up PostgreSQL container for RAG Suite (Volume-only)"
+echo "=============================================================="
 
 # Check if Docker is installed and running
 if ! command -v docker &> /dev/null; then
@@ -34,12 +30,6 @@ if ! docker info &> /dev/null; then
     echo "   sudo systemctl start docker"
     exit 1
 fi
-
-# Create data directory with proper permissions
-echo "📁 Creating data directory: $DATA_DIR"
-sudo mkdir -p $DATA_DIR
-sudo chown -R 999:999 $DATA_DIR  # PostgreSQL user inside container has UID 999
-sudo chmod 755 $DATA_DIR
 
 # Stop and remove existing container if it exists
 if docker ps -a --format 'table {{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
@@ -57,7 +47,7 @@ fi
 
 echo "🚀 Starting PostgreSQL container..."
 
-# Run PostgreSQL container with proper configuration
+# Run PostgreSQL container with only Docker volume (no host mount)
 docker run -d \
     --name $CONTAINER_NAME \
     --restart unless-stopped \
@@ -68,7 +58,6 @@ docker run -d \
     -e PGDATA=/var/lib/postgresql/data/pgdata \
     -p $POSTGRES_PORT:5432 \
     -v $VOLUME_NAME:/var/lib/postgresql/data \
-    -v $DATA_DIR:/backup \
     --shm-size=256mb \
     postgres:$POSTGRES_VERSION
 
@@ -103,8 +92,7 @@ echo "Database: $POSTGRES_DB"
 echo "Username: $POSTGRES_USER"
 echo "Password: $POSTGRES_PASSWORD"
 echo "Port: $POSTGRES_PORT"
-echo "Data Volume: $VOLUME_NAME"
-echo "Backup Directory: $DATA_DIR"
+echo "Data Volume: $VOLUME_NAME (Docker managed)"
 echo ""
 echo "📝 Connection String:"
 echo "Host=localhost;Database=$POSTGRES_DB;Username=$POSTGRES_USER;Password=$POSTGRES_PASSWORD;Port=$POSTGRES_PORT"
@@ -115,7 +103,11 @@ echo "Stop container:     docker stop $CONTAINER_NAME"
 echo "Start container:    docker start $CONTAINER_NAME"
 echo "View logs:          docker logs $CONTAINER_NAME -f"
 echo "Connect to DB:      docker exec -it $CONTAINER_NAME psql -U $POSTGRES_USER -d $POSTGRES_DB"
-echo "Backup database:    docker exec $CONTAINER_NAME pg_dump -U $POSTGRES_USER $POSTGRES_DB > $DATA_DIR/backup_\$(date +%Y%m%d_%H%M%S).sql"
+echo "Backup database:    docker exec $CONTAINER_NAME pg_dump -U $POSTGRES_USER $POSTGRES_DB > backup_\$(date +%Y%m%d_%H%M%S).sql"
+echo "Volume location:    docker volume inspect $VOLUME_NAME"
 echo ""
 echo "🔄 Auto-restart: Container will automatically restart after server reboot"
 echo "📊 Monitor status: docker ps | grep $CONTAINER_NAME"
+echo ""
+echo "💡 Note: This setup uses only Docker volumes (no host filesystem mounts)"
+echo "   Data is stored in Docker's internal volume system"

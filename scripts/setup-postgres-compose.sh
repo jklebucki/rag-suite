@@ -6,7 +6,7 @@
 set -e
 
 COMPOSE_FILE="scripts/docker-compose.postgres.yml"
-DATA_DIR="/opt/rag-suite/postgresql"
+DATA_DIR="/var/lib/rag-suite/postgresql"
 
 echo "🐘 Setting up PostgreSQL with Docker Compose"
 echo "============================================="
