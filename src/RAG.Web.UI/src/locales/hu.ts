@@ -175,4 +175,21 @@ export const hu: TranslationKeys = {
   'auth.logout.confirm': 'Biztos, hogy ki szeretnél jelentkezni?',
   'auth.logout.signing_out': 'Kijelentkezés...',
   'auth.logout.success': 'Sikeresen kijelentkeztél.',
+
+  // Account
+  'account.title': 'Fiók',
+  'account.manage_account': 'Fiók kezelése',
+  'account.profile_tab': 'Profil',
+  'account.security_tab': 'Biztonság',
+  'account.firstName': 'Keresztnév',
+  'account.lastName': 'Vezetéknév',
+  'account.username': 'Felhasználónév',
+  'account.email': 'E-mail',
+  'account.roles': 'Szerepkörök',
+  'account.created_at': 'Létrehozva',
+  'account.last_login': 'Utolsó bejelentkezés',
+  'account.update_profile': 'Profil frissítése',
+  'account.danger_zone': 'Veszélyes zóna',
+  'account.delete_warning': 'A fiók törlése visszafordíthatatlan. Minden adat véglegesen elvész.',
+  'account.delete_account': 'Fiók törlése',
 };

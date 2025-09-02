@@ -192,6 +192,23 @@ export interface TranslationKeys {
   'auth.logout.confirm': string;
   'auth.logout.signing_out': string;
   'auth.logout.success': string;
+
+  // Account Management
+  'account.title': string;
+  'account.profile_tab': string;
+  'account.security_tab': string;
+  'account.firstName': string;
+  'account.lastName': string;
+  'account.username': string;
+  'account.email': string;
+  'account.roles': string;
+  'account.created_at': string;
+  'account.last_login': string;
+  'account.update_profile': string;
+  'account.manage_account': string;
+  'account.danger_zone': string;
+  'account.delete_warning': string;
+  'account.delete_account': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;

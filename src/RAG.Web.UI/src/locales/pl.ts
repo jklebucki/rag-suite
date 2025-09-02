@@ -175,4 +175,21 @@ export const pl: TranslationKeys = {
   'auth.logout.confirm': 'Czy na pewno chcesz się wylogować?',
   'auth.logout.signing_out': 'Wylogowywanie...',
   'auth.logout.success': 'Zostałeś pomyślnie wylogowany.',
+
+  // Account Management
+  'account.title': 'Moje konto',
+  'account.profile_tab': 'Profil',
+  'account.security_tab': 'Bezpieczeństwo',
+  'account.firstName': 'Imię',
+  'account.lastName': 'Nazwisko',
+  'account.username': 'Nazwa użytkownika',
+  'account.email': 'Email',
+  'account.roles': 'Role',
+  'account.created_at': 'Data utworzenia',
+  'account.last_login': 'Ostatnie logowanie',
+  'account.update_profile': 'Aktualizuj profil',
+  'account.manage_account': 'Zarządzaj kontem',
+  'account.danger_zone': 'Strefa niebezpieczna',
+  'account.delete_warning': 'Usunięcie konta jest nieodwracalne. Wszystkie dane zostaną trwale utracone.',
+  'account.delete_account': 'Usuń konto',
 };

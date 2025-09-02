@@ -175,4 +175,21 @@ export const en: TranslationKeys = {
   'auth.logout.confirm': 'Are you sure you want to sign out?',
   'auth.logout.signing_out': 'Signing out...',
   'auth.logout.success': 'You have been signed out successfully.',
+
+  // Account Management
+  'account.title': 'My Account',
+  'account.profile_tab': 'Profile',
+  'account.security_tab': 'Security',
+  'account.firstName': 'First Name',
+  'account.lastName': 'Last Name',
+  'account.username': 'Username',
+  'account.email': 'Email',
+  'account.roles': 'Roles',
+  'account.created_at': 'Created At',
+  'account.last_login': 'Last Login',
+  'account.update_profile': 'Update Profile',
+  'account.manage_account': 'Manage Account',
+  'account.danger_zone': 'Danger Zone',
+  'account.delete_warning': 'Account deletion is irreversible. All data will be permanently lost.',
+  'account.delete_account': 'Delete Account',
 };

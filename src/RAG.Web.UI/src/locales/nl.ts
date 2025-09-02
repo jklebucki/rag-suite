@@ -175,4 +175,21 @@ export const nl: TranslationKeys = {
   'auth.logout.confirm': 'Weet je zeker dat je wilt uitloggen?',
   'auth.logout.signing_out': 'Uitloggen...',
   'auth.logout.success': 'Je bent succesvol uitgelogd.',
+
+  // Account
+  'account.title': 'Account',
+  'account.manage_account': 'Account beheren',
+  'account.profile_tab': 'Profiel',
+  'account.security_tab': 'Beveiliging',
+  'account.firstName': 'Voornaam',
+  'account.lastName': 'Achternaam',
+  'account.username': 'Gebruikersnaam',
+  'account.email': 'E-mail',
+  'account.roles': 'Rollen',
+  'account.created_at': 'Aangemaakt op',
+  'account.last_login': 'Laatste login',
+  'account.update_profile': 'Profiel bijwerken',
+  'account.danger_zone': 'Gevaarlijke zone',
+  'account.delete_warning': 'Het verwijderen van je account is onomkeerbaar. Alle gegevens gaan definitief verloren.',
+  'account.delete_account': 'Account verwijderen',
 };

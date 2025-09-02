@@ -175,4 +175,21 @@ export const ro: TranslationKeys = {
   'auth.logout.confirm': 'Ești sigur că vrei să te deconectezi?',
   'auth.logout.signing_out': 'Se deconectează...',
   'auth.logout.success': 'Te-ai deconectat cu succes.',
+
+  // Account
+  'account.title': 'Cont',
+  'account.manage_account': 'Gestionare cont',
+  'account.profile_tab': 'Profil',
+  'account.security_tab': 'Securitate',
+  'account.firstName': 'Prenume',
+  'account.lastName': 'Nume',
+  'account.username': 'Nume utilizator',
+  'account.email': 'E-mail',
+  'account.roles': 'Roluri',
+  'account.created_at': 'Creat la',
+  'account.last_login': 'Ultima conectare',
+  'account.update_profile': 'Actualizare profil',
+  'account.danger_zone': 'Zonă periculoasă',
+  'account.delete_warning': 'Ștergerea contului este ireversibilă. Toate datele vor fi pierdute definitiv.',
+  'account.delete_account': 'Șterge contul',
 };
