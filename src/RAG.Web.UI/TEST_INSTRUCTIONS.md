@@ -73,6 +73,15 @@ localStorage.clear()
 location.reload()
 ```
 
+### ⚠️ EMERGENCY: Jeśli widzisz nieskończoną pętlę refreshToken:
+```javascript
+// NATYCHMIAST wykonaj w konsoli:
+localStorage.clear()
+location.reload()
+```
+**Przyczyna**: Błąd w logice refresh tokenów powoduje nieskończoną pętlę.
+**Rozwiązanie**: Tymczasowo wyłączyliśmy automatyczny refresh tokenów.
+
 ### 5. Sprawdzenie tokenów:
 ```javascript
 // Sprawdź ważność tokena:

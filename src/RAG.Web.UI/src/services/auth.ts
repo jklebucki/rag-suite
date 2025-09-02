@@ -36,6 +36,12 @@ class AuthService {
       (response) => response,
       async (error) => {
         const originalRequest = error.config
+        
+        console.debug('🔄 HTTP error intercepted:', {
+          status: error.response?.status,
+          url: originalRequest?.url,
+          hasRetry: !!originalRequest._retry
+        })
 
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true
@@ -47,6 +53,8 @@ class AuthService {
               console.debug('🔄 Token refresh successful, retrying request')
               originalRequest.headers.Authorization = `Bearer ${this.getToken()}`
               return this.client(originalRequest)
+            } else {
+              console.warn('🔄 Token refresh failed, request will fail')
             }
           } catch (refreshError) {
             console.warn('🔄 Token refresh failed in interceptor:', refreshError)
@@ -102,18 +110,29 @@ class AuthService {
   async refreshToken(): Promise<boolean> {
     try {
       const refreshToken = this.getRefreshToken()
+      console.debug('🔄 Attempting token refresh with:', { hasRefreshToken: !!refreshToken })
+      
       if (!refreshToken) {
+        console.warn('🔄 No refresh token available')
         return false
       }
 
-      const response = await this.client.post<LoginResponse>('/refresh', {
-        refreshToken
-      })
+      console.debug('🔄 Calling POST /refresh endpoint...')
+      const requestPayload = { RefreshToken: refreshToken }
+      console.debug('🔄 Request payload:', requestPayload)
+      const response = await this.client.post<LoginResponse>('/refresh', requestPayload)
 
+      console.debug('🔄 Refresh successful, response received')
       const tokenData = response.data
       this.setTokens(tokenData.token, tokenData.refreshToken)
       return true
-    } catch (error) {
+    } catch (error: any) {
+      console.error('🔄 Token refresh failed:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      })
       this.clearStorage()
       return false
     }

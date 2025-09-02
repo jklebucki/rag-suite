@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useReducer, ReactNode, useCallback } from 'react'
+import React, { createContext, useContext, useEffect, useReducer, ReactNode, useCallback, useRef } from 'react'
 import { authService } from '@/services/auth'
 import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 import { useAuthStorage } from '@/hooks/useAuthStorage'
@@ -70,6 +70,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState)
+  const isInitializedRef = useRef(false)
+  const isVerifyingRef = useRef(false)
 
   // Callbacks for auth storage hook
   const handleStorageLogin = useCallback((token: string, refreshToken: string | null, user: User) => {
@@ -98,8 +100,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Initialize auth state - simplified and more reliable approach
   useEffect(() => {
+    if (isInitializedRef.current) {
+      console.debug('🔐 Auth already initialized, skipping')
+      return
+    }
+    
     const initializeAuth = () => {
       console.debug('🔐 Auth initialization started (synchronous)')
+      isInitializedRef.current = true
       
       try {
         // Synchronous check of localStorage - no async calls here
@@ -121,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Schedule background verification (don't block initial render)
           setTimeout(() => {
             verifyAuthInBackground()
-          }, 500)
+          }, 1000) // Increase delay to avoid conflicts
         } else {
           console.debug('🔐 No valid auth found')
           dispatch({ type: 'LOGOUT' })
@@ -133,6 +141,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     
     const verifyAuthInBackground = async () => {
+      if (isVerifyingRef.current) {
+        console.debug('🔐 Background verification already in progress, skipping')
+        return
+      }
+      
+      isVerifyingRef.current = true
+      
       try {
         console.debug('🔐 Background auth verification started')
         const user = await authService.getCurrentUser()
@@ -141,13 +156,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           dispatch({ type: 'SET_USER', payload: user })
         } else {
           console.warn('🔐 Background verification failed - server rejected token')
-          // Try refresh instead of immediate logout
-          performTokenRefresh()
+          // Clear auth data and logout instead of trying to refresh in background
+          clearAuthData()
+          dispatch({ type: 'LOGOUT' })
         }
       } catch (error) {
         console.warn('🔐 Background verification error:', error)
-        // Try refresh instead of immediate logout
-        performTokenRefresh()
+        // Clear auth data and logout instead of trying to refresh in background
+        clearAuthData()
+        dispatch({ type: 'LOGOUT' })
+      } finally {
+        isVerifyingRef.current = false
       }
     }
 
