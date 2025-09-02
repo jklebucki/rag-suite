@@ -1,0 +1,8 @@
+Test Document 2
+===============
+
+This is a plain text file for testing.
+
+Content: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+End of document.

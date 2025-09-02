@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
+using RAG.Collector.Enumerators;
 
 namespace RAG.Collector.Workers;
 
@@ -11,13 +12,16 @@ public class CollectorWorker : BackgroundService
 {
     private readonly ILogger<CollectorWorker> _logger;
     private readonly CollectorOptions _options;
+    private readonly IServiceProvider _serviceProvider;
 
     public CollectorWorker(
         ILogger<CollectorWorker> logger,
-        IOptions<CollectorOptions> options)
+        IOptions<CollectorOptions> options,
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _options = options.Value;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,9 +60,67 @@ public class CollectorWorker : BackgroundService
     /// <param name="cancellationToken">Cancellation token</param>
     private async Task ProcessDocumentsAsync(CancellationToken cancellationToken)
     {
-        // Placeholder for actual implementation
-        _logger.LogInformation("Processing documents (placeholder implementation)");
-        await Task.Delay(1000, cancellationToken);
+        using var scope = _serviceProvider.CreateScope();
+        var fileEnumerator = scope.ServiceProvider.GetRequiredService<IFileEnumerator>();
+
+        try
+        {
+            _logger.LogInformation("Starting file enumeration...");
+            
+            // First, get total count for progress reporting
+            var totalFiles = await fileEnumerator.GetFileCountAsync(
+                _options.SourceFolders, 
+                _options.FileExtensions, 
+                cancellationToken);
+            
+            _logger.LogInformation("Found {TotalFiles} files to process", totalFiles);
+            
+            if (totalFiles == 0)
+            {
+                _logger.LogInformation("No files found matching the configured criteria");
+                return;
+            }
+
+            var processedFiles = 0;
+            var startTime = DateTime.UtcNow;
+
+            // Enumerate and process files
+            await foreach (var fileItem in fileEnumerator.EnumerateFilesAsync(
+                _options.SourceFolders, 
+                _options.FileExtensions, 
+                cancellationToken))
+            {
+                processedFiles++;
+                
+                // Log progress every 50 files
+                if (processedFiles % 50 == 0 || processedFiles == totalFiles)
+                {
+                    var elapsed = DateTime.UtcNow - startTime;
+                    var rate = processedFiles / elapsed.TotalSeconds;
+                    _logger.LogInformation("Progress: {Processed}/{Total} files ({Percentage:F1}%) - {Rate:F1} files/sec", 
+                        processedFiles, totalFiles, (double)processedFiles / totalFiles * 100, rate);
+                }
+
+                // TODO: Process individual file (extract, chunk, embed, index)
+                _logger.LogInformation("Found file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss})", 
+                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc);
+                
+                // Simulate processing time
+                await Task.Delay(10, cancellationToken);
+            }
+
+            var totalElapsed = DateTime.UtcNow - startTime;
+            _logger.LogInformation("File enumeration completed: {ProcessedFiles} files in {Elapsed:mm\\:ss}", 
+                processedFiles, totalElapsed);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("File enumeration was cancelled");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during file enumeration");
+        }
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

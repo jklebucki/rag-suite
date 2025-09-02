@@ -1,5 +1,6 @@
 using RAG.Collector.Config;
 using RAG.Collector.Workers;
+using RAG.Collector.Enumerators;
 using Serilog;
 
 // Configure Serilog
@@ -31,6 +32,9 @@ try
     {
         options.ServiceName = "RAG Collector";
     });
+
+    // Register services
+    builder.Services.AddScoped<IFileEnumerator, FileEnumerator>();
 
     // Register the main worker
     builder.Services.AddHostedService<CollectorWorker>();
