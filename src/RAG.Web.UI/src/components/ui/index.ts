@@ -1,5 +1,7 @@
 export { Modal } from './Modal'
 export { ConfirmModal } from './ConfirmModal'
+export { ConnectionStatus } from './ConnectionStatus'
+export { LanguageSelector } from './LanguageSelector'
 export { Toast } from './Toast'
 export { ToastContainer } from './ToastContainer'
 export type { ToastNotification } from './ToastContainer'

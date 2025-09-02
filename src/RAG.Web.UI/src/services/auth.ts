@@ -125,18 +125,33 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/change-password', request)
   }
 
-  // Token management
+  // Token management with proper storage handling
   getToken(): string | null {
-    return localStorage.getItem('auth_token')
+    try {
+      return localStorage.getItem('auth_token')
+    } catch (error) {
+      console.warn('Failed to access localStorage for token:', error)
+      return null
+    }
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem('refresh_token')
+    try {
+      return localStorage.getItem('refresh_token')
+    } catch (error) {
+      console.warn('Failed to access localStorage for refresh token:', error)
+      return null
+    }
   }
 
   getUser(): User | null {
-    const userData = localStorage.getItem('user_data')
-    return userData ? JSON.parse(userData) : null
+    try {
+      const userData = localStorage.getItem('user_data')
+      return userData ? JSON.parse(userData) : null
+    } catch (error) {
+      console.warn('Failed to parse user data from localStorage:', error)
+      return null
+    }
   }
 
   isAuthenticated(): boolean {
@@ -144,9 +159,35 @@ class AuthService {
     if (!token) return false
 
     try {
-      // Basic check - in production you might want to validate token expiry
+      // Validate token expiry
       const payload = JSON.parse(atob(token.split('.')[1]))
-      return payload.exp * 1000 > Date.now()
+      const isExpired = payload.exp * 1000 <= Date.now()
+      
+      if (isExpired) {
+        // Token expired, clear storage
+        this.clearStorage()
+        return false
+      }
+      
+      return true
+    } catch (error) {
+      console.warn('Invalid token format:', error)
+      this.clearStorage()
+      return false
+    }
+  }
+
+  // Check if token is about to expire (within 5 minutes)
+  isTokenExpiringSoon(): boolean {
+    const token = this.getToken()
+    if (!token) return false
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const expiryTime = payload.exp * 1000
+      const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000)
+      
+      return expiryTime <= fiveMinutesFromNow
     } catch {
       return false
     }
@@ -163,18 +204,42 @@ class AuthService {
   }
 
   private setTokens(accessToken: string, refreshToken: string): void {
-    localStorage.setItem('auth_token', accessToken)
-    localStorage.setItem('refresh_token', refreshToken)
+    try {
+      localStorage.setItem('auth_token', accessToken)
+      localStorage.setItem('refresh_token', refreshToken)
+      // Dispatch storage event for cross-tab synchronization
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auth_token',
+        newValue: accessToken,
+        storageArea: localStorage
+      }))
+    } catch (error) {
+      console.error('Failed to store tokens:', error)
+    }
   }
 
   private setUser(user: User): void {
-    localStorage.setItem('user_data', JSON.stringify(user))
+    try {
+      localStorage.setItem('user_data', JSON.stringify(user))
+    } catch (error) {
+      console.error('Failed to store user data:', error)
+    }
   }
 
   private clearStorage(): void {
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('user_data')
+    try {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user_data')
+      // Dispatch storage event for cross-tab synchronization
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auth_token',
+        newValue: null,
+        storageArea: localStorage
+      }))
+    } catch (error) {
+      console.error('Failed to clear storage:', error)
+    }
   }
 }
 

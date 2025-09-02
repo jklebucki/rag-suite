@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useEffect, useReducer, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useReducer, ReactNode, useCallback } from 'react'
 import { authService } from '@/services/auth'
+import { useTokenRefresh } from '@/hooks/useTokenRefresh'
+import { useAuthStorage } from '@/hooks/useAuthStorage'
 import type { AuthState, User, LoginRequest, RegisterRequest, ResetPasswordRequest } from '@/types/auth'
 
 interface AuthContextType extends AuthState {
@@ -64,33 +66,83 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState)
 
+  // Callbacks for auth storage hook
+  const handleStorageLogin = useCallback((token: string, refreshToken: string | null, user: User) => {
+    dispatch({ type: 'SET_TOKEN', payload: token })
+    dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
+    dispatch({ type: 'SET_USER', payload: user })
+  }, [])
+
+  const handleStorageLogout = useCallback(() => {
+    dispatch({ type: 'LOGOUT' })
+  }, [])
+
+  // Callbacks for token refresh hook
+  const handleTokenRefresh = useCallback((token: string, refreshToken: string) => {
+    dispatch({ type: 'SET_TOKEN', payload: token })
+    dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
+  }, [])
+
+  const handleLogout = useCallback(() => {
+    dispatch({ type: 'LOGOUT' })
+  }, [])
+
+  // Use custom hooks
+  const { storeAuthData, clearAuthData } = useAuthStorage(handleStorageLogin, handleStorageLogout)
+  const { performTokenRefresh } = useTokenRefresh(state.isAuthenticated, handleTokenRefresh, handleLogout)
+
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = authService.getToken()
-      if (token) {
-        try {
-          const user = await authService.getCurrentUser()
-          if (user) {
-            dispatch({ type: 'SET_USER', payload: user })
+      dispatch({ type: 'SET_LOADING', payload: true })
+      
+      try {
+        // Check if user is authenticated based on stored tokens
+        if (authService.isAuthenticated()) {
+          const token = authService.getToken()
+          const refreshToken = authService.getRefreshToken()
+          const userData = authService.getUser()
+          
+          if (token && userData) {
+            // Set initial state from localStorage
             dispatch({ type: 'SET_TOKEN', payload: token })
-            dispatch({ type: 'SET_REFRESH_TOKEN', payload: authService.getRefreshToken() })
+            dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
+            dispatch({ type: 'SET_USER', payload: userData })
+            
+            // Verify with server in background
+            try {
+              const user = await authService.getCurrentUser()
+              if (user) {
+                // Update user data if it changed
+                dispatch({ type: 'SET_USER', payload: user })
+              } else {
+                // Server doesn't recognize the token
+                await logout()
+              }
+            } catch (error) {
+              console.warn('Failed to verify user on init, will try token refresh:', error)
+              // Try to refresh token if verification fails
+              performTokenRefresh()
+            }
           } else {
-            authService.logout()
+            // Incomplete auth data
+            clearAuthData()
             dispatch({ type: 'LOGOUT' })
           }
-        } catch (error) {
-          console.error('Auth initialization failed:', error)
-          authService.logout()
+        } else {
+          // Not authenticated or token expired
+          clearAuthData()
           dispatch({ type: 'LOGOUT' })
         }
-      } else {
-        dispatch({ type: 'SET_LOADING', payload: false })
+      } catch (error) {
+        console.error('Auth initialization failed:', error)
+        clearAuthData()
+        dispatch({ type: 'LOGOUT' })
       }
     }
 
     initializeAuth()
-  }, [])
+  }, [clearAuthData, performTokenRefresh])
 
   const login = async (credentials: LoginRequest): Promise<boolean> => {
     dispatch({ type: 'SET_LOADING', payload: true })
@@ -99,6 +151,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const loginData = await authService.login(credentials)
       
+      // Store auth data using our secure storage method
+      storeAuthData(loginData.token, loginData.refreshToken, loginData.user)
+      
+      // Update context state
       dispatch({ type: 'SET_TOKEN', payload: loginData.token })
       dispatch({ type: 'SET_REFRESH_TOKEN', payload: loginData.refreshToken })
       dispatch({ type: 'SET_USER', payload: loginData.user })
@@ -151,6 +207,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
+      // Clear storage and update state
+      clearAuthData()
       dispatch({ type: 'LOGOUT' })
     }
   }
