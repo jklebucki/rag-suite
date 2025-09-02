@@ -40,6 +40,8 @@ export interface SearchResult {
   score: number
   source: string
   documentType: string
+  filePath?: string
+  fileName?: string
   metadata: Record<string, any>
   createdAt: Date
   updatedAt: Date

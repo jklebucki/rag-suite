@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Options;
+using System.IO;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
@@ -51,48 +52,54 @@ public class SearchService : ISearchService
     {
         try
         {
-            // Ensure index exists
-            if (_options.AutoCreateIndices)
+            _logger.LogInformation("Starting search for query: '{Query}' with limit: {Limit}", request.Query, request.Limit);
+            
+            // Check if index exists before searching
+            var indexExists = await _indexManagement.IndexExistsAsync(_indexName, cancellationToken);
+            if (!indexExists)
             {
-                await _indexManagement.EnsureIndexExistsAsync(_indexName, cancellationToken);
+                _logger.LogWarning("Index {IndexName} does not exist", _indexName);
+                return new SearchResponse([], 0, 0, request.Query);
             }
-            
-            // First check if Elasticsearch is available
-            await CheckElasticsearchHealth(cancellationToken);
-            
+
+            // Create search query - simplified for debugging
             var searchQuery = new
             {
                 query = new
                 {
-                    multi_match = new
+                    query_string = new
                     {
                         query = request.Query,
-                        fields = new[] { "fileName^2", "content", "fileType" },
-                        type = "best_fields",
-                        fuzziness = "AUTO"
+                        fields = new[] { "content" },
+                        default_operator = "AND"
                     }
                 },
                 size = request.Limit,
                 from = request.Offset,
-                _source = new[] { "fileName", "content", "fileType", "chunkIndex", "documentId", "createdAt" },
                 highlight = new
                 {
                     fields = new
                     {
-                        fileName = new { },
-                        content = new { fragment_size = 150, number_of_fragments = 3 }
-                    }
+                        content = new { }
+                    },
+                    pre_tags = new[] { "<em>" },
+                    post_tags = new[] { "</em>" },
+                    fragment_size = 200,
+                    number_of_fragments = 3
                 }
             };
 
             var json = JsonSerializer.Serialize(searchQuery);
+            _logger.LogDebug("Elasticsearch query: {Query}", json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Elasticsearch search failed with status {StatusCode}", response.StatusCode);
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("Elasticsearch search failed with status {StatusCode}. Error: {Error}", 
+                    response.StatusCode, errorContent);
                 return CreateUnavailableResponse(request.Query);
             }
 
@@ -111,18 +118,38 @@ public class SearchService : ISearchService
                 var score = hit.GetProperty("_score").GetSingle();
                 var id = hit.GetProperty("_id").GetString() ?? "";
                 
-                var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
+                // Map fields from ChunkDocument structure
+                var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
+                var title = !string.IsNullOrEmpty(sourceFile) ? Path.GetFileName(sourceFile) : "";
                 var docContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
-                var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
-                var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
+                var fileExtension = source.TryGetProperty("fileExtension", out var extProp) ? extProp.GetString() ?? "" : "";
+                var documentType = !string.IsNullOrEmpty(fileExtension) ? fileExtension.TrimStart('.').ToUpperInvariant() : "";
                 
-                var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
-                    ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+                // Get chunk information for better source identification
+                var chunkIndex = 0;
+                var totalChunks = 1;
+                if (source.TryGetProperty("position", out var positionProp))
+                {
+                    if (positionProp.TryGetProperty("chunkIndex", out var chunkIndexProp))
+                        chunkIndex = chunkIndexProp.GetInt32();
+                    if (positionProp.TryGetProperty("totalChunks", out var totalChunksProp))
+                        totalChunks = totalChunksProp.GetInt32();
+                }
+                
+                var sourceWithChunk = !string.IsNullOrEmpty(sourceFile) 
+                    ? $"{Path.GetFileName(sourceFile)}" + (totalChunks > 1 ? $" (chunk {chunkIndex + 1}/{totalChunks})" : "")
+                    : "";
+                
+                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp) 
+                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now 
                     : DateTime.Now;
+
+                _logger.LogDebug("Processing search result: title={Title}, source={Source}, documentType={DocumentType}, sourceFile={SourceFile}", 
+                    title, sourceWithChunk, documentType, sourceFile);
 
                 var metadata = new Dictionary<string, object>
                 {
-                    { "category", category },
+                    { "category", documentType },
                     { "score", score },
                     { "index", _indexName }
                 };
@@ -144,8 +171,12 @@ public class SearchService : ISearchService
                     }
                 }
 
+                // Extract file information
+                var fileName = !string.IsNullOrEmpty(sourceFile) ? Path.GetFileName(sourceFile) : "";
+                var filePath = !string.IsNullOrEmpty(sourceFile) ? sourceFile : "";
+
                 results.Add(new SearchResult(
-                    id, title, docContent, score, category, type, metadata, createdAt, DateTime.Now
+                    id, title, docContent, score, sourceWithChunk, documentType, filePath, fileName, metadata, createdAt, DateTime.Now
                 ));
             }
 
@@ -241,7 +272,7 @@ public class SearchService : ISearchService
 
             return new DocumentDetail(
                 id, title, content, content, // Using content as both summary and full content
-                1.0, category, type, metadata, createdAt, DateTime.Now
+                1.0, category, type, null, null, metadata, createdAt, DateTime.Now
             );
         }
         catch (ElasticsearchUnavailableException)

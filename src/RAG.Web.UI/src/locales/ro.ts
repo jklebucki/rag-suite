@@ -71,6 +71,8 @@ export const ro: TranslationKeys = {
   'chat.translated_from': 'Tradus din',
   'chat.processing_time': 'Timp de procesare',
   'chat.sources': 'Surse',
+  'chat.sources.title': 'Surse ({0})',
+  'chat.sources.summary': 'Afișează {0} documente sursă',
 
   // Document database status
   'chat.documents_unavailable': 'Baza de date documentelor indisponibilă',

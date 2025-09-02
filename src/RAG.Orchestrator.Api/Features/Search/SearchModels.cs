@@ -22,6 +22,8 @@ public record SearchResult(
     double Score,
     string Source,
     string DocumentType,
+    string? FilePath,
+    string? FileName,
     Dictionary<string, object> Metadata,
     DateTime CreatedAt,
     DateTime UpdatedAt
@@ -42,6 +44,8 @@ public record DocumentDetail(
     double Score,
     string Source,
     string DocumentType,
+    string? FilePath,
+    string? FileName,
     Dictionary<string, object> Metadata,
     DateTime CreatedAt,
     DateTime UpdatedAt,

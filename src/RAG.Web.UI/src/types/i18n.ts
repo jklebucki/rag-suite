@@ -88,6 +88,8 @@ export interface TranslationKeys {
   'chat.translated_from': string;
   'chat.processing_time': string;
   'chat.sources': string;
+  'chat.sources.title': string;
+  'chat.sources.summary': string;
 
   // Document database status
   'chat.documents_unavailable': string;

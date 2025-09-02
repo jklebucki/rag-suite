@@ -4,6 +4,7 @@ import { useMultilingualChat } from '@/hooks/useMultilingualChat'
 import { useI18n } from '@/contexts/I18nContext'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
+import { MessageSources } from './MessageSources'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import type { ChatMessage } from '@/types'
@@ -62,6 +63,11 @@ export function ChatInterface() {
                   </div>
                   <div className={`max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-4`}>
                     <div className="whitespace-pre-wrap">{msg.content}</div>
+                    
+                    {/* Sources for assistant messages */}
+                    {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                      <MessageSources sources={msg.sources} messageRole={msg.role} />
+                    )}
                     
                     {/* Timestamp */}
                     <div 

@@ -71,6 +71,8 @@ export const hu: TranslationKeys = {
   'chat.translated_from': 'Fordítva erről',
   'chat.processing_time': 'Feldolgozási idő',
   'chat.sources': 'Források',
+  'chat.sources.title': 'Források ({0})',
+  'chat.sources.summary': '{0} forrásdokumentum megjelenítése',
 
   // Document database status
   'chat.documents_unavailable': 'Dokumentum adatbázis nem elérhető',
