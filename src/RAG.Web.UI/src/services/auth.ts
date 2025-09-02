@@ -141,13 +141,23 @@ class AuthService {
   async getCurrentUser(): Promise<User | null> {
     try {
       console.debug('🔑 Getting current user from server')
-      const response = await this.client.get<ApiResponse<User>>('/me')
-      const user = response.data.data
+      const response = await this.client.get<User>('/me')
+      console.debug('🔑 Full response from /me:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data
+      })
+      const user = response.data
       console.debug('🔑 Current user received:', user)
       this.setUser(user)
       return user
-    } catch (error) {
-      console.warn('🔑 Failed to get current user:', error)
+    } catch (error: any) {
+      console.warn('🔑 Failed to get current user:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      })
       return null
     }
   }
