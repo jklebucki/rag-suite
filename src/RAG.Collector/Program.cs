@@ -1,6 +1,7 @@
 using RAG.Collector.Config;
 using RAG.Collector.Workers;
 using RAG.Collector.Enumerators;
+using RAG.Collector.Acl;
 using Serilog;
 
 // Configure Serilog
@@ -35,6 +36,7 @@ try
 
     // Register services
     builder.Services.AddScoped<IFileEnumerator, FileEnumerator>();
+    builder.Services.AddScoped<IAclResolver, NtfsAclResolver>();
 
     // Register the main worker
     builder.Services.AddHostedService<CollectorWorker>();

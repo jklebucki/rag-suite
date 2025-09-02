@@ -45,8 +45,14 @@ public class FileItem
     /// </summary>
     public string? RelativePath { get; init; }
 
+    /// <summary>
+    /// List of Active Directory group names that have access to this file
+    /// </summary>
+    public List<string> AclGroups { get; set; } = new();
+
     public override string ToString()
     {
-        return $"FileItem {{ Path: {Path}, Extension: {Extension}, Size: {Size:N0} bytes, LastWrite: {LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC }}";
+        var groupsText = AclGroups.Count > 0 ? $", Groups: [{string.Join(", ", AclGroups)}]" : ", Groups: []";
+        return $"FileItem {{ Path: {Path}, Extension: {Extension}, Size: {Size:N0} bytes, LastWrite: {LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss} UTC{groupsText} }}";
     }
 }

@@ -173,3 +173,128 @@ System.InvalidOperationException: Invalid configuration. See logs for details.
 2025-09-02 21:43:19.884 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:43:19.8848720+02:00"
 2025-09-02 21:43:29.017 +02:00 [INF] Application is shutting down...
 2025-09-02 21:43:29.020 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:51:03.969 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:51:04.124 +02:00 [INF] Configuration validation successful
+2025-09-02 21:51:04.125 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:51:04.133 +02:00 [INF] RAG Collector started
+2025-09-02 21:51:04.136 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:51:04.136 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:51:04.136 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:51:04.136 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:51:04.136 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:51:04.137 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:51:04.1370880+02:00"
+2025-09-02 21:51:04.139 +02:00 [INF] Starting file enumeration...
+2025-09-02 21:51:04.140 +02:00 [WRN] Source folder does not exist for counting: C:\Shares\Documents
+2025-09-02 21:51:04.140 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 21:51:04.140 +02:00 [INF] Found 0 files to process
+2025-09-02 21:51:04.140 +02:00 [INF] No files found matching the configured criteria
+2025-09-02 21:51:04.140 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:51:04.1408560+02:00"
+2025-09-02 21:51:04.142 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:51:04.142 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:51:04.142 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:51:45.998 +02:00 [INF] Application is shutting down...
+2025-09-02 21:51:46.002 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:52:15.679 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:52:15.784 +02:00 [INF] Configuration validation successful
+2025-09-02 21:52:15.785 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:52:15.794 +02:00 [INF] RAG Collector started
+2025-09-02 21:52:15.796 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:52:15.796 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:52:15.796 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:52:15.796 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:52:15.796 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:52:15.797 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:52:15.7974940+02:00"
+2025-09-02 21:52:15.799 +02:00 [INF] Starting file enumeration...
+2025-09-02 21:52:15.800 +02:00 [WRN] Source folder does not exist for counting: C:\Shares\Documents
+2025-09-02 21:52:15.800 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 21:52:15.800 +02:00 [INF] Found 0 files to process
+2025-09-02 21:52:15.800 +02:00 [INF] No files found matching the configured criteria
+2025-09-02 21:52:15.800 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:52:15.8008860+02:00"
+2025-09-02 21:52:15.802 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:52:15.802 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:52:15.802 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:52:27.522 +02:00 [INF] Application is shutting down...
+2025-09-02 21:52:27.525 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:53:09.444 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:53:09.551 +02:00 [INF] Configuration validation successful
+2025-09-02 21:53:09.552 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/test-data, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 21:53:09.560 +02:00 [INF] RAG Collector started
+2025-09-02 21:53:09.562 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/test-data, \\server\share\docs
+2025-09-02 21:53:09.562 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:53:09.562 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:53:09.562 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 21:53:09.562 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 21:53:09.563 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:53:09.5635590+02:00"
+2025-09-02 21:53:09.566 +02:00 [INF] Starting file enumeration...
+2025-09-02 21:53:09.566 +02:00 [WRN] Source folder does not exist for counting: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/test-data
+2025-09-02 21:53:09.567 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 21:53:09.567 +02:00 [INF] Found 0 files to process
+2025-09-02 21:53:09.567 +02:00 [INF] No files found matching the configured criteria
+2025-09-02 21:53:09.567 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:53:09.5675290+02:00"
+2025-09-02 21:53:09.568 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:53:09.568 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:53:09.568 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:53:41.949 +02:00 [INF] Application is shutting down...
+2025-09-02 21:53:41.953 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:54:31.075 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:54:31.193 +02:00 [INF] Configuration validation successful
+2025-09-02 21:54:31.194 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 21:54:31.202 +02:00 [INF] RAG Collector started
+2025-09-02 21:54:31.204 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs
+2025-09-02 21:54:31.204 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:54:31.204 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:54:31.204 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 21:54:31.204 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 21:54:31.205 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:54:31.2057300+02:00"
+2025-09-02 21:54:31.208 +02:00 [INF] Starting file enumeration...
+2025-09-02 21:54:31.210 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 21:54:31.210 +02:00 [INF] Found 3 files to process
+2025-09-02 21:54:31.211 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:54:31.211 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:54:31.211 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:54:31.211 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 21:54:31.216 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:54:31.216 +02:00 [INF] Found file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44)
+2025-09-02 21:54:31.229 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:54:31.229 +02:00 [INF] Found file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44)
+2025-09-02 21:54:31.240 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:54:31.240 +02:00 [INF] Progress: 3/3 files (100.0%) - 99.0 files/sec
+2025-09-02 21:54:31.241 +02:00 [INF] Found file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44)
+2025-09-02 21:54:31.252 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 3 matching files
+2025-09-02 21:54:31.252 +02:00 [INF] Enumerating files in folder: \\server\share\docs
+2025-09-02 21:54:31.252 +02:00 [WRN] Source folder does not exist: \\server\share\docs
+2025-09-02 21:54:31.252 +02:00 [INF] File enumeration completed: 3 files in 00:00
+2025-09-02 21:54:31.253 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:54:31.2532730+02:00"
+2025-09-02 21:54:36.900 +02:00 [INF] Application is shutting down...
+2025-09-02 21:54:36.903 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:55:16.945 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:55:17.061 +02:00 [INF] Configuration validation successful
+2025-09-02 21:55:17.062 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 21:55:17.071 +02:00 [INF] RAG Collector started
+2025-09-02 21:55:17.073 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs
+2025-09-02 21:55:17.074 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:55:17.074 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:55:17.074 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 21:55:17.074 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 21:55:17.074 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:55:17.0749330+02:00"
+2025-09-02 21:55:17.077 +02:00 [INF] Starting file enumeration...
+2025-09-02 21:55:17.080 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 21:55:17.080 +02:00 [INF] Found 3 files to process
+2025-09-02 21:55:17.081 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 21:55:17.082 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:55:17.082 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:55:17.082 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:55:17.085 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:55:17.085 +02:00 [INF] Found file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44, ACL: [])
+2025-09-02 21:55:17.097 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:55:17.097 +02:00 [INF] Found file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [])
+2025-09-02 21:55:17.109 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 21:55:17.109 +02:00 [INF] Progress: 3/3 files (100.0%) - 106.2 files/sec
+2025-09-02 21:55:17.109 +02:00 [INF] Found file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [])
+2025-09-02 21:55:17.120 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 3 matching files
+2025-09-02 21:55:17.121 +02:00 [INF] Enumerating files in folder: \\server\share\docs
+2025-09-02 21:55:17.121 +02:00 [WRN] Source folder does not exist: \\server\share\docs
+2025-09-02 21:55:17.121 +02:00 [INF] File enumeration completed: 3 files in 00:00
+2025-09-02 21:55:17.121 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:55:17.1217180+02:00"
+2025-09-02 21:55:28.256 +02:00 [INF] Application is shutting down...
+2025-09-02 21:55:28.261 +02:00 [INF] RAG Collector is stopping

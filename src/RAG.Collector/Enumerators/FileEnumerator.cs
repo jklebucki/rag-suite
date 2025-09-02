@@ -1,4 +1,5 @@
 using RAG.Collector.Models;
+using RAG.Collector.Acl;
 using System.Runtime.CompilerServices;
 
 namespace RAG.Collector.Enumerators;
@@ -10,10 +11,12 @@ namespace RAG.Collector.Enumerators;
 public class FileEnumerator : IFileEnumerator
 {
     private readonly ILogger<FileEnumerator> _logger;
+    private readonly IAclResolver _aclResolver;
 
-    public FileEnumerator(ILogger<FileEnumerator> logger)
+    public FileEnumerator(ILogger<FileEnumerator> logger, IAclResolver aclResolver)
     {
         _logger = logger;
+        _aclResolver = aclResolver;
     }
 
     /// <inheritdoc />
@@ -114,7 +117,7 @@ public class FileEnumerator : IFileEnumerator
             
             try
             {
-                fileItem = CreateFileItem(filePath, extensions, sourceUri);
+                fileItem = await CreateFileItemAsync(filePath, extensions, sourceUri, cancellationToken);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -160,30 +163,32 @@ public class FileEnumerator : IFileEnumerator
     }
 
     /// <summary>
-    /// Creates a FileItem from a file path, or returns null if the file should be skipped
+    /// Creates a FileItem from file path with ACL resolution
     /// </summary>
-    private FileItem? CreateFileItem(string filePath, HashSet<string> extensions, Uri? sourceUri)
+    private async Task<FileItem?> CreateFileItemAsync(string filePath, HashSet<string> extensions, Uri? sourceUri, CancellationToken cancellationToken = default)
     {
-        var extension = Path.GetExtension(filePath);
-        
-        // Check if the file extension matches our filter
-        if (!extensions.Contains(extension))
+        if (!File.Exists(filePath))
+        {
             return null;
+        }
 
         var fileInfo = new FileInfo(filePath);
-        
-        // Skip files that don't exist or are inaccessible
-        if (!fileInfo.Exists)
-            return null;
+        var extension = fileInfo.Extension.ToLowerInvariant();
 
-        // Calculate relative path for display purposes
+        // Filter by extension
+        if (extensions.Count > 0 && !extensions.Contains(extension))
+        {
+            return null;
+        }
+
+        // Calculate relative path if source URI is provided
         string? relativePath = null;
         if (sourceUri != null)
         {
             try
             {
-                var fileUri = new Uri(Path.GetFullPath(filePath));
-                relativePath = Uri.UnescapeDataString(sourceUri.MakeRelativeUri(fileUri).ToString());
+                var fileUri = new Uri(filePath);
+                relativePath = sourceUri.MakeRelativeUri(fileUri).ToString();
             }
             catch (Exception)
             {
@@ -192,7 +197,8 @@ public class FileEnumerator : IFileEnumerator
             }
         }
 
-        return new FileItem
+        // Create FileItem
+        var fileItem = new FileItem
         {
             Path = filePath,
             Extension = extension,
@@ -200,6 +206,19 @@ public class FileEnumerator : IFileEnumerator
             LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
             RelativePath = relativePath
         };
+
+        // Resolve ACL groups
+        try
+        {
+            fileItem.AclGroups = await _aclResolver.ResolveAclGroupsAsync(filePath, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug("Failed to resolve ACL for file {FilePath}: {Message}", filePath, ex.Message);
+            // Continue with empty ACL groups
+        }
+
+        return fileItem;
     }
 
     /// <summary>

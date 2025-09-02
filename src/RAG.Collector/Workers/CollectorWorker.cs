@@ -102,8 +102,9 @@ public class CollectorWorker : BackgroundService
                 }
 
                 // TODO: Process individual file (extract, chunk, embed, index)
-                _logger.LogInformation("Found file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss})", 
-                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc);
+                var aclGroupsText = fileItem.AclGroups.Count > 0 ? $"[{string.Join(", ", fileItem.AclGroups)}]" : "[]";
+                _logger.LogInformation("Found file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups})", 
+                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText);
                 
                 // Simulate processing time
                 await Task.Delay(10, cancellationToken);
