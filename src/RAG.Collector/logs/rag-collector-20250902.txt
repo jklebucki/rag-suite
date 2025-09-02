@@ -1,0 +1,24 @@
+2025-09-02 21:21:41.849 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:21:41.990 +02:00 [INF] Configuration loaded:
+2025-09-02 21:21:41.991 +02:00 [INF]   Source folders: ["C:\\Shares\\Documents","\\\\server\\share\\docs"]
+2025-09-02 21:21:42.000 +02:00 [INF]   File extensions: [".pdf",".docx",".xlsx",".pptx",".txt",".csv",".md",".pdf",".docx",".xlsx",".pptx",".txt",".csv",".md"]
+2025-09-02 21:21:42.001 +02:00 [INF]   Chunk size: 1200, overlap: 200
+2025-09-02 21:21:42.002 +02:00 [INF]   Elasticsearch URL: http://localhost:9200
+2025-09-02 21:21:42.003 +02:00 [INF]   Index name: rag-chunks
+2025-09-02 21:21:42.003 +02:00 [INF]   Username configured: true
+2025-09-02 21:21:42.003 +02:00 [INF]   API key configured: false
+2025-09-02 21:21:42.004 +02:00 [INF]   Processing interval: 60 minutes
+2025-09-02 21:21:42.020 +02:00 [INF] RAG Collector started
+2025-09-02 21:21:42.023 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:21:42.024 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:21:42.024 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:21:42.024 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:21:42.024 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:21:42.025 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:21:42.0253290+02:00"
+2025-09-02 21:21:42.029 +02:00 [INF] Processing documents (placeholder implementation)
+2025-09-02 21:21:42.032 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:21:42.032 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:21:42.032 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:21:43.032 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:21:43.0324820+02:00"
+2025-09-02 21:21:57.377 +02:00 [INF] Application is shutting down...
+2025-09-02 21:21:57.380 +02:00 [INF] RAG Collector is stopping
