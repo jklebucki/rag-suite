@@ -358,3 +358,98 @@ System.AggregateException: Some services are not able to be constructed (Error w
 2025-09-02 22:07:30.660 +02:00 [INF] Document collection cycle completed at "2025-09-02T22:07:30.6608570+02:00"
 2025-09-02 22:08:02.413 +02:00 [INF] Application is shutting down...
 2025-09-02 22:08:02.417 +02:00 [INF] RAG Collector is stopping
+2025-09-02 22:14:46.287 +02:00 [INF] Starting RAG Collector service
+2025-09-02 22:14:46.420 +02:00 [INF] Configuration validation successful
+2025-09-02 22:14:46.421 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 22:14:46.430 +02:00 [INF] RAG Collector started
+2025-09-02 22:14:46.432 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs
+2025-09-02 22:14:46.432 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 22:14:46.432 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 22:14:46.432 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 22:14:46.432 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 22:14:46.433 +02:00 [INF] Starting document collection cycle at "2025-09-02T22:14:46.4331630+02:00"
+2025-09-02 22:14:46.435 +02:00 [INF] Starting file enumeration...
+2025-09-02 22:14:46.438 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 22:14:46.438 +02:00 [INF] Found 4 files to process
+2025-09-02 22:14:46.438 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 22:14:46.438 +02:00 [INF] Hosting environment: Development
+2025-09-02 22:14:46.439 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 22:14:46.439 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 22:14:46.443 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:14:46.444 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:14:46.448 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:14:46.458 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt into 1 chunks
+2025-09-02 22:14:46.458 +02:00 [INF] Processed file: sample-pdf.txt (405 bytes, .txt, Modified: 2025-09-02 20:08:21, ACL: [], Content: 405 chars, Chunks: 1)
+2025-09-02 22:14:46.470 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:14:46.471 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:14:46.471 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:14:46.472 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt into 1 chunks
+2025-09-02 22:14:46.472 +02:00 [INF] Processed file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44, ACL: [], Content: 157 chars, Chunks: 1)
+2025-09-02 22:14:46.483 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:14:46.484 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:14:46.485 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:14:46.485 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md into 1 chunks
+2025-09-02 22:14:46.485 +02:00 [INF] Processed file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 329 chars, Chunks: 1)
+2025-09-02 22:14:46.496 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:14:46.496 +02:00 [INF] Progress: 4/4 files (100.0%) - 68.6 files/sec
+2025-09-02 22:14:46.497 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:14:46.497 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:14:46.497 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md into 1 chunks
+2025-09-02 22:14:46.497 +02:00 [INF] Processed file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 230 chars, Chunks: 1)
+2025-09-02 22:14:46.508 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 4 matching files
+2025-09-02 22:14:46.508 +02:00 [INF] Enumerating files in folder: \\server\share\docs
+2025-09-02 22:14:46.508 +02:00 [WRN] Source folder does not exist: \\server\share\docs
+2025-09-02 22:14:46.509 +02:00 [INF] File enumeration completed: 4 files in 00:00
+2025-09-02 22:14:46.509 +02:00 [INF] Document collection cycle completed at "2025-09-02T22:14:46.5091550+02:00"
+2025-09-02 22:15:24.383 +02:00 [INF] Application is shutting down...
+2025-09-02 22:15:24.386 +02:00 [INF] RAG Collector is stopping
+2025-09-02 22:15:41.800 +02:00 [INF] Starting RAG Collector service
+2025-09-02 22:15:41.915 +02:00 [INF] Configuration validation successful
+2025-09-02 22:15:41.915 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 22:15:41.923 +02:00 [INF] RAG Collector started
+2025-09-02 22:15:41.925 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, \\server\share\docs
+2025-09-02 22:15:41.925 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 22:15:41.925 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 22:15:41.925 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 22:15:41.925 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 22:15:41.926 +02:00 [INF] Starting document collection cycle at "2025-09-02T22:15:41.9266690+02:00"
+2025-09-02 22:15:41.929 +02:00 [INF] Starting file enumeration...
+2025-09-02 22:15:41.931 +02:00 [WRN] Source folder does not exist for counting: \\server\share\docs
+2025-09-02 22:15:41.931 +02:00 [INF] Found 5 files to process
+2025-09-02 22:15:41.932 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 22:15:41.932 +02:00 [INF] Hosting environment: Development
+2025-09-02 22:15:41.932 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 22:15:41.932 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 22:15:41.934 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:15:41.935 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:15:41.939 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:15:41.944 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt into 1 chunks
+2025-09-02 22:15:41.944 +02:00 [INF] Processed file: sample-pdf.txt (405 bytes, .txt, Modified: 2025-09-02 20:08:21, ACL: [], Content: 405 chars, Chunks: 1)
+2025-09-02 22:15:41.956 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:15:41.957 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:15:41.957 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:15:41.964 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/large-document.md into 3 chunks
+2025-09-02 22:15:41.964 +02:00 [INF] Processed file: large-document.md (2,572 bytes, .md, Modified: 2025-09-02 20:15:13, ACL: [], Content: 2572 chars, Chunks: 3)
+2025-09-02 22:15:41.976 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:15:41.977 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:15:41.977 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:15:41.977 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt into 1 chunks
+2025-09-02 22:15:41.977 +02:00 [INF] Processed file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44, ACL: [], Content: 157 chars, Chunks: 1)
+2025-09-02 22:15:41.988 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:15:41.989 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:15:41.989 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:15:41.989 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md into 1 chunks
+2025-09-02 22:15:41.989 +02:00 [INF] Processed file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 329 chars, Chunks: 1)
+2025-09-02 22:15:41.999 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 22:15:42.000 +02:00 [INF] Progress: 5/5 files (100.0%) - 73.1 files/sec
+2025-09-02 22:15:42.000 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 22:15:42.000 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 22:15:42.000 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md into 1 chunks
+2025-09-02 22:15:42.000 +02:00 [INF] Processed file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 230 chars, Chunks: 1)
+2025-09-02 22:15:42.011 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 5 matching files
+2025-09-02 22:15:42.012 +02:00 [INF] Enumerating files in folder: \\server\share\docs
+2025-09-02 22:15:42.012 +02:00 [WRN] Source folder does not exist: \\server\share\docs
+2025-09-02 22:15:42.012 +02:00 [INF] File enumeration completed: 5 files in 00:00
+2025-09-02 22:15:42.012 +02:00 [INF] Document collection cycle completed at "2025-09-02T22:15:42.0125890+02:00"
+2025-09-02 22:16:13.380 +02:00 [INF] Application is shutting down...
+2025-09-02 22:16:13.384 +02:00 [INF] RAG Collector is stopping

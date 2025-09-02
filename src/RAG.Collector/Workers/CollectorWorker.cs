@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using RAG.Collector.Config;
 using RAG.Collector.Enumerators;
 using RAG.Collector.ContentExtractors;
+using RAG.Collector.Chunking;
+using RAG.Collector.Indexing;
 using RAG.Collector.Models;
 
 namespace RAG.Collector.Workers;
@@ -107,10 +109,18 @@ public class CollectorWorker : BackgroundService
                 // Extract content from file
                 await ExtractContentAsync(fileItem, cancellationToken);
                 
+                // Chunk content if extraction was successful
+                var chunks = await ChunkContentAsync(fileItem, cancellationToken);
+                
+                // Index chunks if chunking was successful
+                var indexedCount = await IndexChunksAsync(chunks, cancellationToken);
+                
                 var aclGroupsText = fileItem.AclGroups.Count > 0 ? $"[{string.Join(", ", fileItem.AclGroups)}]" : "[]";
                 var contentText = fileItem.IsContentExtracted ? $", Content: {fileItem.ExtractedContent?.Length ?? 0} chars" : ", Content: extraction failed";
-                _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo})", 
-                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText, contentText);
+                var chunkText = chunks.Count > 0 ? $", Chunks: {chunks.Count}" : "";
+                var indexText = indexedCount > 0 ? $", Indexed: {indexedCount}" : "";
+                _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo}{ChunkInfo}{IndexInfo})", 
+                    fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText, contentText, chunkText, indexText);
                 
                 // Simulate processing time
                 await Task.Delay(10, cancellationToken);
@@ -168,6 +178,76 @@ public class CollectorWorker : BackgroundService
             fileItem.IsContentExtracted = false;
             
             _logger.LogError(ex, "Unexpected error during content extraction from {FilePath}", fileItem.Path);
+        }
+    }
+
+    /// <summary>
+    /// Chunks extracted content into smaller segments for processing
+    /// </summary>
+    /// <param name="fileItem">File item with extracted content</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of text chunks</returns>
+    private async Task<IList<TextChunk>> ChunkContentAsync(FileItem fileItem, CancellationToken cancellationToken)
+    {
+        if (!fileItem.IsContentExtracted || string.IsNullOrWhiteSpace(fileItem.ExtractedContent))
+        {
+            _logger.LogDebug("Skipping chunking for {FilePath} - no content extracted", fileItem.Path);
+            return new List<TextChunk>();
+        }
+
+        try
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var chunkingService = scope.ServiceProvider.GetRequiredService<ChunkingService>();
+
+            var chunks = await chunkingService.ChunkAsync(
+                fileItem,
+                _options.ChunkSize,
+                _options.ChunkOverlap,
+                cancellationToken);
+
+            _logger.LogDebug("Successfully chunked {FilePath} into {ChunkCount} chunks", 
+                fileItem.Path, chunks.Count);
+
+            return chunks;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error chunking content from {FilePath}", fileItem.Path);
+            return new List<TextChunk>();
+        }
+    }
+
+    /// <summary>
+    /// Index chunks in Elasticsearch with embeddings
+    /// </summary>
+    /// <param name="chunks">Text chunks to index</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Number of successfully indexed chunks</returns>
+    private async Task<int> IndexChunksAsync(IList<TextChunk> chunks, CancellationToken cancellationToken)
+    {
+        if (!chunks.Any())
+        {
+            _logger.LogDebug("No chunks to index");
+            return 0;
+        }
+
+        try
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var indexingService = scope.ServiceProvider.GetRequiredService<IndexingService>();
+
+            var indexedCount = await indexingService.IndexFileChunksAsync(chunks, cancellationToken);
+            
+            _logger.LogDebug("Successfully indexed {IndexedCount}/{TotalCount} chunks", 
+                indexedCount, chunks.Count);
+
+            return indexedCount;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error indexing {ChunkCount} chunks", chunks.Count);
+            return 0;
         }
     }
 

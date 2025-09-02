@@ -3,7 +3,13 @@ using RAG.Collector.Workers;
 using RAG.Collector.Enumerators;
 using RAG.Collector.Acl;
 using RAG.Collector.ContentExtractors;
+using RAG.Collector.Chunking;
+using RAG.Collector.Embeddings;
+using RAG.Collector.Elasticsearch;
+using RAG.Collector.Indexing;
+using Microsoft.Extensions.Options;
 using Serilog;
+using Elasticsearch.Net;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -44,6 +50,41 @@ try
     builder.Services.AddScoped<IContentExtractor, PdfExtractor>();
     builder.Services.AddScoped<IContentExtractor, OfficeDocumentExtractor>();
     builder.Services.AddScoped<ContentExtractionService>();
+
+    // Register chunking services
+    builder.Services.AddScoped<ChunkingService>();
+
+    // Register HTTP client for embedding service
+    builder.Services.AddHttpClient<HttpEmbeddingProvider>(client =>
+    {
+        // Configure embedding service URL (will be set from configuration)
+        client.BaseAddress = new Uri("http://localhost:8000"); // Default, can be overridden
+        client.Timeout = TimeSpan.FromMinutes(2);
+    });
+
+    // Register Elasticsearch client
+    builder.Services.AddSingleton<IElasticLowLevelClient>(serviceProvider =>
+    {
+        var options = serviceProvider.GetRequiredService<IOptions<CollectorOptions>>().Value;
+        var settings = new ConnectionConfiguration(new Uri(options.ElasticsearchUrl));
+        
+        if (!string.IsNullOrEmpty(options.ElasticsearchUsername) && !string.IsNullOrEmpty(options.ElasticsearchPassword))
+        {
+            settings = settings.BasicAuthentication(options.ElasticsearchUsername, options.ElasticsearchPassword);
+        }
+        
+        if (options.AllowSelfSignedCert)
+        {
+            settings = settings.ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
+        }
+
+        return new ElasticLowLevelClient(settings);
+    });
+
+    // Register embedding and indexing services
+    builder.Services.AddScoped<IEmbeddingProvider, HttpEmbeddingProvider>();
+    builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
+    builder.Services.AddScoped<IndexingService>();
 
     // Register the main worker
     builder.Services.AddHostedService<CollectorWorker>();
