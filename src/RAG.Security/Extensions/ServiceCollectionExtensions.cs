@@ -16,12 +16,23 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRAGSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        // Add SQLite DbContext
+        // Add SQLite DbContext with fallback
         var connectionString = configuration.GetConnectionString("SecurityDatabase") 
             ?? "Data Source=rag-security.db";
         
         services.AddDbContext<SecurityDbContext>(options =>
-            options.UseSqlite(connectionString));
+        {
+            try
+            {
+                options.UseSqlite(connectionString);
+            }
+            catch (Exception ex)
+            {
+                // Fallback to in-memory database if SQLite fails
+                Console.WriteLine($"SQLite initialization failed: {ex.Message}. Using in-memory database.");
+                options.UseInMemoryDatabase("SecurityDatabase");
+            }
+        });
 
         // Add Identity
         services.AddIdentity<User, Role>(options =>
@@ -93,15 +104,47 @@ public static class ServiceCollectionExtensions
 
     public static async Task EnsureSecurityDatabaseCreatedAsync(this IServiceProvider services)
     {
-        using var scope = services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SecurityDbContext>();
-        
-        // Ensure database is created - this will create the database if it doesn't exist
-        // and won't throw exception if it already exists
-        await context.Database.EnsureCreatedAsync();
+        try
+        {
+            using var scope = services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<SecurityDbContext>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<SecurityDbContext>>();
+            
+            logger.LogInformation("Attempting to ensure database is created...");
+            
+            // Ensure database is created - this will create the database if it doesn't exist
+            // and won't throw exception if it already exists
+            await context.Database.EnsureCreatedAsync();
+            
+            logger.LogInformation("Database creation successful");
 
-        // Ensure admin user exists
-        await EnsureAdminUserAsync(scope.ServiceProvider);
+            // Ensure admin user exists
+            await EnsureAdminUserAsync(scope.ServiceProvider);
+        }
+        catch (TypeInitializationException ex) when (ex.Message.Contains("Microsoft.Data.Sqlite.SqliteConnection"))
+        {
+            // Handle SQLite initialization issues
+            throw new InvalidOperationException(
+                "SQLite initialization failed. This might be due to missing native libraries on the server. " +
+                "Please ensure SQLite native libraries are installed or consider using an alternative database provider.", ex);
+        }
+        catch (System.IO.FileNotFoundException ex) when (ex.Message.Contains("Microsoft.Data.Sqlite"))
+        {
+            // Handle missing SQLite assembly
+            throw new InvalidOperationException(
+                "Microsoft.Data.Sqlite assembly not found. Please ensure all SQLite dependencies are properly deployed.", ex);
+        }
+        catch (System.DllNotFoundException ex) when (ex.Message.Contains("e_sqlite3"))
+        {
+            // Handle missing native SQLite library
+            throw new InvalidOperationException(
+                "Native SQLite library (e_sqlite3) not found. Please install sqlite3 on the server or use self-contained deployment.", ex);
+        }
+        catch (Exception ex)
+        {
+            // General database initialization error
+            throw new InvalidOperationException($"Database initialization failed: {ex.Message}", ex);
+        }
     }
 
     private static async Task EnsureAdminUserAsync(IServiceProvider services)
