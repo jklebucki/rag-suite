@@ -98,10 +98,20 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await this.client.post('/logout')
+      const refreshToken = this.getRefreshToken()
+      console.debug('🔐 Logout attempt with:', { hasRefreshToken: !!refreshToken })
+      
+      if (refreshToken) {
+        await this.client.post('/logout', {
+          RefreshToken: refreshToken
+        })
+        console.debug('🔐 Logout request successful')
+      } else {
+        console.warn('🔐 No refresh token for logout request')
+      }
     } catch (error) {
       // Continue with logout even if server request fails
-      console.warn('Logout request failed:', error)
+      console.warn('🔐 Logout request failed:', error)
     } finally {
       this.clearStorage()
     }
