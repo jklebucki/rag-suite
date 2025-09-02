@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # PostgreSQL Docker Container Setup Script for RAG Suite
-# This script creates and runs a PostgreSQL container with intelligent directory handling
+if [ "$USE_HOST_MOUNT" = false ]; then
+    echo ""
+    echo "⚠️  Cannot create host directory for PostgreSQL backup"
+    echo "💡 Using Docker volume-only approach (secure and portable)"
+    echo "   Data will be stored safely in Docker's internal volume system"
+    echo ""
+fiript creates and runs a PostgreSQL container with intelligent directory handling
 # It automatically handles filesystem permission issues and read-only systems
 
 set -e
@@ -32,24 +38,18 @@ if ! docker info &> /dev/null; then
 fi
 
 # Function to test directory creation
+# Function to test if we can create a directory at the given location
 test_directory_creation() {
-    local test_dir="$1"
-    local parent_dir=$(dirname "$test_dir")
+    local dir="$1"
+    echo "📍 Testing directory creation at: $dir"
     
-    echo "   Testing: $test_dir"
-    
-    # Try to create parent directory
-    if sudo mkdir -p "$parent_dir" 2>/dev/null; then
-        if sudo mkdir -p "$test_dir" 2>/dev/null; then
-            if sudo chown -R 999:999 "$test_dir" 2>/dev/null; then
-                sudo chmod 755 "$test_dir" 2>/dev/null
-                echo "   ✅ Successfully created: $test_dir"
-                return 0
-            fi
-        fi
+    if sudo mkdir -p "$dir" 2>/dev/null; then
+        echo "✅ Directory creation successful"
+        return 0
+    else
+        echo "❌ Directory creation failed"
+        return 1
     fi
-    echo "   ❌ Cannot create/access: $test_dir"
-    return 1
 }
 
 # Try to find suitable directory for backup mount
@@ -77,8 +77,10 @@ done
 if [ "$USE_HOST_MOUNT" = false ]; then
     echo ""
     echo "⚠️  Cannot create host directory for PostgreSQL backup"
-    echo "💡 Using Docker volume-only approach (recommended for read-only systems)"
+    echo "� Detected read-only filesystem - Docker cannot create mount points"
+    echo "�💡 Using Docker volume-only approach (recommended for read-only systems)"
     echo "   Data will be stored securely in Docker's internal volume system"
+    echo "   This is actually more secure and portable!"
     echo ""
 fi
 
@@ -98,10 +100,11 @@ fi
 
 echo "🚀 Starting PostgreSQL container..."
 
-# Prepare Docker run command based on available directory
+# Start with host mount attempt if directory is available
 if [ "$USE_HOST_MOUNT" = true ]; then
-    echo "   Using host directory mount for backups: $DATA_DIR"
-    docker run -d \
+    echo "   Attempting host directory mount for backups: $DATA_DIR"
+    
+    if docker run -d \
         --name $CONTAINER_NAME \
         --restart unless-stopped \
         -e POSTGRES_DB=$POSTGRES_DB \
@@ -113,10 +116,23 @@ if [ "$USE_HOST_MOUNT" = true ]; then
         -v $VOLUME_NAME:/var/lib/postgresql/data \
         -v $DATA_DIR:/backup \
         --shm-size=256mb \
-        postgres:$POSTGRES_VERSION
-else
+        postgres:$POSTGRES_VERSION 2>/dev/null; then
+        
+        echo "✅ PostgreSQL started with host directory backup"
+        MOUNT_SUCCESS=true
+    else
+        echo "⚠️  Host mount failed. Removing container and trying volume-only..."
+        docker rm -f $CONTAINER_NAME 2>/dev/null || true
+        USE_HOST_MOUNT=false
+        MOUNT_SUCCESS=false
+    fi
+fi
+
+# Fallback to volume-only if host mount failed or wasn't attempted
+if [ "$USE_HOST_MOUNT" = false ]; then
     echo "   Using Docker volume-only approach"
-    docker run -d \
+    
+    if docker run -d \
         --name $CONTAINER_NAME \
         --restart unless-stopped \
         -e POSTGRES_DB=$POSTGRES_DB \
@@ -127,7 +143,15 @@ else
         -p $POSTGRES_PORT:5432 \
         -v $VOLUME_NAME:/var/lib/postgresql/data \
         --shm-size=256mb \
-        postgres:$POSTGRES_VERSION
+        postgres:$POSTGRES_VERSION; then
+        
+        echo "✅ PostgreSQL started with Docker volume"
+        MOUNT_SUCCESS=true
+    else
+        echo "❌ Failed to start PostgreSQL container"
+        docker logs $CONTAINER_NAME 2>/dev/null || true
+        exit 1
+    fi
 fi
 
 # Wait for PostgreSQL to be ready
@@ -136,11 +160,17 @@ sleep 10
 
 # Check if container is running
 if docker ps --format 'table {{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "✅ PostgreSQL container started successfully!"
+    if [ "$MOUNT_SUCCESS" = true ]; then
+        if [ "$USE_HOST_MOUNT" = true ]; then
+            echo "✅ PostgreSQL container started successfully with host backup!"
+        else
+            echo "✅ PostgreSQL container started successfully with Docker volume!"
+        fi
+    fi
 else
     echo "❌ Failed to start PostgreSQL container"
     echo "📋 Container logs:"
-    docker logs $CONTAINER_NAME
+    docker logs $CONTAINER_NAME 2>/dev/null || true
     exit 1
 fi
 
