@@ -16,6 +16,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRAGSecurity(this IServiceCollection services, IConfiguration configuration)
     {
+        // Register DefaultAdmin configuration
+        var defaultAdminConfig = new DefaultAdminConfiguration();
+        configuration.GetSection("DefaultAdmin").Bind(defaultAdminConfig);
+        services.AddSingleton(defaultAdminConfig);
+
         // Add PostgreSQL DbContext
         var connectionString = configuration.GetConnectionString("SecurityDatabase") 
             ?? "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
@@ -123,10 +128,11 @@ public static class ServiceCollectionExtensions
     {
         var userManager = services.GetRequiredService<UserManager<User>>();
         var logger = services.GetRequiredService<ILogger<SecurityDbContext>>();
+        var adminConfig = services.GetRequiredService<DefaultAdminConfiguration>();
 
-        // Fixed admin credentials as requested
-        var adminEmail = "admin@citronex.pl";
-        var adminPassword = "Citro123";
+        // Get admin credentials from configuration
+        var adminEmail = adminConfig.Email;
+        var adminPassword = adminConfig.Password;
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
