@@ -1,6 +1,50 @@
-# RAG Suite - LLM Integration
+# RAG Suite Scripts
 
-## 🚀 Szybki start
+## 🐘 PostgreSQL Setup
+
+### Opcja 1: Docker (Zalecane)
+```bash
+# Uruchom PostgreSQL w kontenerze Docker
+./setup-postgres-docker.sh
+
+# Zarządzaj kontenerem
+./postgres-manager.sh status    # Sprawdź status
+./postgres-manager.sh backup    # Utwórz backup
+./postgres-manager.sh connect   # Połącz się z bazą
+./postgres-manager.sh help      # Zobacz wszystkie opcje
+```
+
+### Opcja 2: Docker Compose
+```bash
+# Uruchom PostgreSQL z docker-compose
+./setup-postgres-compose.sh
+
+# Zarządzaj z docker-compose
+docker-compose -f scripts/docker-compose.postgres.yml ps
+docker-compose -f scripts/docker-compose.postgres.yml logs -f
+```
+
+### 🔧 Konfiguracja PostgreSQL:
+- **Database:** rag-suite
+- **Username:** postgres
+- **Password:** postgres
+- **Port:** 5432
+- **Auto-restart:** Tak (po restarcie serwera)
+- **Wolumen:** `/opt/rag-suite/postgresql` (Ubuntu best practices)
+
+## � Security Tools
+
+### JWT Key Generation
+```bash
+# Generuj bezpieczny klucz JWT
+./generate-jwt-key.sh
+
+# Dla konkretnego środowiska
+./generate-jwt-key.sh dev
+./generate-jwt-key.sh prod
+```
+
+## 🚀 LLM Integration
 
 ```bash
 # 1. Przejdź do katalogu scripts
