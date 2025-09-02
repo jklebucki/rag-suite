@@ -4,6 +4,7 @@ export interface User {
   firstName: string
   lastName: string
   fullName: string
+  userName: string
   roles: string[]
   isActive: boolean
   createdAt: string
