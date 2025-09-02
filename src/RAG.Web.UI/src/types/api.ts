@@ -88,6 +88,7 @@ export interface ChatMessage {
 
 export interface ChatSession {
   id: string
+  userId?: string // Optional for backwards compatibility with anonymous chat
   title: string
   messages: ChatMessage[]
   createdAt: Date

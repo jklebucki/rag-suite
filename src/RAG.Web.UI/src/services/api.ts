@@ -97,19 +97,19 @@ class ApiClient {
     return response.data.data
   }
 
-  // Chat
+  // Chat - Using user-specific endpoints for proper security
   async sendMessage(sessionId: string, request: ChatRequest): Promise<ChatMessage> {
-    const response: AxiosResponse<ApiResponse<ChatMessage>> = await this.client.post(`/chat/sessions/${sessionId}/messages`, request)
+    const response: AxiosResponse<ApiResponse<ChatMessage>> = await this.client.post(`/user-chat/sessions/${sessionId}/messages`, request)
     return response.data.data
   }
 
   // Multilingual Chat
   async sendMultilingualMessage(sessionId: string, request: MultilingualChatRequest): Promise<MultilingualChatResponse> {
-    console.log(`Calling API: POST /api/chat/sessions/${sessionId}/messages/multilingual`, request)
+    console.log(`Calling API: POST /api/user-chat/sessions/${sessionId}/messages/multilingual`, request)
     try {
       // Uses main client timeout (15 minutes configured in constructor)
       const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(
-        `/chat/sessions/${sessionId}/messages/multilingual`, 
+        `/user-chat/sessions/${sessionId}/messages/multilingual`, 
         request
       )
       console.log('API response received:', response.data)
@@ -121,22 +121,22 @@ class ApiClient {
   }
 
   async getChatSessions(): Promise<ChatSession[]> {
-    const response: AxiosResponse<ApiResponse<ChatSession[]>> = await this.client.get('/chat/sessions')
+    const response: AxiosResponse<ApiResponse<ChatSession[]>> = await this.client.get('/user-chat/sessions')
     return response.data.data
   }
 
   async getChatSession(sessionId: string): Promise<ChatSession> {
-    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.get(`/chat/sessions/${sessionId}`)
+    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.get(`/user-chat/sessions/${sessionId}`)
     return response.data.data
   }
 
   async createChatSession(title?: string): Promise<ChatSession> {
-    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.post('/chat/sessions', { title })
+    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.post('/user-chat/sessions', { title })
     return response.data.data
   }
 
   async deleteChatSession(sessionId: string): Promise<void> {
-    await this.client.delete(`/chat/sessions/${sessionId}`)
+    await this.client.delete(`/user-chat/sessions/${sessionId}`)
   }
 
   // Plugins
