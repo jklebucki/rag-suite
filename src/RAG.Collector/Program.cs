@@ -20,9 +20,11 @@ try
     // Add Serilog
     builder.Services.AddSerilog();
 
-    // Configure CollectorOptions
+    // Configure CollectorOptions with validation
     builder.Services.Configure<CollectorOptions>(
         builder.Configuration.GetSection(CollectorOptions.SectionName));
+    
+    builder.Services.AddOptionsWithValidateOnStart<CollectorOptions>();
 
     // Add Windows Service support
     builder.Services.AddWindowsService(options =>
@@ -35,19 +37,31 @@ try
 
     var host = builder.Build();
 
-    // Log configuration details (mask sensitive data)
+    // Validate and log configuration details
     var options = builder.Configuration.GetSection(CollectorOptions.SectionName).Get<CollectorOptions>();
     if (options != null)
     {
-        Log.Information("Configuration loaded:");
-        Log.Information("  Source folders: {@Folders}", options.SourceFolders);
-        Log.Information("  File extensions: {@Extensions}", options.FileExtensions);
-        Log.Information("  Chunk size: {ChunkSize}, overlap: {ChunkOverlap}", options.ChunkSize, options.ChunkOverlap);
-        Log.Information("  Elasticsearch URL: {Url}", options.ElasticsearchUrl);
-        Log.Information("  Index name: {IndexName}", options.IndexName);
-        Log.Information("  Username configured: {HasUsername}", !string.IsNullOrEmpty(options.ElasticsearchUsername));
-        Log.Information("  API key configured: {HasApiKey}", !string.IsNullOrEmpty(options.ElasticsearchApiKey));
-        Log.Information("  Processing interval: {Interval} minutes", options.ProcessingIntervalMinutes);
+        // Validate configuration
+        var validationResults = options.Validate().ToList();
+        if (validationResults.Any())
+        {
+            Log.Error("Configuration validation failed:");
+            foreach (var result in validationResults)
+            {
+                Log.Error("  {ErrorMessage} (Properties: {Properties})", 
+                    result.ErrorMessage, 
+                    string.Join(", ", result.MemberNames));
+            }
+            throw new InvalidOperationException("Invalid configuration. See logs for details.");
+        }
+
+        Log.Information("Configuration validation successful");
+        Log.Information("Configuration: {Config}", options.ToLogString());
+    }
+    else
+    {
+        Log.Error("Failed to load CollectorOptions from configuration");
+        throw new InvalidOperationException("CollectorOptions configuration section is missing or invalid");
     }
 
     await host.RunAsync();

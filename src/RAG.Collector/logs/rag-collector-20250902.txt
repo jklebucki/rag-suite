@@ -22,3 +22,85 @@
 2025-09-02 21:21:43.032 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:21:43.0324820+02:00"
 2025-09-02 21:21:57.377 +02:00 [INF] Application is shutting down...
 2025-09-02 21:21:57.380 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:28:10.676 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:28:10.870 +02:00 [INF] Configuration validation successful
+2025-09-02 21:28:10.871 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:28:10.881 +02:00 [INF] RAG Collector started
+2025-09-02 21:28:10.883 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:28:10.883 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:28:10.883 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:28:10.883 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:28:10.883 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:28:10.884 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:28:10.8842610+02:00"
+2025-09-02 21:28:10.885 +02:00 [INF] Processing documents (placeholder implementation)
+2025-09-02 21:28:10.886 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:28:10.886 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:28:10.886 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:28:11.889 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:28:11.8897720+02:00"
+2025-09-02 21:31:32.693 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:31:32.814 +02:00 [INF] Configuration validation successful
+2025-09-02 21:31:32.815 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:31:32.824 +02:00 [INF] RAG Collector started
+2025-09-02 21:31:32.826 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:31:32.826 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:31:32.826 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:31:32.826 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:31:32.826 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:31:32.827 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:31:32.8276020+02:00"
+2025-09-02 21:31:32.828 +02:00 [INF] Processing documents (placeholder implementation)
+2025-09-02 21:31:32.829 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:31:32.829 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:31:32.829 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:31:33.832 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:31:33.8323740+02:00"
+2025-09-02 21:31:48.726 +02:00 [INF] Application is shutting down...
+2025-09-02 21:31:48.727 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:32:04.895 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:32:05.016 +02:00 [INF] Configuration validation successful
+2025-09-02 21:32:05.017 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:32:05.025 +02:00 [INF] RAG Collector started
+2025-09-02 21:32:05.027 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:32:05.027 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md, .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:32:05.028 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:32:05.028 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:32:05.028 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:32:05.028 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:32:05.0288070+02:00"
+2025-09-02 21:32:05.029 +02:00 [INF] Processing documents (placeholder implementation)
+2025-09-02 21:32:05.030 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:32:05.031 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:32:05.031 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:32:06.033 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:32:06.0329480+02:00"
+2025-09-02 21:33:20.563 +02:00 [INF] Application is shutting down...
+2025-09-02 21:33:20.566 +02:00 [INF] RAG Collector is stopping
+2025-09-02 21:33:36.136 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:33:36.251 +02:00 [ERR] Configuration validation failed:
+2025-09-02 21:33:36.251 +02:00 [ERR]   At least one source folder must be specified (Properties: SourceFolders)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Chunk size must be between 100 and 10000 characters (Properties: ChunkSize)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Chunk overlap must be between 0 and 1000 characters (Properties: ChunkOverlap)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Elasticsearch URL must be a valid URL (Properties: ElasticsearchUrl)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Index name must start with lowercase letter and contain only lowercase letters, numbers, hyphens and underscores (Properties: IndexName)
+2025-09-02 21:33:36.252 +02:00 [ERR]   The EmbeddingModelName field is required. (Properties: EmbeddingModelName)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Processing interval must be between 1 and 1440 minutes (24 hours) (Properties: ProcessingIntervalMinutes)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Bulk batch size must be between 1 and 1000 (Properties: BulkBatchSize)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Chunk overlap must be less than chunk size (Properties: ChunkOverlap)
+2025-09-02 21:33:36.252 +02:00 [ERR]   Either username/password or API key must be provided for Elasticsearch authentication (Properties: ElasticsearchUsername, ElasticsearchApiKey)
+2025-09-02 21:33:36.252 +02:00 [ERR]   File extension 'pdf' must start with a dot (Properties: FileExtensions)
+2025-09-02 21:33:36.252 +02:00 [FTL] Application terminated unexpectedly
+System.InvalidOperationException: Invalid configuration. See logs for details.
+   at Program.<Main>$(String[] args) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Program.cs:line 55
+2025-09-02 21:35:13.804 +02:00 [INF] Starting RAG Collector service
+2025-09-02 21:35:13.929 +02:00 [INF] Configuration validation successful
+2025-09-02 21:35:13.929 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [C:\Shares\Documents, \\server\share\docs], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 60, BulkBatchSize: 200 }
+2025-09-02 21:35:13.938 +02:00 [INF] RAG Collector started
+2025-09-02 21:35:13.940 +02:00 [INF] Configured source folders: C:\Shares\Documents, \\server\share\docs
+2025-09-02 21:35:13.940 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 21:35:13.940 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 21:35:13.940 +02:00 [INF] Index name: rag-chunks
+2025-09-02 21:35:13.940 +02:00 [INF] Processing interval: 60 minutes
+2025-09-02 21:35:13.941 +02:00 [INF] Starting document collection cycle at "2025-09-02T21:35:13.9411810+02:00"
+2025-09-02 21:35:13.942 +02:00 [INF] Processing documents (placeholder implementation)
+2025-09-02 21:35:13.943 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 21:35:13.943 +02:00 [INF] Hosting environment: Development
+2025-09-02 21:35:13.943 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 21:35:14.945 +02:00 [INF] Document collection cycle completed at "2025-09-02T21:35:14.9450610+02:00"
+2025-09-02 21:35:29.265 +02:00 [INF] Application is shutting down...
+2025-09-02 21:35:29.267 +02:00 [INF] RAG Collector is stopping
