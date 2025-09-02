@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using RAG.Security.Data;
 using RAG.Security.Models;
@@ -94,6 +95,9 @@ public static class ServiceCollectionExtensions
     {
         using var scope = services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<SecurityDbContext>();
+        
+        // Ensure database is created - this will create the database if it doesn't exist
+        // and won't throw exception if it already exists
         await context.Database.EnsureCreatedAsync();
 
         // Ensure admin user exists
@@ -103,20 +107,23 @@ public static class ServiceCollectionExtensions
     private static async Task EnsureAdminUserAsync(IServiceProvider services)
     {
         var userManager = services.GetRequiredService<UserManager<User>>();
-        var configuration = services.GetRequiredService<IConfiguration>();
+        var logger = services.GetRequiredService<ILogger<SecurityDbContext>>();
 
-        var adminEmail = configuration["DefaultAdmin:Email"] ?? "admin@rag-suite.com";
-        var adminPassword = configuration["DefaultAdmin:Password"] ?? "Admin123!";
+        // Fixed admin credentials as requested
+        var adminEmail = "admin@citronex.pl";
+        var adminPassword = "Citro123";
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
+            logger.LogInformation("Creating default admin user: {AdminEmail}", adminEmail);
+            
             adminUser = new User
             {
                 Email = adminEmail,
-                UserName = "admin",
-                FirstName = "System",
-                LastName = "Administrator",
+                UserName = "ADMIN",
+                FirstName = "Admin",
+                LastName = "Admin",
                 EmailConfirmed = true,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
@@ -126,7 +133,17 @@ public static class ServiceCollectionExtensions
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, Models.UserRoles.Admin);
+                logger.LogInformation("Default admin user created successfully with Admin role");
             }
+            else
+            {
+                logger.LogError("Failed to create default admin user: {Errors}", 
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+        else
+        {
+            logger.LogInformation("Default admin user already exists: {AdminEmail}", adminEmail);
         }
     }
 }

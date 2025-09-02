@@ -22,8 +22,17 @@ builder.Services.AddFeatureServices();
 
 var app = builder.Build();
 
-// Ensure database is created
-await app.Services.EnsureSecurityDatabaseCreatedAsync();
+// Ensure database is created and admin user exists
+try
+{
+    await app.Services.EnsureSecurityDatabaseCreatedAsync();
+    app.Logger.LogInformation("Database initialization completed successfully");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to initialize database. Application will continue but authentication may not work properly.");
+    // Don't throw - let the application continue to run
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
