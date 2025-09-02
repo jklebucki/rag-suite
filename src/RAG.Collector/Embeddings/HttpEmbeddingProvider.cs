@@ -36,42 +36,36 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         
         try
         {
-            var request = new
-            {
-                inputs = chunk.Content,
-                parameters = new
-                {
-                    normalize = true,
-                    truncate = true
-                }
-            };
+        var request = new
+        {
+            inputs = chunk.Content
+        };
 
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            _logger.LogDebug("Generating embedding for chunk {ChunkId} (length: {Length})", 
-                chunk.Id, chunk.Content.Length);
+        _logger.LogDebug("Generating embedding for chunk {ChunkId} (length: {Length})", 
+            chunk.Id, chunk.Content.Length);
 
-            var response = await _httpClient.PostAsync("/embeddings", content, cancellationToken);
-            response.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
+        response.EnsureSuccessStatusCode();
 
-            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        // Response is directly an array of floats, not wrapped in an object
+        var embeddings = JsonSerializer.Deserialize<float[][]>(responseContent);
 
-            if (embeddingResponse?.Embeddings?.Length > 0)
-            {
-                var duration = DateTime.UtcNow - startTime;
-                _logger.LogDebug("Successfully generated embedding for chunk {ChunkId} in {Duration}ms", 
-                    chunk.Id, duration.TotalMilliseconds);
+        if (embeddings?.Length > 0 && embeddings[0]?.Length > 0)
+        {
+            var duration = DateTime.UtcNow - startTime;
+            _logger.LogDebug("Successfully generated embedding for chunk {ChunkId} in {Duration}ms", 
+                chunk.Id, duration.TotalMilliseconds);
 
-                return EmbeddingResult.CreateSuccess(
-                    embeddingResponse.Embeddings,
-                    ModelName,
-                    chunk.EstimatedTokens,
-                    duration);
-            }
-
-            return EmbeddingResult.CreateFailure("No embeddings returned from service");
+            return EmbeddingResult.CreateSuccess(
+                embeddings[0], // First (and only) embedding
+                ModelName,
+                chunk.EstimatedTokens,
+                duration);
+        }            return EmbeddingResult.CreateFailure("No embeddings returned from service");
         }
         catch (HttpRequestException ex)
         {

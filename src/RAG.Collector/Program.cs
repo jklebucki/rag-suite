@@ -55,11 +55,17 @@ try
     builder.Services.AddScoped<ChunkingService>();
 
     // Register HTTP client for embedding service
-    builder.Services.AddHttpClient<HttpEmbeddingProvider>(client =>
+    builder.Services.AddHttpClient("EmbeddingService");
+    
+    // Register configured HttpClient for HttpEmbeddingProvider
+    builder.Services.AddScoped<HttpClient>(serviceProvider =>
     {
-        // Configure embedding service URL (will be set from configuration)
-        client.BaseAddress = new Uri("http://localhost:8000"); // Default, can be overridden
+        var options = serviceProvider.GetRequiredService<IOptions<CollectorOptions>>().Value;
+        var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+        var client = httpClientFactory.CreateClient("EmbeddingService");
+        client.BaseAddress = new Uri(options.EmbeddingServiceUrl);
         client.Timeout = TimeSpan.FromMinutes(2);
+        return client;
     });
 
     // Register Elasticsearch client

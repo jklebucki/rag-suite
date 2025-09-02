@@ -70,6 +70,13 @@ public class CollectorOptions
     public string IndexName { get; set; } = "rag-chunks";
 
     /// <summary>
+    /// Embedding service URL
+    /// </summary>
+    [Required]
+    [Url(ErrorMessage = "Embedding service URL must be a valid URL")]
+    public string EmbeddingServiceUrl { get; set; } = "http://localhost:8580";
+
+    /// <summary>
     /// Embedding model name
     /// </summary>
     [Required]
@@ -159,6 +166,7 @@ public class CollectorOptions
                $"HasApiKey: {!string.IsNullOrEmpty(ElasticsearchApiKey)}, " +
                $"AllowSelfSignedCert: {AllowSelfSignedCert}, " +
                $"IndexName: {IndexName}, " +
+               $"EmbeddingServiceUrl: {EmbeddingServiceUrl}, " +
                $"EmbeddingModelName: {EmbeddingModelName}, " +
                $"ProcessingIntervalMinutes: {ProcessingIntervalMinutes}, " +
                $"BulkBatchSize: {BulkBatchSize} }}";

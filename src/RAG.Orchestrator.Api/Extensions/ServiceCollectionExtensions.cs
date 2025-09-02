@@ -6,6 +6,7 @@ using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
+using Elasticsearch.Net;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
@@ -87,6 +88,29 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
         
+        // Configure Elasticsearch Options
+        services.Configure<ElasticsearchOptions>(options =>
+        {
+            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            configuration.GetSection(ElasticsearchOptions.SectionName).Bind(options);
+        });
+        
+        // Configure Elasticsearch Low Level Client
+        services.AddSingleton<IElasticLowLevelClient>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var url = configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
+            var username = configuration["Services:Elasticsearch:Username"] ?? "elastic";
+            var password = configuration["Services:Elasticsearch:Password"] ?? "changeme";
+            var timeoutMinutes = configuration.GetValue<int>("Services:Elasticsearch:TimeoutMinutes", 10);
+            
+            var settings = new ConnectionConfiguration(new Uri(url))
+                .BasicAuthentication(username, password)
+                .RequestTimeout(TimeSpan.FromMinutes(timeoutMinutes));
+                
+            return new ElasticLowLevelClient(settings);
+        });
+        
         // Add HttpClient for LLM service (used by HealthAggregator) with SHORT timeout for health checks
         services.AddHttpClient<ILlmService, LlmService>(client =>
         {
@@ -103,6 +127,7 @@ public static class ServiceCollectionExtensions
         // ChatService now uses Kernel instead of ILlmService
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IUserChatService, UserChatService>();
+        services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<ISearchService, SearchService>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();

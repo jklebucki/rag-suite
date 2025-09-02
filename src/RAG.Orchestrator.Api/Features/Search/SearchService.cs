@@ -1,6 +1,8 @@
 using RAG.Orchestrator.Api.Features.Search;
 using System.Text.Json;
 using System.Text;
+using Elasticsearch.Net;
+using Microsoft.Extensions.Options;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
@@ -18,36 +20,43 @@ public interface ISearchService
 
 public class SearchService : ISearchService
 {
+    private readonly IElasticLowLevelClient _client;
     private readonly HttpClient _httpClient;
     private readonly ILogger<SearchService> _logger;
-    private readonly IConfiguration _configuration;
-    private readonly string _esUrl;
-    private readonly string _esUsername;
-    private readonly string _esPassword;
-    private readonly string _indexName = "rag_documents";
+    private readonly IIndexManagementService _indexManagement;
+    private readonly ElasticsearchOptions _options;
+    private readonly string _indexName;
 
-    public SearchService(HttpClient httpClient, ILogger<SearchService> logger, IConfiguration configuration)
+    public SearchService(
+        IElasticLowLevelClient client,
+        HttpClient httpClient, 
+        ILogger<SearchService> logger, 
+        IIndexManagementService indexManagement,
+        IOptions<ElasticsearchOptions> options)
     {
+        _client = client;
         _httpClient = httpClient;
         _logger = logger;
-        _configuration = configuration;
-        _esUrl = configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
-        _esUsername = configuration["Services:Elasticsearch:Username"] ?? "elastic";
-        _esPassword = configuration["Services:Elasticsearch:Password"] ?? "changeme";
+        _indexManagement = indexManagement;
+        _options = options.Value;
+        _indexName = _options.DefaultIndexName;
         
-        // Configure HTTP client for Elasticsearch
-        var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_esUsername}:{_esPassword}"));
+        // Configure HTTP client for fallback operations
+        var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_options.Username}:{_options.Password}"));
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-        
-        // Set timeout for Elasticsearch requests (default to 10 minutes)
-        var timeoutMinutes = configuration.GetValue<int>("Services:Elasticsearch:TimeoutMinutes", 10);
-        _httpClient.Timeout = TimeSpan.FromMinutes(timeoutMinutes);
+        _httpClient.Timeout = TimeSpan.FromMinutes(_options.TimeoutMinutes);
     }
 
     public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
+            // Ensure index exists
+            if (_options.AutoCreateIndices)
+            {
+                await _indexManagement.EnsureIndexExistsAsync(_indexName, cancellationToken);
+            }
+            
             // First check if Elasticsearch is available
             await CheckElasticsearchHealth(cancellationToken);
             
@@ -79,7 +88,7 @@ public class SearchService : ISearchService
             var json = JsonSerializer.Serialize(searchQuery);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_esUrl}/{_indexName}/_search", content, cancellationToken);
+            var response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -156,7 +165,7 @@ public class SearchService : ISearchService
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5)); // Quick health check
             
-            var response = await _httpClient.GetAsync($"{_esUrl}/", cts.Token);
+            var response = await _httpClient.GetAsync($"{_options.Url}/", cts.Token);
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Elasticsearch health check failed with status: {response.StatusCode}");
@@ -178,10 +187,16 @@ public class SearchService : ISearchService
     {
         try
         {
+            // Ensure index exists
+            if (_options.AutoCreateIndices)
+            {
+                await _indexManagement.EnsureIndexExistsAsync(_indexName, cancellationToken);
+            }
+            
             // Check Elasticsearch availability first
             await CheckElasticsearchHealth(cancellationToken);
             
-            var response = await _httpClient.GetAsync($"{_esUrl}/{_indexName}/_doc/{documentId}", cancellationToken);
+            var response = await _httpClient.GetAsync($"{_options.Url}/{_indexName}/_doc/{documentId}", cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {

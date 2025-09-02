@@ -43,7 +43,10 @@ export function SearchInterface() {
         filters={filters}
         onQueryChange={setQuery}
         onToggleAdvanced={toggleAdvancedMode}
-        onSearch={() => handleSearch()}
+        onSearch={(e) => {
+          e.preventDefault()
+          handleSearch()
+        }}
         onFilterChange={handleFilterChange}
         onClear={handleClearSearch}
       />
