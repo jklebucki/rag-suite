@@ -1,13 +1,7 @@
 #!/bin/bash
 
 # PostgreSQL Docker Container Setup Script for RAG Suite
-if [ "$USE_HOST_MOUNT" = false ]; then
-    echo ""
-    echo "⚠️  Cannot create host directory for PostgreSQL backup"
-    echo "💡 Using Docker volume-only approach (secure and portable)"
-    echo "   Data will be stored safely in Docker's internal volume system"
-    echo ""
-fiript creates and runs a PostgreSQL container with intelligent directory handling
+# This script creates and runs a PostgreSQL container with intelligent directory handling
 # It automatically handles filesystem permission issues and read-only systems
 
 set -e
@@ -37,7 +31,6 @@ if ! docker info &> /dev/null; then
     exit 1
 fi
 
-# Function to test directory creation
 # Function to test if we can create a directory at the given location
 test_directory_creation() {
     local dir="$1"
@@ -77,10 +70,8 @@ done
 if [ "$USE_HOST_MOUNT" = false ]; then
     echo ""
     echo "⚠️  Cannot create host directory for PostgreSQL backup"
-    echo "� Detected read-only filesystem - Docker cannot create mount points"
-    echo "�💡 Using Docker volume-only approach (recommended for read-only systems)"
-    echo "   Data will be stored securely in Docker's internal volume system"
-    echo "   This is actually more secure and portable!"
+    echo "💡 Using Docker volume-only approach (secure and portable)"
+    echo "   Data will be stored safely in Docker's internal volume system"
     echo ""
 fi
 
@@ -218,12 +209,3 @@ else
 fi
 
 echo "Volume location:    docker volume inspect $VOLUME_NAME"
-echo ""
-echo "🔄 Auto-restart: Container will automatically restart after server reboot"
-echo "📊 Monitor status: docker ps | grep $CONTAINER_NAME"
-
-if [ "$USE_HOST_MOUNT" = false ]; then
-    echo ""
-    echo "💡 Note: Running in volume-only mode (no filesystem mount issues)"
-    echo "   This is perfect for read-only filesystems and secure environments"
-fi
