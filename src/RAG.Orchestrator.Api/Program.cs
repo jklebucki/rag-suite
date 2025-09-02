@@ -4,13 +4,16 @@ using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
+using RAG.Orchestrator.Api.Data;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddRAGSecurity(builder.Configuration);
+builder.Services.AddChatDatabase(builder.Configuration);
 builder.Services.AddSemanticKernel();
 builder.Services.AddLocalization(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
@@ -26,11 +29,17 @@ var app = builder.Build();
 try
 {
     await app.Services.EnsureSecurityDatabaseCreatedAsync();
-    app.Logger.LogInformation("Database initialization completed successfully");
+    app.Logger.LogInformation("Security database initialization completed successfully");
+    
+    // Initialize Chat database
+    using var scope = app.Services.CreateScope();
+    var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+    await chatDbContext.Database.MigrateAsync();
+    app.Logger.LogInformation("Chat database initialization completed successfully");
 }
 catch (Exception ex)
 {
-    app.Logger.LogError(ex, "Failed to initialize database. Application will continue but authentication may not work properly.");
+    app.Logger.LogError(ex, "Failed to initialize databases. Application will continue but some features may not work properly.");
     // Don't throw - let the application continue to run
 }
 

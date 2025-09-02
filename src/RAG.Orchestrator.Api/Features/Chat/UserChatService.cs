@@ -2,9 +2,12 @@ using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Data.Models;
 using RAG.Security.Services;
 using System.Text;
 using Microsoft.SemanticKernel;
+using Microsoft.EntityFrameworkCore;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -20,10 +23,7 @@ public interface IUserChatService
 
 public class UserChatService : IUserChatService
 {
-    // Store sessions per user
-    private static readonly Dictionary<string, List<UserChatSession>> _userSessions = new();
-    private static readonly Dictionary<string, Dictionary<string, List<UserChatMessage>>> _userMessages = new();
-    
+    private readonly ChatDbContext _chatDbContext;
     private readonly Kernel _kernel;
     private readonly ISearchService _searchService;
     private readonly ILanguageService _languageService;
@@ -31,12 +31,14 @@ public class UserChatService : IUserChatService
     private readonly IConfiguration _configuration;
 
     public UserChatService(
+        ChatDbContext chatDbContext,
         Kernel kernel,
         ISearchService searchService,
         ILanguageService languageService,
         ILogger<UserChatService> logger,
         IConfiguration configuration)
     {
+        _chatDbContext = chatDbContext;
         _kernel = kernel;
         _searchService = searchService;
         _languageService = languageService;
@@ -44,71 +46,91 @@ public class UserChatService : IUserChatService
         _configuration = configuration;
     }
 
-    public Task<UserChatSession[]> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<UserChatSession[]> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var sessions = _userSessions.GetValueOrDefault(userId, new List<UserChatSession>());
-        return Task.FromResult(sessions.ToArray());
+        var dbSessions = await _chatDbContext.ChatSessions
+            .Where(s => s.UserId == userId)
+            .OrderByDescending(s => s.UpdatedAt)
+            .ToListAsync(cancellationToken);
+            
+        return dbSessions.Select(s => new UserChatSession(
+            s.Id,
+            s.UserId,
+            s.Title,
+            Array.Empty<UserChatMessage>(), // Messages loaded separately when needed
+            s.CreatedAt,
+            s.UpdatedAt
+        )).ToArray();
     }
 
-    public Task<UserChatSession> CreateUserSessionAsync(string userId, CreateUserSessionRequest request, CancellationToken cancellationToken = default)
+    public async Task<UserChatSession> CreateUserSessionAsync(string userId, CreateUserSessionRequest request, CancellationToken cancellationToken = default)
     {
         var sessionId = Guid.NewGuid().ToString();
         var language = request.Language ?? _languageService.GetDefaultLanguage();
         var normalizedLanguage = _languageService.NormalizeLanguage(language);
         var sessionTitle = request.Title ?? _languageService.GetLocalizedString("session_labels", "new_conversation", normalizedLanguage);
         
-        var session = new UserChatSession(
-            sessionId,
-            userId,
-            sessionTitle,
+        var dbSession = new Data.Models.ChatSession
+        {
+            Id = sessionId,
+            UserId = userId,
+            Title = sessionTitle,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        
+        _chatDbContext.ChatSessions.Add(dbSession);
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+        
+        return new UserChatSession(
+            dbSession.Id,
+            dbSession.UserId,
+            dbSession.Title,
             Array.Empty<UserChatMessage>(),
-            DateTime.Now,
-            DateTime.Now
+            dbSession.CreatedAt,
+            dbSession.UpdatedAt
         );
-        
-        // Initialize user session lists if they don't exist
-        if (!_userSessions.ContainsKey(userId))
-        {
-            _userSessions[userId] = new List<UserChatSession>();
-        }
-        if (!_userMessages.ContainsKey(userId))
-        {
-            _userMessages[userId] = new Dictionary<string, List<UserChatMessage>>();
-        }
-        
-        _userSessions[userId].Add(session);
-        _userMessages[userId][sessionId] = new List<UserChatMessage>();
-        
-        return Task.FromResult(session);
     }
 
-    public Task<UserChatSession?> GetUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
+    public async Task<UserChatSession?> GetUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
     {
-        var userSessions = _userSessions.GetValueOrDefault(userId, new List<UserChatSession>());
-        var session = userSessions.FirstOrDefault(s => s.Id == sessionId);
+        var dbSession = await _chatDbContext.ChatSessions
+            .Include(s => s.Messages)
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
         
-        if (session == null) return Task.FromResult<UserChatSession?>(null);
+        if (dbSession == null) return null;
         
-        var userMessages = _userMessages.GetValueOrDefault(userId, new Dictionary<string, List<UserChatMessage>>());
-        var messages = userMessages.GetValueOrDefault(sessionId, new List<UserChatMessage>());
-        var sessionWithMessages = session with { Messages = messages.ToArray() };
+        var messages = dbSession.Messages
+            .OrderBy(m => m.Timestamp)
+            .Select(m => new UserChatMessage(
+                m.Id,
+                m.Role,
+                m.Content,
+                m.Timestamp,
+                m.Sources,
+                m.Metadata
+            ))
+            .ToArray();
         
-        return Task.FromResult<UserChatSession?>(sessionWithMessages);
+        return new UserChatSession(
+            dbSession.Id,
+            dbSession.UserId,
+            dbSession.Title,
+            messages,
+            dbSession.CreatedAt,
+            dbSession.UpdatedAt
+        );
     }
 
     public async Task<UserChatMessage> SendUserMessageAsync(string userId, string sessionId, UserChatRequest request, CancellationToken cancellationToken = default)
     {
         // Check if user has access to this session
-        var userSessions = _userSessions.GetValueOrDefault(userId, new List<UserChatSession>());
-        if (!userSessions.Any(s => s.Id == sessionId))
+        var dbSession = await _chatDbContext.ChatSessions
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
+            
+        if (dbSession == null)
         {
             throw new ArgumentException("Session not found or access denied", nameof(sessionId));
-        }
-
-        var userMessages = _userMessages.GetValueOrDefault(userId, new Dictionary<string, List<UserChatMessage>>());
-        if (!userMessages.ContainsKey(sessionId))
-        {
-            throw new ArgumentException("Session not found", nameof(sessionId));
         }
 
         var maxMessageLength = _configuration.GetValue<int>("Chat:MaxMessageLength", 2000);
@@ -117,14 +139,41 @@ public class UserChatService : IUserChatService
             throw new ArgumentException($"Message too long. Maximum length is {maxMessageLength} characters.");
         }
 
-        // Add user message
+        // Get conversation history for context
+        var conversationHistory = await _chatDbContext.ChatMessages
+            .Where(m => m.SessionId == sessionId)
+            .OrderBy(m => m.Timestamp)
+            .Select(m => new UserChatMessage(
+                m.Id,
+                m.Role,
+                m.Content,
+                m.Timestamp,
+                m.Sources,
+                m.Metadata
+            ))
+            .ToListAsync(cancellationToken);
+
+        // Add user message to database
+        var userDbMessage = new Data.Models.ChatMessage
+        {
+            Id = Guid.NewGuid().ToString(),
+            SessionId = sessionId,
+            Role = "user",
+            Content = request.Message,
+            Timestamp = DateTime.UtcNow
+        };
+        
+        _chatDbContext.ChatMessages.Add(userDbMessage);
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+
+        // Add to conversation history for prompt building
         var userMessage = new UserChatMessage(
-            Guid.NewGuid().ToString(),
-            "user",
-            request.Message,
-            DateTime.Now
+            userDbMessage.Id,
+            userDbMessage.Role,
+            userDbMessage.Content,
+            userDbMessage.Timestamp
         );
-        userMessages[sessionId].Add(userMessage);
+        conversationHistory.Add(userMessage);
 
         try
         {
@@ -137,61 +186,75 @@ public class UserChatService : IUserChatService
             ), cancellationToken);
 
             // Build context-aware prompt
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, userMessages[sessionId]);
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory);
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
             var aiResponseContent = aiResponse.GetValue<string>() ?? 
                 _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
 
-            var aiMessage = new UserChatMessage(
-                Guid.NewGuid().ToString(),
-                "assistant",
-                aiResponseContent,
-                DateTime.Now,
-                searchResults.Results.Length > 0 ? searchResults.Results : null
-            );
-            
-            userMessages[sessionId].Add(aiMessage);
-
-            // Update session timestamp
-            var sessionIndex = userSessions.FindIndex(s => s.Id == sessionId);
-            if (sessionIndex >= 0)
+            // Save AI response to database
+            var aiDbMessage = new Data.Models.ChatMessage
             {
-                userSessions[sessionIndex] = userSessions[sessionIndex] with { UpdatedAt = DateTime.Now };
-            }
+                Id = Guid.NewGuid().ToString(),
+                SessionId = sessionId,
+                Role = "assistant",
+                Content = aiResponseContent,
+                Timestamp = DateTime.UtcNow,
+                Sources = searchResults.Results.Length > 0 ? searchResults.Results : null
+            };
+            
+            _chatDbContext.ChatMessages.Add(aiDbMessage);
+            
+            // Update session timestamp
+            dbSession.UpdatedAt = DateTime.UtcNow;
+            
+            await _chatDbContext.SaveChangesAsync(cancellationToken);
 
-            return aiMessage;
+            return new UserChatMessage(
+                aiDbMessage.Id,
+                aiDbMessage.Role,
+                aiDbMessage.Content,
+                aiDbMessage.Timestamp,
+                aiDbMessage.Sources,
+                aiDbMessage.Metadata
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating AI response for user {UserId} session {SessionId}", userId, sessionId);
             
-            var errorMessage = new UserChatMessage(
-                Guid.NewGuid().ToString(),
-                "assistant",
-                _languageService.GetLocalizedErrorMessage("processing_error", _languageService.GetDefaultLanguage()),
-                DateTime.Now
-            );
+            // Save error message to database
+            var errorDbMessage = new Data.Models.ChatMessage
+            {
+                Id = Guid.NewGuid().ToString(),
+                SessionId = sessionId,
+                Role = "assistant",
+                Content = _languageService.GetLocalizedErrorMessage("processing_error", _languageService.GetDefaultLanguage()),
+                Timestamp = DateTime.UtcNow
+            };
             
-            userMessages[sessionId].Add(errorMessage);
-            return errorMessage;
+            _chatDbContext.ChatMessages.Add(errorDbMessage);
+            await _chatDbContext.SaveChangesAsync(cancellationToken);
+            
+            return new UserChatMessage(
+                errorDbMessage.Id,
+                errorDbMessage.Role,
+                errorDbMessage.Content,
+                errorDbMessage.Timestamp
+            );
         }
     }
 
     public async Task<Models.MultilingualChatResponse> SendUserMultilingualMessageAsync(string userId, string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
     {
         // Check if user has access to this session
-        var userSessions = _userSessions.GetValueOrDefault(userId, new List<UserChatSession>());
-        if (!userSessions.Any(s => s.Id == sessionId))
+        var dbSession = await _chatDbContext.ChatSessions
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
+            
+        if (dbSession == null)
         {
             throw new ArgumentException("Session not found or access denied", nameof(sessionId));
-        }
-
-        var userMessages = _userMessages.GetValueOrDefault(userId, new Dictionary<string, List<UserChatMessage>>());
-        if (!userMessages.ContainsKey(sessionId))
-        {
-            throw new ArgumentException("Session not found", nameof(sessionId));
         }
 
         var maxMessageLength = _configuration.GetValue<int>("Chat:MaxMessageLength", 2000);
@@ -207,20 +270,48 @@ public class UserChatService : IUserChatService
 
         var responseLanguage = request.ResponseLanguage ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
         
-        // Add user message
-        var userMessage = new UserChatMessage(
-            Guid.NewGuid().ToString(),
-            "user",
-            request.Message,
-            DateTime.Now,
-            null,
-            new Dictionary<string, object>
+        // Get conversation history for context
+        var conversationHistory = await _chatDbContext.ChatMessages
+            .Where(m => m.SessionId == sessionId)
+            .OrderBy(m => m.Timestamp)
+            .Select(m => new UserChatMessage(
+                m.Id,
+                m.Role,
+                m.Content,
+                m.Timestamp,
+                m.Sources,
+                m.Metadata
+            ))
+            .ToListAsync(cancellationToken);
+
+        // Add user message to database
+        var userDbMessage = new Data.Models.ChatMessage
+        {
+            Id = Guid.NewGuid().ToString(),
+            SessionId = sessionId,
+            Role = "user",
+            Content = request.Message,
+            Timestamp = DateTime.UtcNow,
+            Metadata = new Dictionary<string, object>
             {
                 ["detectedLanguage"] = detectedLanguage ?? "unknown",
                 ["originalLanguage"] = detectedLanguage ?? "unknown"
             }
+        };
+        
+        _chatDbContext.ChatMessages.Add(userDbMessage);
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+
+        // Add to conversation history for prompt building
+        var userMessage = new UserChatMessage(
+            userDbMessage.Id,
+            userDbMessage.Role,
+            userDbMessage.Content,
+            userDbMessage.Timestamp,
+            null,
+            userDbMessage.Metadata
         );
-        userMessages[sessionId].Add(userMessage);
+        conversationHistory.Add(userMessage);
 
         try
         {
@@ -236,7 +327,7 @@ public class UserChatService : IUserChatService
             var prompt = BuildMultilingualContextualPrompt(
                 request.Message, 
                 searchResults.Results, 
-                userMessages[sessionId],
+                conversationHistory,
                 detectedLanguage ?? "unknown",
                 responseLanguage,
                 searchResults.Results.Length > 0
@@ -247,31 +338,32 @@ public class UserChatService : IUserChatService
             var aiResponseContent = aiResponse.GetValue<string>() ?? 
                 _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
 
-            var aiMessage = new UserChatMessage(
-                Guid.NewGuid().ToString(),
-                "assistant",
-                aiResponseContent,
-                DateTime.Now,
-                searchResults.Results.Length > 0 ? searchResults.Results : null,
-                new Dictionary<string, object>
+            // Save AI response to database
+            var aiDbMessage = new Data.Models.ChatMessage
+            {
+                Id = Guid.NewGuid().ToString(),
+                SessionId = sessionId,
+                Role = "assistant",
+                Content = aiResponseContent,
+                Timestamp = DateTime.UtcNow,
+                Sources = searchResults.Results.Length > 0 ? searchResults.Results : null,
+                Metadata = new Dictionary<string, object>
                 {
                     ["responseLanguage"] = responseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length
                 }
-            );
+            };
             
-            userMessages[sessionId].Add(aiMessage);
-
+            _chatDbContext.ChatMessages.Add(aiDbMessage);
+            
             // Update session timestamp
-            var sessionIndex = userSessions.FindIndex(s => s.Id == sessionId);
-            if (sessionIndex >= 0)
-            {
-                userSessions[sessionIndex] = userSessions[sessionIndex] with { UpdatedAt = DateTime.Now };
-            }
+            dbSession.UpdatedAt = DateTime.UtcNow;
+            
+            await _chatDbContext.SaveChangesAsync(cancellationToken);
 
             return new Models.MultilingualChatResponse
             {
-                Response = aiMessage.Content,
+                Response = aiDbMessage.Content,
                 SessionId = sessionId,
                 DetectedLanguage = detectedLanguage ?? "unknown",
                 ResponseLanguage = responseLanguage,
@@ -284,18 +376,22 @@ public class UserChatService : IUserChatService
         {
             _logger.LogError(ex, "Error generating multilingual AI response for user {UserId} session {SessionId}", userId, sessionId);
             
-            var errorMessage = new UserChatMessage(
-                Guid.NewGuid().ToString(),
-                "assistant",
-                _languageService.GetLocalizedErrorMessage("processing_error", responseLanguage),
-                DateTime.Now
-            );
+            // Save error message to database
+            var errorDbMessage = new Data.Models.ChatMessage
+            {
+                Id = Guid.NewGuid().ToString(),
+                SessionId = sessionId,
+                Role = "assistant",
+                Content = _languageService.GetLocalizedErrorMessage("processing_error", responseLanguage),
+                Timestamp = DateTime.UtcNow
+            };
             
-            userMessages[sessionId].Add(errorMessage);
+            _chatDbContext.ChatMessages.Add(errorDbMessage);
+            await _chatDbContext.SaveChangesAsync(cancellationToken);
             
             return new Models.MultilingualChatResponse
             {
-                Response = errorMessage.Content,
+                Response = errorDbMessage.Content,
                 SessionId = sessionId,
                 DetectedLanguage = detectedLanguage ?? "unknown",
                 ResponseLanguage = responseLanguage,
@@ -306,18 +402,21 @@ public class UserChatService : IUserChatService
         }
     }
 
-    public Task<bool> DeleteUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
     {
-        var userSessions = _userSessions.GetValueOrDefault(userId, new List<UserChatSession>());
-        var removed = userSessions.RemoveAll(s => s.Id == sessionId) > 0;
+        var dbSession = await _chatDbContext.ChatSessions
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
         
-        if (removed)
+        if (dbSession == null)
         {
-            var userMessages = _userMessages.GetValueOrDefault(userId, new Dictionary<string, List<UserChatMessage>>());
-            userMessages.Remove(sessionId);
+            return false;
         }
         
-        return Task.FromResult(removed);
+        // Delete the session (messages will be deleted automatically due to cascade delete)
+        _chatDbContext.ChatSessions.Remove(dbSession);
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+        
+        return true;
     }
 
     private static string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory)

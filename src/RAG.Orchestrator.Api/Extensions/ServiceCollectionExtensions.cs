@@ -1,4 +1,6 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
@@ -106,6 +108,26 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         
+        return services;
+    }
+
+    public static IServiceCollection AddChatDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Use the same connection string as SecurityDatabase for simplicity
+        var connectionString = configuration.GetConnectionString("SecurityDatabase") 
+            ?? "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
+        
+        services.AddDbContext<ChatDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+            
+            // Enable sensitive data logging in development
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                options.EnableSensitiveDataLogging();
+            }
+        });
+
         return services;
     }
 }
