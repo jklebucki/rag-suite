@@ -1,0 +1,53 @@
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: es-srv
+    restart: unless-stopped
+    environment:
+      - node.name=es-node
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=elastic
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-srv-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:elastic http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    container_name: embedding-service-srv
+    restart: unless-stopped
+    volumes:
+      - embedding-srv-data:/data
+    platform: linux/amd64
+    environment:
+      - MODEL_ID=sentence-transformers/all-MiniLM-L6-v2
+    ports:
+      - "8580:80"
+    command:
+      - --model-id
+      - "sentence-transformers/all-MiniLM-L6-v2"
+      - --max-input-length
+      - "512"
+      - --max-batch-tokens
+      - "16384"
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  elasticsearch-srv-data:
+  embedding-srv-data:
