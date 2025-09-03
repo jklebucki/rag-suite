@@ -45,7 +45,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        _logger.LogDebug("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)", 
+        _logger.LogInformation("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)", 
             chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
 
         var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
@@ -60,8 +60,8 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-        _logger.LogDebug("Embedding service response for chunk {ChunkId}: {ResponseLength} chars, starts with: {ResponseStart}",
-            chunk.Id, responseContent.Length, responseContent.Length > 50 ? responseContent.Substring(0, 50) : responseContent);
+        _logger.LogInformation("Embedding service response for chunk {ChunkId}: {ResponseLength} chars, status: {StatusCode}, starts with: {ResponseStart}",
+            chunk.Id, responseContent.Length, response.StatusCode, responseContent.Length > 50 ? responseContent.Substring(0, 50) : responseContent);
         
         // Response is directly an array of floats, not wrapped in an object
         var embeddings = JsonSerializer.Deserialize<float[][]>(responseContent);
@@ -69,7 +69,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         if (embeddings?.Length > 0 && embeddings[0]?.Length > 0)
         {
             var duration = DateTime.UtcNow - startTime;
-            _logger.LogDebug("Successfully generated embedding for chunk {ChunkId} in {Duration}ms: vector dimension {Dimension}", 
+            _logger.LogInformation("Successfully generated embedding for chunk {ChunkId} in {Duration}ms: vector dimension {Dimension}", 
                 chunk.Id, duration.TotalMilliseconds, embeddings[0].Length);
 
             return EmbeddingResult.CreateSuccess(

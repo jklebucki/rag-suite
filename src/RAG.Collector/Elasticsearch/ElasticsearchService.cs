@@ -101,7 +101,7 @@ public class ElasticsearchService : IElasticsearchService
                             documents.Count);
                         
                         // Log detailed response for debugging
-                        _logger.LogDebug("Bulk response: {Response}", response.Body);
+                        _logger.LogWarning("Bulk response: {Response}", response.Body);
                     }
                     
                     return successCount;

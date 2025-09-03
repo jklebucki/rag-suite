@@ -1164,3 +1164,640 @@ System.Threading.Tasks.TaskCanceledException: A task was canceled.
 2025-09-03 11:54:43.704 +02:00 [INF] Document collection cycle completed at "2025-09-03T11:54:43.7043195+02:00"
 2025-09-03 11:55:00.880 +02:00 [INF] Application is shutting down...
 2025-09-03 11:55:00.883 +02:00 [INF] RAG Collector is stopping
+2025-09-03 12:43:55.267 +02:00 [INF] Starting RAG Collector service
+2025-09-03 12:43:55.414 +02:00 [INF] Configuration validation successful
+2025-09-03 12:43:55.418 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [X:\Citronex\IFS Materialy\Instrukcje], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 400, ChunkOverlap: 80, ElasticsearchUrl: http://192.168.21.13:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingServiceUrl: http://192.168.21.13:8580, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 5, BulkBatchSize: 50 }
+2025-09-03 12:43:55.442 +02:00 [INF] RAG Collector started
+2025-09-03 12:43:55.535 +02:00 [INF] Configured source folders: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:43:55.536 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-03 12:43:55.537 +02:00 [INF] Elasticsearch URL: http://192.168.21.13:9200
+2025-09-03 12:43:55.539 +02:00 [INF] Index name: rag-chunks
+2025-09-03 12:43:55.562 +02:00 [INF] Processing interval: 5 minutes
+2025-09-03 12:43:55.567 +02:00 [INF] Starting document collection cycle at "2025-09-03T12:43:55.5671668+02:00"
+2025-09-03 12:43:55.576 +02:00 [INF] Starting file enumeration...
+2025-09-03 12:43:55.585 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-03 12:43:55.586 +02:00 [INF] Hosting environment: Development
+2025-09-03 12:43:55.586 +02:00 [INF] Content root path: C:\VSC\repos\rag-suite\src\RAG.Collector
+2025-09-03 12:43:55.647 +02:00 [INF] Found 41 files to process
+2025-09-03 12:43:55.649 +02:00 [INF] Enumerating files in folder: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:43:57.504 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:43:58.045 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:43:58.057 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx into 5 chunks
+2025-09-03 12:43:58.081 +02:00 [INF] Indexing 5 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:43:58.240 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:43:58.243 +02:00 [INF] Starting batch indexing of 5 chunks
+2025-09-03 12:43:58.899 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (5 attempted)
+2025-09-03 12:43:58.901 +02:00 [INF] Batch indexing completed: 0/5/5 chunks indexed
+2025-09-03 12:43:58.902 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx: 0/5 chunks indexed
+2025-09-03 12:43:58.905 +02:00 [INF] Processed file: Autoryzacja płatności.docx (498,799 bytes, .docx, Modified: 2023-03-10 14:52:44, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 1416 chars, Chunks: 5)
+2025-09-03 12:44:00.398 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:00.488 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:00.490 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx into 1 chunks
+2025-09-03 12:44:00.492 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:44:00.501 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:44:00.502 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:44:00.662 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:44:00.664 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:44:00.665 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx: 0/1 chunks indexed
+2025-09-03 12:44:00.667 +02:00 [INF] Processed file: Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx (154,296 bytes, .docx, Modified: 2024-10-25 13:08:50, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 323 chars, Chunks: 1)
+2025-09-03 12:44:02.243 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:02.340 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:02.341 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx into 1 chunks
+2025-09-03 12:44:02.345 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:44:02.355 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:44:02.357 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:44:02.501 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:44:02.503 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:44:02.503 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx: 0/1 chunks indexed
+2025-09-03 12:44:02.504 +02:00 [INF] Processed file: Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx (369,384 bytes, .docx, Modified: 2024-12-04 11:25:08, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 242 chars, Chunks: 1)
+2025-09-03 12:44:04.006 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:04.173 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:04.175 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx into 2 chunks
+2025-09-03 12:44:04.176 +02:00 [INF] Indexing 2 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:44:04.187 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:44:04.188 +02:00 [INF] Starting batch indexing of 2 chunks
+2025-09-03 12:44:04.451 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (2 attempted)
+2025-09-03 12:44:04.453 +02:00 [INF] Batch indexing completed: 0/2/2 chunks indexed
+2025-09-03 12:44:04.457 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx: 0/2 chunks indexed
+2025-09-03 12:44:04.459 +02:00 [INF] Processed file: Citronex Zmiana wartości obiektu.docx (505,205 bytes, .docx, Modified: 2024-12-03 10:23:06, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 677 chars, Chunks: 2)
+2025-09-03 12:44:06.085 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:06.247 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:06.249 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx into 1 chunks
+2025-09-03 12:44:06.250 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:44:06.259 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:44:06.261 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:44:06.391 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:44:06.392 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:44:06.393 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx: 0/1 chunks indexed
+2025-09-03 12:44:06.394 +02:00 [INF] Processed file: DodanieGrupySprzedaży.docx (233,694 bytes, .docx, Modified: 2023-03-10 09:32:41, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 216 chars, Chunks: 1)
+2025-09-03 12:44:07.882 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:08.103 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:08.105 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx into 8 chunks
+2025-09-03 12:44:08.106 +02:00 [INF] Indexing 8 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:44:08.118 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:44:08.119 +02:00 [INF] Starting batch indexing of 8 chunks
+2025-09-03 12:44:08.893 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (8 attempted)
+2025-09-03 12:44:08.895 +02:00 [INF] Batch indexing completed: 0/8/8 chunks indexed
+2025-09-03 12:44:08.896 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx: 0/8 chunks indexed
+2025-09-03 12:44:08.897 +02:00 [INF] Processed file: E-sprawozdania Instrukcja.docx (1,527,602 bytes, .docx, Modified: 2025-03-31 08:46:12, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 2513 chars, Chunks: 8)
+2025-09-03 12:44:10.400 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:10.625 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:10.627 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx into 6 chunks
+2025-09-03 12:44:10.628 +02:00 [INF] Indexing 6 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx
+2025-09-03 12:44:10.638 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx
+2025-09-03 12:44:10.640 +02:00 [INF] Starting batch indexing of 6 chunks
+2025-09-03 12:44:11.280 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (6 attempted)
+2025-09-03 12:44:11.282 +02:00 [INF] Batch indexing completed: 0/6/6 chunks indexed
+2025-09-03 12:44:11.283 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx: 0/6 chunks indexed
+2025-09-03 12:44:11.284 +02:00 [INF] Processed file: IFS - opis merytoryczny faktury.docx (1,102,120 bytes, .docx, Modified: 2023-02-07 13:01:21, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 1757 chars, Chunks: 6)
+2025-09-03 12:44:12.751 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:12.996 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:12.998 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx into 57 chunks
+2025-09-03 12:44:12.999 +02:00 [INF] Indexing 57 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx
+2025-09-03 12:44:13.008 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx
+2025-09-03 12:44:13.011 +02:00 [INF] Starting batch indexing of 50 chunks
+2025-09-03 12:44:17.764 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (50 attempted)
+2025-09-03 12:44:17.765 +02:00 [INF] Batch indexing completed: 0/50/50 chunks indexed
+2025-09-03 12:44:17.766 +02:00 [INF] Starting batch indexing of 7 chunks
+2025-09-03 12:44:18.436 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (7 attempted)
+2025-09-03 12:44:18.438 +02:00 [INF] Batch indexing completed: 0/7/7 chunks indexed
+2025-09-03 12:44:18.439 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx: 0/57 chunks indexed
+2025-09-03 12:44:18.440 +02:00 [INF] Processed file: IFS - proces HR_edit.docx (3,031,098 bytes, .docx, Modified: 2024-05-22 08:53:28, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 16354 chars, Chunks: 57)
+2025-09-03 12:44:19.931 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:20.063 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:44:20.065 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx into 11 chunks
+2025-09-03 12:44:20.066 +02:00 [INF] Indexing 11 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx
+2025-09-03 12:44:20.075 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx
+2025-09-03 12:44:20.076 +02:00 [INF] Starting batch indexing of 11 chunks
+2025-09-03 12:44:21.115 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (11 attempted)
+2025-09-03 12:44:21.117 +02:00 [INF] Batch indexing completed: 0/11/11 chunks indexed
+2025-09-03 12:44:21.118 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx: 0/11 chunks indexed
+2025-09-03 12:44:21.118 +02:00 [INF] Processed file: IFS Indeksy.docx (434,560 bytes, .docx, Modified: 2025-05-29 13:08:51, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 2729 chars, Chunks: 11)
+2025-09-03 12:44:22.068 +02:00 [INF] Application is shutting down...
+2025-09-03 12:44:22.070 +02:00 [INF] RAG Collector is stopping
+2025-09-03 12:44:22.103 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:44:22.106 +02:00 [ERR] Failed to extract content from Office document: X:\Citronex\IFS Materialy\Instrukcje\IFS uproszczone instrukcje.docx
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at RAG.Collector.ContentExtractors.OfficeDocumentExtractor.ExtractAsync(String filePath, CancellationToken cancellationToken) in C:\VSC\repos\rag-suite\src\RAG.Collector\ContentExtractors\OfficeDocumentExtractor.cs:line 47
+2025-09-03 12:44:22.121 +02:00 [WRN] Content extraction failed for X:\Citronex\IFS Materialy\Instrukcje\IFS uproszczone instrukcje.docx: Error reading Office document: A task was canceled.
+2025-09-03 12:44:22.122 +02:00 [WRN] Content extraction failed for X:\Citronex\IFS Materialy\Instrukcje\IFS uproszczone instrukcje.docx: Error reading Office document: A task was canceled.
+2025-09-03 12:44:22.123 +02:00 [INF] Processed file: IFS uproszczone instrukcje.docx (23,303 bytes, .docx, Modified: 2022-12-30 08:10:00, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl], Content: extraction failed)
+2025-09-03 12:44:22.126 +02:00 [INF] File enumeration was cancelled
+2025-09-03 12:44:22.127 +02:00 [INF] Document collection cycle completed at "2025-09-03T12:44:22.1276689+02:00"
+2025-09-03 12:46:01.938 +02:00 [INF] Starting RAG Collector service
+2025-09-03 12:46:02.068 +02:00 [INF] Configuration validation successful
+2025-09-03 12:46:02.072 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [X:\Citronex\IFS Materialy\Instrukcje], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 400, ChunkOverlap: 80, ElasticsearchUrl: http://192.168.21.13:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingServiceUrl: http://192.168.21.13:8580, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 5, BulkBatchSize: 50 }
+2025-09-03 12:46:02.091 +02:00 [INF] RAG Collector started
+2025-09-03 12:46:02.100 +02:00 [INF] Configured source folders: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:46:02.101 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-03 12:46:02.103 +02:00 [INF] Elasticsearch URL: http://192.168.21.13:9200
+2025-09-03 12:46:02.104 +02:00 [INF] Index name: rag-chunks
+2025-09-03 12:46:02.106 +02:00 [INF] Processing interval: 5 minutes
+2025-09-03 12:46:02.108 +02:00 [INF] Starting document collection cycle at "2025-09-03T12:46:02.1079811+02:00"
+2025-09-03 12:46:02.114 +02:00 [INF] Starting file enumeration...
+2025-09-03 12:46:02.123 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-03 12:46:02.125 +02:00 [INF] Hosting environment: Development
+2025-09-03 12:46:02.127 +02:00 [INF] Content root path: C:\VSC\repos\rag-suite\src\RAG.Collector
+2025-09-03 12:46:02.147 +02:00 [INF] Found 41 files to process
+2025-09-03 12:46:02.152 +02:00 [INF] Enumerating files in folder: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:46:03.869 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:04.435 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:04.447 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx into 5 chunks
+2025-09-03 12:46:04.472 +02:00 [INF] Indexing 5 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:46:04.638 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:46:04.642 +02:00 [INF] Starting batch indexing of 5 chunks
+2025-09-03 12:46:04.651 +02:00 [INF] Generating embedding for chunk 64e86c0d-41f7-4bb3-96bc-58aca02cb8a3 (length: 363 chars, ~91 tokens)
+2025-09-03 12:46:04.714 +02:00 [INF] Embedding service response for chunk 64e86c0d-41f7-4bb3-96bc-58aca02cb8a3: 4694 chars, status: "OK", starts with: [[-0.03820628,0.07678584,-0.12729496,-0.04572149,-
+2025-09-03 12:46:04.735 +02:00 [INF] Successfully generated embedding for chunk 64e86c0d-41f7-4bb3-96bc-58aca02cb8a3 in 89.4867ms: vector dimension 384
+2025-09-03 12:46:04.797 +02:00 [INF] Generating embedding for chunk 3774e4ab-6fd9-42cd-b745-7b4e4abd49bd (length: 328 chars, ~82 tokens)
+2025-09-03 12:46:04.829 +02:00 [INF] Embedding service response for chunk 3774e4ab-6fd9-42cd-b745-7b4e4abd49bd: 4689 chars, status: "OK", starts with: [[-0.08406379,0.14869098,-0.11636818,-0.016128646,
+2025-09-03 12:46:04.834 +02:00 [INF] Successfully generated embedding for chunk 3774e4ab-6fd9-42cd-b745-7b4e4abd49bd in 36.5529ms: vector dimension 384
+2025-09-03 12:46:04.889 +02:00 [INF] Generating embedding for chunk 125fdd50-bdfa-4514-b650-7b69af53152f (length: 475 chars, ~119 tokens)
+2025-09-03 12:46:04.932 +02:00 [INF] Embedding service response for chunk 125fdd50-bdfa-4514-b650-7b69af53152f: 4712 chars, status: "OK", starts with: [[-0.10261467,0.08698345,-0.11184647,-0.014579099,
+2025-09-03 12:46:04.933 +02:00 [INF] Successfully generated embedding for chunk 125fdd50-bdfa-4514-b650-7b69af53152f in 43.7598ms: vector dimension 384
+2025-09-03 12:46:04.998 +02:00 [INF] Generating embedding for chunk fded5cb6-030d-47b9-b1ee-141ada44a0a8 (length: 187 chars, ~47 tokens)
+2025-09-03 12:46:05.020 +02:00 [INF] Embedding service response for chunk fded5cb6-030d-47b9-b1ee-141ada44a0a8: 4676 chars, status: "OK", starts with: [[-0.09514869,0.14034148,-0.08807431,-0.017921839,
+2025-09-03 12:46:05.023 +02:00 [INF] Successfully generated embedding for chunk fded5cb6-030d-47b9-b1ee-141ada44a0a8 in 25.531ms: vector dimension 384
+2025-09-03 12:46:05.076 +02:00 [INF] Generating embedding for chunk 85487919-8c2e-4dd7-add2-7d9cd79417d2 (length: 428 chars, ~107 tokens)
+2025-09-03 12:46:05.125 +02:00 [INF] Embedding service response for chunk 85487919-8c2e-4dd7-add2-7d9cd79417d2: 4710 chars, status: "OK", starts with: [[-0.101817206,0.092325665,-0.09686918,-0.05150931
+2025-09-03 12:46:05.127 +02:00 [INF] Successfully generated embedding for chunk 85487919-8c2e-4dd7-add2-7d9cd79417d2 in 51.6703ms: vector dimension 384
+2025-09-03 12:46:05.388 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (5 attempted)
+2025-09-03 12:46:05.390 +02:00 [INF] Batch indexing completed: 0/5/5 chunks indexed
+2025-09-03 12:46:05.391 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx: 0/5 chunks indexed
+2025-09-03 12:46:05.392 +02:00 [INF] Processed file: Autoryzacja płatności.docx (498,799 bytes, .docx, Modified: 2023-03-10 14:52:44, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 1416 chars, Chunks: 5)
+2025-09-03 12:46:06.913 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:07.028 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:07.031 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx into 1 chunks
+2025-09-03 12:46:07.034 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:46:07.043 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:46:07.046 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:46:07.047 +02:00 [INF] Generating embedding for chunk 4e9e9c0f-668b-4555-a5cd-ffb599545eb4 (length: 321 chars, ~81 tokens)
+2025-09-03 12:46:07.075 +02:00 [INF] Embedding service response for chunk 4e9e9c0f-668b-4555-a5cd-ffb599545eb4: 4704 chars, status: "OK", starts with: [[-0.009718538,0.049283516,-0.050438616,-0.038104,
+2025-09-03 12:46:07.077 +02:00 [INF] Successfully generated embedding for chunk 4e9e9c0f-668b-4555-a5cd-ffb599545eb4 in 30.4415ms: vector dimension 384
+2025-09-03 12:46:07.304 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:46:07.305 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:46:07.306 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx: 0/1 chunks indexed
+2025-09-03 12:46:07.307 +02:00 [INF] Processed file: Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx (154,296 bytes, .docx, Modified: 2024-10-25 13:08:50, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 323 chars, Chunks: 1)
+2025-09-03 12:46:08.833 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:08.947 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:08.948 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx into 1 chunks
+2025-09-03 12:46:08.951 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:46:08.962 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:46:08.964 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:46:08.964 +02:00 [INF] Generating embedding for chunk 274ab903-0f83-4e75-a0df-ad6986ec9c65 (length: 235 chars, ~59 tokens)
+2025-09-03 12:46:08.988 +02:00 [INF] Embedding service response for chunk 274ab903-0f83-4e75-a0df-ad6986ec9c65: 4688 chars, status: "OK", starts with: [[-0.041860748,0.09261859,-0.02888414,-0.015985109
+2025-09-03 12:46:08.991 +02:00 [INF] Successfully generated embedding for chunk 274ab903-0f83-4e75-a0df-ad6986ec9c65 in 26.7331ms: vector dimension 384
+2025-09-03 12:46:09.096 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:46:09.097 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:46:09.100 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx: 0/1 chunks indexed
+2025-09-03 12:46:09.101 +02:00 [INF] Processed file: Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx (369,384 bytes, .docx, Modified: 2024-12-04 11:25:08, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 242 chars, Chunks: 1)
+2025-09-03 12:46:10.598 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:10.761 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:10.763 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx into 2 chunks
+2025-09-03 12:46:10.764 +02:00 [INF] Indexing 2 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:46:10.772 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:46:10.774 +02:00 [INF] Starting batch indexing of 2 chunks
+2025-09-03 12:46:10.774 +02:00 [INF] Generating embedding for chunk cbf0df4c-d647-4f06-b394-e4e6837e8448 (length: 394 chars, ~99 tokens)
+2025-09-03 12:46:10.813 +02:00 [INF] Embedding service response for chunk cbf0df4c-d647-4f06-b394-e4e6837e8448: 4692 chars, status: "OK", starts with: [[-0.053751428,0.1363817,-0.04556009,-0.022786556,
+2025-09-03 12:46:10.815 +02:00 [INF] Successfully generated embedding for chunk cbf0df4c-d647-4f06-b394-e4e6837e8448 in 41.1723ms: vector dimension 384
+2025-09-03 12:46:10.879 +02:00 [INF] Generating embedding for chunk cebe247c-ff0c-4783-b6ea-05e566374296 (length: 426 chars, ~107 tokens)
+2025-09-03 12:46:10.917 +02:00 [INF] Embedding service response for chunk cebe247c-ff0c-4783-b6ea-05e566374296: 4715 chars, status: "OK", starts with: [[-0.08043445,0.08678475,-0.044972453,-0.04504442,
+2025-09-03 12:46:10.920 +02:00 [INF] Successfully generated embedding for chunk cebe247c-ff0c-4783-b6ea-05e566374296 in 41.2074ms: vector dimension 384
+2025-09-03 12:46:11.049 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (2 attempted)
+2025-09-03 12:46:11.051 +02:00 [INF] Batch indexing completed: 0/2/2 chunks indexed
+2025-09-03 12:46:11.053 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx: 0/2 chunks indexed
+2025-09-03 12:46:11.054 +02:00 [INF] Processed file: Citronex Zmiana wartości obiektu.docx (505,205 bytes, .docx, Modified: 2024-12-03 10:23:06, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 677 chars, Chunks: 2)
+2025-09-03 12:46:12.553 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:12.654 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:12.656 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx into 1 chunks
+2025-09-03 12:46:12.657 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:46:12.665 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:46:12.667 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:46:12.668 +02:00 [INF] Generating embedding for chunk 470538a9-b42a-4e90-9739-fe785f92b2f4 (length: 207 chars, ~52 tokens)
+2025-09-03 12:46:12.688 +02:00 [INF] Embedding service response for chunk 470538a9-b42a-4e90-9739-fe785f92b2f4: 4694 chars, status: "OK", starts with: [[-0.120746315,0.12583934,-0.07845928,-0.05414584,
+2025-09-03 12:46:12.691 +02:00 [INF] Successfully generated embedding for chunk 470538a9-b42a-4e90-9739-fe785f92b2f4 in 23.3366ms: vector dimension 384
+2025-09-03 12:46:12.799 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:46:12.800 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:46:12.801 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx: 0/1 chunks indexed
+2025-09-03 12:46:12.802 +02:00 [INF] Processed file: DodanieGrupySprzedaży.docx (233,694 bytes, .docx, Modified: 2023-03-10 09:32:41, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 216 chars, Chunks: 1)
+2025-09-03 12:46:14.294 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:46:14.478 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:46:14.480 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx into 8 chunks
+2025-09-03 12:46:14.481 +02:00 [INF] Indexing 8 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:46:14.490 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:46:14.493 +02:00 [INF] Starting batch indexing of 8 chunks
+2025-09-03 12:46:14.494 +02:00 [INF] Generating embedding for chunk a2526112-01b9-4c99-b968-a9a5d834c025 (length: 394 chars, ~99 tokens)
+2025-09-03 12:46:14.518 +02:00 [INF] Application is shutting down...
+2025-09-03 12:46:14.520 +02:00 [INF] RAG Collector is stopping
+2025-09-03 12:46:14.523 +02:00 [ERR] Unexpected error while generating embedding for chunk a2526112-01b9-4c99-b968-a9a5d834c025
+System.Threading.Tasks.TaskCanceledException: The operation was canceled.
+ ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled.
+ ---> System.IO.IOException: Unable to read data from the transport connection: Operacja We/Wy została przerwana z powodu zakończenia wątku lub żądania aplikacji..
+ ---> System.Net.Sockets.SocketException (995): Operacja We/Wy została przerwana z powodu zakończenia wątku lub żądania aplikacji.
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in C:\VSC\repos\rag-suite\src\RAG.Collector\Embeddings\HttpEmbeddingProvider.cs:line 51
+2025-09-03 12:46:14.544 +02:00 [ERR] Error during batch indexing of 8 chunks
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateBatchEmbeddingsAsync(IList`1 chunks, CancellationToken cancellationToken) in C:\VSC\repos\rag-suite\src\RAG.Collector\Embeddings\HttpEmbeddingProvider.cs:line 116
+   at RAG.Collector.Indexing.IndexingService.IndexChunksBatchAsync(IList`1 chunks, CancellationToken cancellationToken) in C:\VSC\repos\rag-suite\src\RAG.Collector\Indexing\IndexingService.cs:line 93
+2025-09-03 12:46:14.546 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx: 0/8 chunks indexed
+2025-09-03 12:46:14.547 +02:00 [INF] Processed file: E-sprawozdania Instrukcja.docx (1,527,602 bytes, .docx, Modified: 2025-03-31 08:46:12, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 2513 chars, Chunks: 8)
+2025-09-03 12:46:14.549 +02:00 [INF] File enumeration was cancelled
+2025-09-03 12:46:14.550 +02:00 [INF] Document collection cycle completed at "2025-09-03T12:46:14.5504719+02:00"
+2025-09-03 12:47:28.205 +02:00 [INF] Starting RAG Collector service
+2025-09-03 12:47:28.417 +02:00 [INF] Configuration validation successful
+2025-09-03 12:47:28.419 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [X:\Citronex\IFS Materialy\Instrukcje], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 400, ChunkOverlap: 80, ElasticsearchUrl: http://192.168.21.13:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks, EmbeddingServiceUrl: http://192.168.21.13:8580, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 5, BulkBatchSize: 50 }
+2025-09-03 12:47:28.438 +02:00 [INF] RAG Collector started
+2025-09-03 12:47:28.446 +02:00 [INF] Configured source folders: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:47:28.449 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-03 12:47:28.451 +02:00 [INF] Elasticsearch URL: http://192.168.21.13:9200
+2025-09-03 12:47:28.452 +02:00 [INF] Index name: rag-chunks
+2025-09-03 12:47:28.453 +02:00 [INF] Processing interval: 5 minutes
+2025-09-03 12:47:28.454 +02:00 [INF] Starting document collection cycle at "2025-09-03T12:47:28.4548158+02:00"
+2025-09-03 12:47:28.459 +02:00 [INF] Starting file enumeration...
+2025-09-03 12:47:28.467 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-03 12:47:28.469 +02:00 [INF] Hosting environment: Development
+2025-09-03 12:47:28.469 +02:00 [INF] Content root path: C:\VSC\repos\rag-suite\src\RAG.Collector
+2025-09-03 12:47:28.505 +02:00 [INF] Found 41 files to process
+2025-09-03 12:47:28.508 +02:00 [INF] Enumerating files in folder: X:\Citronex\IFS Materialy\Instrukcje
+2025-09-03 12:47:30.416 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:31.281 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:31.292 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx into 5 chunks
+2025-09-03 12:47:31.316 +02:00 [INF] Indexing 5 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:47:31.469 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx
+2025-09-03 12:47:31.472 +02:00 [INF] Starting batch indexing of 5 chunks
+2025-09-03 12:47:31.479 +02:00 [INF] Generating embedding for chunk 2b51b521-bf49-4948-8b5f-bee6feaa0421 (length: 363 chars, ~91 tokens)
+2025-09-03 12:47:31.537 +02:00 [INF] Embedding service response for chunk 2b51b521-bf49-4948-8b5f-bee6feaa0421: 4694 chars, status: "OK", starts with: [[-0.03820628,0.07678584,-0.12729496,-0.04572149,-
+2025-09-03 12:47:31.551 +02:00 [INF] Successfully generated embedding for chunk 2b51b521-bf49-4948-8b5f-bee6feaa0421 in 76.8812ms: vector dimension 384
+2025-09-03 12:47:31.617 +02:00 [INF] Generating embedding for chunk 2a83f146-c12c-4aff-9c6f-734b7e4fb3d8 (length: 328 chars, ~82 tokens)
+2025-09-03 12:47:31.638 +02:00 [INF] Embedding service response for chunk 2a83f146-c12c-4aff-9c6f-734b7e4fb3d8: 4689 chars, status: "OK", starts with: [[-0.08406379,0.14869098,-0.11636818,-0.016128646,
+2025-09-03 12:47:31.640 +02:00 [INF] Successfully generated embedding for chunk 2a83f146-c12c-4aff-9c6f-734b7e4fb3d8 in 23.5903ms: vector dimension 384
+2025-09-03 12:47:31.692 +02:00 [INF] Generating embedding for chunk 6af84427-53ea-4e88-af3f-b41e3de0ed66 (length: 475 chars, ~119 tokens)
+2025-09-03 12:47:31.727 +02:00 [INF] Embedding service response for chunk 6af84427-53ea-4e88-af3f-b41e3de0ed66: 4712 chars, status: "OK", starts with: [[-0.10261467,0.08698345,-0.11184647,-0.014579099,
+2025-09-03 12:47:31.729 +02:00 [INF] Successfully generated embedding for chunk 6af84427-53ea-4e88-af3f-b41e3de0ed66 in 37.1233ms: vector dimension 384
+2025-09-03 12:47:31.786 +02:00 [INF] Generating embedding for chunk 83e3ca0e-ce9e-4442-bc4c-183126995741 (length: 187 chars, ~47 tokens)
+2025-09-03 12:47:31.805 +02:00 [INF] Embedding service response for chunk 83e3ca0e-ce9e-4442-bc4c-183126995741: 4676 chars, status: "OK", starts with: [[-0.09514869,0.14034148,-0.08807431,-0.017921839,
+2025-09-03 12:47:31.807 +02:00 [INF] Successfully generated embedding for chunk 83e3ca0e-ce9e-4442-bc4c-183126995741 in 21.3357ms: vector dimension 384
+2025-09-03 12:47:31.862 +02:00 [INF] Generating embedding for chunk af9015eb-cd64-4775-9925-2234d11fb7fe (length: 428 chars, ~107 tokens)
+2025-09-03 12:47:31.896 +02:00 [INF] Embedding service response for chunk af9015eb-cd64-4775-9925-2234d11fb7fe: 4710 chars, status: "OK", starts with: [[-0.101817206,0.092325665,-0.09686918,-0.05150931
+2025-09-03 12:47:31.898 +02:00 [INF] Successfully generated embedding for chunk af9015eb-cd64-4775-9925-2234d11fb7fe in 36.1162ms: vector dimension 384
+2025-09-03 12:47:32.175 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (5 attempted)
+2025-09-03 12:47:32.177 +02:00 [WRN] Bulk response: {"errors":false,"took":178,"items":[{"index":{"_index":"rag-chunks","_id":"2b51b521-bf49-4948-8b5f-bee6feaa0421","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1526,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"2a83f146-c12c-4aff-9c6f-734b7e4fb3d8","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1527,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"6af84427-53ea-4e88-af3f-b41e3de0ed66","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1528,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"83e3ca0e-ce9e-4442-bc4c-183126995741","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1529,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"af9015eb-cd64-4775-9925-2234d11fb7fe","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1530,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:32.177 +02:00 [INF] Batch indexing completed: 0/5/5 chunks indexed
+2025-09-03 12:47:32.178 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Autoryzacja płatności.docx: 0/5 chunks indexed
+2025-09-03 12:47:32.179 +02:00 [INF] Processed file: Autoryzacja płatności.docx (498,799 bytes, .docx, Modified: 2023-03-10 14:52:44, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 1416 chars, Chunks: 5)
+2025-09-03 12:47:33.698 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:33.799 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:33.801 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx into 1 chunks
+2025-09-03 12:47:33.803 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:47:33.813 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx
+2025-09-03 12:47:33.815 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:47:33.816 +02:00 [INF] Generating embedding for chunk f8ac07fe-0166-48f0-a616-b791013bc358 (length: 321 chars, ~81 tokens)
+2025-09-03 12:47:33.840 +02:00 [INF] Embedding service response for chunk f8ac07fe-0166-48f0-a616-b791013bc358: 4704 chars, status: "OK", starts with: [[-0.009718538,0.049283516,-0.050438616,-0.038104,
+2025-09-03 12:47:33.842 +02:00 [INF] Successfully generated embedding for chunk f8ac07fe-0166-48f0-a616-b791013bc358 in 25.9538ms: vector dimension 384
+2025-09-03 12:47:33.950 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:47:33.952 +02:00 [WRN] Bulk response: {"errors":false,"took":37,"items":[{"index":{"_index":"rag-chunks","_id":"f8ac07fe-0166-48f0-a616-b791013bc358","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1531,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:33.953 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:47:33.954 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx: 0/1 chunks indexed
+2025-09-03 12:47:33.955 +02:00 [INF] Processed file: Blad kwoty dekretacji walutowej dla faktury podczas ksiegowania.docx (154,296 bytes, .docx, Modified: 2024-10-25 13:08:50, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 323 chars, Chunks: 1)
+2025-09-03 12:47:35.506 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:35.756 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:35.759 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx into 1 chunks
+2025-09-03 12:47:35.761 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:47:35.771 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx
+2025-09-03 12:47:35.773 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:47:35.773 +02:00 [INF] Generating embedding for chunk df56ca58-a0b7-496c-a7ab-f05dd219c959 (length: 235 chars, ~59 tokens)
+2025-09-03 12:47:35.802 +02:00 [INF] Embedding service response for chunk df56ca58-a0b7-496c-a7ab-f05dd219c959: 4688 chars, status: "OK", starts with: [[-0.041860748,0.09261859,-0.02888414,-0.015985109
+2025-09-03 12:47:35.804 +02:00 [INF] Successfully generated embedding for chunk df56ca58-a0b7-496c-a7ab-f05dd219c959 in 31.0333ms: vector dimension 384
+2025-09-03 12:47:35.918 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:47:35.919 +02:00 [WRN] Bulk response: {"errors":false,"took":47,"items":[{"index":{"_index":"rag-chunks","_id":"df56ca58-a0b7-496c-a7ab-f05dd219c959","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1532,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:35.920 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:47:35.921 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx: 0/1 chunks indexed
+2025-09-03 12:47:35.922 +02:00 [INF] Processed file: Blad podczas zlecenia produkcyjnego - pole cost jest obowiazkowe dla linii zk.docx (369,384 bytes, .docx, Modified: 2024-12-04 11:25:08, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 242 chars, Chunks: 1)
+2025-09-03 12:47:37.396 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:37.573 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:37.575 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx into 2 chunks
+2025-09-03 12:47:37.576 +02:00 [INF] Indexing 2 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:47:37.585 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx
+2025-09-03 12:47:37.587 +02:00 [INF] Starting batch indexing of 2 chunks
+2025-09-03 12:47:37.587 +02:00 [INF] Generating embedding for chunk ff6007cf-5ea3-43da-845b-dca62ff83584 (length: 394 chars, ~99 tokens)
+2025-09-03 12:47:37.628 +02:00 [INF] Embedding service response for chunk ff6007cf-5ea3-43da-845b-dca62ff83584: 4692 chars, status: "OK", starts with: [[-0.053751428,0.1363817,-0.04556009,-0.022786556,
+2025-09-03 12:47:37.630 +02:00 [INF] Successfully generated embedding for chunk ff6007cf-5ea3-43da-845b-dca62ff83584 in 42.1532ms: vector dimension 384
+2025-09-03 12:47:37.693 +02:00 [INF] Generating embedding for chunk 2cf64c35-3c15-42ce-aed5-a521f4127912 (length: 426 chars, ~107 tokens)
+2025-09-03 12:47:37.731 +02:00 [INF] Embedding service response for chunk 2cf64c35-3c15-42ce-aed5-a521f4127912: 4715 chars, status: "OK", starts with: [[-0.08043445,0.08678475,-0.044972453,-0.04504442,
+2025-09-03 12:47:37.735 +02:00 [INF] Successfully generated embedding for chunk 2cf64c35-3c15-42ce-aed5-a521f4127912 in 42.5183ms: vector dimension 384
+2025-09-03 12:47:37.844 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (2 attempted)
+2025-09-03 12:47:37.846 +02:00 [WRN] Bulk response: {"errors":false,"took":37,"items":[{"index":{"_index":"rag-chunks","_id":"ff6007cf-5ea3-43da-845b-dca62ff83584","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1533,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"2cf64c35-3c15-42ce-aed5-a521f4127912","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1534,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:37.846 +02:00 [INF] Batch indexing completed: 0/2/2 chunks indexed
+2025-09-03 12:47:37.847 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\Citronex Zmiana wartości obiektu.docx: 0/2 chunks indexed
+2025-09-03 12:47:37.848 +02:00 [INF] Processed file: Citronex Zmiana wartości obiektu.docx (505,205 bytes, .docx, Modified: 2024-12-03 10:23:06, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 677 chars, Chunks: 2)
+2025-09-03 12:47:39.387 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:39.548 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:39.550 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx into 1 chunks
+2025-09-03 12:47:39.551 +02:00 [INF] Indexing 1 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:47:39.561 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx
+2025-09-03 12:47:39.563 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-03 12:47:39.563 +02:00 [INF] Generating embedding for chunk 9bca90a6-d875-432d-9b05-23b3ffd482d8 (length: 207 chars, ~52 tokens)
+2025-09-03 12:47:39.585 +02:00 [INF] Embedding service response for chunk 9bca90a6-d875-432d-9b05-23b3ffd482d8: 4694 chars, status: "OK", starts with: [[-0.120746315,0.12583934,-0.07845928,-0.05414584,
+2025-09-03 12:47:39.589 +02:00 [INF] Successfully generated embedding for chunk 9bca90a6-d875-432d-9b05-23b3ffd482d8 in 25.611ms: vector dimension 384
+2025-09-03 12:47:39.693 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (1 attempted)
+2025-09-03 12:47:39.694 +02:00 [WRN] Bulk response: {"errors":false,"took":39,"items":[{"index":{"_index":"rag-chunks","_id":"9bca90a6-d875-432d-9b05-23b3ffd482d8","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1535,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:39.695 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-03 12:47:39.695 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\DodanieGrupySprzedaży.docx: 0/1 chunks indexed
+2025-09-03 12:47:39.697 +02:00 [INF] Processed file: DodanieGrupySprzedaży.docx (233,694 bytes, .docx, Modified: 2023-03-10 09:32:41, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 216 chars, Chunks: 1)
+2025-09-03 12:47:41.234 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:41.498 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:41.500 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx into 8 chunks
+2025-09-03 12:47:41.501 +02:00 [INF] Indexing 8 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:47:41.510 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx
+2025-09-03 12:47:41.511 +02:00 [INF] Starting batch indexing of 8 chunks
+2025-09-03 12:47:41.512 +02:00 [INF] Generating embedding for chunk 6c2420f0-8319-45a3-a98c-93db5eafc957 (length: 394 chars, ~99 tokens)
+2025-09-03 12:47:41.575 +02:00 [INF] Embedding service response for chunk 6c2420f0-8319-45a3-a98c-93db5eafc957: 4709 chars, status: "OK", starts with: [[-0.048000667,0.0827666,-0.07371311,-0.029693997,
+2025-09-03 12:47:41.577 +02:00 [INF] Successfully generated embedding for chunk 6c2420f0-8319-45a3-a98c-93db5eafc957 in 65.5876ms: vector dimension 384
+2025-09-03 12:47:41.632 +02:00 [INF] Generating embedding for chunk a7246ebb-3dab-4472-ac3c-058d934ad3a6 (length: 373 chars, ~94 tokens)
+2025-09-03 12:47:41.695 +02:00 [INF] Embedding service response for chunk a7246ebb-3dab-4472-ac3c-058d934ad3a6: 4736 chars, status: "OK", starts with: [[-0.024160672,0.09961816,-0.09715407,-0.015226245
+2025-09-03 12:47:41.697 +02:00 [INF] Successfully generated embedding for chunk a7246ebb-3dab-4472-ac3c-058d934ad3a6 in 65.7918ms: vector dimension 384
+2025-09-03 12:47:41.757 +02:00 [INF] Generating embedding for chunk 66d3b579-6b34-4267-8b0a-1896867e9ddf (length: 418 chars, ~105 tokens)
+2025-09-03 12:47:41.839 +02:00 [INF] Embedding service response for chunk 66d3b579-6b34-4267-8b0a-1896867e9ddf: 4707 chars, status: "OK", starts with: [[-0.039367586,0.1045426,-0.12970756,-0.011288618,
+2025-09-03 12:47:41.842 +02:00 [INF] Successfully generated embedding for chunk 66d3b579-6b34-4267-8b0a-1896867e9ddf in 85.1283ms: vector dimension 384
+2025-09-03 12:47:41.898 +02:00 [INF] Generating embedding for chunk 0880144d-d8d1-4283-9874-808a64c8a054 (length: 383 chars, ~96 tokens)
+2025-09-03 12:47:41.941 +02:00 [INF] Embedding service response for chunk 0880144d-d8d1-4283-9874-808a64c8a054: 4717 chars, status: "OK", starts with: [[-0.046423614,0.054639578,-0.12868711,-0.07781651
+2025-09-03 12:47:41.944 +02:00 [INF] Successfully generated embedding for chunk 0880144d-d8d1-4283-9874-808a64c8a054 in 45.6947ms: vector dimension 384
+2025-09-03 12:47:42.007 +02:00 [INF] Generating embedding for chunk a5b351fc-b93e-48fa-8d03-c38522202032 (length: 403 chars, ~101 tokens)
+2025-09-03 12:47:42.070 +02:00 [INF] Embedding service response for chunk a5b351fc-b93e-48fa-8d03-c38522202032: 4729 chars, status: "OK", starts with: [[-0.055958904,0.064951465,-0.08605788,-0.06245596
+2025-09-03 12:47:42.074 +02:00 [INF] Successfully generated embedding for chunk a5b351fc-b93e-48fa-8d03-c38522202032 in 67.8893ms: vector dimension 384
+2025-09-03 12:47:42.133 +02:00 [INF] Generating embedding for chunk a375c070-d1fd-4e63-90dc-473d329de848 (length: 465 chars, ~117 tokens)
+2025-09-03 12:47:42.194 +02:00 [INF] Embedding service response for chunk a375c070-d1fd-4e63-90dc-473d329de848: 4706 chars, status: "OK", starts with: [[-0.058187008,0.07917588,-0.042594075,-0.00780210
+2025-09-03 12:47:42.203 +02:00 [INF] Successfully generated embedding for chunk a375c070-d1fd-4e63-90dc-473d329de848 in 70.5959ms: vector dimension 384
+2025-09-03 12:47:42.257 +02:00 [INF] Generating embedding for chunk 19aa393c-ec58-4bbd-9a7f-fb56062af207 (length: 425 chars, ~107 tokens)
+2025-09-03 12:47:42.330 +02:00 [INF] Embedding service response for chunk 19aa393c-ec58-4bbd-9a7f-fb56062af207: 4744 chars, status: "OK", starts with: [[-0.0701888,0.06706982,-0.051308732,0.031172048,-
+2025-09-03 12:47:42.332 +02:00 [INF] Successfully generated embedding for chunk 19aa393c-ec58-4bbd-9a7f-fb56062af207 in 75.2165ms: vector dimension 384
+2025-09-03 12:47:42.395 +02:00 [INF] Generating embedding for chunk dddb3982-3b4f-40c8-810f-6387785feedf (length: 306 chars, ~77 tokens)
+2025-09-03 12:47:42.441 +02:00 [INF] Embedding service response for chunk dddb3982-3b4f-40c8-810f-6387785feedf: 4724 chars, status: "OK", starts with: [[-0.06347343,0.07326584,-0.0700532,0.002442856,-0
+2025-09-03 12:47:42.445 +02:00 [INF] Successfully generated embedding for chunk dddb3982-3b4f-40c8-810f-6387785feedf in 49.5878ms: vector dimension 384
+2025-09-03 12:47:42.584 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (8 attempted)
+2025-09-03 12:47:42.587 +02:00 [WRN] Bulk response: {"errors":false,"took":68,"items":[{"index":{"_index":"rag-chunks","_id":"6c2420f0-8319-45a3-a98c-93db5eafc957","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1536,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"a7246ebb-3dab-4472-ac3c-058d934ad3a6","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1537,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"66d3b579-6b34-4267-8b0a-1896867e9ddf","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1538,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"0880144d-d8d1-4283-9874-808a64c8a054","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1539,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"a5b351fc-b93e-48fa-8d03-c38522202032","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1540,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"a375c070-d1fd-4e63-90dc-473d329de848","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1541,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"19aa393c-ec58-4bbd-9a7f-fb56062af207","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1542,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"dddb3982-3b4f-40c8-810f-6387785feedf","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1543,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:42.589 +02:00 [INF] Batch indexing completed: 0/8/8 chunks indexed
+2025-09-03 12:47:42.590 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\E-sprawozdania Instrukcja.docx: 0/8 chunks indexed
+2025-09-03 12:47:42.591 +02:00 [INF] Processed file: E-sprawozdania Instrukcja.docx (1,527,602 bytes, .docx, Modified: 2025-03-31 08:46:12, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 2513 chars, Chunks: 8)
+2025-09-03 12:47:44.113 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:44.263 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:44.265 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx into 6 chunks
+2025-09-03 12:47:44.267 +02:00 [INF] Indexing 6 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx
+2025-09-03 12:47:44.277 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx
+2025-09-03 12:47:44.278 +02:00 [INF] Starting batch indexing of 6 chunks
+2025-09-03 12:47:44.279 +02:00 [INF] Generating embedding for chunk 2e26c468-956d-4d10-b759-1fedd07562e1 (length: 399 chars, ~100 tokens)
+2025-09-03 12:47:44.321 +02:00 [INF] Embedding service response for chunk 2e26c468-956d-4d10-b759-1fedd07562e1: 4707 chars, status: "OK", starts with: [[-0.06089083,0.056681823,-0.028215248,-0.04045207
+2025-09-03 12:47:44.323 +02:00 [INF] Successfully generated embedding for chunk 2e26c468-956d-4d10-b759-1fedd07562e1 in 44.3659ms: vector dimension 384
+2025-09-03 12:47:44.389 +02:00 [INF] Generating embedding for chunk 491d67de-a03e-45e3-b3de-68dab08d65e3 (length: 333 chars, ~84 tokens)
+2025-09-03 12:47:44.439 +02:00 [INF] Embedding service response for chunk 491d67de-a03e-45e3-b3de-68dab08d65e3: 4707 chars, status: "OK", starts with: [[-0.11367576,0.0899232,-0.041407406,-0.039726075,
+2025-09-03 12:47:44.443 +02:00 [INF] Successfully generated embedding for chunk 491d67de-a03e-45e3-b3de-68dab08d65e3 in 53.7986ms: vector dimension 384
+2025-09-03 12:47:44.499 +02:00 [INF] Generating embedding for chunk d4278d42-79d3-4019-a83a-d7409213087a (length: 478 chars, ~120 tokens)
+2025-09-03 12:47:44.568 +02:00 [INF] Embedding service response for chunk d4278d42-79d3-4019-a83a-d7409213087a: 4715 chars, status: "OK", starts with: [[-0.06742778,0.083864965,-0.046844292,-0.01797296
+2025-09-03 12:47:44.572 +02:00 [INF] Successfully generated embedding for chunk d4278d42-79d3-4019-a83a-d7409213087a in 72.8931ms: vector dimension 384
+2025-09-03 12:47:44.638 +02:00 [INF] Generating embedding for chunk 1aad157b-5977-4ff9-9621-2ab78092acbc (length: 255 chars, ~64 tokens)
+2025-09-03 12:47:44.672 +02:00 [INF] Embedding service response for chunk 1aad157b-5977-4ff9-9621-2ab78092acbc: 4712 chars, status: "OK", starts with: [[-0.011344442,0.09299254,-0.09522021,-0.013762318
+2025-09-03 12:47:44.674 +02:00 [INF] Successfully generated embedding for chunk 1aad157b-5977-4ff9-9621-2ab78092acbc in 36.4083ms: vector dimension 384
+2025-09-03 12:47:44.732 +02:00 [INF] Generating embedding for chunk 1334a26e-f92f-45ac-9594-abed7033ae6c (length: 428 chars, ~107 tokens)
+2025-09-03 12:47:44.801 +02:00 [INF] Embedding service response for chunk 1334a26e-f92f-45ac-9594-abed7033ae6c: 4704 chars, status: "OK", starts with: [[-0.028759617,0.067722686,-0.079877764,-0.0591816
+2025-09-03 12:47:44.803 +02:00 [INF] Successfully generated embedding for chunk 1334a26e-f92f-45ac-9594-abed7033ae6c in 70.6967ms: vector dimension 384
+2025-09-03 12:47:44.858 +02:00 [INF] Generating embedding for chunk ed835423-07fa-43a2-836c-c38b5fc30f12 (length: 374 chars, ~94 tokens)
+2025-09-03 12:47:44.912 +02:00 [INF] Embedding service response for chunk ed835423-07fa-43a2-836c-c38b5fc30f12: 4697 chars, status: "OK", starts with: [[-0.07782689,0.02578434,-0.109589584,-0.012550510
+2025-09-03 12:47:44.914 +02:00 [INF] Successfully generated embedding for chunk ed835423-07fa-43a2-836c-c38b5fc30f12 in 55.7424ms: vector dimension 384
+2025-09-03 12:47:45.072 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (6 attempted)
+2025-09-03 12:47:45.073 +02:00 [WRN] Bulk response: {"errors":false,"took":99,"items":[{"index":{"_index":"rag-chunks","_id":"2e26c468-956d-4d10-b759-1fedd07562e1","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1544,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"491d67de-a03e-45e3-b3de-68dab08d65e3","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1545,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"d4278d42-79d3-4019-a83a-d7409213087a","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1546,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1aad157b-5977-4ff9-9621-2ab78092acbc","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1547,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1334a26e-f92f-45ac-9594-abed7033ae6c","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1548,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"ed835423-07fa-43a2-836c-c38b5fc30f12","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1549,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:45.074 +02:00 [INF] Batch indexing completed: 0/6/6 chunks indexed
+2025-09-03 12:47:45.075 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\IFS - opis merytoryczny faktury.docx: 0/6 chunks indexed
+2025-09-03 12:47:45.077 +02:00 [INF] Processed file: IFS - opis merytoryczny faktury.docx (1,102,120 bytes, .docx, Modified: 2023-02-07 13:01:21, ACL: [adm-aw@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, kkozlowski@ad.citronex.pl, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 1757 chars, Chunks: 6)
+2025-09-03 12:47:46.680 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:46.938 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:46.940 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx into 57 chunks
+2025-09-03 12:47:46.942 +02:00 [INF] Indexing 57 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx
+2025-09-03 12:47:46.952 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx
+2025-09-03 12:47:46.954 +02:00 [INF] Starting batch indexing of 50 chunks
+2025-09-03 12:47:46.955 +02:00 [INF] Generating embedding for chunk f275f170-8cde-4474-a578-f0befddf71cc (length: 374 chars, ~94 tokens)
+2025-09-03 12:47:47.029 +02:00 [INF] Embedding service response for chunk f275f170-8cde-4474-a578-f0befddf71cc: 4715 chars, status: "OK", starts with: [[-0.1013337,0.05895462,-0.073587455,-0.10822776,-
+2025-09-03 12:47:47.031 +02:00 [INF] Successfully generated embedding for chunk f275f170-8cde-4474-a578-f0befddf71cc in 76.4383ms: vector dimension 384
+2025-09-03 12:47:47.082 +02:00 [INF] Generating embedding for chunk 5a4d54b5-3324-4cc0-8944-6fa0a2797ae7 (length: 361 chars, ~91 tokens)
+2025-09-03 12:47:47.123 +02:00 [INF] Embedding service response for chunk 5a4d54b5-3324-4cc0-8944-6fa0a2797ae7: 4711 chars, status: "OK", starts with: [[-0.054119818,0.047839265,-0.05665332,-0.08541723
+2025-09-03 12:47:47.126 +02:00 [INF] Successfully generated embedding for chunk 5a4d54b5-3324-4cc0-8944-6fa0a2797ae7 in 44.0523ms: vector dimension 384
+2025-09-03 12:47:47.176 +02:00 [INF] Generating embedding for chunk ec86845d-b6f0-4381-96f3-d075d5d69ad1 (length: 451 chars, ~113 tokens)
+2025-09-03 12:47:47.258 +02:00 [INF] Embedding service response for chunk ec86845d-b6f0-4381-96f3-d075d5d69ad1: 4700 chars, status: "OK", starts with: [[-0.06683302,0.0910846,-0.06858583,-0.04130453,-0
+2025-09-03 12:47:47.261 +02:00 [INF] Successfully generated embedding for chunk ec86845d-b6f0-4381-96f3-d075d5d69ad1 in 84.3822ms: vector dimension 384
+2025-09-03 12:47:47.317 +02:00 [INF] Generating embedding for chunk b9d0ecb9-faa3-4d5f-8866-8dc080333289 (length: 295 chars, ~74 tokens)
+2025-09-03 12:47:47.362 +02:00 [INF] Embedding service response for chunk b9d0ecb9-faa3-4d5f-8866-8dc080333289: 4701 chars, status: "OK", starts with: [[-0.09567903,0.090810396,-0.028490683,0.015969086
+2025-09-03 12:47:47.365 +02:00 [INF] Successfully generated embedding for chunk b9d0ecb9-faa3-4d5f-8866-8dc080333289 in 47.4933ms: vector dimension 384
+2025-09-03 12:47:47.428 +02:00 [INF] Generating embedding for chunk dc6faf26-2581-47b2-a9f4-84094d5c69fd (length: 481 chars, ~121 tokens)
+2025-09-03 12:47:47.519 +02:00 [INF] Embedding service response for chunk dc6faf26-2581-47b2-a9f4-84094d5c69fd: 4709 chars, status: "OK", starts with: [[-0.1364536,0.08382901,-0.055389617,0.028847057,-
+2025-09-03 12:47:47.522 +02:00 [INF] Successfully generated embedding for chunk dc6faf26-2581-47b2-a9f4-84094d5c69fd in 94.3178ms: vector dimension 384
+2025-09-03 12:47:47.584 +02:00 [INF] Generating embedding for chunk 82bd9930-2831-4550-96a7-c3a60cf0de23 (length: 338 chars, ~85 tokens)
+2025-09-03 12:47:47.639 +02:00 [INF] Embedding service response for chunk 82bd9930-2831-4550-96a7-c3a60cf0de23: 4690 chars, status: "OK", starts with: [[-0.05162166,0.13178061,-0.08704066,-0.0022410809
+2025-09-03 12:47:47.642 +02:00 [INF] Successfully generated embedding for chunk 82bd9930-2831-4550-96a7-c3a60cf0de23 in 57.6847ms: vector dimension 384
+2025-09-03 12:47:47.696 +02:00 [INF] Generating embedding for chunk 42111bdf-fb44-4abe-a30a-e0f68c49ed18 (length: 468 chars, ~117 tokens)
+2025-09-03 12:47:47.771 +02:00 [INF] Embedding service response for chunk 42111bdf-fb44-4abe-a30a-e0f68c49ed18: 4692 chars, status: "OK", starts with: [[-0.069502175,0.07982708,-0.06682772,0.0011710261
+2025-09-03 12:47:47.773 +02:00 [INF] Successfully generated embedding for chunk 42111bdf-fb44-4abe-a30a-e0f68c49ed18 in 77.3181ms: vector dimension 384
+2025-09-03 12:47:47.837 +02:00 [INF] Generating embedding for chunk 28a49cf4-2484-42bd-a4ec-df8b70feb8a9 (length: 134 chars, ~34 tokens)
+2025-09-03 12:47:47.861 +02:00 [INF] Embedding service response for chunk 28a49cf4-2484-42bd-a4ec-df8b70feb8a9: 4707 chars, status: "OK", starts with: [[-0.06588297,0.124499194,-0.07135027,0.013633729,
+2025-09-03 12:47:47.863 +02:00 [INF] Successfully generated embedding for chunk 28a49cf4-2484-42bd-a4ec-df8b70feb8a9 in 26.1457ms: vector dimension 384
+2025-09-03 12:47:47.916 +02:00 [INF] Generating embedding for chunk 3685edd9-a208-4494-877c-b48cff237d72 (length: 420 chars, ~105 tokens)
+2025-09-03 12:47:47.994 +02:00 [INF] Embedding service response for chunk 3685edd9-a208-4494-877c-b48cff237d72: 4725 chars, status: "OK", starts with: [[-0.12536669,0.085861385,-0.071695514,-0.04052353
+2025-09-03 12:47:47.997 +02:00 [INF] Successfully generated embedding for chunk 3685edd9-a208-4494-877c-b48cff237d72 in 80.2667ms: vector dimension 384
+2025-09-03 12:47:48.059 +02:00 [INF] Generating embedding for chunk 9521fff6-9f48-47a1-a314-46e64d670097 (length: 284 chars, ~71 tokens)
+2025-09-03 12:47:48.109 +02:00 [INF] Embedding service response for chunk 9521fff6-9f48-47a1-a314-46e64d670097: 4710 chars, status: "OK", starts with: [[-0.11426861,0.042983428,-0.07652077,-0.009326481
+2025-09-03 12:47:48.113 +02:00 [INF] Successfully generated embedding for chunk 9521fff6-9f48-47a1-a314-46e64d670097 in 53.6912ms: vector dimension 384
+2025-09-03 12:47:48.167 +02:00 [INF] Generating embedding for chunk 67b579b7-ca25-445d-9e45-7cb17a2e28a0 (length: 420 chars, ~105 tokens)
+2025-09-03 12:47:48.238 +02:00 [INF] Embedding service response for chunk 67b579b7-ca25-445d-9e45-7cb17a2e28a0: 4725 chars, status: "OK", starts with: [[-0.097996034,0.08292371,-0.025260879,-0.02575330
+2025-09-03 12:47:48.240 +02:00 [INF] Successfully generated embedding for chunk 67b579b7-ca25-445d-9e45-7cb17a2e28a0 in 72.8347ms: vector dimension 384
+2025-09-03 12:47:48.294 +02:00 [INF] Generating embedding for chunk 40f0dc37-ea26-4782-87d6-dc9bb18b4df3 (length: 390 chars, ~98 tokens)
+2025-09-03 12:47:48.356 +02:00 [INF] Embedding service response for chunk 40f0dc37-ea26-4782-87d6-dc9bb18b4df3: 4720 chars, status: "OK", starts with: [[-0.025469152,0.11521275,0.029909758,0.0070333267
+2025-09-03 12:47:48.359 +02:00 [INF] Successfully generated embedding for chunk 40f0dc37-ea26-4782-87d6-dc9bb18b4df3 in 65.552ms: vector dimension 384
+2025-09-03 12:47:48.420 +02:00 [INF] Generating embedding for chunk 2ffc855a-750d-4332-b447-50756ffc332d (length: 466 chars, ~117 tokens)
+2025-09-03 12:47:48.482 +02:00 [INF] Embedding service response for chunk 2ffc855a-750d-4332-b447-50756ffc332d: 4688 chars, status: "OK", starts with: [[-0.04067876,0.030817578,-0.08422005,-0.001618041
+2025-09-03 12:47:48.484 +02:00 [INF] Successfully generated embedding for chunk 2ffc855a-750d-4332-b447-50756ffc332d in 64.672ms: vector dimension 384
+2025-09-03 12:47:48.545 +02:00 [INF] Generating embedding for chunk 93d53872-630c-41ea-baa2-64714ebd185e (length: 156 chars, ~39 tokens)
+2025-09-03 12:47:48.560 +02:00 [INF] Embedding service response for chunk 93d53872-630c-41ea-baa2-64714ebd185e: 4717 chars, status: "OK", starts with: [[-0.08681543,0.072404645,-0.03346478,-0.06196828,
+2025-09-03 12:47:48.565 +02:00 [INF] Successfully generated embedding for chunk 93d53872-630c-41ea-baa2-64714ebd185e in 20.0684ms: vector dimension 384
+2025-09-03 12:47:48.624 +02:00 [INF] Generating embedding for chunk bc6c5115-d612-45b1-a027-c51eaaa01234 (length: 455 chars, ~114 tokens)
+2025-09-03 12:47:48.683 +02:00 [INF] Embedding service response for chunk bc6c5115-d612-45b1-a027-c51eaaa01234: 4706 chars, status: "OK", starts with: [[-0.061464854,0.07082613,-0.049857635,-0.05963649
+2025-09-03 12:47:48.685 +02:00 [INF] Successfully generated embedding for chunk bc6c5115-d612-45b1-a027-c51eaaa01234 in 60.3998ms: vector dimension 384
+2025-09-03 12:47:48.750 +02:00 [INF] Generating embedding for chunk ee56d3e3-115d-48a0-91aa-27ca6dd5c9fb (length: 286 chars, ~72 tokens)
+2025-09-03 12:47:48.785 +02:00 [INF] Embedding service response for chunk ee56d3e3-115d-48a0-91aa-27ca6dd5c9fb: 4708 chars, status: "OK", starts with: [[-0.032765556,0.08015407,-0.038554598,-0.08073179
+2025-09-03 12:47:48.787 +02:00 [INF] Successfully generated embedding for chunk ee56d3e3-115d-48a0-91aa-27ca6dd5c9fb in 37.5044ms: vector dimension 384
+2025-09-03 12:47:48.844 +02:00 [INF] Generating embedding for chunk 20d7d447-8929-4dd1-9470-5161ed2246de (length: 461 chars, ~116 tokens)
+2025-09-03 12:47:48.893 +02:00 [INF] Embedding service response for chunk 20d7d447-8929-4dd1-9470-5161ed2246de: 4712 chars, status: "OK", starts with: [[-0.017069424,0.15300828,-0.017650977,0.000636232
+2025-09-03 12:47:48.897 +02:00 [INF] Successfully generated embedding for chunk 20d7d447-8929-4dd1-9470-5161ed2246de in 52.5918ms: vector dimension 384
+2025-09-03 12:47:48.955 +02:00 [INF] Generating embedding for chunk a640555f-949b-4818-8363-163dfb2f93fd (length: 224 chars, ~56 tokens)
+2025-09-03 12:47:48.996 +02:00 [INF] Embedding service response for chunk a640555f-949b-4818-8363-163dfb2f93fd: 4711 chars, status: "OK", starts with: [[-0.026463406,0.14032005,-0.04182282,-0.07400648,
+2025-09-03 12:47:48.999 +02:00 [INF] Successfully generated embedding for chunk a640555f-949b-4818-8363-163dfb2f93fd in 43.7961ms: vector dimension 384
+2025-09-03 12:47:49.064 +02:00 [INF] Generating embedding for chunk 1ede47ce-48e3-4d8d-a975-119444ace1e4 (length: 278 chars, ~70 tokens)
+2025-09-03 12:47:49.098 +02:00 [INF] Embedding service response for chunk 1ede47ce-48e3-4d8d-a975-119444ace1e4: 4716 chars, status: "OK", starts with: [[-0.048939735,0.08587634,-0.06589037,-0.036103852
+2025-09-03 12:47:49.100 +02:00 [INF] Successfully generated embedding for chunk 1ede47ce-48e3-4d8d-a975-119444ace1e4 in 35.9655ms: vector dimension 384
+2025-09-03 12:47:49.159 +02:00 [INF] Generating embedding for chunk c46d1052-e891-4772-b83f-c20635eb1c96 (length: 470 chars, ~118 tokens)
+2025-09-03 12:47:49.217 +02:00 [INF] Embedding service response for chunk c46d1052-e891-4772-b83f-c20635eb1c96: 4705 chars, status: "OK", starts with: [[-0.12413025,0.07691854,-0.058922086,-0.043588713
+2025-09-03 12:47:49.219 +02:00 [INF] Successfully generated embedding for chunk c46d1052-e891-4772-b83f-c20635eb1c96 in 59.729ms: vector dimension 384
+2025-09-03 12:47:49.270 +02:00 [INF] Generating embedding for chunk 48f891cf-a5d3-4d44-8b35-d1ab9fcfa8ed (length: 292 chars, ~73 tokens)
+2025-09-03 12:47:49.313 +02:00 [INF] Embedding service response for chunk 48f891cf-a5d3-4d44-8b35-d1ab9fcfa8ed: 4692 chars, status: "OK", starts with: [[-0.058380738,0.033604294,-0.036212053,-0.0400342
+2025-09-03 12:47:49.315 +02:00 [INF] Successfully generated embedding for chunk 48f891cf-a5d3-4d44-8b35-d1ab9fcfa8ed in 44.3354ms: vector dimension 384
+2025-09-03 12:47:49.366 +02:00 [INF] Generating embedding for chunk e35414c0-b1e8-4def-981e-b585acc9aa71 (length: 389 chars, ~98 tokens)
+2025-09-03 12:47:49.433 +02:00 [INF] Embedding service response for chunk e35414c0-b1e8-4def-981e-b585acc9aa71: 4697 chars, status: "OK", starts with: [[-0.068338834,0.08528653,-0.117605306,0.012072471
+2025-09-03 12:47:49.434 +02:00 [INF] Successfully generated embedding for chunk e35414c0-b1e8-4def-981e-b585acc9aa71 in 68.2075ms: vector dimension 384
+2025-09-03 12:47:49.491 +02:00 [INF] Generating embedding for chunk 5147effe-86aa-4271-b33a-bd4b2fb4bf57 (length: 425 chars, ~107 tokens)
+2025-09-03 12:47:49.535 +02:00 [INF] Embedding service response for chunk 5147effe-86aa-4271-b33a-bd4b2fb4bf57: 4718 chars, status: "OK", starts with: [[-0.082039855,0.08118813,-0.09146919,-0.03803746,
+2025-09-03 12:47:49.538 +02:00 [INF] Successfully generated embedding for chunk 5147effe-86aa-4271-b33a-bd4b2fb4bf57 in 46.8161ms: vector dimension 384
+2025-09-03 12:47:49.599 +02:00 [INF] Generating embedding for chunk aca9a1dc-d8c5-48fc-8502-35df04dc4ecd (length: 549 chars, ~138 tokens)
+2025-09-03 12:47:49.665 +02:00 [INF] Embedding service response for chunk aca9a1dc-d8c5-48fc-8502-35df04dc4ecd: 4715 chars, status: "OK", starts with: [[-0.07823896,0.050263997,-0.10488671,-0.014781024
+2025-09-03 12:47:49.668 +02:00 [INF] Successfully generated embedding for chunk aca9a1dc-d8c5-48fc-8502-35df04dc4ecd in 68.6697ms: vector dimension 384
+2025-09-03 12:47:49.724 +02:00 [INF] Generating embedding for chunk deca0144-8a58-4741-8947-bc27c6edddf7 (length: 347 chars, ~87 tokens)
+2025-09-03 12:47:49.831 +02:00 [INF] Embedding service response for chunk deca0144-8a58-4741-8947-bc27c6edddf7: 4722 chars, status: "OK", starts with: [[-0.0836087,0.071623325,-0.113439575,-0.03721135,
+2025-09-03 12:47:49.839 +02:00 [INF] Successfully generated embedding for chunk deca0144-8a58-4741-8947-bc27c6edddf7 in 115.7094ms: vector dimension 384
+2025-09-03 12:47:49.894 +02:00 [INF] Generating embedding for chunk d38c8509-44fb-489c-b5e2-678b33ceff6f (length: 465 chars, ~117 tokens)
+2025-09-03 12:47:49.959 +02:00 [INF] Embedding service response for chunk d38c8509-44fb-489c-b5e2-678b33ceff6f: 4718 chars, status: "OK", starts with: [[-0.061560437,0.067166544,-0.08331293,0.023502432
+2025-09-03 12:47:49.961 +02:00 [INF] Successfully generated embedding for chunk d38c8509-44fb-489c-b5e2-678b33ceff6f in 66.9235ms: vector dimension 384
+2025-09-03 12:47:50.019 +02:00 [INF] Generating embedding for chunk 9d2239c3-0c9a-4baa-87c5-311bdfff05e2 (length: 258 chars, ~65 tokens)
+2025-09-03 12:47:50.047 +02:00 [INF] Embedding service response for chunk 9d2239c3-0c9a-4baa-87c5-311bdfff05e2: 4717 chars, status: "OK", starts with: [[-0.00008049131,0.0784956,-0.06943031,0.030448243
+2025-09-03 12:47:50.050 +02:00 [INF] Successfully generated embedding for chunk 9d2239c3-0c9a-4baa-87c5-311bdfff05e2 in 30.9739ms: vector dimension 384
+2025-09-03 12:47:50.114 +02:00 [INF] Generating embedding for chunk b868508c-0e25-40ba-b146-0d89f8f435b5 (length: 419 chars, ~105 tokens)
+2025-09-03 12:47:50.173 +02:00 [INF] Embedding service response for chunk b868508c-0e25-40ba-b146-0d89f8f435b5: 4737 chars, status: "OK", starts with: [[-0.061545957,0.07041177,-0.079714336,-0.00737219
+2025-09-03 12:47:50.174 +02:00 [INF] Successfully generated embedding for chunk b868508c-0e25-40ba-b146-0d89f8f435b5 in 59.9656ms: vector dimension 384
+2025-09-03 12:47:50.226 +02:00 [INF] Generating embedding for chunk 4c7ae19b-35a1-4b0b-bcec-9932efee88de (length: 476 chars, ~119 tokens)
+2025-09-03 12:47:50.322 +02:00 [INF] Embedding service response for chunk 4c7ae19b-35a1-4b0b-bcec-9932efee88de: 4688 chars, status: "OK", starts with: [[-0.0068686665,0.07524827,-0.080240145,-0.0017811
+2025-09-03 12:47:50.325 +02:00 [INF] Successfully generated embedding for chunk 4c7ae19b-35a1-4b0b-bcec-9932efee88de in 99.4368ms: vector dimension 384
+2025-09-03 12:47:50.384 +02:00 [INF] Generating embedding for chunk c67a5764-1fd6-4ac7-871a-4a8f41dad5cf (length: 449 chars, ~113 tokens)
+2025-09-03 12:47:50.441 +02:00 [INF] Embedding service response for chunk c67a5764-1fd6-4ac7-871a-4a8f41dad5cf: 4695 chars, status: "OK", starts with: [[-0.008702226,0.11567007,-0.1281247,0.003557202,-
+2025-09-03 12:47:50.444 +02:00 [INF] Successfully generated embedding for chunk c67a5764-1fd6-4ac7-871a-4a8f41dad5cf in 60.4436ms: vector dimension 384
+2025-09-03 12:47:50.510 +02:00 [INF] Generating embedding for chunk dd0c1df6-eccd-498c-b71b-701e7ef15597 (length: 459 chars, ~115 tokens)
+2025-09-03 12:47:50.567 +02:00 [INF] Embedding service response for chunk dd0c1df6-eccd-498c-b71b-701e7ef15597: 4672 chars, status: "OK", starts with: [[-0.056343015,0.07800377,-0.1193012,-0.047068674,
+2025-09-03 12:47:50.568 +02:00 [INF] Successfully generated embedding for chunk dd0c1df6-eccd-498c-b71b-701e7ef15597 in 58.7224ms: vector dimension 384
+2025-09-03 12:47:50.633 +02:00 [INF] Generating embedding for chunk 776302c4-9c31-4b5d-b07f-982f2e978dbb (length: 324 chars, ~81 tokens)
+2025-09-03 12:47:50.674 +02:00 [INF] Embedding service response for chunk 776302c4-9c31-4b5d-b07f-982f2e978dbb: 4713 chars, status: "OK", starts with: [[0.014220589,0.09705345,-0.11590134,0.040236507,-
+2025-09-03 12:47:50.678 +02:00 [INF] Successfully generated embedding for chunk 776302c4-9c31-4b5d-b07f-982f2e978dbb in 44.7983ms: vector dimension 384
+2025-09-03 12:47:50.745 +02:00 [INF] Generating embedding for chunk 1015f83d-54a3-479c-8f91-0b295492d937 (length: 431 chars, ~108 tokens)
+2025-09-03 12:47:50.791 +02:00 [INF] Embedding service response for chunk 1015f83d-54a3-479c-8f91-0b295492d937: 4710 chars, status: "OK", starts with: [[-0.020405289,0.12227534,-0.09281092,0.009441492,
+2025-09-03 12:47:50.795 +02:00 [INF] Successfully generated embedding for chunk 1015f83d-54a3-479c-8f91-0b295492d937 in 50.4827ms: vector dimension 384
+2025-09-03 12:47:50.854 +02:00 [INF] Generating embedding for chunk 88029675-5525-4f3b-b560-ae885fd0768d (length: 388 chars, ~97 tokens)
+2025-09-03 12:47:50.905 +02:00 [INF] Embedding service response for chunk 88029675-5525-4f3b-b560-ae885fd0768d: 4711 chars, status: "OK", starts with: [[-0.091817625,0.13556749,-0.07636314,-0.030621286
+2025-09-03 12:47:50.908 +02:00 [INF] Successfully generated embedding for chunk 88029675-5525-4f3b-b560-ae885fd0768d in 54.2761ms: vector dimension 384
+2025-09-03 12:47:50.964 +02:00 [INF] Generating embedding for chunk 3125e819-ea32-46bb-8505-da0b2358bc2d (length: 480 chars, ~120 tokens)
+2025-09-03 12:47:51.044 +02:00 [INF] Embedding service response for chunk 3125e819-ea32-46bb-8505-da0b2358bc2d: 4713 chars, status: "OK", starts with: [[-0.078532554,0.056386665,-0.0925485,-0.011831468
+2025-09-03 12:47:51.046 +02:00 [INF] Successfully generated embedding for chunk 3125e819-ea32-46bb-8505-da0b2358bc2d in 81.2515ms: vector dimension 384
+2025-09-03 12:47:51.104 +02:00 [INF] Generating embedding for chunk 6ffd13be-db75-4224-a6e1-7f2b4e16b7cb (length: 440 chars, ~110 tokens)
+2025-09-03 12:47:51.151 +02:00 [INF] Embedding service response for chunk 6ffd13be-db75-4224-a6e1-7f2b4e16b7cb: 4714 chars, status: "OK", starts with: [[-0.07127622,0.11124228,-0.07585923,-0.0390203,-0
+2025-09-03 12:47:51.153 +02:00 [INF] Successfully generated embedding for chunk 6ffd13be-db75-4224-a6e1-7f2b4e16b7cb in 49.5712ms: vector dimension 384
+2025-09-03 12:47:51.211 +02:00 [INF] Generating embedding for chunk f6a57774-3faf-4727-8c11-93e02924955d (length: 372 chars, ~93 tokens)
+2025-09-03 12:47:51.262 +02:00 [INF] Embedding service response for chunk f6a57774-3faf-4727-8c11-93e02924955d: 4699 chars, status: "OK", starts with: [[-0.05924198,0.057004582,-0.11636455,-0.06945134,
+2025-09-03 12:47:51.264 +02:00 [INF] Successfully generated embedding for chunk f6a57774-3faf-4727-8c11-93e02924955d in 52.7937ms: vector dimension 384
+2025-09-03 12:47:51.321 +02:00 [INF] Generating embedding for chunk 1434f24a-d380-496d-be3b-529cc17a13ba (length: 444 chars, ~111 tokens)
+2025-09-03 12:47:51.352 +02:00 [INF] Embedding service response for chunk 1434f24a-d380-496d-be3b-529cc17a13ba: 4678 chars, status: "OK", starts with: [[-0.05364531,0.059093777,-0.12892742,-0.0856509,-
+2025-09-03 12:47:51.355 +02:00 [INF] Successfully generated embedding for chunk 1434f24a-d380-496d-be3b-529cc17a13ba in 34.1857ms: vector dimension 384
+2025-09-03 12:47:51.412 +02:00 [INF] Generating embedding for chunk 9f25a8ab-a5c8-4a9d-9bef-362ca11d1e60 (length: 219 chars, ~55 tokens)
+2025-09-03 12:47:51.451 +02:00 [INF] Embedding service response for chunk 9f25a8ab-a5c8-4a9d-9bef-362ca11d1e60: 4701 chars, status: "OK", starts with: [[-0.08400293,0.07548893,-0.09564417,-0.059445616,
+2025-09-03 12:47:51.454 +02:00 [INF] Successfully generated embedding for chunk 9f25a8ab-a5c8-4a9d-9bef-362ca11d1e60 in 41.3166ms: vector dimension 384
+2025-09-03 12:47:51.506 +02:00 [INF] Generating embedding for chunk 2c504c8c-8721-4129-8d4a-9a59ad78fbf6 (length: 411 chars, ~103 tokens)
+2025-09-03 12:47:51.546 +02:00 [INF] Embedding service response for chunk 2c504c8c-8721-4129-8d4a-9a59ad78fbf6: 4709 chars, status: "OK", starts with: [[-0.072775386,0.103998594,-0.07165956,-0.00669463
+2025-09-03 12:47:51.548 +02:00 [INF] Successfully generated embedding for chunk 2c504c8c-8721-4129-8d4a-9a59ad78fbf6 in 42.8809ms: vector dimension 384
+2025-09-03 12:47:51.614 +02:00 [INF] Generating embedding for chunk 04ee8daf-f0bd-43d5-a5d0-4e4a7b65679f (length: 361 chars, ~91 tokens)
+2025-09-03 12:47:51.670 +02:00 [INF] Embedding service response for chunk 04ee8daf-f0bd-43d5-a5d0-4e4a7b65679f: 4711 chars, status: "OK", starts with: [[-0.04340099,0.10763277,-0.05754088,-0.027610363,
+2025-09-03 12:47:51.673 +02:00 [INF] Successfully generated embedding for chunk 04ee8daf-f0bd-43d5-a5d0-4e4a7b65679f in 59.2845ms: vector dimension 384
+2025-09-03 12:47:51.737 +02:00 [INF] Generating embedding for chunk 5920e248-9825-4c23-8fd8-0946babcfdf1 (length: 434 chars, ~109 tokens)
+2025-09-03 12:47:51.801 +02:00 [INF] Embedding service response for chunk 5920e248-9825-4c23-8fd8-0946babcfdf1: 4707 chars, status: "OK", starts with: [[-0.110509306,0.07591401,-0.13443495,-0.070756055
+2025-09-03 12:47:51.804 +02:00 [INF] Successfully generated embedding for chunk 5920e248-9825-4c23-8fd8-0946babcfdf1 in 67.4173ms: vector dimension 384
+2025-09-03 12:47:51.860 +02:00 [INF] Generating embedding for chunk 599fe789-306e-4c5b-b71f-f442d49afa22 (length: 388 chars, ~97 tokens)
+2025-09-03 12:47:51.900 +02:00 [INF] Embedding service response for chunk 599fe789-306e-4c5b-b71f-f442d49afa22: 4698 chars, status: "OK", starts with: [[-0.057726853,0.060362432,-0.060670927,-0.0075747
+2025-09-03 12:47:51.902 +02:00 [INF] Successfully generated embedding for chunk 599fe789-306e-4c5b-b71f-f442d49afa22 in 41.7995ms: vector dimension 384
+2025-09-03 12:47:51.953 +02:00 [INF] Generating embedding for chunk 936cc4b7-2d88-4306-b404-bc0165df0094 (length: 456 chars, ~114 tokens)
+2025-09-03 12:47:52.008 +02:00 [INF] Embedding service response for chunk 936cc4b7-2d88-4306-b404-bc0165df0094: 4722 chars, status: "OK", starts with: [[-0.03282631,0.06800183,-0.100458525,-0.024798175
+2025-09-03 12:47:52.010 +02:00 [INF] Successfully generated embedding for chunk 936cc4b7-2d88-4306-b404-bc0165df0094 in 56.9097ms: vector dimension 384
+2025-09-03 12:47:52.062 +02:00 [INF] Generating embedding for chunk 5eb2e26a-3a28-4f5c-a6cf-712557eaa8a6 (length: 295 chars, ~74 tokens)
+2025-09-03 12:47:52.112 +02:00 [INF] Embedding service response for chunk 5eb2e26a-3a28-4f5c-a6cf-712557eaa8a6: 4705 chars, status: "OK", starts with: [[-0.067333296,0.08761216,-0.028941512,-0.08948351
+2025-09-03 12:47:52.114 +02:00 [INF] Successfully generated embedding for chunk 5eb2e26a-3a28-4f5c-a6cf-712557eaa8a6 in 52.2378ms: vector dimension 384
+2025-09-03 12:47:52.170 +02:00 [INF] Generating embedding for chunk 1075ab15-38a6-4bcb-a89f-4f5467570b96 (length: 473 chars, ~119 tokens)
+2025-09-03 12:47:52.235 +02:00 [INF] Embedding service response for chunk 1075ab15-38a6-4bcb-a89f-4f5467570b96: 4694 chars, status: "OK", starts with: [[-0.041054264,0.110238925,-0.053357705,-0.1040324
+2025-09-03 12:47:52.237 +02:00 [INF] Successfully generated embedding for chunk 1075ab15-38a6-4bcb-a89f-4f5467570b96 in 67.394ms: vector dimension 384
+2025-09-03 12:47:52.295 +02:00 [INF] Generating embedding for chunk c08f6a7e-bba6-4abc-990a-0eeb5497c46b (length: 283 chars, ~71 tokens)
+2025-09-03 12:47:52.335 +02:00 [INF] Embedding service response for chunk c08f6a7e-bba6-4abc-990a-0eeb5497c46b: 4696 chars, status: "OK", starts with: [[-0.008245662,0.12745783,-0.07794045,-0.06369493,
+2025-09-03 12:47:52.338 +02:00 [INF] Successfully generated embedding for chunk c08f6a7e-bba6-4abc-990a-0eeb5497c46b in 43.1043ms: vector dimension 384
+2025-09-03 12:47:52.404 +02:00 [INF] Generating embedding for chunk c276c7d2-3f9d-4580-a28c-3e6c55b1f5e2 (length: 462 chars, ~116 tokens)
+2025-09-03 12:47:52.446 +02:00 [INF] Embedding service response for chunk c276c7d2-3f9d-4580-a28c-3e6c55b1f5e2: 4702 chars, status: "OK", starts with: [[-0.03135796,0.13843717,-0.07395438,-0.015123381,
+2025-09-03 12:47:52.448 +02:00 [INF] Successfully generated embedding for chunk c276c7d2-3f9d-4580-a28c-3e6c55b1f5e2 in 43.4896ms: vector dimension 384
+2025-09-03 12:47:52.498 +02:00 [INF] Generating embedding for chunk 6963b373-16d0-45d2-b382-0cfc95d5a77a (length: 478 chars, ~120 tokens)
+2025-09-03 12:47:52.548 +02:00 [INF] Embedding service response for chunk 6963b373-16d0-45d2-b382-0cfc95d5a77a: 4700 chars, status: "OK", starts with: [[-0.058359608,0.07021567,-0.049179588,-0.10855033
+2025-09-03 12:47:52.550 +02:00 [INF] Successfully generated embedding for chunk 6963b373-16d0-45d2-b382-0cfc95d5a77a in 52.045ms: vector dimension 384
+2025-09-03 12:47:52.607 +02:00 [INF] Generating embedding for chunk 773e5752-c4a2-4e50-a57b-4f6596ef7cac (length: 285 chars, ~72 tokens)
+2025-09-03 12:47:52.650 +02:00 [INF] Embedding service response for chunk 773e5752-c4a2-4e50-a57b-4f6596ef7cac: 4712 chars, status: "OK", starts with: [[-0.07624059,0.12152074,-0.013382844,-0.082556255
+2025-09-03 12:47:52.653 +02:00 [INF] Successfully generated embedding for chunk 773e5752-c4a2-4e50-a57b-4f6596ef7cac in 45.2172ms: vector dimension 384
+2025-09-03 12:47:52.845 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (50 attempted)
+2025-09-03 12:47:52.846 +02:00 [WRN] Bulk response: {"errors":false,"took":110,"items":[{"index":{"_index":"rag-chunks","_id":"f275f170-8cde-4474-a578-f0befddf71cc","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1550,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"5a4d54b5-3324-4cc0-8944-6fa0a2797ae7","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1551,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"ec86845d-b6f0-4381-96f3-d075d5d69ad1","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1552,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"b9d0ecb9-faa3-4d5f-8866-8dc080333289","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1553,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"dc6faf26-2581-47b2-a9f4-84094d5c69fd","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1554,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"82bd9930-2831-4550-96a7-c3a60cf0de23","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1555,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"42111bdf-fb44-4abe-a30a-e0f68c49ed18","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1556,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"28a49cf4-2484-42bd-a4ec-df8b70feb8a9","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1557,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"3685edd9-a208-4494-877c-b48cff237d72","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1558,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"9521fff6-9f48-47a1-a314-46e64d670097","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1559,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"67b579b7-ca25-445d-9e45-7cb17a2e28a0","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1560,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"40f0dc37-ea26-4782-87d6-dc9bb18b4df3","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1561,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"2ffc855a-750d-4332-b447-50756ffc332d","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1562,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"93d53872-630c-41ea-baa2-64714ebd185e","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1563,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"bc6c5115-d612-45b1-a027-c51eaaa01234","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1564,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"ee56d3e3-115d-48a0-91aa-27ca6dd5c9fb","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1565,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"20d7d447-8929-4dd1-9470-5161ed2246de","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1566,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"a640555f-949b-4818-8363-163dfb2f93fd","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1567,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1ede47ce-48e3-4d8d-a975-119444ace1e4","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1568,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"c46d1052-e891-4772-b83f-c20635eb1c96","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1569,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"48f891cf-a5d3-4d44-8b35-d1ab9fcfa8ed","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1570,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"e35414c0-b1e8-4def-981e-b585acc9aa71","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1571,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"5147effe-86aa-4271-b33a-bd4b2fb4bf57","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1572,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"aca9a1dc-d8c5-48fc-8502-35df04dc4ecd","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1573,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"deca0144-8a58-4741-8947-bc27c6edddf7","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1574,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"d38c8509-44fb-489c-b5e2-678b33ceff6f","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1575,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"9d2239c3-0c9a-4baa-87c5-311bdfff05e2","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1576,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"b868508c-0e25-40ba-b146-0d89f8f435b5","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1577,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"4c7ae19b-35a1-4b0b-bcec-9932efee88de","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1578,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"c67a5764-1fd6-4ac7-871a-4a8f41dad5cf","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1579,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"dd0c1df6-eccd-498c-b71b-701e7ef15597","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1580,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"776302c4-9c31-4b5d-b07f-982f2e978dbb","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1581,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1015f83d-54a3-479c-8f91-0b295492d937","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1582,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"88029675-5525-4f3b-b560-ae885fd0768d","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1583,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"3125e819-ea32-46bb-8505-da0b2358bc2d","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1584,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"6ffd13be-db75-4224-a6e1-7f2b4e16b7cb","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1585,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"f6a57774-3faf-4727-8c11-93e02924955d","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1586,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1434f24a-d380-496d-be3b-529cc17a13ba","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1587,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"9f25a8ab-a5c8-4a9d-9bef-362ca11d1e60","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1588,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"2c504c8c-8721-4129-8d4a-9a59ad78fbf6","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1589,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"04ee8daf-f0bd-43d5-a5d0-4e4a7b65679f","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1590,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"5920e248-9825-4c23-8fd8-0946babcfdf1","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1591,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"599fe789-306e-4c5b-b71f-f442d49afa22","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1592,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"936cc4b7-2d88-4306-b404-bc0165df0094","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1593,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"5eb2e26a-3a28-4f5c-a6cf-712557eaa8a6","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1594,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"1075ab15-38a6-4bcb-a89f-4f5467570b96","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1595,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"c08f6a7e-bba6-4abc-990a-0eeb5497c46b","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1596,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"c276c7d2-3f9d-4580-a28c-3e6c55b1f5e2","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1597,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"6963b373-16d0-45d2-b382-0cfc95d5a77a","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1598,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"773e5752-c4a2-4e50-a57b-4f6596ef7cac","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1599,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:52.848 +02:00 [INF] Batch indexing completed: 0/50/50 chunks indexed
+2025-09-03 12:47:52.849 +02:00 [INF] Starting batch indexing of 7 chunks
+2025-09-03 12:47:52.850 +02:00 [INF] Generating embedding for chunk 2c1d065c-e1c1-461d-ba22-69a9452376d4 (length: 308 chars, ~77 tokens)
+2025-09-03 12:47:52.911 +02:00 [INF] Embedding service response for chunk 2c1d065c-e1c1-461d-ba22-69a9452376d4: 4703 chars, status: "OK", starts with: [[-0.036697518,0.1001532,-0.08175623,-0.04413553,-
+2025-09-03 12:47:52.913 +02:00 [INF] Successfully generated embedding for chunk 2c1d065c-e1c1-461d-ba22-69a9452376d4 in 63.0471ms: vector dimension 384
+2025-09-03 12:47:52.965 +02:00 [INF] Generating embedding for chunk dfa61a20-2ecf-4ffa-983c-9dea07ca9417 (length: 476 chars, ~119 tokens)
+2025-09-03 12:47:53.060 +02:00 [INF] Embedding service response for chunk dfa61a20-2ecf-4ffa-983c-9dea07ca9417: 4718 chars, status: "OK", starts with: [[-0.054283522,0.07360137,-0.09362456,-0.054906625
+2025-09-03 12:47:53.065 +02:00 [INF] Successfully generated embedding for chunk dfa61a20-2ecf-4ffa-983c-9dea07ca9417 in 99.4569ms: vector dimension 384
+2025-09-03 12:47:53.122 +02:00 [INF] Generating embedding for chunk 7f4b56c7-b79b-43cc-af69-d36042ed0a65 (length: 520 chars, ~130 tokens)
+2025-09-03 12:47:53.212 +02:00 [INF] Embedding service response for chunk 7f4b56c7-b79b-43cc-af69-d36042ed0a65: 4686 chars, status: "OK", starts with: [[-0.07209442,0.07194409,-0.06147759,-0.055972666,
+2025-09-03 12:47:53.215 +02:00 [INF] Successfully generated embedding for chunk 7f4b56c7-b79b-43cc-af69-d36042ed0a65 in 92.7184ms: vector dimension 384
+2025-09-03 12:47:53.278 +02:00 [INF] Generating embedding for chunk 375b817a-50c7-45f1-807a-e7572ec155e4 (length: 339 chars, ~85 tokens)
+2025-09-03 12:47:53.320 +02:00 [INF] Embedding service response for chunk 375b817a-50c7-45f1-807a-e7572ec155e4: 4698 chars, status: "OK", starts with: [[-0.05595024,0.071113795,-0.097359814,-0.04749849
+2025-09-03 12:47:53.322 +02:00 [INF] Successfully generated embedding for chunk 375b817a-50c7-45f1-807a-e7572ec155e4 in 44.911ms: vector dimension 384
+2025-09-03 12:47:53.388 +02:00 [INF] Generating embedding for chunk ba3c7136-8ec5-480c-97de-972d8fd8ce83 (length: 470 chars, ~118 tokens)
+2025-09-03 12:47:53.446 +02:00 [INF] Embedding service response for chunk ba3c7136-8ec5-480c-97de-972d8fd8ce83: 4719 chars, status: "OK", starts with: [[-0.07027626,0.08128738,-0.098049134,-0.001250327
+2025-09-03 12:47:53.449 +02:00 [INF] Successfully generated embedding for chunk ba3c7136-8ec5-480c-97de-972d8fd8ce83 in 60.715ms: vector dimension 384
+2025-09-03 12:47:53.512 +02:00 [INF] Generating embedding for chunk 2d07ae90-4c40-4aea-a0d6-3a03d58ce36c (length: 307 chars, ~77 tokens)
+2025-09-03 12:47:53.551 +02:00 [INF] Embedding service response for chunk 2d07ae90-4c40-4aea-a0d6-3a03d58ce36c: 4708 chars, status: "OK", starts with: [[-0.07623409,0.06994199,-0.10302555,-0.004173837,
+2025-09-03 12:47:53.553 +02:00 [INF] Successfully generated embedding for chunk 2d07ae90-4c40-4aea-a0d6-3a03d58ce36c in 41.3351ms: vector dimension 384
+2025-09-03 12:47:53.607 +02:00 [INF] Generating embedding for chunk 46c2e665-d822-44df-96c0-adc637fcc8d0 (length: 475 chars, ~119 tokens)
+2025-09-03 12:47:53.661 +02:00 [INF] Embedding service response for chunk 46c2e665-d822-44df-96c0-adc637fcc8d0: 4704 chars, status: "OK", starts with: [[-0.07221475,0.09086642,-0.10233794,-0.016373975,
+2025-09-03 12:47:53.663 +02:00 [INF] Successfully generated embedding for chunk 46c2e665-d822-44df-96c0-adc637fcc8d0 in 56.3131ms: vector dimension 384
+2025-09-03 12:47:53.763 +02:00 [WRN] Bulk indexing completed but no documents were successfully indexed (7 attempted)
+2025-09-03 12:47:53.766 +02:00 [WRN] Bulk response: {"errors":false,"took":40,"items":[{"index":{"_index":"rag-chunks","_id":"2c1d065c-e1c1-461d-ba22-69a9452376d4","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1600,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"dfa61a20-2ecf-4ffa-983c-9dea07ca9417","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1601,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"7f4b56c7-b79b-43cc-af69-d36042ed0a65","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1602,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"375b817a-50c7-45f1-807a-e7572ec155e4","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1603,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"ba3c7136-8ec5-480c-97de-972d8fd8ce83","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1604,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"2d07ae90-4c40-4aea-a0d6-3a03d58ce36c","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1605,"_primary_term":5,"status":201}},{"index":{"_index":"rag-chunks","_id":"46c2e665-d822-44df-96c0-adc637fcc8d0","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1606,"_primary_term":5,"status":201}}]}
+2025-09-03 12:47:53.768 +02:00 [INF] Batch indexing completed: 0/7/7 chunks indexed
+2025-09-03 12:47:53.769 +02:00 [INF] Completed indexing file X:\Citronex\IFS Materialy\Instrukcje\IFS - proces HR_edit.docx: 0/57 chunks indexed
+2025-09-03 12:47:53.770 +02:00 [INF] Processed file: IFS - proces HR_edit.docx (3,031,098 bytes, .docx, Modified: 2024-05-22 08:53:28, ACL: [kkozlowski@ad.citronex.pl, ZARZĄDZANIE NT\Użytkownicy uwierzytelnieni, ZARZĄDZANIE NT\SYSTEM, ajochym@ad.pposiechnice.pl, mmrugalska@ad.pposiechnice.pl, alytvynenko@ad.pposiechnice.pl, Użytkownicy domeny, awitkowski@ad.citronex.pl, adm-aw@ad.citronex.pl, pdabrowski@ad.citronex.pl, jklebucki@ad.citronex.pl, Admins FSSRV, aiskra@ad.citronex.pl, mkossarova@ad.citronex.pl], Content: 16354 chars, Chunks: 57)
+2025-09-03 12:47:55.385 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-03 12:47:55.577 +02:00 [INF] Chunking service initialized with 10 chunkers supporting 10 content types
+2025-09-03 12:47:55.581 +02:00 [INF] Successfully chunked file: X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx into 11 chunks
+2025-09-03 12:47:55.582 +02:00 [INF] Indexing 11 chunks from file: X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx
+2025-09-03 12:47:55.591 +02:00 [INF] Deleted 0 documents for source file X:\Citronex\IFS Materialy\Instrukcje\IFS Indeksy.docx
+2025-09-03 12:47:55.593 +02:00 [INF] Starting batch indexing of 11 chunks
+2025-09-03 12:47:55.594 +02:00 [INF] Generating embedding for chunk 9798582b-b771-4798-baac-ee51bc9a920e (length: 329 chars, ~83 tokens)
+2025-09-03 12:47:55.629 +02:00 [INF] Embedding service response for chunk 9798582b-b771-4798-baac-ee51bc9a920e: 4704 chars, status: "OK", starts with: [[-0.06444925,0.063154474,-0.03552567,-0.054024965
+2025-09-03 12:47:55.635 +02:00 [INF] Successfully generated embedding for chunk 9798582b-b771-4798-baac-ee51bc9a920e in 40.5796ms: vector dimension 384
+2025-09-03 12:47:55.694 +02:00 [INF] Generating embedding for chunk c6a89dda-c8be-45ca-8467-f477ebfe5035 (length: 226 chars, ~57 tokens)
+2025-09-03 12:47:55.770 +02:00 [INF] Embedding service response for chunk c6a89dda-c8be-45ca-8467-f477ebfe5035: 4731 chars, status: "OK", starts with: [[-0.050978158,0.12261246,-0.022445496,-0.02450518
+2025-09-03 12:47:55.773 +02:00 [INF] Successfully generated embedding for chunk c6a89dda-c8be-45ca-8467-f477ebfe5035 in 78.3969ms: vector dimension 384
+2025-09-03 12:47:55.830 +02:00 [INF] Generating embedding for chunk cb8c6f35-21da-451b-b285-41d9ae996669 (length: 470 chars, ~118 tokens)
+2025-09-03 12:47:55.905 +02:00 [INF] Embedding service response for chunk cb8c6f35-21da-451b-b285-41d9ae996669: 4718 chars, status: "OK", starts with: [[-0.069266625,0.022768999,-0.05876485,0.005587903
+2025-09-03 12:47:55.907 +02:00 [INF] Successfully generated embedding for chunk cb8c6f35-21da-451b-b285-41d9ae996669 in 77.1635ms: vector dimension 384
+2025-09-03 12:47:55.970 +02:00 [INF] Generating embedding for chunk 2dddaae5-e6dd-44c4-be27-3bc6676ad434 (length: 214 chars, ~54 tokens)
+2025-09-03 12:47:56.019 +02:00 [INF] Embedding service response for chunk 2dddaae5-e6dd-44c4-be27-3bc6676ad434: 4714 chars, status: "OK", starts with: [[-0.03925469,0.034055296,-0.0569735,-0.0034387368
+2025-09-03 12:47:56.022 +02:00 [INF] Successfully generated embedding for chunk 2dddaae5-e6dd-44c4-be27-3bc6676ad434 in 52.0641ms: vector dimension 384
+2025-09-03 12:47:56.080 +02:00 [INF] Generating embedding for chunk 49c4290f-b760-4bb5-a433-367a3dc8a414 (length: 468 chars, ~117 tokens)
+2025-09-03 12:47:56.206 +02:00 [INF] Embedding service response for chunk 49c4290f-b760-4bb5-a433-367a3dc8a414: 4702 chars, status: "OK", starts with: [[-0.076859586,-0.000116884934,-0.11631158,-0.0412
+2025-09-03 12:47:56.215 +02:00 [INF] Successfully generated embedding for chunk 49c4290f-b760-4bb5-a433-367a3dc8a414 in 135.4872ms: vector dimension 384
+2025-09-03 12:47:56.283 +02:00 [INF] Generating embedding for chunk 6c5ecf80-a647-4bd9-b215-436fb8f86e70 (length: 446 chars, ~112 tokens)
+2025-09-03 12:47:56.341 +02:00 [INF] Embedding service response for chunk 6c5ecf80-a647-4bd9-b215-436fb8f86e70: 4710 chars, status: "OK", starts with: [[-0.059733313,0.066426106,-0.048208196,-0.0188735
+2025-09-03 12:47:56.342 +02:00 [INF] Successfully generated embedding for chunk 6c5ecf80-a647-4bd9-b215-436fb8f86e70 in 59.9358ms: vector dimension 384
+2025-09-03 12:47:56.407 +02:00 [INF] Generating embedding for chunk 2d98a903-43b2-4f0f-88fe-114be4f1780b (length: 468 chars, ~117 tokens)
+2025-09-03 12:47:56.472 +02:00 [INF] Embedding service response for chunk 2d98a903-43b2-4f0f-88fe-114be4f1780b: 4716 chars, status: "OK", starts with: [[-0.085018784,0.05228268,-0.055825572,-0.01579997
+2025-09-03 12:47:56.473 +02:00 [INF] Successfully generated embedding for chunk 2d98a903-43b2-4f0f-88fe-114be4f1780b in 66.4001ms: vector dimension 384
+2025-09-03 12:47:56.531 +02:00 [INF] Generating embedding for chunk ac59ff59-9448-46e2-921b-992489a296c9 (length: 260 chars, ~65 tokens)
+2025-09-03 12:47:56.581 +02:00 [INF] Embedding service response for chunk ac59ff59-9448-46e2-921b-992489a296c9: 4719 chars, status: "OK", starts with: [[-0.055716734,0.028117964,-0.039322704,-0.0134063
+2025-09-03 12:47:56.583 +02:00 [INF] Successfully generated embedding for chunk ac59ff59-9448-46e2-921b-992489a296c9 in 51.8486ms: vector dimension 384
+2025-09-03 12:47:56.638 +02:00 [INF] Generating embedding for chunk b4a172e5-e124-4948-ac61-931326dec14c (length: 476 chars, ~119 tokens)
+2025-09-03 12:47:56.700 +02:00 [INF] Embedding service response for chunk b4a172e5-e124-4948-ac61-931326dec14c: 4731 chars, status: "OK", starts with: [[-0.0701663,-0.0097980285,-0.058620684,-0.0538086
+2025-09-03 12:47:56.703 +02:00 [INF] Successfully generated embedding for chunk b4a172e5-e124-4948-ac61-931326dec14c in 64.2735ms: vector dimension 384
