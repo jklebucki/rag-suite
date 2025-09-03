@@ -160,6 +160,7 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
             {result.documentType}
           </span>
           <span>{result.source}</span>
+          <span>{result.filePath}</span>
           <span>{formatDate(result.updatedAt, language)}</span>
         </div>
         <button 

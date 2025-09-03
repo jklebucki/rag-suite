@@ -1069,3 +1069,217 @@ System.Net.Http.HttpRequestException: Response status code does not indicate suc
 2025-09-02 22:38:58.016 +02:00 [INF] Document collection cycle completed at "2025-09-02T22:38:58.0164240+02:00"
 2025-09-02 22:39:18.943 +02:00 [INF] Application is shutting down...
 2025-09-02 22:39:18.946 +02:00 [INF] RAG Collector is stopping
+2025-09-02 23:59:40.582 +02:00 [INF] Starting RAG Collector service
+2025-09-02 23:59:40.705 +02:00 [INF] Configuration validation successful
+2025-09-02 23:59:40.706 +02:00 [INF] Configuration: CollectorOptions { SourceFolders: [/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, /Users/jklebucki/Projects/rag-suite/data/documents], FileExtensions: [.pdf, .docx, .xlsx, .pptx, .txt, .csv, .md], ChunkSize: 1200, ChunkOverlap: 200, ElasticsearchUrl: http://localhost:9200, HasUsername: True, HasPassword: True, HasApiKey: False, AllowSelfSignedCert: False, IndexName: rag-chunks-dev, EmbeddingServiceUrl: http://localhost:8580, EmbeddingModelName: intfloat/multilingual-e5-small, ProcessingIntervalMinutes: 1, BulkBatchSize: 50 }
+2025-09-02 23:59:40.714 +02:00 [INF] RAG Collector started
+2025-09-02 23:59:40.716 +02:00 [INF] Configured source folders: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, /Users/jklebucki/Projects/rag-suite/data/documents
+2025-09-02 23:59:40.716 +02:00 [INF] File extensions: .pdf, .docx, .xlsx, .pptx, .txt, .csv, .md
+2025-09-02 23:59:40.716 +02:00 [INF] Elasticsearch URL: http://localhost:9200
+2025-09-02 23:59:40.716 +02:00 [INF] Index name: rag-chunks-dev
+2025-09-02 23:59:40.716 +02:00 [INF] Processing interval: 1 minutes
+2025-09-02 23:59:40.717 +02:00 [INF] Starting document collection cycle at "2025-09-02T23:59:40.7170730+02:00"
+2025-09-02 23:59:40.719 +02:00 [INF] Starting file enumeration...
+2025-09-02 23:59:40.721 +02:00 [INF] Found 9 files to process
+2025-09-02 23:59:40.722 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 23:59:40.722 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData
+2025-09-02 23:59:40.722 +02:00 [INF] Hosting environment: Development
+2025-09-02 23:59:40.722 +02:00 [INF] Content root path: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector
+2025-09-02 23:59:40.725 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:40.727 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:40.730 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:40.735 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt into 1 chunks
+2025-09-02 23:59:40.750 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt
+2025-09-02 23:59:40.832 +02:00 [ERR] Failed to delete documents for source file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt: Unsuccessful (404) low level call on POST: /rag-chunks-dev/_delete_by_query
+# Audit trail of this API call:
+ - [1] ProductCheckOnStartup: Took: 00:00:00.0533540
+ - [2] ProductCheckSuccess: Node: http://localhost:9200/ Took: 00:00:00.0509120
+ - [3] BadResponse: Node: http://localhost:9200/ Took: 00:00:00.0093700
+# OriginalException: Elasticsearch.Net.ElasticsearchClientException: Request failed to execute. Call: Status code 404 from: POST /rag-chunks-dev/_delete_by_query. ServerError: Type: index_not_found_exception Reason: "no such index [rag-chunks-dev]"
+# Request:
+{"query":{"term":{"sourceFile":{"value":"/Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt"}}}}
+# Response:
+{"error":{"root_cause":[{"type":"index_not_found_exception","reason":"no such index [rag-chunks-dev]","resource.type":"index_or_alias","resource.id":"rag-chunks-dev","index_uuid":"_na_","index":"rag-chunks-dev"}],"type":"index_not_found_exception","reason":"no such index [rag-chunks-dev]","resource.type":"index_or_alias","resource.id":"rag-chunks-dev","index_uuid":"_na_","index":"rag-chunks-dev"},"status":404}
+
+2025-09-02 23:59:40.833 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:40.837 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:40.839 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:40.872 +02:00 [INF] Received HTTP response headers after 31.6092ms - 200
+2025-09-02 23:59:40.873 +02:00 [INF] End processing HTTP request after 38.1289ms - 200
+2025-09-02 23:59:41.043 +02:00 [INF] Successfully indexed 0/1 documents in batch
+2025-09-02 23:59:41.043 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-02 23:59:41.043 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/sample-pdf.txt: 0/1 chunks indexed
+2025-09-02 23:59:41.043 +02:00 [INF] Processed file: sample-pdf.txt (405 bytes, .txt, Modified: 2025-09-02 20:08:21, ACL: [], Content: 405 chars, Chunks: 1)
+2025-09-02 23:59:41.054 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.055 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.055 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.063 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/large-document.md into 3 chunks
+2025-09-02 23:59:41.063 +02:00 [INF] Indexing 3 chunks from file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/large-document.md
+2025-09-02 23:59:41.069 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/large-document.md
+2025-09-02 23:59:41.069 +02:00 [INF] Starting batch indexing of 3 chunks
+2025-09-02 23:59:41.069 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.069 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.130 +02:00 [INF] Received HTTP response headers after 60.9988ms - 200
+2025-09-02 23:59:41.131 +02:00 [INF] End processing HTTP request after 61.4723ms - 200
+2025-09-02 23:59:41.182 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.183 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.235 +02:00 [INF] Received HTTP response headers after 52.5543ms - 200
+2025-09-02 23:59:41.236 +02:00 [INF] End processing HTTP request after 53.2395ms - 200
+2025-09-02 23:59:41.287 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.287 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.307 +02:00 [INF] Received HTTP response headers after 19.4151ms - 200
+2025-09-02 23:59:41.307 +02:00 [INF] End processing HTTP request after 20.1689ms - 200
+2025-09-02 23:59:41.369 +02:00 [INF] Successfully indexed 0/3 documents in batch
+2025-09-02 23:59:41.369 +02:00 [INF] Batch indexing completed: 0/3/3 chunks indexed
+2025-09-02 23:59:41.369 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/large-document.md: 0/3 chunks indexed
+2025-09-02 23:59:41.369 +02:00 [INF] Processed file: large-document.md (2,572 bytes, .md, Modified: 2025-09-02 20:16:39, ACL: [], Content: 2572 chars, Chunks: 3)
+2025-09-02 23:59:41.381 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.383 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.384 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.384 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt into 1 chunks
+2025-09-02 23:59:41.386 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt
+2025-09-02 23:59:41.389 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt
+2025-09-02 23:59:41.390 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:41.390 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.390 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.408 +02:00 [INF] Received HTTP response headers after 17.66ms - 200
+2025-09-02 23:59:41.408 +02:00 [INF] End processing HTTP request after 18.1604ms - 200
+2025-09-02 23:59:41.467 +02:00 [INF] Successfully indexed 0/1 documents in batch
+2025-09-02 23:59:41.467 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-02 23:59:41.467 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-2.txt: 0/1 chunks indexed
+2025-09-02 23:59:41.467 +02:00 [INF] Processed file: test-document-2.txt (157 bytes, .txt, Modified: 2025-09-02 19:44:44, ACL: [], Content: 157 chars, Chunks: 1)
+2025-09-02 23:59:41.479 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.479 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.480 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.480 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md into 1 chunks
+2025-09-02 23:59:41.480 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md
+2025-09-02 23:59:41.485 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md
+2025-09-02 23:59:41.485 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:41.486 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.486 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.518 +02:00 [INF] Received HTTP response headers after 31.9921ms - 200
+2025-09-02 23:59:41.518 +02:00 [INF] End processing HTTP request after 32.6173ms - 200
+2025-09-02 23:59:41.581 +02:00 [INF] Successfully indexed 0/1 documents in batch
+2025-09-02 23:59:41.581 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-02 23:59:41.582 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/test-document-1.md: 0/1 chunks indexed
+2025-09-02 23:59:41.582 +02:00 [INF] Processed file: test-document-1.md (329 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 329 chars, Chunks: 1)
+2025-09-02 23:59:41.592 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.593 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.593 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.593 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md into 1 chunks
+2025-09-02 23:59:41.593 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md
+2025-09-02 23:59:41.600 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md
+2025-09-02 23:59:41.600 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:41.600 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.600 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.625 +02:00 [INF] Received HTTP response headers after 24.9894ms - 200
+2025-09-02 23:59:41.626 +02:00 [INF] End processing HTTP request after 25.4832ms - 200
+2025-09-02 23:59:41.692 +02:00 [INF] Successfully indexed 0/1 documents in batch
+2025-09-02 23:59:41.692 +02:00 [INF] Batch indexing completed: 0/1/1 chunks indexed
+2025-09-02 23:59:41.693 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData/Documents/Subfolder/subfolder-doc.md: 0/1 chunks indexed
+2025-09-02 23:59:41.693 +02:00 [INF] Processed file: subfolder-doc.md (230 bytes, .md, Modified: 2025-09-02 19:44:44, ACL: [], Content: 230 chars, Chunks: 1)
+2025-09-02 23:59:41.704 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/TestData, found 5 matching files
+2025-09-02 23:59:41.705 +02:00 [INF] Enumerating files in folder: /Users/jklebucki/Projects/rag-suite/data/documents
+2025-09-02 23:59:41.705 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.705 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.706 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.706 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/data/documents/api-documentation.md into 1 chunks
+2025-09-02 23:59:41.706 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/data/documents/api-documentation.md
+2025-09-02 23:59:41.710 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/data/documents/api-documentation.md
+2025-09-02 23:59:41.710 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:41.710 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.710 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.715 +02:00 [INF] Received HTTP response headers after 4.9105ms - 413
+2025-09-02 23:59:41.716 +02:00 [INF] End processing HTTP request after 5.6769ms - 413
+2025-09-02 23:59:41.717 +02:00 [ERR] HTTP error while generating embedding for chunk 89822eef-1be3-428b-ad84-1c42e36f53df
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:41.773 +02:00 [WRN] Skipping chunk 89822eef-1be3-428b-ad84-1c42e36f53df due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:41.773 +02:00 [WRN] No chunks could be processed - all embedding generation failed
+2025-09-02 23:59:41.773 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/data/documents/api-documentation.md: 0/1 chunks indexed
+2025-09-02 23:59:41.773 +02:00 [INF] Processed file: api-documentation.md (1,008 bytes, .md, Modified: 2025-08-31 14:34:06, ACL: [], Content: 1008 chars, Chunks: 1)
+2025-09-02 23:59:41.785 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.785 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.785 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.786 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/data/documents/rag-introduction.md into 2 chunks
+2025-09-02 23:59:41.786 +02:00 [INF] Indexing 2 chunks from file: /Users/jklebucki/Projects/rag-suite/data/documents/rag-introduction.md
+2025-09-02 23:59:41.790 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/data/documents/rag-introduction.md
+2025-09-02 23:59:41.790 +02:00 [INF] Starting batch indexing of 2 chunks
+2025-09-02 23:59:41.790 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.790 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.795 +02:00 [INF] Received HTTP response headers after 4.6972ms - 413
+2025-09-02 23:59:41.795 +02:00 [INF] End processing HTTP request after 5.1482ms - 413
+2025-09-02 23:59:41.796 +02:00 [ERR] HTTP error while generating embedding for chunk 86611418-5988-481f-964f-d1c56d23a7ab
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:41.847 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.847 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.851 +02:00 [INF] Received HTTP response headers after 3.5815ms - 413
+2025-09-02 23:59:41.851 +02:00 [INF] End processing HTTP request after 4.0847ms - 413
+2025-09-02 23:59:41.851 +02:00 [ERR] HTTP error while generating embedding for chunk c598d47e-5886-425d-89b3-5cc2d04a55f0
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:41.902 +02:00 [WRN] Skipping chunk 86611418-5988-481f-964f-d1c56d23a7ab due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:41.903 +02:00 [WRN] Skipping chunk c598d47e-5886-425d-89b3-5cc2d04a55f0 due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:41.903 +02:00 [WRN] No chunks could be processed - all embedding generation failed
+2025-09-02 23:59:41.903 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/data/documents/rag-introduction.md: 0/2 chunks indexed
+2025-09-02 23:59:41.903 +02:00 [INF] Processed file: rag-introduction.md (2,116 bytes, .md, Modified: 2025-08-24 21:03:59, ACL: [], Content: 2059 chars, Chunks: 2)
+2025-09-02 23:59:41.915 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.915 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.915 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.915 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/data/documents/company-policies.txt into 1 chunks
+2025-09-02 23:59:41.915 +02:00 [INF] Indexing 1 chunks from file: /Users/jklebucki/Projects/rag-suite/data/documents/company-policies.txt
+2025-09-02 23:59:41.919 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/data/documents/company-policies.txt
+2025-09-02 23:59:41.919 +02:00 [INF] Starting batch indexing of 1 chunks
+2025-09-02 23:59:41.919 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.920 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.924 +02:00 [INF] Received HTTP response headers after 4.1839ms - 413
+2025-09-02 23:59:41.924 +02:00 [INF] End processing HTTP request after 4.5324ms - 413
+2025-09-02 23:59:41.924 +02:00 [ERR] HTTP error while generating embedding for chunk 83118c4d-03a5-4923-9a9b-5db244e5caee
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:41.975 +02:00 [WRN] Skipping chunk 83118c4d-03a5-4923-9a9b-5db244e5caee due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:41.975 +02:00 [WRN] No chunks could be processed - all embedding generation failed
+2025-09-02 23:59:41.975 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/data/documents/company-policies.txt: 0/1 chunks indexed
+2025-09-02 23:59:41.976 +02:00 [INF] Processed file: company-policies.txt (907 bytes, .txt, Modified: 2025-08-31 14:34:06, ACL: [], Content: 877 chars, Chunks: 1)
+2025-09-02 23:59:41.987 +02:00 [WRN] ACL resolution is not supported on this platform
+2025-09-02 23:59:41.987 +02:00 [INF] Progress: 9/9 files (100.0%) - 7.1 files/sec
+2025-09-02 23:59:41.988 +02:00 [INF] Content extraction service initialized with 3 extractors supporting 12 file types
+2025-09-02 23:59:41.988 +02:00 [INF] Chunking service initialized with 7 chunkers supporting 7 content types
+2025-09-02 23:59:41.989 +02:00 [INF] Successfully chunked file: /Users/jklebucki/Projects/rag-suite/data/documents/elasticsearch-rag.md into 3 chunks
+2025-09-02 23:59:41.989 +02:00 [INF] Indexing 3 chunks from file: /Users/jklebucki/Projects/rag-suite/data/documents/elasticsearch-rag.md
+2025-09-02 23:59:41.993 +02:00 [INF] Deleted 0 documents for source file /Users/jklebucki/Projects/rag-suite/data/documents/elasticsearch-rag.md
+2025-09-02 23:59:41.993 +02:00 [INF] Starting batch indexing of 3 chunks
+2025-09-02 23:59:41.993 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:41.994 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:42.001 +02:00 [INF] Received HTTP response headers after 7.279ms - 413
+2025-09-02 23:59:42.001 +02:00 [INF] End processing HTTP request after 7.5894ms - 413
+2025-09-02 23:59:42.001 +02:00 [ERR] HTTP error while generating embedding for chunk ad2eca72-e4fd-4f52-9b92-1d84861d6e3b
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:42.053 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:42.053 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:42.056 +02:00 [INF] Received HTTP response headers after 2.2464ms - 413
+2025-09-02 23:59:42.056 +02:00 [INF] End processing HTTP request after 2.8897ms - 413
+2025-09-02 23:59:42.056 +02:00 [ERR] HTTP error while generating embedding for chunk a2ee4e68-ccbf-4b9c-b57b-14266a782e20
+System.Net.Http.HttpRequestException: Response status code does not indicate success: 413 (Payload Too Large).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at RAG.Collector.Embeddings.HttpEmbeddingProvider.GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken) in /Users/jklebucki/Projects/rag-suite/src/RAG.Collector/Embeddings/HttpEmbeddingProvider.cs:line 51
+2025-09-02 23:59:42.107 +02:00 [INF] Start processing HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:42.108 +02:00 [INF] Sending HTTP request POST http://localhost:8580/embed
+2025-09-02 23:59:42.156 +02:00 [INF] Received HTTP response headers after 47.9035ms - 200
+2025-09-02 23:59:42.156 +02:00 [INF] End processing HTTP request after 48.7725ms - 200
+2025-09-02 23:59:42.208 +02:00 [WRN] Skipping chunk ad2eca72-e4fd-4f52-9b92-1d84861d6e3b due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:42.208 +02:00 [WRN] Skipping chunk a2ee4e68-ccbf-4b9c-b57b-14266a782e20 due to embedding failure: HTTP error: Response status code does not indicate success: 413 (Payload Too Large).
+2025-09-02 23:59:42.215 +02:00 [INF] Successfully indexed 0/1 documents in batch
+2025-09-02 23:59:42.215 +02:00 [INF] Batch indexing completed: 0/1/3 chunks indexed
+2025-09-02 23:59:42.215 +02:00 [INF] Completed indexing file /Users/jklebucki/Projects/rag-suite/data/documents/elasticsearch-rag.md: 0/3 chunks indexed
+2025-09-02 23:59:42.216 +02:00 [INF] Processed file: elasticsearch-rag.md (2,370 bytes, .md, Modified: 2025-08-24 21:03:59, ACL: [], Content: 2336 chars, Chunks: 3)
+2025-09-02 23:59:42.227 +02:00 [INF] Completed enumeration of folder: /Users/jklebucki/Projects/rag-suite/data/documents, found 4 matching files
+2025-09-02 23:59:42.227 +02:00 [INF] File enumeration completed: 9 files in 00:01
+2025-09-02 23:59:42.227 +02:00 [INF] Document collection cycle completed at "2025-09-02T23:59:42.2278380+02:00"

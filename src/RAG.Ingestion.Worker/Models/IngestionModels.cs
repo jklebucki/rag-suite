@@ -17,7 +17,7 @@ public class IngestionSettings
 {
     public string ElasticsearchUrl { get; set; } = "http://localhost:9200";
     public string ElasticsearchUsername { get; set; } = "elastic";
-    public string ElasticsearchPassword { get; set; } = "changeme";
+    public string ElasticsearchPassword { get; set; } = "elastic";
     public string IndexName { get; set; } = "rag_documents";
     public string DocumentsPath { get; set; } = "/data/documents";
     public int ChunkSize { get; set; } = 1000;

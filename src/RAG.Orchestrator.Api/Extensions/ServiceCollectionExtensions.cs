@@ -101,7 +101,7 @@ public static class ServiceCollectionExtensions
             var configuration = provider.GetRequiredService<IConfiguration>();
             var url = configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
             var username = configuration["Services:Elasticsearch:Username"] ?? "elastic";
-            var password = configuration["Services:Elasticsearch:Password"] ?? "changeme";
+            var password = configuration["Services:Elasticsearch:Password"] ?? "elastic";
             var timeoutMinutes = configuration.GetValue<int>("Services:Elasticsearch:TimeoutMinutes", 10);
             
             var settings = new ConnectionConfiguration(new Uri(url))
