@@ -88,7 +88,11 @@ public class ElasticsearchService : IElasticsearchService
             {
                 try
                 {
-                    var bulkResponse = JsonSerializer.Deserialize<BulkResponse>(response.Body);
+                    var jsonOptions = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var bulkResponse = JsonSerializer.Deserialize<BulkResponse>(response.Body, jsonOptions);
                     var successCount = CountSuccessfulOperations(bulkResponse);
                     
                     if (successCount > 0)
