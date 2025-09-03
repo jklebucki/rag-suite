@@ -20,6 +20,15 @@ public static class SearchEndpoints
         .WithSummary("Search documents")
         .WithDescription("Search for documents in the knowledge base using natural language queries");
 
+        group.MapPost("/hybrid", async (SearchRequest request, ISearchService searchService) =>
+        {
+            var response = await searchService.SearchHybridAsync(request);
+            return response.ToApiResponse();
+        })
+        .WithName("SearchDocumentsHybrid")
+        .WithSummary("Search documents with hybrid BM25 + kNN")
+        .WithDescription("Search for documents using hybrid approach combining BM25 keyword search with semantic similarity (kNN)");
+
         group.MapGet("/", async (string query, int? limit, int? offset, ISearchService searchService) =>
         {
             var request = new SearchRequest(query, null, limit ?? 10, offset ?? 0);

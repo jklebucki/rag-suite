@@ -6,6 +6,7 @@ using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
+using RAG.Orchestrator.Api.Features.Embeddings;
 using Elasticsearch.Net;
 
 namespace RAG.Orchestrator.Api.Extensions;
@@ -122,6 +123,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserChatService, UserChatService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<ISearchService, SearchService>();
+        services.AddScoped<IEmbeddingService, EmbeddingService>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
