@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RAG.Collector.Elasticsearch;
 
@@ -376,10 +377,19 @@ public class ElasticsearchService : IElasticsearchService
 
     private class BulkOperationResponse
     {
+        [JsonPropertyName("_id")]
         public string? _Id { get; set; }
+        
+        [JsonPropertyName("_index")]
         public string? _Index { get; set; }
+        
+        [JsonPropertyName("status")]
         public int Status { get; set; }
+        
+        [JsonPropertyName("error")]
         public object? Error { get; set; }
+        
+        [JsonPropertyName("result")]
         public string? Result { get; set; }
     }
 
