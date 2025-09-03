@@ -312,11 +312,11 @@ public class ChatService : IChatService
 
         try
         {
-            // Search for relevant context
+            // Search for relevant context with higher limit to catch chunk groups
             var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null,
-                Limit: 3,
+                Limit: 10, // Increased to allow for chunk reconstruction
                 Offset: 0
             ), cancellationToken);
 
@@ -400,7 +400,7 @@ public class ChatService : IChatService
             var searchRequest = new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null, // TODO: Map metadata to SearchFilters if needed
-                Limit: 3,
+                Limit: 10, // Increased to allow for chunk reconstruction
                 Offset: 0
             );
 
@@ -531,7 +531,28 @@ public class ChatService : IChatService
             foreach (var result in searchResults.Take(3))
             {
                 promptBuilder.AppendLine($"Dokument: {result.Title}");
-                promptBuilder.AppendLine($"Treść: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                
+                // Check if this is a reconstructed document
+                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") && 
+                                     result.Metadata["reconstructed"] is bool reconstructed && reconstructed;
+                
+                if (isReconstructed)
+                {
+                    // For reconstructed documents, use more content (up to 2000 chars)
+                    var contentLength = Math.Min(2000, result.Content.Length);
+                    promptBuilder.AppendLine($"Treść (pełny dokument): {result.Content.Substring(0, contentLength)}");
+                    if (result.Content.Length > contentLength)
+                        promptBuilder.AppendLine("...");
+                        
+                    var chunksCount = result.Metadata.ContainsKey("chunksFound") ? result.Metadata["chunksFound"] : "unknown";
+                    promptBuilder.AppendLine($"[Zrekonstruowany z {chunksCount} fragmentów]");
+                }
+                else
+                {
+                    // For regular chunks, use the original 300 chars limit
+                    promptBuilder.AppendLine($"Treść: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                }
+                
                 promptBuilder.AppendLine($"Źródło: {result.Source}");
                 promptBuilder.AppendLine();
             }
@@ -596,7 +617,30 @@ public class ChatService : IChatService
                 var sourceLabel = _languageService.GetLocalizedString("system_prompts", "source", responseLanguage);
                 
                 promptBuilder.AppendLine($"{titleLabel}: {result.Title}");
-                promptBuilder.AppendLine($"{contentLabel}: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                
+                // Check if this is a reconstructed document
+                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") && 
+                                     result.Metadata["reconstructed"] is bool reconstructed && reconstructed;
+                
+                if (isReconstructed)
+                {
+                    // For reconstructed documents, use more content (up to 2000 chars)
+                    var contentLength = Math.Min(2000, result.Content.Length);
+                    promptBuilder.AppendLine($"{contentLabel} (pełny dokument): {result.Content.Substring(0, contentLength)}");
+                    if (result.Content.Length > contentLength)
+                        promptBuilder.AppendLine("...");
+                        
+                    var chunksCount = result.Metadata.ContainsKey("chunksFound") ? result.Metadata["chunksFound"] : "unknown";
+                    var reconstructedLabel = _languageService.GetLocalizedString("system_prompts", "reconstructed_from_chunks", responseLanguage)
+                        ?? "[Zrekonstruowany z {0} fragmentów]";
+                    promptBuilder.AppendLine(string.Format(reconstructedLabel, chunksCount));
+                }
+                else
+                {
+                    // For regular chunks, use the original 300 chars limit
+                    promptBuilder.AppendLine($"{contentLabel}: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
+                }
+                
                 promptBuilder.AppendLine($"{sourceLabel}: {result.Source}");
                 promptBuilder.AppendLine();
             }
