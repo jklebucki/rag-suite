@@ -8,6 +8,6 @@ public class ElasticsearchOptions
     public string Username { get; set; } = "elastic";
     public string Password { get; set; } = "changeme";
     public int TimeoutMinutes { get; set; } = 10;
-    public string DefaultIndexName { get; set; } = "rag-chunks-dev";
+    public string DefaultIndexName { get; set; } = "rag-chunks";
     public bool AutoCreateIndices { get; set; } = true;
 }
