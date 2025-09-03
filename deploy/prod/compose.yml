@@ -36,8 +36,6 @@ services:
       - --model-id
       - "sentence-transformers/all-MiniLM-L6-v2"
       - --auto-truncate
-      - --max-input-length
-      - "512"
     depends_on:
       - elasticsearch
     healthcheck:
