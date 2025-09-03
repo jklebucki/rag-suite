@@ -35,10 +35,6 @@ services:
     command:
       - --model-id
       - "sentence-transformers/all-MiniLM-L6-v2"
-      - --max-input-length
-      - "512"
-      - --max-batch-tokens
-      - "16384"
     depends_on:
       - elasticsearch
     healthcheck:
