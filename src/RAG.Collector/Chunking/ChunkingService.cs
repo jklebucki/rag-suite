@@ -105,6 +105,7 @@ public class ChunkingService
     {
         var sentenceChunker = new SentenceAwareChunker();
         var pdfChunker = new PdfAwareChunker();
+        var officeChunker = new OfficeDocumentChunker();
 
         // Register chunkers by their supported content types
         foreach (var contentType in sentenceChunker.SupportedContentTypes)
@@ -115,6 +116,11 @@ public class ChunkingService
         foreach (var contentType in pdfChunker.SupportedContentTypes)
         {
             _chunkers[contentType] = pdfChunker;
+        }
+
+        foreach (var contentType in officeChunker.SupportedContentTypes)
+        {
+            _chunkers[contentType] = officeChunker;
         }
 
         _logger.LogInformation("Chunking service initialized with {ChunkerCount} chunkers supporting {ContentTypeCount} content types",

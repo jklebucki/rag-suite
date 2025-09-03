@@ -172,6 +172,12 @@ public class CollectorWorker : BackgroundService
                     fileItem.Path, result.ErrorMessage);
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogDebug("Content extraction cancelled for {FilePath}", fileItem.Path);
+            fileItem.ContentExtractionError = "Operation cancelled";
+            fileItem.IsContentExtracted = false;
+        }
         catch (Exception ex)
         {
             fileItem.ContentExtractionError = ex.Message;

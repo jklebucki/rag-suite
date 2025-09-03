@@ -44,10 +44,18 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        _logger.LogDebug("Generating embedding for chunk {ChunkId} (length: {Length})", 
-            chunk.Id, chunk.Content.Length);
+        _logger.LogDebug("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)", 
+            chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
 
         var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
+        
+        if (response.StatusCode == (System.Net.HttpStatusCode)413)
+        {
+            _logger.LogWarning("Chunk {ChunkId} too large for embedding service: {Length} chars, ~{Tokens} tokens. Consider reducing chunk size.", 
+                chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
+            return EmbeddingResult.CreateFailure($"Payload too large: {chunk.Content.Length} characters");
+        }
+        
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);

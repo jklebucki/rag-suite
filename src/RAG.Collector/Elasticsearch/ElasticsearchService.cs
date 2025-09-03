@@ -85,13 +85,33 @@ public class ElasticsearchService : IElasticsearchService
 
             if (response.Success)
             {
-                var bulkResponse = JsonSerializer.Deserialize<BulkResponse>(response.Body);
-                var successCount = CountSuccessfulOperations(bulkResponse);
-                
-                _logger.LogInformation("Successfully indexed {SuccessCount}/{TotalCount} documents in batch", 
-                    successCount, documents.Count);
-                
-                return successCount;
+                try
+                {
+                    var bulkResponse = JsonSerializer.Deserialize<BulkResponse>(response.Body);
+                    var successCount = CountSuccessfulOperations(bulkResponse);
+                    
+                    if (successCount > 0)
+                    {
+                        _logger.LogInformation("Successfully indexed {SuccessCount}/{TotalCount} documents in batch", 
+                            successCount, documents.Count);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Bulk indexing completed but no documents were successfully indexed ({TotalCount} attempted)", 
+                            documents.Count);
+                        
+                        // Log detailed response for debugging
+                        _logger.LogDebug("Bulk response: {Response}", response.Body);
+                    }
+                    
+                    return successCount;
+                }
+                catch (JsonException ex)
+                {
+                    _logger.LogWarning(ex, "Failed to parse bulk response, assuming all {Count} documents were indexed", documents.Count);
+                    // If parsing fails but response was successful, assume all documents were indexed
+                    return documents.Count;
+                }
             }
 
             _logger.LogError("Bulk indexing failed: {Error}", response.DebugInformation);
@@ -306,27 +326,61 @@ public class ElasticsearchService : IElasticsearchService
 
     private static int CountSuccessfulOperations(BulkResponse? bulkResponse)
     {
-        if (bulkResponse?.Items == null)
+        if (bulkResponse?.Items == null || !bulkResponse.Items.Any())
             return 0;
 
-        return bulkResponse.Items.Count(item => 
-            item.Index?.Status >= 200 && item.Index?.Status < 300);
+        var successCount = 0;
+        foreach (var item in bulkResponse.Items)
+        {
+            if (item.Index?.Status != null)
+            {
+                // HTTP status codes 200-299 indicate success
+                if (item.Index.Status >= 200 && item.Index.Status < 300)
+                {
+                    successCount++;
+                }
+            }
+            else if (item.Create?.Status != null)
+            {
+                if (item.Create.Status >= 200 && item.Create.Status < 300)
+                {
+                    successCount++;
+                }
+            }
+            else if (item.Update?.Status != null)
+            {
+                if (item.Update.Status >= 200 && item.Update.Status < 300)
+                {
+                    successCount++;
+                }
+            }
+        }
+
+        return successCount;
     }
 
     // Response models for JSON deserialization
     private class BulkResponse
     {
+        public bool? Errors { get; set; }
         public List<BulkResponseItem> Items { get; set; } = new();
     }
 
     private class BulkResponseItem
     {
         public BulkOperationResponse? Index { get; set; }
+        public BulkOperationResponse? Create { get; set; }
+        public BulkOperationResponse? Update { get; set; }
+        public BulkOperationResponse? Delete { get; set; }
     }
 
     private class BulkOperationResponse
     {
+        public string? _Id { get; set; }
+        public string? _Index { get; set; }
         public int Status { get; set; }
+        public object? Error { get; set; }
+        public string? Result { get; set; }
     }
 
     private class DeleteByQueryResponse
