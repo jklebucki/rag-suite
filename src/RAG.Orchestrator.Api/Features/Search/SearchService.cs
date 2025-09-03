@@ -13,6 +13,7 @@ internal class ChunkInfo
     public string Id { get; set; } = "";
     public string Content { get; set; } = "";
     public double Score { get; set; }
+    public string SourceFile { get; set; } = "";
     public int ChunkIndex { get; set; }
     public int TotalChunks { get; set; }
     public string FileExtension { get; set; } = "";
@@ -230,6 +231,7 @@ public class SearchService : ISearchService
                         Id = id,
                         Content = docContent,
                         Score = score,
+                        SourceFile = sourceFile,
                         ChunkIndex = chunkIndex,
                         TotalChunks = totalChunks,
                         FileExtension = fileExtension,
@@ -602,7 +604,7 @@ public class SearchService : ISearchService
                     }
                 },
                 ["size"] = request.Limit * 3, // Get more results for better reconstruction
-                ["_source"] = new[] { "content", "source_file", "chunk_index", "total_chunks", "file_extension", "created_at" },
+                ["_source"] = new[] { "content", "sourceFile", "position", "fileExtension", "indexedAt" },
                 ["highlight"] = new Dictionary<string, object>
                 {
                     ["fields"] = new Dictionary<string, object>
@@ -672,10 +674,11 @@ public class SearchService : ISearchService
                 Id = hit.GetProperty("_id").GetString() ?? "",
                 Content = source.GetProperty("content").GetString() ?? "",
                 Score = score,
-                ChunkIndex = source.TryGetProperty("chunk_index", out var chunkIdx) ? chunkIdx.GetInt32() : 0,
-                TotalChunks = source.TryGetProperty("total_chunks", out var totalChunks) ? totalChunks.GetInt32() : 1,
-                FileExtension = source.TryGetProperty("file_extension", out var ext) ? ext.GetString() ?? "" : "",
-                CreatedAt = source.TryGetProperty("created_at", out var created) ? DateTime.Parse(created.GetString() ?? "") : DateTime.MinValue,
+                SourceFile = source.TryGetProperty("sourceFile", out var sourceFile) ? sourceFile.GetString() ?? "" : "",
+                ChunkIndex = source.TryGetProperty("position", out var position) && position.TryGetProperty("chunkIndex", out var chunkIdx) ? chunkIdx.GetInt32() : 0,
+                TotalChunks = source.TryGetProperty("position", out var positionTotal) && positionTotal.TryGetProperty("totalChunks", out var totalChunks) ? totalChunks.GetInt32() : 1,
+                FileExtension = source.TryGetProperty("fileExtension", out var ext) ? ext.GetString() ?? "" : "",
+                CreatedAt = source.TryGetProperty("indexedAt", out var created) ? DateTime.Parse(created.GetString() ?? "") : DateTime.MinValue,
                 Highlights = highlights
             });
         }
@@ -685,8 +688,8 @@ public class SearchService : ISearchService
         // Group chunks by source file and reconstruct documents
         var results = new List<SearchResult>();
         var chunksByFile = chunks
-            .Where(c => !string.IsNullOrEmpty(c.Content))
-            .GroupBy(c => ExtractSourceFile(c.Id))
+            .Where(c => !string.IsNullOrEmpty(c.Content) && !string.IsNullOrEmpty(c.SourceFile))
+            .GroupBy(c => c.SourceFile)
             .ToDictionary(g => g.Key, g => g.ToList());
 
         foreach (var kvp in chunksByFile)
