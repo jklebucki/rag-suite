@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Skrypt do nadania uprawnień wykonywania dla skryptów RAG-Suite
 echo "Nadawanie uprawnień wykonywania dla skryptów..."
 
