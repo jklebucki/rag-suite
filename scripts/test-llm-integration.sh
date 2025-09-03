@@ -34,7 +34,7 @@ test_services() {
     
     # Test Elasticsearch
     print_status "Testing Elasticsearch..."
-    if curl -s -u elastic:changeme http://localhost:9200/_cluster/health | grep -q "green\|yellow"; then
+    if curl -s -u elastic:elastic http://localhost:9200/_cluster/health | grep -q "green\|yellow"; then
         print_success "Elasticsearch is responding"
     else
         print_error "Elasticsearch is not responding"

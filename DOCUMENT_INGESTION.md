@@ -42,13 +42,13 @@ dotnet run
 
 ```bash
 # Sprawdź liczbę dokumentów
-curl -u elastic:changeme "http://localhost:9200/rag_documents/_count?pretty"
+curl -u elastic:elastic "http://localhost:9200/rag_documents/_count?pretty"
 
 # Sprawdź przykładowy dokument
-curl -u elastic:changeme "http://localhost:9200/rag_documents/_search?size=1&pretty"
+curl -u elastic:elastic "http://localhost:9200/rag_documents/_search?size=1&pretty"
 
 # Wyszukaj po treści
-curl -u elastic:changeme -X POST "http://localhost:9200/rag_documents/_search?pretty" \
+curl -u elastic:elastic -X POST "http://localhost:9200/rag_documents/_search?pretty" \
   -H "Content-Type: application/json" \
   -d '{"query": {"match": {"content": "twoje zapytanie"}}}'
 ```
@@ -62,7 +62,7 @@ curl -u elastic:changeme -X POST "http://localhost:9200/rag_documents/_search?pr
 
 ### Elasticsearch Settings:
 - **URL**: http://localhost:9200
-- **Credentials**: elastic/changeme
+- **Credentials**: elastic/elastic
 - **Index**: rag_documents
 
 ## 📁 Struktura danych
@@ -96,12 +96,12 @@ Każdy dokument zostaje podzielony na chunki zawierające:
 ### Sprawdź wyniki wyszukiwania:
 ```bash
 # Test wyszukiwania API
-curl -u elastic:changeme -X POST "http://localhost:9200/rag_documents/_search" \
+curl -u elastic:elastic -X POST "http://localhost:9200/rag_documents/_search" \
   -H "Content-Type: application/json" \
   -d '{"query": {"match": {"content": "API endpoints"}}}'
 
 # Test wyszukiwania o Elasticsearch
-curl -u elastic:changeme -X POST "http://localhost:9200/rag_documents/_search" \
+curl -u elastic:elastic -X POST "http://localhost:9200/rag_documents/_search" \
   -H "Content-Type: application/json" \
   -d '{"query": {"match": {"content": "vector search"}}}'
 ```

@@ -129,7 +129,7 @@ show_status() {
     echo "Service Health Checks:"
     
     # Elasticsearch
-    if curl -s -u elastic:changeme http://localhost:9200/_cluster/health > /dev/null 2>&1; then
+    if curl -s -u elastic:elastic http://localhost:9200/_cluster/health > /dev/null 2>&1; then
         echo -e "  Elasticsearch: ${GREEN}✓ Healthy${NC}"
     else
         echo -e "  Elasticsearch: ${RED}✗ Not responding${NC}"

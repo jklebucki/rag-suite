@@ -168,7 +168,7 @@ check_services_health() {
     print_status "Checking services health..."
     
     # Check Elasticsearch
-    if curl -s -u elastic:changeme http://localhost:9200/_cluster/health > /dev/null; then
+    if curl -s -u elastic:elastic http://localhost:9200/_cluster/health > /dev/null; then
         print_success "Elasticsearch is healthy"
     else
         print_warning "Elasticsearch may not be ready yet"

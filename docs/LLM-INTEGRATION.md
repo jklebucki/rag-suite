@@ -93,7 +93,7 @@ Aplikacja została skonfigurowana z następującymi ustawieniami:
     "Elasticsearch": {
       "Url": "http://localhost:9200",
       "Username": "elastic",
-      "Password": "changeme"
+      "Password": "elastic"
     },
     "EmbeddingService": {
       "Url": "http://localhost:8580"
@@ -157,7 +157,7 @@ docker-compose logs -f llm-service
 
 ### 2. Kibana Dashboard
 - URL: http://localhost:5601
-- Dane logowania: elastic / changeme
+- Dane logowania: elastic / elastic
 
 ### 3. API Health Checks
 ```bash

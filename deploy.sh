@@ -251,7 +251,7 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
     "Elasticsearch": {
       "Url": "http://localhost:9200",
       "Username": "elastic",
-      "Password": "changeme",
+      "Password": "elastic",
       "TimeoutMinutes": 10
     },
     "EmbeddingService": {

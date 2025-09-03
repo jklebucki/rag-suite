@@ -177,8 +177,8 @@ docker-compose -f docker-compose.prod.yml up -d
 | Orchestrator API | http://localhost:7107 | - |
 | Swagger UI | http://localhost:7107 | - |
 | Web UI | http://localhost:5173 | - |
-| Elasticsearch | http://localhost:9200 | elastic / changeme |
-| Kibana | http://localhost:5601 | elastic / changeme |
+| Elasticsearch | http://localhost:9200 | elastic / elastic |
+| Kibana | http://localhost:5601 | elastic / elastic |
 | LLM Service | http://localhost:8581 | - |
 | Embedding Service | http://localhost:8580 | - |
 

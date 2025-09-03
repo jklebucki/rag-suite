@@ -12,7 +12,7 @@ services:
       - node.name=es-node-prod
       - discovery.type=single-node
       - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme123!}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-elastic123!}
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
       - xpack.security.http.ssl.enabled=false
       - xpack.license.self_generated.type=basic
@@ -25,7 +25,7 @@ services:
       - rag-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD:-changeme123!} http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD:-elastic123!} http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -42,7 +42,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme123!}
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-elastic123!}
       - SERVER_NAME=kibana
       - SERVER_HOST=0.0.0.0
     ports:

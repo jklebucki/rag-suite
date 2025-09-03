@@ -124,7 +124,7 @@ Once setup is complete, services will be available at:
 
 - **Web UI**: http://localhost:3000
 - **API**: http://localhost:7107
-- **Elasticsearch**: http://localhost:9200 (elastic/changeme)
+- **Elasticsearch**: http://localhost:9200 (elastic/elastic)
 - **Kibana**: http://localhost:5601
 - **Ollama (LLM)**: http://localhost:11434
 - **Embedding Service**: http://localhost:8580

@@ -131,7 +131,7 @@ function Test-ServicesHealth {
     Write-ColoredOutput "🏥 Checking services health..." "Blue"
     
     $services = @(
-        @{ Name = "Elasticsearch"; Url = "http://localhost:9200"; Auth = "elastic:changeme" },
+        @{ Name = "Elasticsearch"; Url = "http://localhost:9200"; Auth = "elastic:elastic" },
         @{ Name = "Kibana"; Url = "http://localhost:5601" },
         @{ Name = "Ollama"; Url = "http://localhost:11434/api/tags" },
         @{ Name = "Embedding Service"; Url = "http://localhost:8580/health" }
@@ -251,7 +251,7 @@ function Show-Help {
     Write-Host "  help    - Show this help message"
     Write-Host ""
     Write-Host "Services will be available at:"
-    Write-Host "  • Elasticsearch: http://localhost:9200 (elastic/changeme)"
+    Write-Host "  • Elasticsearch: http://localhost:9200 (elastic/elastic)"
     Write-Host "  • Kibana: http://localhost:5601"
     Write-Host "  • Ollama (LLM): http://localhost:11434"
     Write-Host "  • Embedding Service: http://localhost:8580"

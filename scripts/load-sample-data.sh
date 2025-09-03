@@ -8,7 +8,7 @@ set -e
 # Configuration
 ES_HOST="http://localhost:9200"
 ES_USER="elastic"
-ES_PASS="changeme"
+ES_PASS="elastic"
 ES_INDEX="rag_knowledge_base"
 
 echo "==================================================="
