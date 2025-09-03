@@ -14,16 +14,16 @@ echo ""
 cd "$(dirname "$0")"
 
 echo "1. Zatrzymywanie wszystkich serwisów..."
-docker-compose -f compose.yml down
+docker compose -f compose.yml down
 
 echo "2. Usuwanie kontenerów..."
-docker-compose -f compose.yml rm -f
+docker compose -f compose.yml rm -f
 
 echo "3. Pobieranie najnowszych obrazów..."
-docker-compose -f compose.yml pull
+docker compose -f compose.yml pull
 
 echo "4. Uruchamianie wszystkich serwisów..."
-docker-compose -f compose.yml up -d
+docker compose -f compose.yml up -d
 
 echo "5. Sprawdzanie statusu serwisów..."
 sleep 15
