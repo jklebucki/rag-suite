@@ -67,16 +67,9 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins(
-                    "http://localhost:5173", // Vite dev server
-                    "http://localhost:3000", // React dev server
-                    "http://localhost:8080", // Alternative dev server
-                    "http://asystent.ad.citronex.pl", // Production HTTP
-                    "https://asystent.ad.citronex.pl" // Production HTTPS
-                )
+                policy.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                .AllowAnyHeader();
             });
         });
 
