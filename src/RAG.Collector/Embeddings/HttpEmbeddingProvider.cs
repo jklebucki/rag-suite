@@ -60,14 +60,17 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogDebug("Embedding service response for chunk {ChunkId}: {ResponseLength} chars, starts with: {ResponseStart}",
+            chunk.Id, responseContent.Length, responseContent.Length > 50 ? responseContent.Substring(0, 50) : responseContent);
+        
         // Response is directly an array of floats, not wrapped in an object
         var embeddings = JsonSerializer.Deserialize<float[][]>(responseContent);
 
         if (embeddings?.Length > 0 && embeddings[0]?.Length > 0)
         {
             var duration = DateTime.UtcNow - startTime;
-            _logger.LogDebug("Successfully generated embedding for chunk {ChunkId} in {Duration}ms", 
-                chunk.Id, duration.TotalMilliseconds);
+            _logger.LogDebug("Successfully generated embedding for chunk {ChunkId} in {Duration}ms: vector dimension {Dimension}", 
+                chunk.Id, duration.TotalMilliseconds, embeddings[0].Length);
 
             return EmbeddingResult.CreateSuccess(
                 embeddings[0], // First (and only) embedding
