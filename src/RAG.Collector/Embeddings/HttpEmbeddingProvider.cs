@@ -38,7 +38,8 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         {
         var request = new
         {
-            inputs = chunk.Content
+            inputs = chunk.Content,
+            truncate = true
         };
 
         var json = JsonSerializer.Serialize(request);
