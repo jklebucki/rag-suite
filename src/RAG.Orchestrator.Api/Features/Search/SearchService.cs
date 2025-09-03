@@ -74,30 +74,71 @@ public class SearchService : ISearchService
                 return new SearchResponse([], 0, 0, request.Query);
             }
 
-            // Create search query - simplified for debugging
-            var searchQuery = new
+            // Create hybrid search query for better results
+            var searchQuery = new Dictionary<string, object>
             {
-                query = new
+                ["query"] = new Dictionary<string, object>
                 {
-                    query_string = new
+                    ["bool"] = new Dictionary<string, object>
                     {
-                        query = request.Query,
-                        fields = new[] { "content" },
-                        default_operator = "AND"
+                        ["should"] = new object[]
+                        {
+                            // Exact phrase match gets highest score
+                            new Dictionary<string, object>
+                            {
+                                ["match_phrase"] = new Dictionary<string, object>
+                                {
+                                    ["content"] = new Dictionary<string, object>
+                                    {
+                                        ["query"] = request.Query,
+                                        ["boost"] = 3.0
+                                    }
+                                }
+                            },
+                            // Important terms match with OR operator
+                            new Dictionary<string, object>
+                            {
+                                ["match"] = new Dictionary<string, object>
+                                {
+                                    ["content"] = new Dictionary<string, object>
+                                    {
+                                        ["query"] = request.Query,
+                                        ["operator"] = "OR",
+                                        ["boost"] = 2.0,
+                                        ["minimum_should_match"] = "30%" // At least 30% of terms should match
+                                    }
+                                }
+                            },
+                            // Fuzzy match for typos
+                            new Dictionary<string, object>
+                            {
+                                ["match"] = new Dictionary<string, object>
+                                {
+                                    ["content"] = new Dictionary<string, object>
+                                    {
+                                        ["query"] = request.Query,
+                                        ["operator"] = "OR",
+                                        ["fuzziness"] = "AUTO",
+                                        ["boost"] = 1.0
+                                    }
+                                }
+                            }
+                        },
+                        ["minimum_should_match"] = 1 // At least one of the should clauses must match
                     }
                 },
-                size = request.Limit,
-                from = request.Offset,
-                highlight = new
+                ["size"] = request.Limit,
+                ["from"] = request.Offset,
+                ["highlight"] = new Dictionary<string, object>
                 {
-                    fields = new
+                    ["fields"] = new Dictionary<string, object>
                     {
-                        content = new { }
+                        ["content"] = new { }
                     },
-                    pre_tags = new[] { "<em>" },
-                    post_tags = new[] { "</em>" },
-                    fragment_size = 200,
-                    number_of_fragments = 3
+                    ["pre_tags"] = new[] { "<em>" },
+                    ["post_tags"] = new[] { "</em>" },
+                    ["fragment_size"] = 200,
+                    ["number_of_fragments"] = 3
                 }
             };
 
