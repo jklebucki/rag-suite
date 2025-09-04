@@ -46,6 +46,11 @@ public class TextChunk
     public string ContentHash { get; set; } = string.Empty;
 
     /// <summary>
+    /// Hash of the entire source file for file-level deduplication
+    /// </summary>
+    public string FileHash { get; set; } = string.Empty;
+
+    /// <summary>
     /// When this chunk was created
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

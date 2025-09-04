@@ -124,6 +124,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<ISearchService, SearchService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();
+        services.AddScoped<IQueryProcessor, QueryProcessor>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();

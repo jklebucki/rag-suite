@@ -70,6 +70,11 @@ public class FileItem
     /// </summary>
     public string? ContentExtractionError { get; set; }
 
+    /// <summary>
+    /// Hash of the entire file content for change detection
+    /// </summary>
+    public string FileHash { get; set; } = string.Empty;
+
     public override string ToString()
     {
         var groupsText = AclGroups.Count > 0 ? $"[{string.Join(", ", AclGroups)}]" : "[]";

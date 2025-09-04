@@ -14,17 +14,20 @@ public class IndexingService
 {
     private readonly IEmbeddingProvider _embeddingProvider;
     private readonly IElasticsearchService _elasticsearchService;
+    private readonly IFileChangeDetectionService _fileChangeDetection;
     private readonly ILogger<IndexingService> _logger;
     private readonly CollectorOptions _options;
 
     public IndexingService(
         IEmbeddingProvider embeddingProvider,
         IElasticsearchService elasticsearchService,
+        IFileChangeDetectionService fileChangeDetection,
         ILogger<IndexingService> logger,
         IOptions<CollectorOptions> options)
     {
         _embeddingProvider = embeddingProvider;
         _elasticsearchService = elasticsearchService;
+        _fileChangeDetection = fileChangeDetection;
         _logger = logger;
         _options = options.Value;
     }
@@ -147,14 +150,37 @@ public class IndexingService
             return 0;
 
         var sourceFile = fileChunks.First().SourceFile?.Path ?? "unknown";
+        var firstChunk = fileChunks.First();
         
         try
         {
+            _logger.LogInformation("Checking if file needs reindexing: {SourceFile}", sourceFile);
+
+            // Check if file needs reindexing
+            if (firstChunk.SourceFile != null)
+            {
+                var fileHash = firstChunk.FileHash; // Use file hash for change detection
+                var lastModified = firstChunk.SourceFile.LastWriteTimeUtc;
+                
+                var needsReindexing = await _fileChangeDetection.ShouldReindexFileAsync(
+                    sourceFile, fileHash, lastModified, cancellationToken);
+
+                if (!needsReindexing)
+                {
+                    _logger.LogInformation("File unchanged, skipping indexing: {SourceFile}", sourceFile);
+                    return 0;
+                }
+            }
+
             _logger.LogInformation("Indexing {ChunkCount} chunks from file: {SourceFile}", 
                 fileChunks.Count, sourceFile);
 
             // Delete existing documents for this file first
-            await _elasticsearchService.DeleteDocumentsBySourceFileAsync(sourceFile, cancellationToken);
+            var deletedCount = await _elasticsearchService.DeleteDocumentsBySourceFileAsync(sourceFile, cancellationToken);
+            if (deletedCount > 0)
+            {
+                _logger.LogInformation("Deleted {DeletedCount} existing chunks for file: {SourceFile}", deletedCount, sourceFile);
+            }
 
             // Index chunks using batch processing if we have many chunks
             var indexedCount = 0;
@@ -174,6 +200,17 @@ public class IndexingService
                     var batchResult = await IndexChunksBatchAsync(batch.ToList(), cancellationToken);
                     indexedCount += batchResult;
                 }
+            }
+
+            // Record that file was successfully indexed
+            if (indexedCount > 0 && firstChunk.SourceFile != null)
+            {
+                await _fileChangeDetection.RecordIndexedFileAsync(
+                    sourceFile, 
+                    firstChunk.FileHash, // Use file hash
+                    firstChunk.SourceFile.LastWriteTimeUtc, 
+                    indexedCount, 
+                    cancellationToken);
             }
 
             _logger.LogInformation("Completed indexing file {SourceFile}: {IndexedCount}/{TotalCount} chunks indexed", 

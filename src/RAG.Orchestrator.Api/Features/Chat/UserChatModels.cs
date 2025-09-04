@@ -25,7 +25,8 @@ public record UserChatRequest(
     string? SessionId = null,
     bool UseRag = true,
     string[]? Context = null,
-    string? Language = null
+    string? Language = null,
+    Dictionary<string, object>? Metadata = null
 );
 
 public record CreateUserSessionRequest(string? Title = null, string? Language = null);

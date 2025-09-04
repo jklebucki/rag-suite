@@ -152,6 +152,12 @@ public class CollectorWorker : BackgroundService
             using var scope = _serviceProvider.CreateScope();
             var contentExtractionService = scope.ServiceProvider.GetRequiredService<ContentExtractionService>();
             
+            // Generate file hash before extraction
+            if (string.IsNullOrEmpty(fileItem.FileHash))
+            {
+                fileItem.FileHash = await GenerateFileHashAsync(fileItem.Path, cancellationToken);
+            }
+            
             var result = await contentExtractionService.ExtractContentAsync(fileItem.Path, cancellationToken);
 
             if (result.IsSuccess)
@@ -261,5 +267,28 @@ public class CollectorWorker : BackgroundService
     {
         _logger.LogInformation("RAG Collector is stopping");
         await base.StopAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Generate SHA-256 hash of file content for change detection
+    /// </summary>
+    /// <param name="filePath">Path to the file</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Base64 encoded hash of the file</returns>
+    private async Task<string> GenerateFileHashAsync(string filePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var stream = File.OpenRead(filePath);
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            
+            var hashBytes = await sha256.ComputeHashAsync(stream, cancellationToken);
+            return Convert.ToBase64String(hashBytes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to generate hash for file: {FilePath}", filePath);
+            return string.Empty;
+        }
     }
 }

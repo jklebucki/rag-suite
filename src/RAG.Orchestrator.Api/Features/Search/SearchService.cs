@@ -41,6 +41,7 @@ public class SearchService : ISearchService
     private readonly ILogger<SearchService> _logger;
     private readonly IIndexManagementService _indexManagement;
     private readonly IEmbeddingService _embeddingService;
+    private readonly IQueryProcessor _queryProcessor;
     private readonly ElasticsearchOptions _options;
     private readonly string _indexName;
 
@@ -50,6 +51,7 @@ public class SearchService : ISearchService
         ILogger<SearchService> logger, 
         IIndexManagementService indexManagement,
         IEmbeddingService embeddingService,
+        IQueryProcessor queryProcessor,
         IOptions<ElasticsearchOptions> options)
     {
         _client = client;
@@ -57,6 +59,7 @@ public class SearchService : ISearchService
         _logger = logger;
         _indexManagement = indexManagement;
         _embeddingService = embeddingService;
+        _queryProcessor = queryProcessor;
         _options = options.Value;
         _indexName = _options.DefaultIndexName;
         
@@ -726,12 +729,28 @@ public class SearchService : ISearchService
         {
             _logger.LogInformation("Starting hybrid BM25 + kNN search for query: '{Query}'", request.Query);
 
-            // Generate query embedding
-            var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(request.Query);
+            // Process query to optimize for better results
+            var queryProcessing = _queryProcessor.ProcessQuery(request.Query);
+            _logger.LogDebug("Query processed: Type={Type}, KeyTerms=[{KeyTerms}], Processed='{ProcessedQuery}'", 
+                queryProcessing.Type, string.Join(", ", queryProcessing.KeyTerms), queryProcessing.ProcessedQuery);
+
+            // Use processed query for better keyword matching
+            var searchQuery = request.Query;
+            var embeddingQuery = request.Query;
+            
+            // For conversational queries, prioritize processed version for BM25
+            if (queryProcessing.Type == QueryType.Conversational && queryProcessing.KeyTerms.Any())
+            {
+                searchQuery = queryProcessing.ProcessedQuery;
+                embeddingQuery = queryProcessing.ProcessedQuery; // Use processed query for embeddings too
+            }
+
+            // Generate embedding for the optimal query
+            var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(embeddingQuery);
             _logger.LogDebug("Generated query embedding with {Dimensions} dimensions", queryEmbedding.Length);
 
             // Create hybrid search query with script_score
-            var searchQuery = new Dictionary<string, object>
+            var elasticQuery = new Dictionary<string, object>
             {
                 ["query"] = new Dictionary<string, object>
                 {
@@ -744,15 +763,15 @@ public class SearchService : ISearchService
                             {
                                 ["should"] = new object[]
                                 {
-                                    // Phrase match for exact terms
+                                    // Phrase match for exact terms - use optimized query
                                     new Dictionary<string, object>
                                     {
                                         ["match_phrase"] = new Dictionary<string, object>
                                         {
                                             ["content"] = new Dictionary<string, object>
                                             {
-                                                ["query"] = request.Query,
-                                                ["boost"] = 2.0
+                                                ["query"] = searchQuery,
+                                                ["boost"] = queryProcessing.Type == QueryType.Keywords ? 3.0 : 2.0
                                             }
                                         }
                                     },
@@ -763,9 +782,9 @@ public class SearchService : ISearchService
                                         {
                                             ["content"] = new Dictionary<string, object>
                                             {
-                                                ["query"] = request.Query,
+                                                ["query"] = searchQuery,
                                                 ["operator"] = "OR",
-                                                ["minimum_should_match"] = "20%"
+                                                ["minimum_should_match"] = queryProcessing.Type == QueryType.Keywords ? "50%" : "20%"
                                             }
                                         }
                                     }
@@ -773,23 +792,25 @@ public class SearchService : ISearchService
                                 ["minimum_should_match"] = 1
                             }
                         },
-                        // Hybrid scoring script combining BM25 and cosine similarity
+                        // Hybrid scoring script combining BM25 and cosine similarity with adaptive weights
                         ["script"] = new Dictionary<string, object>
                         {
                             ["source"] = @"
                                 double bm25Score = _score;
                                 double cosineSim = cosineSimilarity(params.query_vector, 'embedding');
                                 
-                                // Adaptive weighting based on BM25 score
-                                double bm25Weight = bm25Score > 5.0 ? 0.7 : 0.4;
-                                double semanticWeight = 1.0 - bm25Weight;
+                                // Use query-specific weights from processing
+                                double bm25Weight = params.bm25_weight;
+                                double semanticWeight = params.semantic_weight;
                                 
                                 // Combine scores with adaptive weighting
                                 return bm25Weight * bm25Score + semanticWeight * (cosineSim + 1.0) * 10.0;
                             ",
                             ["params"] = new Dictionary<string, object>
                             {
-                                ["query_vector"] = queryEmbedding
+                                ["query_vector"] = queryEmbedding,
+                                ["bm25_weight"] = queryProcessing.KeywordWeight,
+                                ["semantic_weight"] = queryProcessing.SemanticWeight
                             }
                         }
                     }
@@ -809,7 +830,7 @@ public class SearchService : ISearchService
                 }
             };
 
-            var json = JsonSerializer.Serialize(searchQuery);
+            var json = JsonSerializer.Serialize(elasticQuery);
             _logger.LogDebug("Hybrid search query: {Query}", json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 

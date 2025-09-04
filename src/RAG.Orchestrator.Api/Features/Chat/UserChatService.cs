@@ -186,8 +186,13 @@ public class UserChatService : IUserChatService
             ), cancellationToken);
 
             // Build context-aware prompt
-            // Use language from UI, or detect from message, or fall back to default
-            var userLanguage = request.Language ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
+            // Extract UI language from metadata if available
+            var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true 
+                ? uiLangObj?.ToString() 
+                : null;
+            
+            // Priority: Language from UI > UI Language from metadata > detected > default
+            var userLanguage = request.Language ?? uiLanguage ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
             var normalizedLanguage = _languageService.NormalizeLanguage(userLanguage);
             var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage);
             
@@ -281,8 +286,13 @@ public class UserChatService : IUserChatService
             ? _languageService.DetectLanguage(request.Message)
             : request.Language;
 
-        // Priority: ResponseLanguage from UI > Language from UI > detected > default
-        var responseLanguage = request.ResponseLanguage ?? request.Language ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
+        // Extract UI language from metadata if available
+        var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true 
+            ? uiLangObj?.ToString() 
+            : null;
+
+        // Priority: ResponseLanguage from UI > Language from UI > UI Language from metadata > detected > default
+        var responseLanguage = request.ResponseLanguage ?? request.Language ?? uiLanguage ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
         var normalizedResponseLanguage = _languageService.NormalizeLanguage(responseLanguage);
         
         // Get conversation history for context
@@ -499,12 +509,15 @@ public class UserChatService : IUserChatService
     {
         var promptBuilder = new StringBuilder();
         
+        // CRITICAL: Strong language instruction at the beginning
+        var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage);
+        promptBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
+        promptBuilder.AppendLine($"MUST RESPOND IN: {responseLanguage.ToUpper()}");
+        promptBuilder.AppendLine();
+        
         // Add system instruction with language information using localization
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage));
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage));
-        
-        // Add instructions for language consistency
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage));
         
         if (documentsAvailable && searchResults.Length > 0)
         {
@@ -514,6 +527,10 @@ public class UserChatService : IUserChatService
             {
                 promptBuilder.AppendLine($"- {result.Content}");
             }
+            
+            // Reinforce language instruction after context
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine($"REMINDER: {languageInstruction}");
         }
         else
         {
@@ -541,6 +558,9 @@ public class UserChatService : IUserChatService
         var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
         promptBuilder.AppendLine($"{userLabel} ({detectedLanguage}): {userMessage}");
         promptBuilder.AppendLine();
+        
+        // FINAL CRITICAL REMINDER before response
+        promptBuilder.AppendLine($"CRITICAL: {languageInstruction}");
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
         
         return promptBuilder.ToString();

@@ -73,10 +73,11 @@ public class ChunkingService
                 overlap,
                 cancellationToken);
 
-            // Set source file reference for all chunks
+            // Set source file reference and file hash for all chunks
             foreach (var chunk in chunks)
             {
                 chunk.SourceFile = fileItem;
+                chunk.FileHash = fileItem.FileHash;
             }
 
             _logger.LogInformation("Successfully chunked file: {FilePath} into {ChunkCount} chunks", 

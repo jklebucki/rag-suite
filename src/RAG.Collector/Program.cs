@@ -96,6 +96,7 @@ try
     // Register embedding and indexing services
     builder.Services.AddScoped<IEmbeddingProvider, HttpEmbeddingProvider>();
     builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
+    builder.Services.AddScoped<IFileChangeDetectionService, FileChangeDetectionService>();
     builder.Services.AddScoped<IndexingService>();
 
     // Register the main worker
