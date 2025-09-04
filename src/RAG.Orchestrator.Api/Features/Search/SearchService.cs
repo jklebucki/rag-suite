@@ -385,16 +385,54 @@ public class SearchService : ISearchService
                 var allChunks = await FetchAllChunksForDocument(sourceFile, cancellationToken);
                 if (allChunks.Count > 0)
                 {
-                    // Validate that we have a reasonable number of chunks
-                    var expectedChunks = firstChunk.TotalChunks;
+                    // Use the actual TotalChunks from fetched chunks (they should all be the same for one document)
+                    var expectedChunks = allChunks.FirstOrDefault()?.TotalChunks ?? firstChunk.TotalChunks;
                     var actualChunks = allChunks.Count;
+                    
+                    // Log discrepancy if TotalChunks values don't match
+                    if (firstChunk.TotalChunks != expectedChunks)
+                    {
+                        _logger.LogWarning("TotalChunks mismatch for {SourceFile}: original chunk says {OriginalTotal}, fetched chunks say {FetchedTotal}, actual count: {ActualCount}", 
+                            sourceFile, firstChunk.TotalChunks, expectedChunks, actualChunks);
+                    }
                     
                     if (actualChunks >= expectedChunks * _options.MinimumChunkCompleteness) // Use configurable threshold
                     {
-                        reconstructedContent = string.Join("\n\n", allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+                        // Filter out chunks with empty content before reconstruction
+                        var validChunks = allChunks.Where(c => !string.IsNullOrWhiteSpace(c.Content)).ToList();
+                        
+                        if (validChunks.Count == 0)
+                        {
+                            _logger.LogWarning("All fetched chunks for {SourceFile} have empty content! Falling back to matching chunks.", sourceFile);
+                            reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                        }
+                        else
+                        {
+                            reconstructedContent = string.Join("\n\n", validChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+                            
+                            if (validChunks.Count < allChunks.Count)
+                            {
+                                _logger.LogWarning("Filtered out {EmptyCount} empty chunks from {TotalCount} for {SourceFile}", 
+                                    allChunks.Count - validChunks.Count, allChunks.Count, sourceFile);
+                            }
+                        }
+                        
                         allHighlights.AddRange(chunks.SelectMany(c => c.Highlights)); // Keep only highlights from matching chunks
-                        _logger.LogInformation("Successfully reconstructed full document with {ActualChunks}/{ExpectedChunks} chunks for {SourceFile}", 
-                            actualChunks, expectedChunks, sourceFile);
+                        
+                        _logger.LogInformation("Successfully reconstructed full document with {ActualChunks}/{ExpectedChunks} chunks for {SourceFile}. Content length: {ContentLength} characters", 
+                            actualChunks, expectedChunks, sourceFile, reconstructedContent.Length);
+                            
+                        // Additional debug info for troubleshooting
+                        if (reconstructedContent.Length == 0)
+                        {
+                            _logger.LogWarning("WARNING: Reconstructed content is empty! Chunks found: {ChunkCount}, First chunk content length: {FirstChunkLength}", 
+                                allChunks.Count, allChunks.FirstOrDefault()?.Content?.Length ?? 0);
+                        }
+                        else if (reconstructedContent.Length < 100)
+                        {
+                            _logger.LogWarning("WARNING: Reconstructed content is very short ({Length} chars): {Content}", 
+                                reconstructedContent.Length, reconstructedContent.Substring(0, Math.Min(100, reconstructedContent.Length)));
+                        }
                     }
                     else
                     {
@@ -531,6 +569,8 @@ public class SearchService : ISearchService
             var json = JsonSerializer.Serialize(searchQuery);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            _logger.LogDebug("Fetching all chunks query for {SourceFile}: {Query}", sourceFile, json);
+
             var response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
@@ -538,7 +578,46 @@ public class SearchService : ISearchService
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogWarning("Failed to fetch all chunks for document {SourceFile}. Status: {StatusCode}. Error: {Error}", 
                     sourceFile, response.StatusCode, errorContent);
-                return new List<ChunkInfo>();
+                
+                // Try alternative query without .keyword suffix if first attempt failed
+                if (errorContent.Contains("field [sourceFile.keyword]"))
+                {
+                    _logger.LogInformation("Retrying fetch with alternative query (without .keyword) for {SourceFile}", sourceFile);
+                    
+                    var alternativeQuery = new Dictionary<string, object>
+                    {
+                        ["query"] = new Dictionary<string, object>
+                        {
+                            ["term"] = new Dictionary<string, object>
+                            {
+                                ["sourceFile"] = sourceFile // Without .keyword
+                            }
+                        },
+                        ["size"] = _options.MaxChunksPerDocument,
+                        ["sort"] = new[] 
+                        { 
+                            new Dictionary<string, object> 
+                            { 
+                                ["position.chunkIndex"] = new { order = "asc" } 
+                            } 
+                        },
+                        ["_source"] = new[] { "content", "position", "sourceFile", "fileExtension", "indexedAt" }
+                    };
+                    
+                    var altJson = JsonSerializer.Serialize(alternativeQuery);
+                    var altContent = new StringContent(altJson, Encoding.UTF8, "application/json");
+                    _logger.LogDebug("Alternative query for {SourceFile}: {Query}", sourceFile, altJson);
+                    
+                    response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", altContent, cancellationToken);
+                }
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    var finalErrorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    _logger.LogWarning("Final attempt failed for document {SourceFile}. Status: {StatusCode}. Error: {Error}", 
+                        sourceFile, response.StatusCode, finalErrorContent);
+                    return new List<ChunkInfo>();
+                }
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -552,6 +631,14 @@ public class SearchService : ISearchService
             {
                 var source = hit.GetProperty("_source");
                 var chunkContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
+                
+                // Debug empty content
+                if (string.IsNullOrEmpty(chunkContent))
+                {
+                    _logger.LogDebug("Empty content found in chunk {ChunkId} from document {SourceFile}. Available fields: {Fields}", 
+                        hit.GetProperty("_id").GetString() ?? "unknown", sourceFile, 
+                        string.Join(", ", source.EnumerateObject().Select(p => p.Name)));
+                }
                 
                 var chunkIndex = 0;
                 var totalChunks = 1;
@@ -579,6 +666,20 @@ public class SearchService : ISearchService
 
             _logger.LogInformation("Successfully fetched {ChunkCount}/{TotalFound} chunks for document {SourceFile}", 
                 allChunks.Count, totalFound, sourceFile);
+            
+            // Debug chunk content lengths
+            var chunkContentLengths = allChunks.Select(c => c.Content?.Length ?? 0).ToList();
+            var totalContentLength = chunkContentLengths.Sum();
+            var emptyChunks = chunkContentLengths.Count(l => l == 0);
+            
+            _logger.LogDebug("Chunk content analysis - Total content length: {TotalLength}, Empty chunks: {EmptyCount}/{TotalCount}, Avg chunk size: {AvgSize}", 
+                totalContentLength, emptyChunks, allChunks.Count, chunkContentLengths.Count > 0 ? chunkContentLengths.Average() : 0);
+                
+            if (emptyChunks > allChunks.Count * 0.1) // More than 10% empty chunks
+            {
+                _logger.LogWarning("High number of empty chunks detected: {EmptyCount}/{TotalCount} for document {SourceFile}", 
+                    emptyChunks, allChunks.Count, sourceFile);
+            }
             
             // Validate chunk sequence completeness
             if (allChunks.Count > 1)
