@@ -24,7 +24,8 @@ public record UserChatRequest(
     string Message,
     string? SessionId = null,
     bool UseRag = true,
-    string[]? Context = null
+    string[]? Context = null,
+    string? Language = null
 );
 
 public record CreateUserSessionRequest(string? Title = null, string? Language = null);

@@ -186,8 +186,10 @@ public class UserChatService : IUserChatService
             ), cancellationToken);
 
             // Build context-aware prompt
-            var userLanguage = _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, userLanguage);
+            // Use language from UI, or detect from message, or fall back to default
+            var userLanguage = request.Language ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
+            var normalizedLanguage = _languageService.NormalizeLanguage(userLanguage);
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage);
             
             // Debug logging for search results content
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
@@ -274,12 +276,14 @@ public class UserChatService : IUserChatService
             throw new ArgumentException($"Message too long. Maximum length is {maxMessageLength} characters.");
         }
 
-        // Detect language if not provided
+        // Detect language if not provided, but prefer UI language
         var detectedLanguage = string.IsNullOrEmpty(request.Language) 
             ? _languageService.DetectLanguage(request.Message)
             : request.Language;
 
-        var responseLanguage = request.ResponseLanguage ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
+        // Priority: ResponseLanguage from UI > Language from UI > detected > default
+        var responseLanguage = request.ResponseLanguage ?? request.Language ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
+        var normalizedResponseLanguage = _languageService.NormalizeLanguage(responseLanguage);
         
         // Get conversation history for context
         var conversationHistory = await _chatDbContext.ChatMessages
@@ -340,7 +344,7 @@ public class UserChatService : IUserChatService
                 searchResults.Results, 
                 conversationHistory,
                 detectedLanguage ?? "unknown",
-                responseLanguage,
+                normalizedResponseLanguage,
                 searchResults.Results.Length > 0
             );
 
@@ -357,7 +361,7 @@ public class UserChatService : IUserChatService
             // Generate AI response
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
             var aiResponseContent = aiResponse.GetValue<string>() ?? 
-                _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
+                _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
 
             // Save AI response to database
             var aiDbMessage = new Data.Models.ChatMessage
@@ -370,7 +374,7 @@ public class UserChatService : IUserChatService
                 Sources = searchResults.Results.Length > 0 ? searchResults.Results : null,
                 Metadata = new Dictionary<string, object>
                 {
-                    ["responseLanguage"] = responseLanguage,
+                    ["responseLanguage"] = normalizedResponseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length
                 }
             };
@@ -387,7 +391,7 @@ public class UserChatService : IUserChatService
                 Response = aiDbMessage.Content,
                 SessionId = sessionId,
                 DetectedLanguage = detectedLanguage ?? "unknown",
-                ResponseLanguage = responseLanguage,
+                ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false, // TODO: Implement translation logic when needed
                 Sources = searchResults.Results.Length > 0 ? searchResults.Results.Select(r => r.Content).ToList() : null,
                 ProcessingTimeMs = 0 // TODO: Add timing measurement if needed
@@ -403,7 +407,7 @@ public class UserChatService : IUserChatService
                 Id = Guid.NewGuid().ToString(),
                 SessionId = sessionId,
                 Role = "assistant",
-                Content = _languageService.GetLocalizedErrorMessage("processing_error", responseLanguage),
+                Content = _languageService.GetLocalizedErrorMessage("processing_error", normalizedResponseLanguage),
                 Timestamp = DateTime.UtcNow
             };
             
@@ -415,7 +419,7 @@ public class UserChatService : IUserChatService
                 Response = errorDbMessage.Content,
                 SessionId = sessionId,
                 DetectedLanguage = detectedLanguage ?? "unknown",
-                ResponseLanguage = responseLanguage,
+                ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false,
                 Sources = null,
                 ProcessingTimeMs = 0
