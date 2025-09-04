@@ -47,6 +47,36 @@ public interface IElasticsearchService
     /// </summary>
     /// <returns>Index statistics</returns>
     Task<IndexStats?> GetIndexStatsAsync();
+
+    /// <summary>
+    /// Get a document by ID from a specific index
+    /// </summary>
+    /// <typeparam name="T">Document type</typeparam>
+    /// <param name="indexName">Index name</param>
+    /// <param name="documentId">Document ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Document if found, null otherwise</returns>
+    Task<T?> GetDocumentByIdAsync<T>(string indexName, string documentId, CancellationToken cancellationToken = default) where T : class;
+
+    /// <summary>
+    /// Index a document to a custom index
+    /// </summary>
+    /// <typeparam name="T">Document type</typeparam>
+    /// <param name="indexName">Index name</param>
+    /// <param name="documentId">Document ID</param>
+    /// <param name="document">Document to index</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if successful</returns>
+    Task<bool> IndexDocumentToCustomIndexAsync<T>(string indexName, string documentId, T document, CancellationToken cancellationToken = default) where T : class;
+
+    /// <summary>
+    /// Ensure a custom index exists
+    /// </summary>
+    /// <param name="indexName">Index name</param>
+    /// <param name="mappingJson">Optional mapping JSON</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if index is ready</returns>
+    Task<bool> EnsureCustomIndexExistsAsync(string indexName, string? mappingJson = null, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

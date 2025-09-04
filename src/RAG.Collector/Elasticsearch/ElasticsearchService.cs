@@ -401,4 +401,136 @@ public class ElasticsearchService : IElasticsearchService
     {
         public int Deleted { get; set; }
     }
+
+    public async Task<T?> GetDocumentByIdAsync<T>(string indexName, string documentId, CancellationToken cancellationToken = default) where T : class
+    {
+        try
+        {
+            var response = await _client.GetAsync<StringResponse>(indexName, documentId);
+
+            if (response.Success)
+            {
+                var getResponse = JsonSerializer.Deserialize<GetDocumentResponse<T>>(response.Body, GetJsonOptions());
+                
+                if (getResponse?.Found == true && getResponse.Source != null)
+                {
+                    _logger.LogDebug("Successfully retrieved document {DocumentId} from index {IndexName}", documentId, indexName);
+                    return getResponse.Source;
+                }
+
+                _logger.LogDebug("Document {DocumentId} not found in index {IndexName}", documentId, indexName);
+                return null;
+            }
+
+            // Handle 404 as "not found" rather than error
+            if (response.HttpStatusCode == 404)
+            {
+                _logger.LogDebug("Document {DocumentId} not found in index {IndexName}", documentId, indexName);
+                return null;
+            }
+
+            _logger.LogError("Failed to get document {DocumentId} from index {IndexName}: {Error}", 
+                documentId, indexName, response.DebugInformation);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting document {DocumentId} from index {IndexName}", documentId, indexName);
+            return null;
+        }
+    }
+
+    public async Task<bool> IndexDocumentToCustomIndexAsync<T>(string indexName, string documentId, T document, CancellationToken cancellationToken = default) where T : class
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(document, GetJsonOptions());
+            var response = await _client.IndexAsync<StringResponse>(
+                indexName,
+                documentId,
+                PostData.String(json));
+
+            if (response.Success)
+            {
+                _logger.LogDebug("Successfully indexed document {DocumentId} to index {IndexName}", documentId, indexName);
+                return true;
+            }
+
+            _logger.LogError("Failed to index document {DocumentId} to index {IndexName}: {Error}", 
+                documentId, indexName, response.DebugInformation);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error indexing document {DocumentId} to index {IndexName}", documentId, indexName);
+            return false;
+        }
+    }
+
+    public async Task<bool> EnsureCustomIndexExistsAsync(string indexName, string? mappingJson = null, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Check if index already exists
+            var existsResponse = await _client.Indices.ExistsAsync<StringResponse>(indexName);
+            
+            if (existsResponse.Success && existsResponse.HttpStatusCode == 200)
+            {
+                _logger.LogDebug("Index {IndexName} already exists", indexName);
+                return true;
+            }
+
+            // Create index with mapping if provided
+            PostData indexData;
+            if (!string.IsNullOrEmpty(mappingJson))
+            {
+                indexData = PostData.String(mappingJson);
+            }
+            else
+            {
+                // Default mapping for file metadata
+                var defaultMapping = new
+                {
+                    mappings = new
+                    {
+                        properties = new
+                        {
+                            filePath = new { type = "keyword" },
+                            contentHash = new { type = "keyword" },
+                            lastModified = new { type = "date" },
+                            chunkCount = new { type = "integer" },
+                            indexedAt = new { type = "date" },
+                            fileExtension = new { type = "keyword" }
+                        }
+                    }
+                };
+                indexData = PostData.String(JsonSerializer.Serialize(defaultMapping, GetJsonOptions()));
+            }
+
+            var createResponse = await _client.Indices.CreateAsync<StringResponse>(indexName, indexData);
+            
+            if (createResponse.Success)
+            {
+                _logger.LogInformation("Successfully created index {IndexName}", indexName);
+                return true;
+            }
+
+            _logger.LogError("Failed to create index {IndexName}: {Error}", indexName, createResponse.DebugInformation);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error ensuring index {IndexName} exists", indexName);
+            return false;
+        }
+    }
+
+    private class GetDocumentResponse<T>
+    {
+        [JsonPropertyName("found")]
+        public bool Found { get; set; }
+
+        [JsonPropertyName("_source")]
+        public T? Source { get; set; }
+    }
 }

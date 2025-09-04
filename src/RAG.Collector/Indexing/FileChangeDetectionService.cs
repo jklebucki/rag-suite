@@ -93,8 +93,9 @@ public class FileChangeDetectionService : IFileChangeDetectionService
     {
         try
         {
-            // This would require implementing aggregation queries in ElasticsearchService
-            // For now, return basic stats
+            // For now, return basic stats - this could be implemented later with aggregation queries
+            await Task.CompletedTask;
+            
             return new FileIndexStats
             {
                 TotalIndexedFiles = 0,
@@ -116,22 +117,20 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         {
             var fileId = GenerateFileId(filePath);
             
-            // This would require implementing document get by ID in ElasticsearchService
-            // For now, we'll use a search query
-            var searchQuery = new
-            {
-                query = new
-                {
-                    term = new
-                    {
-                        filePath = new { value = filePath }
-                    }
-                },
-                size = 1
-            };
+            // Ensure metadata index exists
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            
+            // Get document by ID
+            var metadata = await _elasticsearchService.GetDocumentByIdAsync<FileMetadataDocument>(
+                FILE_METADATA_INDEX, fileId, cancellationToken);
 
-            // This is a placeholder - would need actual implementation in ElasticsearchService
-            // For now, return null to trigger reindexing
+            if (metadata != null)
+            {
+                _logger.LogDebug("Found existing file metadata for: {FilePath}", filePath);
+                return metadata;
+            }
+
+            _logger.LogDebug("No existing file metadata found for: {FilePath}", filePath);
             return null;
         }
         catch (Exception ex)
@@ -145,9 +144,21 @@ public class FileChangeDetectionService : IFileChangeDetectionService
     {
         try
         {
-            // This would require extending ElasticsearchService to support multiple indices
-            // For now, we'll log the metadata that would be stored
-            _logger.LogDebug("Would store file metadata: {Metadata}", JsonSerializer.Serialize(metadata));
+            // Ensure metadata index exists
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            
+            // Index the metadata document
+            var success = await _elasticsearchService.IndexDocumentToCustomIndexAsync(
+                FILE_METADATA_INDEX, metadata.Id, metadata, cancellationToken);
+
+            if (success)
+            {
+                _logger.LogDebug("Successfully stored file metadata: {FilePath}", metadata.FilePath);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to store file metadata: {FilePath}", metadata.FilePath);
+            }
         }
         catch (Exception ex)
         {
