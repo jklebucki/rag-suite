@@ -186,7 +186,8 @@ public class UserChatService : IUserChatService
             ), cancellationToken);
 
             // Build context-aware prompt
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory);
+            var userLanguage = _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, userLanguage);
             
             // Debug logging for search results content
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
@@ -439,17 +440,19 @@ public class UserChatService : IUserChatService
         return true;
     }
 
-    private static string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory)
+    private string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en")
     {
         var promptBuilder = new StringBuilder();
         
-        // Add system instruction
-        promptBuilder.AppendLine("You are a helpful AI assistant. Answer the user's question based on the provided context and conversation history.");
+        // Add system instruction using localization
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", language));
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", language));
         
         // Add context from search results if available
         if (searchResults.Length > 0)
         {
-            promptBuilder.AppendLine("\nRelevant context:");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine($"- {result.Content}");
@@ -460,16 +463,24 @@ public class UserChatService : IUserChatService
         var recentMessages = conversationHistory.TakeLast(5).ToArray();
         if (recentMessages.Length > 1) // More than just the current message
         {
-            promptBuilder.AppendLine("\nRecent conversation:");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
             foreach (var msg in recentMessages.SkipLast(1)) // Skip the current message we're responding to
             {
-                promptBuilder.AppendLine($"{msg.Role}: {msg.Content}");
+                var roleLabel = msg.Role == "user" 
+                    ? _languageService.GetLocalizedString("ui_labels", "user", language)
+                    : _languageService.GetLocalizedString("ui_labels", "assistant", language);
+                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
         }
         
         // Add current user message
-        promptBuilder.AppendLine($"\nUser: {userMessage}");
-        promptBuilder.AppendLine("Assistant:");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", language));
+        var userLabel = _languageService.GetLocalizedString("ui_labels", "user", language);
+        promptBuilder.AppendLine($"{userLabel}: {userMessage}");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
         
         return promptBuilder.ToString();
     }
@@ -484,13 +495,17 @@ public class UserChatService : IUserChatService
     {
         var promptBuilder = new StringBuilder();
         
-        // Add system instruction with language information
-        promptBuilder.AppendLine($"You are a helpful multilingual AI assistant. The user wrote in {detectedLanguage} and expects a response in {responseLanguage}.");
-        promptBuilder.AppendLine($"Please respond naturally and fluently in {responseLanguage}.");
+        // Add system instruction with language information using localization
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage));
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage));
+        
+        // Add instructions for language consistency
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage));
         
         if (documentsAvailable && searchResults.Length > 0)
         {
-            promptBuilder.AppendLine("\nRelevant context from documents:");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine($"- {result.Content}");
@@ -498,22 +513,31 @@ public class UserChatService : IUserChatService
         }
         else
         {
-            promptBuilder.AppendLine("\nNo relevant documents found. Please provide a helpful response based on your general knowledge.");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest", responseLanguage));
         }
         
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(5).ToArray();
         if (recentMessages.Length > 1)
         {
-            promptBuilder.AppendLine("\nRecent conversation:");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage));
             foreach (var msg in recentMessages.SkipLast(1))
             {
-                promptBuilder.AppendLine($"{msg.Role}: {msg.Content}");
+                var roleLabel = msg.Role == "user" 
+                    ? _languageService.GetLocalizedString("ui_labels", "user", responseLanguage)
+                    : _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
+                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
         }
         
-        promptBuilder.AppendLine($"\nUser ({detectedLanguage}): {userMessage}");
-        promptBuilder.AppendLine($"Assistant ({responseLanguage}):");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage));
+        var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
+        promptBuilder.AppendLine($"{userLabel} ({detectedLanguage}): {userMessage}");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
         
         return promptBuilder.ToString();
     }

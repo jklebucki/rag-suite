@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "C#: RAG.Orchestrator.Api [Default Configuration]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/src/RAG.Orchestrator.Api/RAG.Orchestrator.Api.csproj"
+        }
+    ]
+}
