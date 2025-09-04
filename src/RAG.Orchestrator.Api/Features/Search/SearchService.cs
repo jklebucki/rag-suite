@@ -385,15 +385,32 @@ public class SearchService : ISearchService
                 var allChunks = await FetchAllChunksForDocument(sourceFile, cancellationToken);
                 if (allChunks.Count > 0)
                 {
-                    reconstructedContent = string.Join("\n\n", allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
-                    allHighlights.AddRange(chunks.SelectMany(c => c.Highlights)); // Keep only highlights from matching chunks
-                    _logger.LogInformation("Successfully reconstructed full document with {TotalChunks} chunks", allChunks.Count);
+                    // Validate that we have a reasonable number of chunks
+                    var expectedChunks = firstChunk.TotalChunks;
+                    var actualChunks = allChunks.Count;
+                    
+                    if (actualChunks >= expectedChunks * _options.MinimumChunkCompleteness) // Use configurable threshold
+                    {
+                        reconstructedContent = string.Join("\n\n", allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+                        allHighlights.AddRange(chunks.SelectMany(c => c.Highlights)); // Keep only highlights from matching chunks
+                        _logger.LogInformation("Successfully reconstructed full document with {ActualChunks}/{ExpectedChunks} chunks for {SourceFile}", 
+                            actualChunks, expectedChunks, sourceFile);
+                    }
+                    else
+                    {
+                        // Too many missing chunks, fall back to found chunks only
+                        reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                        allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
+                        _logger.LogWarning("Document {SourceFile} has too many missing chunks ({ActualChunks}/{ExpectedChunks}), using only matching chunks", 
+                            sourceFile, actualChunks, expectedChunks);
+                    }
                 }
                 else
                 {
                     // Fallback to available chunks
                     reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
                     allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
+                    _logger.LogWarning("Could not fetch any chunks for document {SourceFile}, using only matching chunks", sourceFile);
                 }
             }
             else
@@ -456,27 +473,59 @@ public class SearchService : ISearchService
 
     private bool ShouldReconstructFullDocument(List<ChunkInfo> chunks)
     {
-        // Reconstruct if we have multiple chunks from the same document
-        // or if any chunk indicates it's part of a larger document
-        return chunks.Count > 1 || chunks.Any(c => c.TotalChunks > 1);
+        // Check configuration setting
+        if (!_options.AlwaysReconstructFullDocuments)
+        {
+            _logger.LogDebug("Document reconstruction disabled in configuration");
+            return false;
+        }
+        
+        // Always reconstruct if we have multiple chunks from the same document
+        if (chunks.Count > 1)
+        {
+            _logger.LogDebug("Will reconstruct document: multiple matching chunks ({ChunkCount})", chunks.Count);
+            return true;
+        }
+        
+        // Reconstruct if any chunk indicates it's part of a larger document
+        var firstChunk = chunks.First();
+        if (firstChunk.TotalChunks > 1)
+        {
+            _logger.LogDebug("Will reconstruct document: chunk {ChunkIndex}/{TotalChunks} indicates multi-chunk document", 
+                firstChunk.ChunkIndex, firstChunk.TotalChunks);
+            return true;
+        }
+        
+        // Don't reconstruct for single-chunk documents
+        _logger.LogDebug("Will not reconstruct: single chunk document");
+        return false;
     }
 
     private async Task<List<ChunkInfo>> FetchAllChunksForDocument(string sourceFile, CancellationToken cancellationToken)
     {
         try
         {
-            // Use Dictionary for complex field names instead of anonymous types
+            _logger.LogDebug("Fetching all chunks for document: {SourceFile}", sourceFile);
+            
+            // Use exact match query for sourceFile and sort by chunkIndex
             var searchQuery = new Dictionary<string, object>
             {
-                ["query"] = new { term = new { sourceFile = sourceFile } },
-                ["size"] = 100,
+                ["query"] = new Dictionary<string, object>
+                {
+                    ["term"] = new Dictionary<string, object>
+                    {
+                        ["sourceFile.keyword"] = sourceFile // Use .keyword for exact match
+                    }
+                },
+                ["size"] = _options.MaxChunksPerDocument, // Use configurable size for large documents
                 ["sort"] = new[] 
                 { 
                     new Dictionary<string, object> 
                     { 
                         ["position.chunkIndex"] = new { order = "asc" } 
                     } 
-                }
+                },
+                ["_source"] = new[] { "content", "position", "sourceFile", "fileExtension", "indexedAt" }
             };
 
             var json = JsonSerializer.Serialize(searchQuery);
@@ -486,8 +535,9 @@ public class SearchService : ISearchService
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Failed to fetch all chunks for document {SourceFile}. Status: {StatusCode}", 
-                    sourceFile, response.StatusCode);
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("Failed to fetch all chunks for document {SourceFile}. Status: {StatusCode}. Error: {Error}", 
+                    sourceFile, response.StatusCode, errorContent);
                 return new List<ChunkInfo>();
             }
 
@@ -495,6 +545,7 @@ public class SearchService : ISearchService
             using var doc = JsonDocument.Parse(responseJson);
             
             var hits = doc.RootElement.GetProperty("hits").GetProperty("hits");
+            var totalFound = doc.RootElement.GetProperty("hits").GetProperty("total").GetProperty("value").GetInt32();
             var allChunks = new List<ChunkInfo>();
             
             foreach (var hit in hits.EnumerateArray())
@@ -503,20 +554,59 @@ public class SearchService : ISearchService
                 var chunkContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
                 
                 var chunkIndex = 0;
-                if (source.TryGetProperty("position", out var positionProp) &&
-                    positionProp.TryGetProperty("chunkIndex", out var chunkIndexProp))
+                var totalChunks = 1;
+                if (source.TryGetProperty("position", out var positionProp))
                 {
-                    chunkIndex = chunkIndexProp.GetInt32();
+                    if (positionProp.TryGetProperty("chunkIndex", out var chunkIndexProp))
+                        chunkIndex = chunkIndexProp.GetInt32();
+                    if (positionProp.TryGetProperty("totalChunks", out var totalChunksProp))
+                        totalChunks = totalChunksProp.GetInt32();
                 }
+
+                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp) 
+                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now 
+                    : DateTime.Now;
 
                 allChunks.Add(new ChunkInfo
                 {
                     Content = chunkContent,
-                    ChunkIndex = chunkIndex
+                    ChunkIndex = chunkIndex,
+                    TotalChunks = totalChunks,
+                    SourceFile = sourceFile,
+                    CreatedAt = createdAt
                 });
             }
 
-            _logger.LogDebug("Fetched {ChunkCount} chunks for document {SourceFile}", allChunks.Count, sourceFile);
+            _logger.LogInformation("Successfully fetched {ChunkCount}/{TotalFound} chunks for document {SourceFile}", 
+                allChunks.Count, totalFound, sourceFile);
+            
+            // Validate chunk sequence completeness
+            if (allChunks.Count > 1)
+            {
+                var sortedChunks = allChunks.OrderBy(c => c.ChunkIndex).ToList();
+                var expectedTotalChunks = sortedChunks.First().TotalChunks;
+                var missingChunks = new List<int>();
+                
+                for (int i = 0; i < expectedTotalChunks; i++)
+                {
+                    if (!sortedChunks.Any(c => c.ChunkIndex == i))
+                    {
+                        missingChunks.Add(i);
+                    }
+                }
+                
+                if (missingChunks.Any())
+                {
+                    _logger.LogWarning("Document {SourceFile} is missing chunks: {MissingChunks}. Expected {ExpectedTotal}, found {ActualCount}", 
+                        sourceFile, string.Join(", ", missingChunks), expectedTotalChunks, allChunks.Count);
+                }
+                else
+                {
+                    _logger.LogDebug("Document {SourceFile} has complete chunk sequence: {ChunkCount} chunks", 
+                        sourceFile, allChunks.Count);
+                }
+            }
+            
             return allChunks;
         }
         catch (Exception ex)
@@ -743,13 +833,5 @@ public class SearchService : ISearchService
             took, 
             request.Query
         );
-    }
-
-    private static string ExtractSourceFile(string chunkId)
-    {
-        // Assuming chunk ID format contains source file information
-        // This might need adjustment based on actual ID format
-        var parts = chunkId.Split('_');
-        return parts.Length > 1 ? string.Join("_", parts.Take(parts.Length - 1)) : chunkId;
     }
 }
