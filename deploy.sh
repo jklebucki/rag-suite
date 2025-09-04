@@ -258,7 +258,7 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
       "Url": "http://localhost:8580"
     },
     "LlmService": {
-      "Url": "http://192.168.21.12:11434",
+      "Url": "http://192.168.21.14:11434",
       "MaxTokens": 300,
       "Temperature": 0.7,
       "Model": "llama3.1:8b",
