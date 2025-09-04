@@ -187,6 +187,16 @@ public class UserChatService : IUserChatService
 
             // Build context-aware prompt
             var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory);
+            
+            // Debug logging for search results content
+            _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
+            foreach (var result in searchResults.Results)
+            {
+                _logger.LogDebug("Search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}", 
+                    result.Source, result.Content?.Length ?? 0, 
+                    result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
+            }
+            _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
@@ -332,6 +342,16 @@ public class UserChatService : IUserChatService
                 responseLanguage,
                 searchResults.Results.Length > 0
             );
+
+            // Debug logging for multilingual search results content
+            _logger.LogDebug("Multilingual search results for prompt: {ResultCount} results", searchResults.Results.Length);
+            foreach (var result in searchResults.Results)
+            {
+                _logger.LogDebug("Multilingual search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}", 
+                    result.Source, result.Content?.Length ?? 0, 
+                    result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
+            }
+            _logger.LogDebug("Final multilingual prompt length: {PromptLength} characters", prompt.Length);
 
             // Generate AI response
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
