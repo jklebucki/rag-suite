@@ -1,5 +1,6 @@
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Embeddings;
+using RAG.Orchestrator.Api.Features.Reconstruction;
 using System.Text.Json;
 using System.Text;
 using Elasticsearch.Net;
@@ -8,7 +9,7 @@ using System.IO;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 
-internal class ChunkInfo
+public class ChunkInfo
 {
     public string Id { get; set; } = "";
     public string Content { get; set; } = "";
@@ -42,6 +43,7 @@ public class SearchService : ISearchService
     private readonly IIndexManagementService _indexManagement;
     private readonly IEmbeddingService _embeddingService;
     private readonly IQueryProcessor _queryProcessor;
+    private readonly IDocumentReconstructionService _reconstructionService;
     private readonly ElasticsearchOptions _options;
     private readonly string _indexName;
 
@@ -52,6 +54,7 @@ public class SearchService : ISearchService
         IIndexManagementService indexManagement,
         IEmbeddingService embeddingService,
         IQueryProcessor queryProcessor,
+        IDocumentReconstructionService reconstructionService,
         IOptions<ElasticsearchOptions> options)
     {
         _client = client;
@@ -60,6 +63,7 @@ public class SearchService : ISearchService
         _indexManagement = indexManagement;
         _embeddingService = embeddingService;
         _queryProcessor = queryProcessor;
+        _reconstructionService = reconstructionService;
         _options = options.Value;
         _indexName = _options.DefaultIndexName;
         
@@ -342,7 +346,7 @@ public class SearchService : ISearchService
             
             // Reconstruct the document using the existing logic
             var firstChunk = allChunks.OrderBy(c => c.ChunkIndex).First();
-            var reconstructedContent = string.Join("\n\n", allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+            var reconstructedContent = _reconstructionService.ReconstructDocument(allChunks);
             
             // Get metadata from first chunk
             var fileName = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
@@ -454,11 +458,11 @@ public class SearchService : ISearchService
                         if (validChunks.Count == 0)
                         {
                             _logger.LogWarning("All fetched chunks for {SourceFile} have empty content! Falling back to matching chunks.", sourceFile);
-                            reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                            reconstructedContent = _reconstructionService.ReconstructDocument(sortedChunks);
                         }
                         else
                         {
-                            reconstructedContent = string.Join("\n\n", validChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+                            reconstructedContent = _reconstructionService.ReconstructDocument(validChunks);
                             
                             if (validChunks.Count < allChunks.Count)
                             {
@@ -487,7 +491,7 @@ public class SearchService : ISearchService
                     else
                     {
                         // Too many missing chunks, fall back to found chunks only
-                        reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                        reconstructedContent = _reconstructionService.ReconstructDocument(sortedChunks);
                         allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
                         _logger.LogWarning("Document {SourceFile} has too many missing chunks ({ActualChunks}/{ExpectedChunks}), using only matching chunks", 
                             sourceFile, actualChunks, expectedChunks);
@@ -496,7 +500,7 @@ public class SearchService : ISearchService
                 else
                 {
                     // Fallback to available chunks
-                    reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                    reconstructedContent = _reconstructionService.ReconstructDocument(sortedChunks);
                     allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
                     _logger.LogWarning("Could not fetch any chunks for document {SourceFile}, using only matching chunks", sourceFile);
                 }
@@ -504,7 +508,7 @@ public class SearchService : ISearchService
             else
             {
                 // Use only the found chunks
-                reconstructedContent = string.Join("\n\n", sortedChunks.Select(c => c.Content));
+                reconstructedContent = _reconstructionService.ReconstructDocument(sortedChunks);
                 allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
             }
 

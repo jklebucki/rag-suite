@@ -7,6 +7,7 @@ using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Embeddings;
+using RAG.Orchestrator.Api.Features.Reconstruction;
 using Elasticsearch.Net;
 
 namespace RAG.Orchestrator.Api.Extensions;
@@ -128,6 +129,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
         
         return services;
     }
