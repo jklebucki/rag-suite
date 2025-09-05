@@ -306,6 +306,7 @@ public class SearchService : ISearchService
             // Check Elasticsearch availability first
             await CheckElasticsearchHealth(cancellationToken);
             
+            // First, get the chunk to find the source file
             var response = await _httpClient.GetAsync($"{_options.Url}/{_indexName}/_doc/{documentId}", cancellationToken);
             
             if (!response.IsSuccessStatusCode)
@@ -322,36 +323,82 @@ public class SearchService : ISearchService
             using var doc = JsonDocument.Parse(responseJson);
             
             var source = doc.RootElement.GetProperty("_source");
-            var id = doc.RootElement.GetProperty("_id").GetString() ?? documentId;
+            var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
             
-            var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
-            var content = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
-            var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
-            var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
+            if (string.IsNullOrEmpty(sourceFile))
+            {
+                // Fallback to single chunk if sourceFile is not available
+                return await GetSingleChunkAsDocumentDetail(doc, documentId, cancellationToken);
+            }
+            
+            // Get all chunks for this document and reconstruct it
+            var allChunks = await FetchAllChunksForDocument(sourceFile, cancellationToken);
+            
+            if (allChunks.Count == 0)
+            {
+                // Fallback to single chunk if no chunks found
+                return await GetSingleChunkAsDocumentDetail(doc, documentId, cancellationToken);
+            }
+            
+            // Reconstruct the document using the existing logic
+            var firstChunk = allChunks.OrderBy(c => c.ChunkIndex).First();
+            var reconstructedContent = string.Join("\n\n", allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.Content));
+            
+            // Get metadata from first chunk
+            var fileName = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
+            var fileType = firstChunk.FileExtension ?? "";
+            var filePath = sourceFile;
+            
+            // Extract additional metadata
+            var metadata = new Dictionary<string, object>
+            {
+                { "category", fileType },
+                { "index", _indexName },
+                { "document_id", documentId },
+                { "source_file", sourceFile },
+                { "file_path", filePath },
+                { "file_extension", fileType },
+                { "chunk_count", allChunks.Count },
+                { "total_chunks", firstChunk.TotalChunks }
+            };
+            
+            // Add file size and timestamps if available
+            if (source.TryGetProperty("fileSize", out var fileSizeProp))
+            {
+                metadata["file_size"] = fileSizeProp.ToString();
+            }
+            
+            if (source.TryGetProperty("lastModified", out var lastModifiedProp))
+            {
+                metadata["last_modified"] = lastModifiedProp.ToString();
+            }
+            
+            if (source.TryGetProperty("indexedAt", out var indexedAtProp))
+            {
+                metadata["indexed_at"] = indexedAtProp.ToString();
+            }
             
             var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
                 ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
                 : DateTime.Now;
-
-            var metadata = new Dictionary<string, object>
-            {
-                { "category", category },
-                { "index", _indexName },
-                { "document_id", id }
-            };
-
-            // Add all source fields to metadata
-            foreach (var property in source.EnumerateObject())
-            {
-                if (property.Name != "fileName" && property.Name != "content" && property.Name != "createdAt")
-                {
-                    metadata[property.Name] = property.Value.ToString();
-                }
-            }
+                
+            var updatedAt = source.TryGetProperty("updatedAt", out var updatedProp) 
+                ? DateTime.TryParse(updatedProp.GetString(), out var updated) ? updated : DateTime.Now 
+                : DateTime.Now;
 
             return new DocumentDetail(
-                id, title, content, content, // Using content as both summary and full content
-                1.0, category, type, null, null, metadata, createdAt, DateTime.Now
+                documentId, 
+                fileName, 
+                reconstructedContent.Length > 500 ? reconstructedContent.Substring(0, 500) + "..." : reconstructedContent, // Summary
+                reconstructedContent, // Full content
+                1.0, 
+                fileType, 
+                "Document", 
+                filePath, 
+                fileName, 
+                metadata, 
+                createdAt, 
+                updatedAt
             );
         }
         catch (ElasticsearchUnavailableException)
@@ -955,5 +1002,45 @@ public class SearchService : ISearchService
             took, 
             request.Query
         );
+    }
+    
+    private Task<DocumentDetail> GetSingleChunkAsDocumentDetail(JsonDocument doc, string documentId, CancellationToken cancellationToken)
+    {
+        var source = doc.RootElement.GetProperty("_source");
+        var id = doc.RootElement.GetProperty("_id").GetString() ?? documentId;
+        
+        var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
+        var content = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
+        var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
+        var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
+        var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
+        
+        var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
+            ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+            : DateTime.Now;
+
+        var metadata = new Dictionary<string, object>
+        {
+            { "category", category },
+            { "index", _indexName },
+            { "document_id", id },
+            { "source_file", sourceFile },
+            { "file_path", sourceFile },
+            { "file_extension", category }
+        };
+
+        // Add all source fields to metadata
+        foreach (var property in source.EnumerateObject())
+        {
+            if (property.Name != "fileName" && property.Name != "content" && property.Name != "createdAt")
+            {
+                metadata[property.Name] = property.Value.ToString();
+            }
+        }
+
+        return Task.FromResult(new DocumentDetail(
+            id, title, content, content, // Using content as both summary and full content
+            1.0, category, type, sourceFile, title, metadata, createdAt, DateTime.Now
+        ));
     }
 }

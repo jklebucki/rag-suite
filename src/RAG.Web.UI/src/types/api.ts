@@ -72,6 +72,8 @@ export interface DocumentDetailResponse {
   score: number
   source: string
   documentType: string
+  filePath?: string
+  fileName?: string
   metadata: Record<string, any>
   createdAt: Date
   updatedAt: Date

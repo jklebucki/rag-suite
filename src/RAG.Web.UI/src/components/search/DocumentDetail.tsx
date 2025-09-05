@@ -1,100 +1,98 @@
 import React from 'react'
-import { Calendar, FileText, Database, Tag, Hash } from 'lucide-react'
+import { Calendar, FileText, Database, Tag, Hash, File, HardDrive, Clock } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
-import type { SearchResult } from '@/types'
+import type { DocumentDetailResponse } from '@/types'
 
 interface DocumentDetailProps {
-  document: SearchResult
+  document: DocumentDetailResponse
 }
 
 export function DocumentDetail({ document }: DocumentDetailProps) {
   const formatScore = (score: number) => Math.round(score * 100)
   const { language } = useI18n()
 
+  // Extract metadata for the table
+  const fileExtension = document.metadata?.file_extension || document.source || ''
+  const fileSize = document.metadata?.file_size || 'Unknown'
+  const lastModified = document.metadata?.last_modified || ''
+  const indexedAt = document.metadata?.indexed_at || ''
+  const filePath = document.filePath || document.metadata?.file_path || document.metadata?.source_file || ''
+
+  const formatBytes = (bytes: string | number) => {
+    if (!bytes || bytes === 'Unknown') return 'Unknown'
+    const num = typeof bytes === 'string' ? parseInt(bytes) : bytes
+    if (isNaN(num)) return 'Unknown'
+    
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    if (num === 0) return '0 Bytes'
+    const i = Math.floor(Math.log(num) / Math.log(1024))
+    return Math.round(num / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
+  }
+
+  const formatMetadataDate = (dateStr: string) => {
+    if (!dateStr) return 'Unknown'
+    try {
+      const date = new Date(dateStr)
+      return isNaN(date.getTime()) ? dateStr : formatDateTime(date, language)
+    } catch {
+      return dateStr
+    }
+  }
+
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="border-b border-gray-200 pb-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{document.title}</h1>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span className="flex items-center">
-                <Database className="h-4 w-4 mr-1" />
-                {document.source}
-              </span>
-              <span className="flex items-center">
-                <FileText className="h-4 w-4 mr-1" />
-                {document.documentType}
-              </span>
-              <span className="flex items-center">
-                <Hash className="h-4 w-4 mr-1" />
-                ID: {document.id}
-              </span>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded-full mb-2">
-              {formatScore(document.score)}% match
-            </div>
+    <div className="flex flex-col h-full max-h-[80vh]">
+      {/* Header with file path */}
+      <div className="flex-shrink-0 border-b border-gray-200 pb-4 mb-4">
+        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+          <File className="h-4 w-4" />
+          <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+            {filePath || 'Unknown path'}
+          </span>
+        </div>
+        <h1 className="text-xl font-bold text-gray-900">{document.title || document.fileName}</h1>
+      </div>
+
+      {/* Scrollable content area */}
+      <div className="flex-grow overflow-y-auto mb-4">
+        <div className="bg-gray-50 rounded-lg p-4 h-full">
+          <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
+            {document.fullContent || document.content}
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Content</h3>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-            {document.content}
-          </p>
-        </div>
-      </div>
-
-      {/* Metadata */}
-      {Object.keys(document.metadata).length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-            <Tag className="h-5 w-5 mr-2" />
-            Metadata
-          </h3>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {Object.entries(document.metadata).map(([key, value]) => (
-                <div key={key} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
-                  <span className="font-medium text-gray-700 capitalize">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                  </span>
-                  <span className="text-gray-600">
-                    {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                  </span>
-                </div>
-              ))}
-            </div>
+      {/* Metadata table at the bottom */}
+      <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+          <Tag className="h-4 w-4 mr-2" />
+          File Information
+        </h3>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">File Extension:</span>
+            <span className="text-gray-600">{fileExtension}</span>
           </div>
-        </div>
-      )}
-
-      {/* Timestamps */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
-            Created
-          </h4>
-          <p className="text-gray-600">
-            {formatDateTime(document.createdAt, language)}
-          </p>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
-            Last Updated
-          </h4>
-          <p className="text-gray-600">
-            {formatDateTime(document.updatedAt, language)}
-          </p>
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">File Size:</span>
+            <span className="text-gray-600">{formatBytes(fileSize)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">Last Modified:</span>
+            <span className="text-gray-600">{formatMetadataDate(lastModified)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">Indexed At:</span>
+            <span className="text-gray-600">{formatMetadataDate(indexedAt)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">Created:</span>
+            <span className="text-gray-600">{formatDateTime(document.createdAt, language)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium text-gray-700">Last Updated:</span>
+            <span className="text-gray-600">{formatDateTime(document.updatedAt, language)}</span>
+          </div>
         </div>
       </div>
     </div>
