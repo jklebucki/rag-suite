@@ -15,6 +15,7 @@ public class PasswordRequirements
     public bool RequireUppercase { get; set; } = true;
     public bool RequireNonAlphanumeric { get; set; } = false;
     public string ValidationMessage { get; set; } = string.Empty;
+    public List<string> ValidationRules { get; set; } = new();
 }
 
 public class UserFieldRequirements
@@ -23,6 +24,8 @@ public class UserFieldRequirements
     public FieldRequirement UserName { get; set; } = new() { Required = true, MinLength = 3, MaxLength = 50 };
     public FieldRequirement FirstName { get; set; } = new() { Required = true, MaxLength = 100 };
     public FieldRequirement LastName { get; set; } = new() { Required = true, MaxLength = 100 };
+    public FieldRequirement Password { get; set; } = new() { Required = true, MinLength = 6 };
+    public FieldRequirement ConfirmPassword { get; set; } = new() { Required = true };
 }
 
 public class FieldRequirement

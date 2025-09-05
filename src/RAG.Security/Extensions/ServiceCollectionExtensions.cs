@@ -16,10 +16,14 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRAGSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        // Register DefaultAdmin configuration
+        // Register configuration options
         var defaultAdminConfig = new DefaultAdminConfiguration();
         configuration.GetSection("DefaultAdmin").Bind(defaultAdminConfig);
         services.AddSingleton(defaultAdminConfig);
+
+        var passwordComplexityConfig = new PasswordComplexityOptions();
+        configuration.GetSection(PasswordComplexityOptions.SectionName).Bind(passwordComplexityConfig);
+        services.Configure<PasswordComplexityOptions>(configuration.GetSection(PasswordComplexityOptions.SectionName));
 
         // Add PostgreSQL DbContext
         var connectionString = configuration.GetConnectionString("SecurityDatabase") 
@@ -33,21 +37,22 @@ public static class ServiceCollectionExtensions
         // Add Identity
         services.AddIdentity<User, Role>(options =>
         {
-            // Password settings
-            options.Password.RequiredLength = 6;
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = false;
+            // Password settings from configuration
+            options.Password.RequiredLength = passwordComplexityConfig.RequiredLength;
+            options.Password.RequireDigit = passwordComplexityConfig.RequireDigit;
+            options.Password.RequireLowercase = passwordComplexityConfig.RequireLowercase;
+            options.Password.RequireUppercase = passwordComplexityConfig.RequireUppercase;
+            options.Password.RequireNonAlphanumeric = passwordComplexityConfig.RequireNonAlphanumeric;
+            options.Password.RequiredUniqueChars = passwordComplexityConfig.RequiredUniqueChars;
 
-            // Lockout settings
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
+            // Lockout settings from configuration
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(passwordComplexityConfig.Security.DefaultLockoutTimeSpanMinutes);
+            options.Lockout.MaxFailedAccessAttempts = passwordComplexityConfig.Security.MaxFailedAccessAttempts;
+            options.Lockout.AllowedForNewUsers = passwordComplexityConfig.Security.AllowedForNewUsers;
 
-            // User settings
-            options.User.RequireUniqueEmail = true;
-            options.SignIn.RequireConfirmedEmail = false; // For simplicity
+            // User settings from configuration
+            options.User.RequireUniqueEmail = passwordComplexityConfig.Security.RequireUniqueEmail;
+            options.SignIn.RequireConfirmedEmail = passwordComplexityConfig.Security.RequireEmailConfirmation;
         })
         .AddEntityFrameworkStores<SecurityDbContext>()
         .AddDefaultTokenProviders();

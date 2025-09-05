@@ -7,65 +7,68 @@ import { LoginForm, RegisterForm, ResetPasswordForm, ProtectedRoute, AuthRoute }
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ConfigurationProvider } from '@/contexts/ConfigurationContext'
 
 function App() {
   return (
     <I18nProvider>
       <ToastProvider>
-        <AuthProvider>
+        <ConfigurationProvider>
+          <AuthProvider>
           <Layout>
             <Routes>
-              <Route 
-                path="/" 
+              <Route
+                path="/"
                 element={
                   <ProtectedRoute>
                     <Dashboard />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="/chat" 
+              <Route
+                path="/chat"
                 element={
                   <ProtectedRoute>
                     <ChatInterface />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="/search" 
+              <Route
+                path="/search"
                 element={
                   <ProtectedRoute>
                     <SearchInterface />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="/login" 
+              <Route
+                path="/login"
                 element={
                   <AuthRoute>
                     <LoginForm />
                   </AuthRoute>
-                } 
+                }
               />
-              <Route 
-                path="/register" 
+              <Route
+                path="/register"
                 element={
                   <AuthRoute>
                     <RegisterForm />
                   </AuthRoute>
-                } 
+                }
               />
-              <Route 
-                path="/reset-password" 
+              <Route
+                path="/reset-password"
                 element={
                   <AuthRoute>
                     <ResetPasswordForm />
                   </AuthRoute>
-                } 
+                }
               />
             </Routes>
           </Layout>
         </AuthProvider>
+        </ConfigurationProvider>
       </ToastProvider>
     </I18nProvider>
   )

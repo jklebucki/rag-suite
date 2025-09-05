@@ -12,10 +12,14 @@ public interface IRegistrationConfigurationService
 public class RegistrationConfigurationService : IRegistrationConfigurationService
 {
     private readonly IdentityOptions _identityOptions;
+    private readonly PasswordComplexityOptions _passwordComplexityOptions;
 
-    public RegistrationConfigurationService(IOptions<IdentityOptions> identityOptions)
+    public RegistrationConfigurationService(
+        IOptions<IdentityOptions> identityOptions,
+        IOptions<PasswordComplexityOptions> passwordComplexityOptions)
     {
         _identityOptions = identityOptions.Value;
+        _passwordComplexityOptions = passwordComplexityOptions.Value;
     }
 
     public RegistrationConfiguration GetConfiguration()
@@ -34,47 +38,59 @@ public class RegistrationConfigurationService : IRegistrationConfigurationServic
                 RequireLowercase = passwordOptions.RequireLowercase,
                 RequireUppercase = passwordOptions.RequireUppercase,
                 RequireNonAlphanumeric = passwordOptions.RequireNonAlphanumeric,
-                ValidationMessage = BuildPasswordValidationMessage(passwordOptions)
+                ValidationMessage = BuildPasswordValidationMessage(passwordOptions),
+                ValidationRules = BuildPasswordValidationRules(passwordOptions)
             },
             UserFieldRequirements = new UserFieldRequirements
             {
                 Email = new FieldRequirement 
                 { 
                     Required = true, 
-                    MaxLength = 256,
+                    MaxLength = _passwordComplexityOptions.UserFields.EmailMaxLength,
                     Pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$",
-                    ValidationMessage = "Valid email address is required"
+                    ValidationMessage = "auth.validation.email_invalid"
                 },
                 UserName = new FieldRequirement 
                 { 
                     Required = true, 
-                    MinLength = 3, 
-                    MaxLength = 50,
-                    ValidationMessage = "Username must be between 3 and 50 characters"
+                    MinLength = _passwordComplexityOptions.UserFields.UserNameMinLength, 
+                    MaxLength = _passwordComplexityOptions.UserFields.UserNameMaxLength,
+                    ValidationMessage = "auth.validation.username_min_length"
                 },
                 FirstName = new FieldRequirement 
                 { 
                     Required = true, 
-                    MaxLength = 100,
-                    ValidationMessage = "First name is required and cannot exceed 100 characters"
+                    MaxLength = _passwordComplexityOptions.UserFields.FirstNameMaxLength,
+                    ValidationMessage = "auth.validation.first_name_required"
                 },
                 LastName = new FieldRequirement 
                 { 
                     Required = true, 
-                    MaxLength = 100,
-                    ValidationMessage = "Last name is required and cannot exceed 100 characters"
+                    MaxLength = _passwordComplexityOptions.UserFields.LastNameMaxLength,
+                    ValidationMessage = "auth.validation.last_name_required"
+                },
+                Password = new FieldRequirement 
+                { 
+                    Required = true, 
+                    MinLength = passwordOptions.RequiredLength,
+                    ValidationMessage = "auth.validation.password_required"
+                },
+                ConfirmPassword = new FieldRequirement 
+                { 
+                    Required = true,
+                    ValidationMessage = "auth.validation.password_mismatch"
                 }
             },
             SecuritySettings = new SecuritySettings
             {
-                RequireEmailConfirmation = signInOptions.RequireConfirmedEmail,
-                RequireUniqueEmail = userOptions.RequireUniqueEmail,
-                RequireTermsAcceptance = true, // This is application-specific
+                RequireEmailConfirmation = _passwordComplexityOptions.Security.RequireEmailConfirmation,
+                RequireUniqueEmail = _passwordComplexityOptions.Security.RequireUniqueEmail,
+                RequireTermsAcceptance = _passwordComplexityOptions.Security.RequireTermsAcceptance,
                 Lockout = new LockoutSettings
                 {
-                    AllowedForNewUsers = lockoutOptions.AllowedForNewUsers,
-                    MaxFailedAccessAttempts = lockoutOptions.MaxFailedAccessAttempts,
-                    DefaultLockoutTimeSpanMinutes = (int)lockoutOptions.DefaultLockoutTimeSpan.TotalMinutes
+                    AllowedForNewUsers = _passwordComplexityOptions.Security.AllowedForNewUsers,
+                    MaxFailedAccessAttempts = _passwordComplexityOptions.Security.MaxFailedAccessAttempts,
+                    DefaultLockoutTimeSpanMinutes = _passwordComplexityOptions.Security.DefaultLockoutTimeSpanMinutes
                 }
             }
         };
@@ -105,5 +121,26 @@ public class RegistrationConfigurationService : IRegistrationConfigurationServic
             2 => $"Password must contain {requirements[0]} and {requirements[1]}",
             _ => $"Password must contain {string.Join(", ", requirements.Take(requirements.Count - 1))} and {requirements.Last()}"
         };
+    }
+
+    private static List<string> BuildPasswordValidationRules(PasswordOptions options)
+    {
+        var rules = new List<string>();
+
+        rules.Add($"auth.validation.password_min_length#{options.RequiredLength}");
+
+        if (options.RequireUppercase)
+            rules.Add("auth.validation.password_require_uppercase");
+
+        if (options.RequireLowercase)
+            rules.Add("auth.validation.password_require_lowercase");
+
+        if (options.RequireDigit)
+            rules.Add("auth.validation.password_require_digit");
+
+        if (options.RequireNonAlphanumeric)
+            rules.Add("auth.validation.password_require_special");
+
+        return rules;
     }
 }

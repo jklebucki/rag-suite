@@ -29,7 +29,7 @@ export const nl: TranslationKeys = {
   'common.view_details': 'Details bekijken',
   'common.export': 'Exporteren',
   'common.settings': 'Instellingen',
-  
+
   // Dashboard
   'dashboard.title': 'RAG Suite Dashboard',
   'dashboard.subtitle': 'Uw intelligente platform voor documentverwerking en zoeken',
@@ -45,7 +45,7 @@ export const nl: TranslationKeys = {
   'dashboard.features.search.description': 'Vind relevante informatie in al uw documenten',
   'dashboard.features.analytics.title': 'Analytics & Inzichten',
   'dashboard.features.analytics.description': 'Monitor gebruik en prestatiemetrieken',
-  
+
   // Chat
   'chat.title': 'Chat Interface',
   'chat.subtitle': 'Voer gesprekken met uw kennisbank',
@@ -97,7 +97,7 @@ export const nl: TranslationKeys = {
   'search.filters.title': 'Zoekfilters',
   'search.filters.max_results': 'Max. Resultaten',
   'search.filters.threshold': 'Relevantiedrempel',
-  
+
   // Language
   'language.selector.title': 'Taal Selecteren',
   'language.selector.current': 'Huidige taal',
@@ -166,6 +166,10 @@ export const nl: TranslationKeys = {
   'auth.validation.email_invalid': 'Voer een geldig e-mailadres in',
   'auth.validation.password_required': 'Wachtwoord is verplicht',
   'auth.validation.password_min_length': 'Wachtwoord moet minimaal 6 tekens bevatten',
+  'auth.validation.password_require_digit': 'Wachtwoord moet een cijfer bevatten',
+  'auth.validation.password_require_uppercase': 'Wachtwoord moet een hoofdletter bevatten',
+  'auth.validation.password_require_lowercase': 'Wachtwoord moet een kleine letter bevatten',
+  'auth.validation.password_require_special': 'Wachtwoord moet een speciaal teken bevatten',
   'auth.validation.password_mismatch': 'Wachtwoorden komen niet overeen',
   'auth.validation.first_name_required': 'Voornaam is verplicht',
   'auth.validation.last_name_required': 'Achternaam is verplicht',

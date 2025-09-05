@@ -29,7 +29,7 @@ export const ro: TranslationKeys = {
   'common.view_details': 'Vezi detalii',
   'common.export': 'Exportă',
   'common.settings': 'Setări',
-  
+
   // Dashboard
   'dashboard.title': 'Panou RAG Suite',
   'dashboard.subtitle': 'Platforma ta inteligentă de procesare și căutare documente',
@@ -45,7 +45,7 @@ export const ro: TranslationKeys = {
   'dashboard.features.search.description': 'Găsește informații relevante în toate documentele',
   'dashboard.features.analytics.title': 'Analiză și Insight-uri',
   'dashboard.features.analytics.description': 'Monitorizează utilizarea și metricile de performanță',
-  
+
   // Chat
   'chat.title': 'Interfață Chat',
   'chat.subtitle': 'Conversează cu baza ta de cunoștințe',
@@ -97,7 +97,7 @@ export const ro: TranslationKeys = {
   'search.filters.title': 'Filtre Căutare',
   'search.filters.max_results': 'Rezultate Maxime',
   'search.filters.threshold': 'Prag Relevanță',
-  
+
   // Language
   'language.selector.title': 'Selectează Limba',
   'language.selector.current': 'Limba curentă',
@@ -166,6 +166,10 @@ export const ro: TranslationKeys = {
   'auth.validation.email_invalid': 'Introdu o adresă de email validă',
   'auth.validation.password_required': 'Parola este obligatorie',
   'auth.validation.password_min_length': 'Parola trebuie să aibă cel puțin 6 caractere',
+  'auth.validation.password_require_digit': 'Parola trebuie să conțină o cifră',
+  'auth.validation.password_require_uppercase': 'Parola trebuie să conțină o literă mare',
+  'auth.validation.password_require_lowercase': 'Parola trebuie să conțină o literă mică',
+  'auth.validation.password_require_special': 'Parola trebuie să conțină un caracter special',
   'auth.validation.password_mismatch': 'Parolele nu se potrivesc',
   'auth.validation.first_name_required': 'Prenumele este obligatoriu',
   'auth.validation.last_name_required': 'Numele este obligatoriu',

@@ -183,6 +183,10 @@ export interface TranslationKeys {
   'auth.validation.email_invalid': string;
   'auth.validation.password_required': string;
   'auth.validation.password_min_length': string;
+  'auth.validation.password_require_digit': string;
+  'auth.validation.password_require_uppercase': string;
+  'auth.validation.password_require_lowercase': string;
+  'auth.validation.password_require_special': string;
   'auth.validation.password_mismatch': string;
   'auth.validation.first_name_required': string;
   'auth.validation.last_name_required': string;

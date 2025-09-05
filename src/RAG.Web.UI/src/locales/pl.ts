@@ -9,7 +9,7 @@ export const pl: TranslationKeys = {
   'nav.ingestion': 'Ingestion',
   'nav.analytics': 'Analityka',
   'nav.settings': 'Ustawienia',
-  
+
   // Dashboard
   'dashboard.title': 'Panel RAG Suite',
   'dashboard.subtitle': 'Twoja inteligentna platforma przetwarzania i wyszukiwania dokumentów',
@@ -25,7 +25,7 @@ export const pl: TranslationKeys = {
   'dashboard.features.search.description': 'Znajdź odpowiednie informacje we wszystkich dokumentach',
   'dashboard.features.analytics.title': 'Analityka i Wgląd',
   'dashboard.features.analytics.description': 'Monitoruj użycie i metryki wydajności',
-  
+
   // Chat
   'chat.title': 'Interfejs Czatu',
   'chat.subtitle': 'Prowadź rozmowy z bazą wiedzy',
@@ -77,7 +77,7 @@ export const pl: TranslationKeys = {
   'search.filters.title': 'Filtry Wyszukiwania',
   'search.filters.max_results': 'Maks. Wyników',
   'search.filters.threshold': 'Próg Trafności',
-  
+
   // Language
   'language.selector.title': 'Wybierz Język',
   'language.selector.current': 'Aktualny język',
@@ -85,7 +85,7 @@ export const pl: TranslationKeys = {
   'language.auto_detect': 'Automatyczne wykrywanie',
   'language.change_success': 'Język zmieniony pomyślnie',
   'language.auto_detected': 'Automatycznie wykryty z przeglądarki',
-  
+
   // Common
   'common.loading': 'Ładowanie...',
   'common.error': 'Wystąpił błąd',
@@ -166,6 +166,10 @@ export const pl: TranslationKeys = {
   'auth.validation.email_invalid': 'Wprowadź prawidłowy adres email',
   'auth.validation.password_required': 'Hasło jest wymagane',
   'auth.validation.password_min_length': 'Hasło musi mieć co najmniej 6 znaków',
+  'auth.validation.password_require_digit': 'Hasło musi zawierać co najmniej jedną cyfrę',
+  'auth.validation.password_require_uppercase': 'Hasło musi zawierać co najmniej jedną wielką literę',
+  'auth.validation.password_require_lowercase': 'Hasło musi zawierać co najmniej jedną małą literę',
+  'auth.validation.password_require_special': 'Hasło musi zawierać co najmniej jeden znak specjalny',
   'auth.validation.password_mismatch': 'Hasła nie są identyczne',
   'auth.validation.first_name_required': 'Imię jest wymagane',
   'auth.validation.last_name_required': 'Nazwisko jest wymagane',

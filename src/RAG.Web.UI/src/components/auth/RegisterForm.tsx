@@ -4,6 +4,7 @@ import { Eye, EyeOff, User, Mail, Lock, Check } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
+import { useConfiguration, usePasswordValidation } from '@/contexts/ConfigurationContext'
 
 interface RegisterData {
   firstName: string
@@ -30,6 +31,8 @@ export function RegisterForm() {
   const { t } = useI18n()
   const { register } = useAuth()
   const { addToast } = useToast()
+  const { configuration } = useConfiguration()
+  const { validatePassword } = usePasswordValidation()
 
   const [formData, setFormData] = useState<RegisterData>({
     firstName: '',
@@ -49,42 +52,75 @@ export function RegisterForm() {
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {}
 
+    if (!configuration) {
+      newErrors.firstName = 'Configuration not loaded'
+      setErrors(newErrors)
+      return false
+    }
+
+    const { userFieldRequirements } = configuration
+
     // First name validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = t('auth.validation.first_name_required')
+    } else if (userFieldRequirements.firstName.maxLength && formData.firstName.length > userFieldRequirements.firstName.maxLength) {
+      newErrors.firstName = `First name cannot exceed ${userFieldRequirements.firstName.maxLength} characters`
     }
 
     // Last name validation
     if (!formData.lastName.trim()) {
       newErrors.lastName = t('auth.validation.last_name_required')
+    } else if (userFieldRequirements.lastName.maxLength && formData.lastName.length > userFieldRequirements.lastName.maxLength) {
+      newErrors.lastName = `Last name cannot exceed ${userFieldRequirements.lastName.maxLength} characters`
     }
 
     // Username validation
     if (!formData.userName.trim()) {
       newErrors.userName = t('auth.validation.username_required')
-    } else if (formData.userName.trim().length < 3) {
-      newErrors.userName = t('auth.validation.username_min_length')
-    }
+    } else {
+      const minLength = userFieldRequirements.userName.minLength || 3
+      const maxLength = userFieldRequirements.userName.maxLength || 50
 
-    // Username validation
-    if (!formData.userName.trim()) {
-      newErrors.userName = t('auth.validation.username_required')
-    } else if (formData.userName.length < 3) {
-      newErrors.userName = t('auth.validation.username_min_length')
+      if (formData.userName.trim().length < minLength) {
+        newErrors.userName = t('auth.validation.username_min_length')
+      } else if (formData.userName.length > maxLength) {
+        newErrors.userName = `Username cannot exceed ${maxLength} characters`
+      }
     }
 
     // Email validation
     if (!formData.email.trim()) {
       newErrors.email = t('auth.validation.email_required')
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (userFieldRequirements.email.pattern && !new RegExp(userFieldRequirements.email.pattern).test(formData.email)) {
       newErrors.email = t('auth.validation.email_invalid')
+    } else if (userFieldRequirements.email.maxLength && formData.email.length > userFieldRequirements.email.maxLength) {
+      newErrors.email = `Email cannot exceed ${userFieldRequirements.email.maxLength} characters`
     }
 
-    // Password validation
+    // Password validation using dynamic validation
     if (!formData.password) {
       newErrors.password = t('auth.validation.password_required')
-    } else if (formData.password.length < 6) {
-      newErrors.password = t('auth.validation.password_min_length')
+    } else {
+      const passwordValidation = validatePassword(formData.password)
+      if (!passwordValidation.isValid && passwordValidation.errors.length > 0) {
+        // Map validation errors to user-friendly messages
+        const errorKey = passwordValidation.errors[0]
+
+        if (errorKey.includes('password_min_length')) {
+          const minLength = configuration.passwordRequirements.requiredLength
+          newErrors.password = `Password must be at least ${minLength} characters`
+        } else if (errorKey.includes('password_require_digit')) {
+          newErrors.password = t('auth.validation.password_require_digit')
+        } else if (errorKey.includes('password_require_uppercase')) {
+          newErrors.password = t('auth.validation.password_require_uppercase')
+        } else if (errorKey.includes('password_require_lowercase')) {
+          newErrors.password = t('auth.validation.password_require_lowercase')
+        } else if (errorKey.includes('password_require_special')) {
+          newErrors.password = t('auth.validation.password_require_special')
+        } else {
+          newErrors.password = t('auth.validation.password_min_length')
+        }
+      }
     }
 
     // Confirm password validation
@@ -175,7 +211,7 @@ export function RegisterForm() {
             {t('auth.register.subtitle')}
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* First Name */}

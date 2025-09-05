@@ -29,7 +29,7 @@ export const hu: TranslationKeys = {
   'common.view_details': 'Részletek megtekintése',
   'common.export': 'Exportálás',
   'common.settings': 'Beállítások',
-  
+
   // Dashboard
   'dashboard.title': 'RAG Suite Vezérlőpult',
   'dashboard.subtitle': 'Az intelligens dokumentumfeldolgozó és kereső platformod',
@@ -45,7 +45,7 @@ export const hu: TranslationKeys = {
   'dashboard.features.search.description': 'Találj releváns információkat minden dokumentumban',
   'dashboard.features.analytics.title': 'Analitika és Betekintés',
   'dashboard.features.analytics.description': 'Figyelj a használatra és teljesítménymutatókra',
-  
+
   // Chat
   'chat.title': 'Chat Felület',
   'chat.subtitle': 'Beszélgess a tudásbázissal',
@@ -97,7 +97,7 @@ export const hu: TranslationKeys = {
   'search.filters.title': 'Keresési Szűrők',
   'search.filters.max_results': 'Max. Eredmények',
   'search.filters.threshold': 'Relevanciasküszöb',
-  
+
   // Language
   'language.selector.title': 'Nyelv Kiválasztása',
   'language.selector.current': 'Jelenlegi nyelv',
@@ -166,6 +166,10 @@ export const hu: TranslationKeys = {
   'auth.validation.email_invalid': 'Adj meg egy érvényes email címet',
   'auth.validation.password_required': 'A jelszó kötelező',
   'auth.validation.password_min_length': 'A jelszónak legalább 6 karakternek kell lennie',
+  'auth.validation.password_require_digit': 'A jelszónak tartalmaznia kell számot',
+  'auth.validation.password_require_uppercase': 'A jelszónak tartalmaznia kell nagybetűt',
+  'auth.validation.password_require_lowercase': 'A jelszónak tartalmaznia kell kisbetűt',
+  'auth.validation.password_require_special': 'A jelszónak tartalmaznia kell speciális karaktert',
   'auth.validation.password_mismatch': 'A jelszavak nem egyeznek',
   'auth.validation.first_name_required': 'A keresztnév kötelező',
     'auth.validation.last_name_required': 'A vezetéknév kötelező',
