@@ -60,12 +60,8 @@ catch (Exception ex)
     // Don't throw - let the application continue to run
 }
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Enable CORS for all environments (needed for direct API access)
 app.UseCors("AllowFrontend");
