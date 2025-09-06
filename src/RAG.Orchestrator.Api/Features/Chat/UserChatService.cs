@@ -344,7 +344,7 @@ public class UserChatService : IUserChatService
             var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null,
-                Limit: 3,
+                Limit: 1, // Get only one document with the highest rating
                 Offset: 0
             ), cancellationToken);
 

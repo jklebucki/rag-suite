@@ -312,11 +312,11 @@ public class ChatService : IChatService
 
         try
         {
-            // Search for relevant context with higher limit to catch chunk groups
+            // Search for relevant context - get only the best matching document
             var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null,
-                Limit: 10, // Increased to allow for chunk reconstruction
+                Limit: 1, // Get only one document with the highest rating
                 Offset: 0
             ), cancellationToken);
 
@@ -400,7 +400,7 @@ public class ChatService : IChatService
             var searchRequest = new Features.Search.SearchRequest(
                 request.Message,
                 Filters: null, // TODO: Map metadata to SearchFilters if needed
-                Limit: 10, // Increased to allow for chunk reconstruction
+                Limit: 1, // Get only one document with the highest rating
                 Offset: 0
             );
 
