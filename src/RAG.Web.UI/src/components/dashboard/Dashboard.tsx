@@ -18,6 +18,8 @@ export function Dashboard() {
     stats,
     plugins,
     systemHealth,
+    analyticsHealth,
+    clusterStats,
     statsCards,
     isLoading,
     hasError,
@@ -67,7 +69,10 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Queries */}
-        <TopQueries queries={stats?.topQueries} />
+        <TopQueries 
+          queries={stats?.topQueries} 
+          searchStats={analyticsHealth?.searchStats}
+        />
 
         {/* Plugin Status */}
         <PluginsStatus 
@@ -76,8 +81,12 @@ export function Dashboard() {
         />
       </div>
 
-      {/* System Health */}
-  <SystemHealth systemHealth={systemHealth} />
+      {/* Enhanced System Health */}
+      <SystemHealth 
+        systemHealth={systemHealth as any} 
+        analyticsHealth={analyticsHealth}
+        clusterStats={clusterStats}
+      />
     </div>
   )
 }

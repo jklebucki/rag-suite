@@ -12,8 +12,14 @@ import type {
   ChatSession,
   PluginInfo,
   UsageStats,
-  PerformanceMetrics
-  , SystemHealthResponse
+  PerformanceMetrics,
+  SystemHealthResponse,
+  ElasticsearchStats,
+  IndexStats,
+  NodeStats,
+  SearchStatistics,
+  SystemHealth,
+  DashboardData
 } from '@/types'
 
 class ApiClient {
@@ -184,6 +190,46 @@ class ApiClient {
     if (filters?.endpoint) params.append('endpoint', filters.endpoint)
 
     const response: AxiosResponse<ApiResponse<PerformanceMetrics[]>> = await this.client.get(`/analytics/performance?${params}`)
+    return response.data.data
+  }
+
+  // Enhanced Analytics - Elasticsearch Integration
+  async getElasticsearchClusterStats(): Promise<ElasticsearchStats> {
+    const response: AxiosResponse<ApiResponse<ElasticsearchStats>> = await this.client.get('/analytics/elasticsearch/cluster')
+    return response.data.data
+  }
+
+  async getElasticsearchIndices(indexName?: string): Promise<IndexStats[]> {
+    const url = indexName ? `/analytics/elasticsearch/indices/${indexName}` : '/analytics/elasticsearch/indices'
+    const response: AxiosResponse<ApiResponse<IndexStats[]>> = await this.client.get(url)
+    return response.data.data
+  }
+
+  async getElasticsearchNodes(): Promise<NodeStats[]> {
+    const response: AxiosResponse<ApiResponse<NodeStats[]>> = await this.client.get('/analytics/elasticsearch/nodes')
+    return response.data.data
+  }
+
+  async getSearchStatistics(): Promise<SearchStatistics> {
+    const response: AxiosResponse<ApiResponse<SearchStatistics>> = await this.client.get('/analytics/search')
+    return response.data.data
+  }
+
+  async getAnalyticsHealth(): Promise<SystemHealth> {
+    const response: AxiosResponse<ApiResponse<SystemHealth>> = await this.client.get('/analytics/health')
+    return response.data.data
+  }
+
+  async getDashboardData(includeDetailedStats = false): Promise<DashboardData> {
+    const params = new URLSearchParams()
+    if (includeDetailedStats) params.append('includeDetailedStats', 'true')
+    
+    const response: AxiosResponse<ApiResponse<DashboardData>> = await this.client.get(`/analytics/dashboard?${params}`)
+    return response.data.data
+  }
+
+  async getAnalyticsStatus(): Promise<{ status: string; services: Record<string, boolean> }> {
+    const response: AxiosResponse<ApiResponse<{ status: string; services: Record<string, boolean> }>> = await this.client.get('/analytics/status')
     return response.data.data
   }
 

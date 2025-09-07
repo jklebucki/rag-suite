@@ -154,7 +154,72 @@ export interface PerformanceMetrics {
   endpoint: string
 }
 
-// Health Types
+// Enhanced Analytics Types for Elasticsearch Integration
+export interface ElasticsearchStats {
+  clusterName: string
+  status: string
+  numberOfNodes: number
+  numberOfDataNodes: number
+  activePrimaryShards: number
+  activeShards: number
+  unassignedShards: number
+  activeShardsPercent: number
+}
+
+export interface IndexStats {
+  indexName: string
+  health: string
+  status: string
+  documentCount: number
+  deletedDocuments: number
+  storeSize: string
+  storeSizeBytes: number
+  indexTotal: number
+  indexTimeInMillis: number
+  searchTotal: number
+  searchTimeInMillis: number
+  getTotal: number
+  getTimeInMillis: number
+}
+
+export interface NodeStats {
+  nodeName: string
+  nodeId: string
+  roles: string[]
+  jvmMemoryUsed: number
+  jvmMemoryMax: number
+  jvmMemoryPercent: number
+  documentCount: number
+  indexingCurrent: number
+  searchCurrent: number
+}
+
+export interface SearchStatistics {
+  totalSearches: number
+  totalSearchTimeMs: number
+  averageSearchTime: number
+  searchesLast24h: number
+  mostActiveIndex: string
+  searchesByIndex: Record<string, number>
+}
+
+export interface SystemHealth {
+  elasticsearchAvailable: boolean
+  embeddingServiceAvailable: boolean
+  llmServiceAvailable: boolean
+  elasticsearchStats?: ElasticsearchStats
+  indices: IndexStats[]
+  nodes: NodeStats[]
+  searchStats: SearchStatistics
+}
+
+export interface DashboardData {
+  systemHealth: SystemHealth
+  clusterStats: ElasticsearchStats
+  recentMetrics: PerformanceMetrics[]
+}
+
+// Legacy Health Types (keeping for compatibility)
 export interface ServiceStatus {
   name: string
   status: 'healthy' | 'warning' | 'error' | string
