@@ -26,7 +26,7 @@ public class FileEnumerator : IFileEnumerator
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var extensions = fileExtensions.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        
+
         foreach (var sourceFolder in sourceFolders)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -84,7 +84,7 @@ public class FileEnumerator : IFileEnumerator
         };
 
         IEnumerable<string> files;
-        
+
         try
         {
             // Use Directory.EnumerateFiles for better memory efficiency with large directories
@@ -98,7 +98,7 @@ public class FileEnumerator : IFileEnumerator
 
         var processedCount = 0;
         Uri? sourceUri = null;
-        
+
         try
         {
             sourceUri = new Uri(Path.GetFullPath(sourceFolder));
@@ -114,7 +114,7 @@ public class FileEnumerator : IFileEnumerator
                 yield break;
 
             FileItem? fileItem = null;
-            
+
             try
             {
                 fileItem = await CreateFileItemAsync(filePath, extensions, sourceUri, cancellationToken);
@@ -158,7 +158,7 @@ public class FileEnumerator : IFileEnumerator
             }
         }
 
-        _logger.LogInformation("Completed enumeration of folder: {Folder}, found {Count} matching files", 
+        _logger.LogInformation("Completed enumeration of folder: {Folder}, found {Count} matching files",
             sourceFolder, processedCount);
     }
 
@@ -236,7 +236,7 @@ public class FileEnumerator : IFileEnumerator
         }
 
         var count = 0;
-        
+
         try
         {
             var enumerationOptions = new EnumerationOptions

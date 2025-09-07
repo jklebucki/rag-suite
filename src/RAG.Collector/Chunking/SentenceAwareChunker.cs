@@ -11,7 +11,7 @@ public class SentenceAwareChunker : ITextChunker
 {
     private static readonly string[] SentenceEndMarkers = { ".", "!", "?" };
     private static readonly string[] ParagraphSeparators = { "\n\n", "\r\n\r\n" };
-    
+
     // Regex for sentence boundaries (handles abbreviations)
     private static readonly Regex SentenceBoundaryRegex = new(
         @"(?<=[.!?])\s+(?=[A-Z])",
@@ -30,7 +30,7 @@ public class SentenceAwareChunker : ITextChunker
     public bool CanChunk(string contentType) => SupportedContentTypes.Contains(contentType);
 
     public Task<IList<TextChunk>> ChunkAsync(
-        string content, 
+        string content,
         Dictionary<string, object> metadata,
         int chunkSize = 1200,
         int overlap = 200,
@@ -40,10 +40,10 @@ public class SentenceAwareChunker : ITextChunker
             return Task.FromResult<IList<TextChunk>>(new List<TextChunk>());
 
         var chunks = new List<TextChunk>();
-        
+
         // First, try to split by paragraphs
         var paragraphs = SplitByParagraphs(content);
-        
+
         var currentChunk = new StringBuilder();
         var currentStartIndex = 0;
         var chunkIndex = 0;
@@ -51,7 +51,7 @@ public class SentenceAwareChunker : ITextChunker
         foreach (var paragraph in paragraphs)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             // If paragraph alone exceeds chunk size, split it by sentences
             if (paragraph.Length > chunkSize)
             {
@@ -64,7 +64,7 @@ public class SentenceAwareChunker : ITextChunker
                         currentStartIndex + currentChunk.Length,
                         chunkIndex++,
                         metadata));
-                    
+
                     currentChunk.Clear();
                     currentStartIndex += currentChunk.Length;
                 }
@@ -96,7 +96,7 @@ public class SentenceAwareChunker : ITextChunker
                     currentChunk.Append(overlapContent);
                     if (overlapContent.Length > 0)
                         currentChunk.Append("\n\n");
-                    
+
                     currentStartIndex += chunkContent.Length - overlapContent.Length;
                 }
 
@@ -131,7 +131,7 @@ public class SentenceAwareChunker : ITextChunker
     private List<string> SplitByParagraphs(string content)
     {
         var paragraphs = new List<string>();
-        
+
         foreach (var separator in ParagraphSeparators)
         {
             if (content.Contains(separator))
@@ -160,7 +160,7 @@ public class SentenceAwareChunker : ITextChunker
     {
         var chunks = new List<TextChunk>();
         var sentences = SplitBySentences(text);
-        
+
         var currentChunk = new StringBuilder();
         var chunkStartIndex = startIndex;
 
@@ -183,7 +183,7 @@ public class SentenceAwareChunker : ITextChunker
                 currentChunk.Append(overlapContent);
                 if (overlapContent.Length > 0)
                     currentChunk.Append(" ");
-                
+
                 chunkStartIndex += chunkContent.Length - overlapContent.Length;
             }
 

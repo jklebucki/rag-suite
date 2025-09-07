@@ -29,15 +29,15 @@ public class SimpleEmbeddingService : IEmbeddingService
         // - OpenAI Embeddings
         // - Azure OpenAI Embeddings
         // - Local embedding models via ONNX
-        
+
         _logger.LogDebug("Generating embedding for text of length: {Length}", text.Length);
-        
+
         var embedding = new float[EmbeddingDimension];
-        
+
         // Create a deterministic but pseudo-random embedding based on text hash
         var hash = text.GetHashCode();
         var random = new Random(hash);
-        
+
         for (int i = 0; i < EmbeddingDimension; i++)
         {
             embedding[i] = (float)(random.NextDouble() * 2.0 - 1.0); // Range: -1 to 1

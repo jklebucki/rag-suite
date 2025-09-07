@@ -38,7 +38,7 @@ public class TextChunkingService : ITextChunkingService
             if (currentChunk.Length + paragraph.Length > chunkSize && !string.IsNullOrWhiteSpace(currentChunk))
             {
                 yield return CreateChunk(documentId, fileName, currentChunk.Trim(), fileType, chunkIndex, metadata);
-                
+
                 // Start new chunk with overlap
                 currentChunk = GetOverlapText(currentChunk, chunkOverlap) + " " + paragraph;
                 chunkIndex++;
@@ -83,7 +83,7 @@ public class TextChunkingService : ITextChunkingService
         // Try to find a word boundary near the overlap size
         var startIndex = text.Length - overlapSize;
         var spaceIndex = text.IndexOf(' ', startIndex);
-        
+
         if (spaceIndex > 0 && spaceIndex < text.Length - 50) // Don't use if space is too close to end
         {
             return text.Substring(spaceIndex + 1);

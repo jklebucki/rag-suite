@@ -64,7 +64,7 @@ public class ElasticsearchService : IElasticsearchService
                     )
                 )
             );
-            
+
             if (response.IsValidResponse)
             {
                 _logger.LogInformation("Successfully created index: {IndexName}", indexName);
@@ -91,7 +91,7 @@ public class ElasticsearchService : IElasticsearchService
                 .Index(indexName)
                 .Id(document.Id)
             );
-            
+
             if (response.IsValidResponse)
             {
                 _logger.LogDebug("Successfully indexed document: {DocumentId}", document.Id);
@@ -118,7 +118,7 @@ public class ElasticsearchService : IElasticsearchService
                 .Index(indexName)
                 .IndexMany(documents, (desc, doc) => desc.Id(doc.Id))
             );
-            
+
             if (response.IsValidResponse)
             {
                 _logger.LogInformation("Successfully bulk indexed {Count} documents", documents.Count());
@@ -142,7 +142,7 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var response = await _client.Indices.DeleteAsync(indexName);
-            
+
             if (response.IsValidResponse)
             {
                 _logger.LogInformation("Successfully deleted index: {IndexName}", indexName);

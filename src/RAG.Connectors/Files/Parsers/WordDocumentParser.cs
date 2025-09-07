@@ -30,7 +30,7 @@ public class WordDocumentParser : IDocumentParser
         {
             var fileInfo = new FileInfo(filePath);
             var content = await ExtractTextFromWordAsync(filePath);
-            
+
             return new DocumentContent
             {
                 Id = Guid.NewGuid().ToString(),

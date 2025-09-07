@@ -33,51 +33,52 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
     public async Task<EmbeddingResult> GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken = default)
     {
         var startTime = DateTime.UtcNow;
-        
+
         try
         {
-        var request = new
-        {
-            inputs = chunk.Content,
-            truncate = true
-        };
+            var request = new
+            {
+                inputs = chunk.Content,
+                truncate = true
+            };
 
-        var json = JsonSerializer.Serialize(request);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        _logger.LogInformation("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)", 
-            chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
-
-        var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
-        
-        if (response.StatusCode == (System.Net.HttpStatusCode)413)
-        {
-            _logger.LogWarning("Chunk {ChunkId} too large for embedding service: {Length} chars, ~{Tokens} tokens. Consider reducing chunk size.", 
+            _logger.LogInformation("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)",
                 chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
-            return EmbeddingResult.CreateFailure($"Payload too large: {chunk.Content.Length} characters");
-        }
-        
-        response.EnsureSuccessStatusCode();
 
-        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-        _logger.LogInformation("Embedding service response for chunk {ChunkId}: {ResponseLength} chars, status: {StatusCode}, starts with: {ResponseStart}",
-            chunk.Id, responseContent.Length, response.StatusCode, responseContent.Length > 50 ? responseContent.Substring(0, 50) : responseContent);
-        
-        // Response is directly an array of floats, not wrapped in an object
-        var embeddings = JsonSerializer.Deserialize<float[][]>(responseContent);
+            var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
 
-        if (embeddings?.Length > 0 && embeddings[0]?.Length > 0)
-        {
-            var duration = DateTime.UtcNow - startTime;
-            _logger.LogInformation("Successfully generated embedding for chunk {ChunkId} in {Duration}ms: vector dimension {Dimension}", 
-                chunk.Id, duration.TotalMilliseconds, embeddings[0].Length);
+            if (response.StatusCode == (System.Net.HttpStatusCode)413)
+            {
+                _logger.LogWarning("Chunk {ChunkId} too large for embedding service: {Length} chars, ~{Tokens} tokens. Consider reducing chunk size.",
+                    chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
+                return EmbeddingResult.CreateFailure($"Payload too large: {chunk.Content.Length} characters");
+            }
 
-            return EmbeddingResult.CreateSuccess(
-                embeddings[0], // First (and only) embedding
-                ModelName,
-                chunk.EstimatedTokens,
-                duration);
-        }            return EmbeddingResult.CreateFailure("No embeddings returned from service");
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogInformation("Embedding service response for chunk {ChunkId}: {ResponseLength} chars, status: {StatusCode}, starts with: {ResponseStart}",
+                chunk.Id, responseContent.Length, response.StatusCode, responseContent.Length > 50 ? responseContent.Substring(0, 50) : responseContent);
+
+            // Response is directly an array of floats, not wrapped in an object
+            var embeddings = JsonSerializer.Deserialize<float[][]>(responseContent);
+
+            if (embeddings?.Length > 0 && embeddings[0]?.Length > 0)
+            {
+                var duration = DateTime.UtcNow - startTime;
+                _logger.LogInformation("Successfully generated embedding for chunk {ChunkId} in {Duration}ms: vector dimension {Dimension}",
+                    chunk.Id, duration.TotalMilliseconds, embeddings[0].Length);
+
+                return EmbeddingResult.CreateSuccess(
+                    embeddings[0], // First (and only) embedding
+                    ModelName,
+                    chunk.EstimatedTokens,
+                    duration);
+            }
+            return EmbeddingResult.CreateFailure("No embeddings returned from service");
         }
         catch (HttpRequestException ex)
         {
@@ -104,14 +105,14 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
     public async Task<IList<EmbeddingResult>> GenerateBatchEmbeddingsAsync(IList<TextChunk> chunks, CancellationToken cancellationToken = default)
     {
         var results = new List<EmbeddingResult>();
-        
+
         // For now, process sequentially to avoid overwhelming the service
         // TODO: Implement true batch processing if the service supports it
         foreach (var chunk in chunks)
         {
             var result = await GenerateEmbeddingAsync(chunk, cancellationToken);
             results.Add(result);
-            
+
             // Add small delay between requests to be respectful
             await Task.Delay(50, cancellationToken);
         }
@@ -134,7 +135,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
 
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var response = await _httpClient.PostAsync("/embeddings", content, cts.Token);
-            
+
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)

@@ -25,7 +25,7 @@ public class PdfAwareChunker : ITextChunker
     public bool CanChunk(string contentType) => SupportedContentTypes.Contains(contentType);
 
     public Task<IList<TextChunk>> ChunkAsync(
-        string content, 
+        string content,
         Dictionary<string, object> metadata,
         int chunkSize = 1200,
         int overlap = 200,
@@ -36,23 +36,23 @@ public class PdfAwareChunker : ITextChunker
 
         var chunks = new List<TextChunk>();
         var pages = ExtractPages(content);
-        
+
         var chunkIndex = 0;
         var globalStartIndex = 0;
 
         foreach (var page in pages)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             var pageChunks = ChunkPage(
-                page.Content, 
-                page.PageNumber, 
-                chunkSize, 
-                overlap, 
-                ref globalStartIndex, 
-                ref chunkIndex, 
+                page.Content,
+                page.PageNumber,
+                chunkSize,
+                overlap,
+                ref globalStartIndex,
+                ref chunkIndex,
                 metadata);
-            
+
             chunks.AddRange(pageChunks);
         }
 
@@ -69,7 +69,7 @@ public class PdfAwareChunker : ITextChunker
     {
         var pages = new List<PageContent>();
         var pageMatches = PageMarkerRegex.Matches(content);
-        
+
         if (pageMatches.Count == 0)
         {
             // No page markers, treat as single page
@@ -82,20 +82,20 @@ public class PdfAwareChunker : ITextChunker
             var pageMatch = pageMatches[i];
             var pageNumberText = pageMatch.Value;
             var pageNumber = ExtractPageNumber(pageNumberText);
-            
+
             var startIndex = pageMatch.Index + pageMatch.Length;
-            var endIndex = i < pageMatches.Count - 1 
-                ? pageMatches[i + 1].Index 
+            var endIndex = i < pageMatches.Count - 1
+                ? pageMatches[i + 1].Index
                 : content.Length;
-            
+
             var pageContent = content.Substring(startIndex, endIndex - startIndex).Trim();
-            
+
             if (!string.IsNullOrWhiteSpace(pageContent))
             {
-                pages.Add(new PageContent 
-                { 
-                    PageNumber = pageNumber, 
-                    Content = pageContent 
+                pages.Add(new PageContent
+                {
+                    PageNumber = pageNumber,
+                    Content = pageContent
                 });
             }
         }
@@ -119,7 +119,7 @@ public class PdfAwareChunker : ITextChunker
         Dictionary<string, object> metadata)
     {
         var chunks = new List<TextChunk>();
-        
+
         if (pageContent.Length <= chunkSize)
         {
             // Page fits in single chunk
@@ -130,7 +130,7 @@ public class PdfAwareChunker : ITextChunker
                 chunkIndex++,
                 pageNumber,
                 metadata);
-            
+
             chunks.Add(chunk);
             globalStartIndex += pageContent.Length;
         }
@@ -145,7 +145,7 @@ public class PdfAwareChunker : ITextChunker
                 globalStartIndex,
                 ref chunkIndex,
                 metadata);
-            
+
             chunks.AddRange(pageChunks);
             globalStartIndex += pageContent.Length;
         }
@@ -164,7 +164,7 @@ public class PdfAwareChunker : ITextChunker
     {
         var chunks = new List<TextChunk>();
         var sentences = SplitBySentences(content);
-        
+
         var currentChunk = new StringBuilder();
         var chunkStartIndex = startIndex;
 
@@ -188,7 +188,7 @@ public class PdfAwareChunker : ITextChunker
                 currentChunk.Append(overlapContent);
                 if (overlapContent.Length > 0)
                     currentChunk.Append(" ");
-                
+
                 chunkStartIndex += chunkContent.Length - overlapContent.Length;
             }
 

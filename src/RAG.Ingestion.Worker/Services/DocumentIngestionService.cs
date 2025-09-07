@@ -43,12 +43,12 @@ public class DocumentIngestionService : IDocumentIngestionService
         try
         {
             var indexExists = await _elasticsearchService.IndexExistsAsync(_settings.IndexName);
-            
+
             if (!indexExists)
             {
                 _logger.LogInformation("Creating index: {IndexName}", _settings.IndexName);
                 var created = await _elasticsearchService.CreateIndexAsync(_settings.IndexName);
-                
+
                 if (!created)
                 {
                     _logger.LogError("Failed to create index: {IndexName}", _settings.IndexName);
@@ -117,7 +117,7 @@ public class DocumentIngestionService : IDocumentIngestionService
 
             // Index chunks to Elasticsearch
             var indexed = await _elasticsearchService.IndexDocumentsAsync(chunks, _settings.IndexName);
-            
+
             if (indexed)
             {
                 _logger.LogInformation("Successfully indexed {ChunkCount} chunks for document: {FileName}", chunks.Count, document.FileName);
@@ -180,11 +180,11 @@ public class DocumentIngestionService : IDocumentIngestionService
 
                     // Index chunks to Elasticsearch
                     var indexed = await _elasticsearchService.IndexDocumentsAsync(chunks, _settings.IndexName);
-                    
+
                     if (indexed)
                     {
                         processedCount++;
-                        _logger.LogInformation("Successfully processed document {ProcessedCount}: {FileName} ({ChunkCount} chunks)", 
+                        _logger.LogInformation("Successfully processed document {ProcessedCount}: {FileName} ({ChunkCount} chunks)",
                             processedCount, document.FileName, chunks.Count);
                     }
                     else
@@ -198,9 +198,9 @@ public class DocumentIngestionService : IDocumentIngestionService
                 }
             }
 
-            _logger.LogInformation("Successfully processed {ProcessedCount} documents from directory: {DirectoryPath}", 
+            _logger.LogInformation("Successfully processed {ProcessedCount} documents from directory: {DirectoryPath}",
                 processedCount, directoryPath);
-            
+
             return processedCount;
         }
         catch (Exception ex)

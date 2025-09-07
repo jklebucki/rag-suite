@@ -83,7 +83,7 @@ public class ChunkDocument
     public static ChunkDocument FromTextChunk(TextChunk chunk, float[] embedding, string modelName)
     {
         var sourceFile = chunk.SourceFile;
-        
+
         return new ChunkDocument
         {
             Id = chunk.Id,

@@ -15,10 +15,10 @@ public class ContentExtractionService
     {
         _logger = logger;
         _extractors = extractors;
-        
+
         // Build a map of file extensions to extractors for quick lookup
         _extractorMap = new Dictionary<string, IContentExtractor>(StringComparer.OrdinalIgnoreCase);
-        
+
         foreach (var extractor in _extractors)
         {
             foreach (var extension in extractor.SupportedExtensions)
@@ -65,7 +65,7 @@ public class ContentExtractionService
         }
 
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        
+
         if (!_extractorMap.TryGetValue(extension, out var extractor))
         {
             return ContentExtractionResult.Failure($"No extractor available for file type: {extension}");
@@ -74,17 +74,17 @@ public class ContentExtractionService
         try
         {
             _logger.LogDebug("Extracting content from {FilePath} using {ExtractorType}", filePath, extractor.GetType().Name);
-            
+
             var result = await extractor.ExtractAsync(filePath, cancellationToken);
-            
+
             if (result.IsSuccess)
             {
-                _logger.LogDebug("Successfully extracted {CharCount} characters from {FilePath}", 
+                _logger.LogDebug("Successfully extracted {CharCount} characters from {FilePath}",
                     result.Content.Length, filePath);
             }
             else
             {
-                _logger.LogWarning("Content extraction failed for {FilePath}: {ErrorMessage}", 
+                _logger.LogWarning("Content extraction failed for {FilePath}: {ErrorMessage}",
                     filePath, result.ErrorMessage);
             }
 

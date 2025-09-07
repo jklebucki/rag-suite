@@ -117,7 +117,7 @@ public class CollectorOptions
     {
         var context = new ValidationContext(this);
         var results = new List<ValidationResult>();
-        
+
         // Basic validation using data annotations
         Validator.TryValidateObject(this, context, results, true);
 
@@ -130,16 +130,16 @@ public class CollectorOptions
         // Validate authentication configuration
         var hasBasicAuth = !string.IsNullOrEmpty(ElasticsearchUsername) && !string.IsNullOrEmpty(ElasticsearchPassword);
         var hasApiKey = !string.IsNullOrEmpty(ElasticsearchApiKey);
-        
+
         if (!hasBasicAuth && !hasApiKey)
         {
-            results.Add(new ValidationResult("Either username/password or API key must be provided for Elasticsearch authentication", 
+            results.Add(new ValidationResult("Either username/password or API key must be provided for Elasticsearch authentication",
                 new[] { nameof(ElasticsearchUsername), nameof(ElasticsearchApiKey) }));
         }
 
         if (hasBasicAuth && hasApiKey)
         {
-            results.Add(new ValidationResult("Cannot use both username/password and API key authentication simultaneously", 
+            results.Add(new ValidationResult("Cannot use both username/password and API key authentication simultaneously",
                 new[] { nameof(ElasticsearchUsername), nameof(ElasticsearchApiKey) }));
         }
 
@@ -170,7 +170,7 @@ public class CollectorOptions
     public string ToLogString()
     {
         var uniqueExtensions = FileExtensions.Distinct().ToList();
-        
+
         return $"CollectorOptions {{ " +
                $"SourceFolders: [{string.Join(", ", SourceFolders)}], " +
                $"FileExtensions: [{string.Join(", ", uniqueExtensions)}], " +

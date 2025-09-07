@@ -31,7 +31,7 @@ public class PdfDocumentParser : IDocumentParser
         {
             var fileInfo = new FileInfo(filePath);
             var content = await ExtractTextFromPdfAsync(filePath);
-            
+
             return new DocumentContent
             {
                 Id = Guid.NewGuid().ToString(),
@@ -62,7 +62,7 @@ public class PdfDocumentParser : IDocumentParser
         {
             using var pdfReader = new PdfReader(filePath);
             using var pdfDocument = new PdfDocument(pdfReader);
-            
+
             var strategy = new SimpleTextExtractionStrategy();
             var text = new StringBuilder();
 

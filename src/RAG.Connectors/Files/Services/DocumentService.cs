@@ -28,7 +28,7 @@ public class DocumentService : IDocumentService
     {
         // Normalize the path for cross-platform compatibility
         var normalizedPath = PathHelper.NormalizePath(filePath);
-        
+
         if (!File.Exists(normalizedPath))
         {
             _logger.LogWarning("File not found: {FilePath}", normalizedPath);
@@ -44,10 +44,10 @@ public class DocumentService : IDocumentService
 
         try
         {
-            _logger.LogInformation("Processing document: {FilePath} with {Parser} on {OS}", 
+            _logger.LogInformation("Processing document: {FilePath} with {Parser} on {OS}",
                 normalizedPath, parser.GetType().Name, PathHelper.GetOSName());
             var document = await parser.ParseAsync(normalizedPath);
-            _logger.LogInformation("Successfully processed document: {FileName}, Content length: {Length}", 
+            _logger.LogInformation("Successfully processed document: {FileName}, Content length: {Length}",
                 document.FileName, document.Content.Length);
             return document;
         }
@@ -62,7 +62,7 @@ public class DocumentService : IDocumentService
     {
         // Normalize the path for cross-platform compatibility
         var normalizedPath = PathHelper.NormalizePath(directoryPath);
-        
+
         if (!Directory.Exists(normalizedPath))
         {
             _logger.LogWarning("Directory not found: {DirectoryPath}", normalizedPath);
@@ -85,7 +85,7 @@ public class DocumentService : IDocumentService
             }
         }
 
-        _logger.LogInformation("Processed {Count} documents from directory: {DirectoryPath} on {OS}", 
+        _logger.LogInformation("Processed {Count} documents from directory: {DirectoryPath} on {OS}",
             documents.Count, normalizedPath, PathHelper.GetOSName());
         return documents;
     }

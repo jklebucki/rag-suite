@@ -45,7 +45,7 @@ public class ElasticsearchService : IElasticsearchService
                 return true;
             }
 
-            _logger.LogError("Failed to index document {DocumentId}: {Error}", 
+            _logger.LogError("Failed to index document {DocumentId}: {Error}",
                 document.Id, response.DebugInformation);
             return false;
         }
@@ -64,7 +64,7 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var bulkBody = new StringBuilder();
-            
+
             foreach (var document in documents)
             {
                 // Index action
@@ -76,7 +76,7 @@ public class ElasticsearchService : IElasticsearchService
                         _id = document.Id
                     }
                 };
-                
+
                 bulkBody.AppendLine(JsonSerializer.Serialize(indexAction, GetJsonOptions()));
                 bulkBody.AppendLine(JsonSerializer.Serialize(document, GetJsonOptions()));
             }
@@ -94,21 +94,21 @@ public class ElasticsearchService : IElasticsearchService
                     };
                     var bulkResponse = JsonSerializer.Deserialize<BulkResponse>(response.Body, jsonOptions);
                     var successCount = CountSuccessfulOperations(bulkResponse);
-                    
+
                     if (successCount > 0)
                     {
-                        _logger.LogInformation("Successfully indexed {SuccessCount}/{TotalCount} documents in batch", 
+                        _logger.LogInformation("Successfully indexed {SuccessCount}/{TotalCount} documents in batch",
                             successCount, documents.Count);
                     }
                     else
                     {
-                        _logger.LogWarning("Bulk indexing completed but no documents were successfully indexed ({TotalCount} attempted)", 
+                        _logger.LogWarning("Bulk indexing completed but no documents were successfully indexed ({TotalCount} attempted)",
                             documents.Count);
-                        
+
                         // Log detailed response for debugging
                         _logger.LogWarning("Bulk response: {Response}", response.Body);
                     }
-                    
+
                     return successCount;
                 }
                 catch (JsonException ex)
@@ -135,7 +135,7 @@ public class ElasticsearchService : IElasticsearchService
         {
             // Check if index exists
             var existsResponse = await _client.Indices.ExistsAsync<StringResponse>(_indexName);
-            
+
             if (existsResponse.HttpStatusCode == 200)
             {
                 _logger.LogDebug("Index {IndexName} already exists", _indexName);
@@ -154,7 +154,7 @@ public class ElasticsearchService : IElasticsearchService
                 return true;
             }
 
-            _logger.LogError("Failed to create index {IndexName}: {Error}", 
+            _logger.LogError("Failed to create index {IndexName}: {Error}",
                 _indexName, createResponse.DebugInformation);
             return false;
         }
@@ -189,14 +189,14 @@ public class ElasticsearchService : IElasticsearchService
             {
                 var deleteResponse = JsonSerializer.Deserialize<DeleteByQueryResponse>(response.Body);
                 var deletedCount = deleteResponse?.Deleted ?? 0;
-                
-                _logger.LogInformation("Deleted {DeletedCount} documents for source file {SourceFile}", 
+
+                _logger.LogInformation("Deleted {DeletedCount} documents for source file {SourceFile}",
                     deletedCount, sourceFile);
-                
+
                 return deletedCount;
             }
 
-            _logger.LogError("Failed to delete documents for source file {SourceFile}: {Error}", 
+            _logger.LogError("Failed to delete documents for source file {SourceFile}: {Error}",
                 sourceFile, response.DebugInformation);
             return 0;
         }
@@ -226,12 +226,12 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var response = await _client.Indices.StatsAsync<StringResponse>(_indexName);
-            
+
             if (response.Success)
             {
                 var stats = JsonSerializer.Deserialize<JsonElement>(response.Body);
                 var indexStats = stats.GetProperty("indices").GetProperty(_indexName);
-                
+
                 return new IndexStats
                 {
                     IndexName = _indexName,
@@ -383,16 +383,16 @@ public class ElasticsearchService : IElasticsearchService
     {
         [JsonPropertyName("_id")]
         public string? _Id { get; set; }
-        
+
         [JsonPropertyName("_index")]
         public string? _Index { get; set; }
-        
+
         [JsonPropertyName("status")]
         public int Status { get; set; }
-        
+
         [JsonPropertyName("error")]
         public object? Error { get; set; }
-        
+
         [JsonPropertyName("result")]
         public string? Result { get; set; }
     }
@@ -411,7 +411,7 @@ public class ElasticsearchService : IElasticsearchService
             if (response.Success)
             {
                 var getResponse = JsonSerializer.Deserialize<GetDocumentResponse<T>>(response.Body, GetJsonOptions());
-                
+
                 if (getResponse?.Found == true && getResponse.Source != null)
                 {
                     _logger.LogDebug("Successfully retrieved document {DocumentId} from index {IndexName}", documentId, indexName);
@@ -429,7 +429,7 @@ public class ElasticsearchService : IElasticsearchService
                 return null;
             }
 
-            _logger.LogError("Failed to get document {DocumentId} from index {IndexName}: {Error}", 
+            _logger.LogError("Failed to get document {DocumentId} from index {IndexName}: {Error}",
                 documentId, indexName, response.DebugInformation);
             return null;
         }
@@ -456,7 +456,7 @@ public class ElasticsearchService : IElasticsearchService
                 return true;
             }
 
-            _logger.LogError("Failed to index document {DocumentId} to index {IndexName}: {Error}", 
+            _logger.LogError("Failed to index document {DocumentId} to index {IndexName}: {Error}",
                 documentId, indexName, response.DebugInformation);
             return false;
         }
@@ -473,7 +473,7 @@ public class ElasticsearchService : IElasticsearchService
         {
             // Check if index already exists
             var existsResponse = await _client.Indices.ExistsAsync<StringResponse>(indexName);
-            
+
             if (existsResponse.Success && existsResponse.HttpStatusCode == 200)
             {
                 _logger.LogDebug("Index {IndexName} already exists", indexName);
@@ -508,7 +508,7 @@ public class ElasticsearchService : IElasticsearchService
             }
 
             var createResponse = await _client.Indices.CreateAsync<StringResponse>(indexName, indexData);
-            
+
             if (createResponse.Success)
             {
                 _logger.LogInformation("Successfully created index {IndexName}", indexName);

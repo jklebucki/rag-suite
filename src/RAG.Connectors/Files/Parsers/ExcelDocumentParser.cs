@@ -30,7 +30,7 @@ public class ExcelDocumentParser : IDocumentParser
         {
             var fileInfo = new FileInfo(filePath);
             var content = await ExtractTextFromExcelAsync(filePath);
-            
+
             return new DocumentContent
             {
                 Id = Guid.NewGuid().ToString(),
@@ -71,7 +71,7 @@ public class ExcelDocumentParser : IDocumentParser
                 foreach (Sheet sheet in workbookPart.Workbook.Sheets)
                 {
                     text.AppendLine($"=== {sheet.Name} ===");
-                    
+
                     var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id!);
                     var worksheet = worksheetPart.Worksheet;
                     var sheetData = worksheet.GetFirstChild<SheetData>();

@@ -14,10 +14,10 @@ public static class FilesServiceCollectionExtensions
         services.AddTransient<IDocumentParser, WordDocumentParser>();
         services.AddTransient<IDocumentParser, ExcelDocumentParser>();
         services.AddTransient<IDocumentParser, TextDocumentParser>();
-        
+
         // Register document service
         services.AddTransient<IDocumentService, DocumentService>();
-        
+
         return services;
     }
 }

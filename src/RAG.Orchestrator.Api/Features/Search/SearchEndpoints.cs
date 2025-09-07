@@ -11,7 +11,7 @@ public static class SearchEndpoints
             .WithTags("Search")
             .WithOpenApi();
 
-        group.MapPost("/", async (SearchRequest request, ISearchService searchService) =>
+        group.MapPost("/", async (RAG.Abstractions.Search.SearchRequest request, RAG.Abstractions.Search.ISearchService searchService) =>
         {
             var response = await searchService.SearchAsync(request);
             return response.ToApiResponse();
@@ -20,7 +20,7 @@ public static class SearchEndpoints
         .WithSummary("Search documents")
         .WithDescription("Search for documents in the knowledge base using natural language queries");
 
-        group.MapPost("/hybrid", async (SearchRequest request, ISearchService searchService) =>
+        group.MapPost("/hybrid", async (RAG.Abstractions.Search.SearchRequest request, RAG.Abstractions.Search.ISearchService searchService) =>
         {
             var response = await searchService.SearchHybridAsync(request);
             return response.ToApiResponse();
@@ -29,9 +29,9 @@ public static class SearchEndpoints
         .WithSummary("Search documents with hybrid BM25 + kNN")
         .WithDescription("Search for documents using hybrid approach combining BM25 keyword search with semantic similarity (kNN)");
 
-        group.MapGet("/", async (string query, int? limit, int? offset, ISearchService searchService) =>
+        group.MapGet("/", async (string query, int? limit, int? offset, RAG.Abstractions.Search.ISearchService searchService) =>
         {
-            var request = new SearchRequest(query, null, limit ?? 10, offset ?? 0);
+            var request = new RAG.Abstractions.Search.SearchRequest(query, null, limit ?? 10, offset ?? 0);
             var response = await searchService.SearchAsync(request);
             return response.ToApiResponse();
         })
@@ -39,7 +39,7 @@ public static class SearchEndpoints
         .WithSummary("Search documents (GET)")
         .WithDescription("Search for documents using query parameters");
 
-        group.MapGet("/documents/{id}", async (string id, ISearchService searchService) =>
+        group.MapGet("/documents/{id}", async (string id, RAG.Abstractions.Search.ISearchService searchService) =>
         {
             var response = await searchService.GetDocumentByIdAsync(id);
             return response.ToApiResponse();

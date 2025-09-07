@@ -27,7 +27,7 @@ public class Worker : BackgroundService
         // Normalize and ensure documents path exists
         var documentsPath = PathHelper.NormalizePath(_settings.DocumentsPath);
         PathHelper.EnsureDirectoryExists(documentsPath);
-        
+
         _logger.LogInformation("Using documents path: {DocumentsPath}", documentsPath);
 
         // Initialize index
@@ -52,13 +52,13 @@ public class Worker : BackgroundService
             try
             {
                 _logger.LogInformation("Worker running at: {Time}", DateTimeOffset.Now);
-                
+
                 // Check for new documents periodically
                 if (Directory.Exists(documentsPath))
                 {
                     var currentCount = await _ingestionService.GetIndexedDocumentCountAsync();
                     _logger.LogInformation("Current indexed document count: {Count}", currentCount);
-                    
+
                     // You could implement file watching here for real-time processing
                     // For now, we just log the status
                 }
@@ -77,7 +77,7 @@ public class Worker : BackgroundService
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
-        
+
         _logger.LogInformation("RAG Ingestion Worker stopping...");
     }
 }

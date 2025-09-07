@@ -26,9 +26,9 @@ public static class ServiceCollectionExtensions
         services.Configure<PasswordComplexityOptions>(configuration.GetSection(PasswordComplexityOptions.SectionName));
 
         // Add PostgreSQL DbContext
-        var connectionString = configuration.GetConnectionString("SecurityDatabase") 
+        var connectionString = configuration.GetConnectionString("SecurityDatabase")
             ?? "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
-        
+
         services.AddDbContext<SecurityDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
@@ -111,13 +111,13 @@ public static class ServiceCollectionExtensions
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<SecurityDbContext>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<SecurityDbContext>>();
-            
+
             logger.LogInformation("Attempting to ensure PostgreSQL database is created...");
-            
+
             // Ensure database is created - this will create the database if it doesn't exist
             // and won't throw exception if it already exists
             await context.Database.EnsureCreatedAsync();
-            
+
             logger.LogInformation("PostgreSQL database creation successful");
 
             // Ensure admin user exists
@@ -144,7 +144,7 @@ public static class ServiceCollectionExtensions
         if (adminUser == null)
         {
             logger.LogInformation("Creating default admin user: {AdminEmail}", adminEmail);
-            
+
             adminUser = new User
             {
                 Email = adminEmail,
@@ -164,7 +164,7 @@ public static class ServiceCollectionExtensions
             }
             else
             {
-                logger.LogError("Failed to create default admin user: {Errors}", 
+                logger.LogError("Failed to create default admin user: {Errors}",
                     string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }

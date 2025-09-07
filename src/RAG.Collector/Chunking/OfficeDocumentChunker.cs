@@ -64,10 +64,10 @@ public class OfficeDocumentChunker : ITextChunker
         {
             // Normalize line endings and clean up content
             var normalizedContent = NormalizeContent(content);
-            
+
             // Split into logical sections first (paragraphs, sections, etc.)
             var sections = SplitIntoSections(normalizedContent);
-            
+
             var chunkIndex = 0;
             var previousChunkEnd = "";
 
@@ -87,17 +87,17 @@ public class OfficeDocumentChunker : ITextChunker
                 {
                     // Split large sections into smaller chunks
                     var sectionChunks = await ChunkLargeSection(
-                        section, 
-                        metadata, 
-                        maxChunkSize, 
-                        overlap, 
-                        chunkIndex, 
+                        section,
+                        metadata,
+                        maxChunkSize,
+                        overlap,
+                        chunkIndex,
                         previousChunkEnd,
                         cancellationToken);
-                    
+
                     chunks.AddRange(sectionChunks);
                     chunkIndex += sectionChunks.Count;
-                    
+
                     if (sectionChunks.Any())
                     {
                         var lastChunk = sectionChunks.Last();
@@ -129,13 +129,13 @@ public class OfficeDocumentChunker : ITextChunker
     {
         // Replace multiple whitespace characters with single spaces
         content = System.Text.RegularExpressions.Regex.Replace(content, @"\s+", " ");
-        
+
         // Normalize line endings
         content = content.Replace("\r\n", "\n").Replace("\r", "\n");
-        
+
         // Clean up excessive newlines but preserve paragraph structure
         content = System.Text.RegularExpressions.Regex.Replace(content, @"\n\s*\n\s*\n+", "\n\n");
-        
+
         return content.Trim();
     }
 
@@ -146,9 +146,9 @@ public class OfficeDocumentChunker : ITextChunker
     {
         // Split by double newlines (paragraph breaks)
         var paragraphs = content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
-        
+
         var sections = new List<string>();
-        
+
         foreach (var paragraph in paragraphs)
         {
             var trimmed = paragraph.Trim();
@@ -166,7 +166,7 @@ public class OfficeDocumentChunker : ITextChunker
                 }
             }
         }
-        
+
         return sections;
     }
 
@@ -179,10 +179,10 @@ public class OfficeDocumentChunker : ITextChunker
         var sentences = System.Text.RegularExpressions.Regex.Split(text, @"(?<=[.!?])\s+")
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .ToList();
-        
+
         var sections = new List<string>();
         var currentSection = "";
-        
+
         foreach (var sentence in sentences)
         {
             if (string.IsNullOrEmpty(currentSection))
@@ -199,12 +199,12 @@ public class OfficeDocumentChunker : ITextChunker
                 currentSection = sentence;
             }
         }
-        
+
         if (!string.IsNullOrEmpty(currentSection))
         {
             sections.Add(currentSection);
         }
-        
+
         return sections;
     }
 
@@ -231,7 +231,7 @@ public class OfficeDocumentChunker : ITextChunker
 
             var remainingLength = section.Length - currentPosition;
             var chunkSize = Math.Min(maxChunkSize, remainingLength);
-            
+
             // Try to find a good break point (sentence end, word boundary)
             if (chunkSize < remainingLength)
             {
@@ -242,12 +242,12 @@ public class OfficeDocumentChunker : ITextChunker
             // Include overlap from previous chunk
             var startPos = Math.Max(0, currentPosition - (string.IsNullOrEmpty(currentPreviousEnd) ? 0 : Math.Min(overlap, currentPosition)));
             var actualChunkSize = chunkSize + (currentPosition - startPos);
-            
+
             var chunkContent = section.Substring(startPos, actualChunkSize);
-            
+
             var chunk = CreateChunk(chunkContent, metadata, chunkIndex++, currentPreviousEnd, overlap);
             chunks.Add(chunk);
-            
+
             currentPreviousEnd = GetChunkEnd(chunkContent, overlap);
             currentPosition += chunkSize;
         }
@@ -261,7 +261,7 @@ public class OfficeDocumentChunker : ITextChunker
     private int FindGoodBreakPoint(string text, int startPosition, int idealLength)
     {
         var endPosition = startPosition + idealLength;
-        
+
         if (endPosition >= text.Length)
             return text.Length;
 
@@ -341,7 +341,7 @@ public class OfficeDocumentChunker : ITextChunker
             return content;
 
         var endPortion = content.Substring(content.Length - overlapSize);
-        
+
         // Try to start at a word boundary
         var spaceIndex = endPortion.IndexOf(' ');
         if (spaceIndex > 0 && spaceIndex < overlapSize / 2)

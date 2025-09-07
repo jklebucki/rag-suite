@@ -313,7 +313,7 @@ public class ChatService : IChatService
         try
         {
             // Search for relevant context - get only the best matching document
-            var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
+            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
                 request.Message,
                 Filters: null,
                 Limit: 1, // Get only one document with the highest rating
@@ -397,14 +397,14 @@ public class ChatService : IChatService
             _messages[sessionId].Add(userMessage);
 
             // Search for relevant context with language consideration
-            var searchRequest = new Features.Search.SearchRequest(
+            var searchRequest = new RAG.Abstractions.Search.SearchRequest(
                 request.Message,
                 Filters: null, // TODO: Map metadata to SearchFilters if needed
                 Limit: 1, // Get only one document with the highest rating
                 Offset: 0
             );
 
-            Features.Search.SearchResponse searchResults;
+            RAG.Abstractions.Search.SearchResponse searchResults;
             bool documentsAvailable = true;
             try
             {
@@ -414,7 +414,7 @@ public class ChatService : IChatService
             {
                 _logger.LogWarning(ex, "Document database unavailable, proceeding without context");
                 documentsAvailable = false;
-                searchResults = new Features.Search.SearchResponse(Array.Empty<Features.Search.SearchResult>(), 0, 0, request.Message);
+                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
             }
 
             // Build multilingual context-aware prompt
@@ -516,7 +516,7 @@ public class ChatService : IChatService
         return Task.FromResult(removed);
     }
 
-    private static string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory)
+    private static string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory)
     {
         var promptBuilder = new StringBuilder();
 
@@ -588,7 +588,7 @@ public class ChatService : IChatService
 
     private string BuildMultilingualContextualPrompt(
         string userMessage,
-        Features.Search.SearchResult[] searchResults,
+        RAG.Abstractions.Search.SearchResult[] searchResults,
         List<ChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,

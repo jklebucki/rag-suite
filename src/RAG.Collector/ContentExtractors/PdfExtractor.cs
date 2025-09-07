@@ -54,7 +54,7 @@ public class PdfExtractor : IContentExtractor
     private ContentExtractionResult ExtractPdfContent(string filePath)
     {
         using var document = PdfDocument.Open(filePath);
-        
+
         var contentBuilder = new List<string>();
         var metadata = new Dictionary<string, string>();
 
@@ -95,19 +95,19 @@ public class PdfExtractor : IContentExtractor
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Failed to extract text from page {PageNumber} in {FilePath}: {Error}", 
+                _logger.LogWarning("Failed to extract text from page {PageNumber} in {FilePath}: {Error}",
                     pageNumber, filePath, ex.Message);
                 contentBuilder.Add($"\n--- Page {pageNumber} (extraction failed) ---\n");
             }
         }
 
         var fullContent = string.Join("\n", contentBuilder);
-        
+
         // Add content statistics
         metadata["CharacterCount"] = fullContent.Length.ToString();
         metadata["WordCount"] = EstimateWordCount(fullContent).ToString();
 
-        _logger.LogDebug("Extracted {CharCount} characters from {PageCount} pages in {FilePath}", 
+        _logger.LogDebug("Extracted {CharCount} characters from {PageCount} pages in {FilePath}",
             fullContent.Length, document.NumberOfPages, filePath);
 
         return ContentExtractionResult.Success(fullContent, metadata, document.NumberOfPages);

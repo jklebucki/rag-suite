@@ -15,7 +15,7 @@ public class ChunkingService
     {
         _logger = logger;
         _chunkers = new Dictionary<string, ITextChunker>();
-        
+
         RegisterChunkers();
     }
 
@@ -27,7 +27,7 @@ public class ChunkingService
     /// <summary>
     /// Gets all supported content types across all chunkers
     /// </summary>
-    public IEnumerable<string> SupportedContentTypes => 
+    public IEnumerable<string> SupportedContentTypes =>
         _chunkers.Values.SelectMany(c => c.SupportedContentTypes).Distinct();
 
     /// <summary>
@@ -55,14 +55,14 @@ public class ChunkingService
 
         if (chunker == null)
         {
-            _logger.LogWarning("No chunker found for content type: {ContentType}, file: {FilePath}", 
+            _logger.LogWarning("No chunker found for content type: {ContentType}, file: {FilePath}",
                 contentType, fileItem.Path);
             return new List<TextChunk>();
         }
 
         try
         {
-            _logger.LogDebug("Chunking content for file: {FilePath} using {ChunkerType}", 
+            _logger.LogDebug("Chunking content for file: {FilePath} using {ChunkerType}",
                 fileItem.Path, chunker.GetType().Name);
 
             var metadata = CreateChunkMetadata(fileItem);
@@ -80,7 +80,7 @@ public class ChunkingService
                 chunk.FileHash = fileItem.FileHash;
             }
 
-            _logger.LogInformation("Successfully chunked file: {FilePath} into {ChunkCount} chunks", 
+            _logger.LogInformation("Successfully chunked file: {FilePath} into {ChunkCount} chunks",
                 fileItem.Path, chunks.Count);
 
             return chunks;
@@ -126,15 +126,15 @@ public class ChunkingService
 
         _logger.LogInformation("Chunking service initialized with {ChunkerCount} chunkers supporting {ContentTypeCount} content types",
             ChunkerCount, SupportedContentTypes.Count());
-        
-        _logger.LogDebug("Supported content types: {ContentTypes}", 
+
+        _logger.LogDebug("Supported content types: {ContentTypes}",
             string.Join(", ", SupportedContentTypes));
     }
 
     private string DetermineContentType(FileItem fileItem)
     {
         var extension = Path.GetExtension(fileItem.Path).ToLowerInvariant();
-        
+
         return extension switch
         {
             ".pdf" => "application/pdf",

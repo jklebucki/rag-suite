@@ -81,15 +81,15 @@ public class CollectorWorker : BackgroundService
         try
         {
             _logger.LogInformation("Starting file enumeration...");
-            
+
             // First, get total count for progress reporting
             var totalFiles = await fileEnumerator.GetFileCountAsync(
-                _options.SourceFolders, 
-                _options.FileExtensions, 
+                _options.SourceFolders,
+                _options.FileExtensions,
                 cancellationToken);
-            
+
             _logger.LogInformation("Found {TotalFiles} files to process", totalFiles);
-            
+
             if (totalFiles == 0)
             {
                 _logger.LogInformation("No files found matching the configured criteria");
@@ -101,43 +101,43 @@ public class CollectorWorker : BackgroundService
 
             // Enumerate and process files
             await foreach (var fileItem in fileEnumerator.EnumerateFilesAsync(
-                _options.SourceFolders, 
-                _options.FileExtensions, 
+                _options.SourceFolders,
+                _options.FileExtensions,
                 cancellationToken))
             {
                 processedFiles++;
-                
+
                 // Log progress every 50 files
                 if (processedFiles % 50 == 0 || processedFiles == totalFiles)
                 {
                     var elapsed = DateTime.UtcNow - startTime;
                     var rate = processedFiles / elapsed.TotalSeconds;
-                    _logger.LogInformation("Progress: {Processed}/{Total} files ({Percentage:F1}%) - {Rate:F1} files/sec", 
+                    _logger.LogInformation("Progress: {Processed}/{Total} files ({Percentage:F1}%) - {Rate:F1} files/sec",
                         processedFiles, totalFiles, (double)processedFiles / totalFiles * 100, rate);
                 }
 
                 // Extract content from file
                 await ExtractContentAsync(fileItem, cancellationToken);
-                
+
                 // Chunk content if extraction was successful
                 var chunks = await ChunkContentAsync(fileItem, cancellationToken);
-                
+
                 // Index chunks if chunking was successful
                 var indexedCount = await IndexChunksAsync(chunks, cancellationToken);
-                
+
                 var aclGroupsText = fileItem.AclGroups.Count > 0 ? $"[{string.Join(", ", fileItem.AclGroups)}]" : "[]";
                 var contentText = fileItem.IsContentExtracted ? $", Content: {fileItem.ExtractedContent?.Length ?? 0} chars" : ", Content: extraction failed";
                 var chunkText = chunks.Count > 0 ? $", Chunks: {chunks.Count}" : "";
                 var indexText = indexedCount > 0 ? $", Indexed: {indexedCount}" : "";
-                _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo}{ChunkInfo}{IndexInfo})", 
+                _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo}{ChunkInfo}{IndexInfo})",
                     fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText, contentText, chunkText, indexText);
-                
+
                 // Simulate processing time
                 await Task.Delay(10, cancellationToken);
             }
 
             var totalElapsed = DateTime.UtcNow - startTime;
-            _logger.LogInformation("File enumeration completed: {ProcessedFiles} files in {Elapsed:mm\\:ss}", 
+            _logger.LogInformation("File enumeration completed: {ProcessedFiles} files in {Elapsed:mm\\:ss}",
                 processedFiles, totalElapsed);
         }
         catch (OperationCanceledException)
@@ -161,13 +161,13 @@ public class CollectorWorker : BackgroundService
 
             using var scope = _serviceProvider.CreateScope();
             var contentExtractionService = scope.ServiceProvider.GetRequiredService<ContentExtractionService>();
-            
+
             // Generate file hash before extraction
             if (string.IsNullOrEmpty(fileItem.FileHash))
             {
                 fileItem.FileHash = await GenerateFileHashAsync(fileItem.Path, cancellationToken);
             }
-            
+
             var result = await contentExtractionService.ExtractContentAsync(fileItem.Path, cancellationToken);
 
             if (result.IsSuccess)
@@ -175,16 +175,16 @@ public class CollectorWorker : BackgroundService
                 fileItem.ExtractedContent = result.Content;
                 fileItem.ContentMetadata = result.Metadata;
                 fileItem.IsContentExtracted = true;
-                
-                _logger.LogDebug("Successfully extracted {CharCount} characters from {FilePath}", 
+
+                _logger.LogDebug("Successfully extracted {CharCount} characters from {FilePath}",
                     result.Content.Length, fileItem.Path);
             }
             else
             {
                 fileItem.ContentExtractionError = result.ErrorMessage;
                 fileItem.IsContentExtracted = false;
-                
-                _logger.LogWarning("Content extraction failed for {FilePath}: {ErrorMessage}", 
+
+                _logger.LogWarning("Content extraction failed for {FilePath}: {ErrorMessage}",
                     fileItem.Path, result.ErrorMessage);
             }
         }
@@ -198,7 +198,7 @@ public class CollectorWorker : BackgroundService
         {
             fileItem.ContentExtractionError = ex.Message;
             fileItem.IsContentExtracted = false;
-            
+
             _logger.LogError(ex, "Unexpected error during content extraction from {FilePath}", fileItem.Path);
         }
     }
@@ -228,7 +228,7 @@ public class CollectorWorker : BackgroundService
                 _options.ChunkOverlap,
                 cancellationToken);
 
-            _logger.LogDebug("Successfully chunked {FilePath} into {ChunkCount} chunks", 
+            _logger.LogDebug("Successfully chunked {FilePath} into {ChunkCount} chunks",
                 fileItem.Path, chunks.Count);
 
             return chunks;
@@ -260,8 +260,8 @@ public class CollectorWorker : BackgroundService
             var indexingService = scope.ServiceProvider.GetRequiredService<IndexingService>();
 
             var indexedCount = await indexingService.IndexFileChunksAsync(chunks, cancellationToken);
-            
-            _logger.LogDebug("Successfully indexed {IndexedCount}/{TotalCount} chunks", 
+
+            _logger.LogDebug("Successfully indexed {IndexedCount}/{TotalCount} chunks",
                 indexedCount, chunks.Count);
 
             return indexedCount;
@@ -291,7 +291,7 @@ public class CollectorWorker : BackgroundService
         {
             using var stream = File.OpenRead(filePath);
             using var sha256 = System.Security.Cryptography.SHA256.Create();
-            
+
             var hashBytes = await sha256.ComputeHashAsync(stream, cancellationToken);
             return Convert.ToBase64String(hashBytes);
         }

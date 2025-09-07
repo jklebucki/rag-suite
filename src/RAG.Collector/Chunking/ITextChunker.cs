@@ -22,7 +22,7 @@ public interface ITextChunker
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of text chunks</returns>
     Task<IList<TextChunk>> ChunkAsync(
-        string content, 
+        string content,
         Dictionary<string, object> metadata,
         int chunkSize = 1200,
         int overlap = 200,

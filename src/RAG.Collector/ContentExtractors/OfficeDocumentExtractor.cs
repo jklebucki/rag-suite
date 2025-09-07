@@ -43,7 +43,7 @@ public class OfficeDocumentExtractor : IContentExtractor
             }
 
             var extension = Path.GetExtension(filePath).ToLowerInvariant();
-            
+
             return await Task.Run(() => extension switch
             {
                 ".docx" => ExtractWordDocument(filePath),
@@ -65,9 +65,9 @@ public class OfficeDocumentExtractor : IContentExtractor
     private ContentExtractionResult ExtractWordDocument(string filePath)
     {
         using var document = WordprocessingDocument.Open(filePath, false);
-        
+
         var metadata = ExtractBasicMetadata(filePath);
-        
+
         // Extract document properties from package
         ExtractPackageProperties(document, metadata);
 
@@ -95,9 +95,9 @@ public class OfficeDocumentExtractor : IContentExtractor
     private ContentExtractionResult ExtractExcelDocument(string filePath)
     {
         using var document = SpreadsheetDocument.Open(filePath, false);
-        
+
         var metadata = ExtractBasicMetadata(filePath);
-        
+
         // Extract document properties from package
         ExtractPackageProperties(document, metadata);
 
@@ -117,7 +117,7 @@ public class OfficeDocumentExtractor : IContentExtractor
             worksheetCount++;
             var worksheet = worksheetPart.Worksheet;
             var sheetData = worksheet.GetFirstChild<SheetData>();
-            
+
             if (sheetData != null)
             {
                 contentBuilder.AppendLine($"\n--- Sheet {worksheetCount} ---");
@@ -129,7 +129,7 @@ public class OfficeDocumentExtractor : IContentExtractor
         metadata["WorksheetCount"] = worksheetCount.ToString();
         AddContentStatistics(content, metadata);
 
-        _logger.LogDebug("Extracted {CharCount} characters from {SheetCount} sheets in Excel document {FilePath}", 
+        _logger.LogDebug("Extracted {CharCount} characters from {SheetCount} sheets in Excel document {FilePath}",
             content.Length, worksheetCount, filePath);
 
         return ContentExtractionResult.Success(content, metadata);
@@ -141,9 +141,9 @@ public class OfficeDocumentExtractor : IContentExtractor
     private ContentExtractionResult ExtractPowerPointDocument(string filePath)
     {
         using var document = PresentationDocument.Open(filePath, false);
-        
+
         var metadata = ExtractBasicMetadata(filePath);
-        
+
         // Extract document properties from package
         ExtractPackageProperties(document, metadata);
 
@@ -161,7 +161,7 @@ public class OfficeDocumentExtractor : IContentExtractor
         {
             slideCount++;
             contentBuilder.AppendLine($"\n--- Slide {slideCount} ---");
-            
+
             var slide = slidePart.Slide;
             ExtractTextFromSlide(slide, contentBuilder);
         }
@@ -170,7 +170,7 @@ public class OfficeDocumentExtractor : IContentExtractor
         metadata["SlideCount"] = slideCount.ToString();
         AddContentStatistics(content, metadata);
 
-        _logger.LogDebug("Extracted {CharCount} characters from {SlideCount} slides in PowerPoint document {FilePath}", 
+        _logger.LogDebug("Extracted {CharCount} characters from {SlideCount} slides in PowerPoint document {FilePath}",
             content.Length, slideCount, filePath);
 
         return ContentExtractionResult.Success(content, metadata, slideCount);
@@ -183,11 +183,11 @@ public class OfficeDocumentExtractor : IContentExtractor
     {
         var metadata = new Dictionary<string, string>();
         var fileInfo = new FileInfo(filePath);
-        
+
         metadata["FileName"] = fileInfo.Name;
         metadata["FileSize"] = fileInfo.Length.ToString();
         metadata["LastModified"] = fileInfo.LastWriteTimeUtc.ToString("yyyy-MM-dd HH:mm:ss UTC");
-        
+
         return metadata;
     }
 
@@ -201,7 +201,7 @@ public class OfficeDocumentExtractor : IContentExtractor
             if (document.PackageProperties != null)
             {
                 var props = document.PackageProperties;
-                
+
                 if (!string.IsNullOrEmpty(props.Title)) metadata["Title"] = props.Title;
                 if (!string.IsNullOrEmpty(props.Creator)) metadata["Author"] = props.Creator;
                 if (!string.IsNullOrEmpty(props.Subject)) metadata["Subject"] = props.Subject;
@@ -241,7 +241,7 @@ public class OfficeDocumentExtractor : IContentExtractor
         foreach (var row in sheetData.Descendants<Row>())
         {
             var rowValues = new List<string>();
-            
+
             foreach (var cell in row.Descendants<Cell>())
             {
                 var cellValue = GetCellValue(cell, sharedStringTable);
@@ -250,7 +250,7 @@ public class OfficeDocumentExtractor : IContentExtractor
                     rowValues.Add(cellValue);
                 }
             }
-            
+
             if (rowValues.Count > 0)
             {
                 contentBuilder.AppendLine(string.Join("\t", rowValues));

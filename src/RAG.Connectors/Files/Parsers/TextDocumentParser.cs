@@ -27,7 +27,7 @@ public class TextDocumentParser : IDocumentParser
         {
             var fileInfo = new FileInfo(filePath);
             var content = await File.ReadAllTextAsync(filePath);
-            
+
             return new DocumentContent
             {
                 Id = Guid.NewGuid().ToString(),

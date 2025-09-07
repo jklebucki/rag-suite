@@ -79,7 +79,7 @@ public class FileChangeDetectionService : IFileChangeDetectionService
             };
 
             await IndexFileMetadataAsync(metadata, cancellationToken);
-            
+
             _logger.LogDebug("Recorded indexed file metadata: {FilePath} ({ChunkCount} chunks)", filePath, chunkCount);
         }
         catch (Exception ex)
@@ -95,7 +95,7 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         {
             // For now, return basic stats - this could be implemented later with aggregation queries
             await Task.CompletedTask;
-            
+
             return new FileIndexStats
             {
                 TotalIndexedFiles = 0,
@@ -146,10 +146,10 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         try
         {
             var fileId = GenerateFileId(filePath);
-            
+
             // Ensure metadata index exists
             await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
-            
+
             // Get document by ID
             var metadata = await _elasticsearchService.GetDocumentByIdAsync<FileMetadataDocument>(
                 FILE_METADATA_INDEX, fileId, cancellationToken);
@@ -176,7 +176,7 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         {
             // Ensure metadata index exists
             await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
-            
+
             // Index the metadata document
             var success = await _elasticsearchService.IndexDocumentToCustomIndexAsync(
                 FILE_METADATA_INDEX, metadata.Id, metadata, cancellationToken);

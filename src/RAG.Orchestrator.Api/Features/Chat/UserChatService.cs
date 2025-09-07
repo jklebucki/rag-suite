@@ -178,7 +178,7 @@ public class UserChatService : IUserChatService
         try
         {
             // Search for relevant context
-            var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
+            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
                 request.Message,
                 Filters: null,
                 Limit: 1,
@@ -341,7 +341,7 @@ public class UserChatService : IUserChatService
         try
         {
             // Search for relevant context
-            var searchResults = await _searchService.SearchAsync(new Features.Search.SearchRequest(
+            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
                 request.Message,
                 Filters: null,
                 Limit: 1, // Get only one document with the highest rating
@@ -454,7 +454,7 @@ public class UserChatService : IUserChatService
         return true;
     }
 
-    private string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en")
+    private string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en")
     {
         var promptBuilder = new StringBuilder();
 
@@ -501,7 +501,7 @@ public class UserChatService : IUserChatService
 
     private string BuildMultilingualContextualPrompt(
         string userMessage,
-        Features.Search.SearchResult[] searchResults,
+        RAG.Abstractions.Search.SearchResult[] searchResults,
         List<UserChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,

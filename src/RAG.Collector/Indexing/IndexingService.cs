@@ -46,10 +46,10 @@ public class IndexingService
 
             // Generate embedding
             var embeddingResult = await _embeddingProvider.GenerateEmbeddingAsync(chunk, cancellationToken);
-            
+
             if (!embeddingResult.Success)
             {
-                _logger.LogError("Failed to generate embedding for chunk {ChunkId}: {Error}", 
+                _logger.LogError("Failed to generate embedding for chunk {ChunkId}: {Error}",
                     chunk.Id, embeddingResult.ErrorMessage);
                 return false;
             }
@@ -59,10 +59,10 @@ public class IndexingService
 
             // Index document
             var indexResult = await _elasticsearchService.IndexDocumentAsync(document, cancellationToken);
-            
+
             if (indexResult)
             {
-                _logger.LogDebug("Successfully indexed chunk {ChunkId} with {Dimensions}D embedding", 
+                _logger.LogDebug("Successfully indexed chunk {ChunkId} with {Dimensions}D embedding",
                     chunk.Id, embeddingResult.Dimensions);
                 return true;
             }
@@ -94,7 +94,7 @@ public class IndexingService
 
             // Generate embeddings for all chunks
             var embeddingResults = await _embeddingProvider.GenerateBatchEmbeddingsAsync(chunks, cancellationToken);
-            
+
             // Create documents for successful embeddings
             var documents = new List<ChunkDocument>();
             var successfulEmbeddings = 0;
@@ -112,7 +112,7 @@ public class IndexingService
                 }
                 else
                 {
-                    _logger.LogWarning("Skipping chunk {ChunkId} due to embedding failure: {Error}", 
+                    _logger.LogWarning("Skipping chunk {ChunkId} due to embedding failure: {Error}",
                         chunk.Id, embeddingResult.ErrorMessage);
                 }
             }
@@ -125,8 +125,8 @@ public class IndexingService
 
             // Index documents in Elasticsearch
             var indexedCount = await _elasticsearchService.IndexDocumentsBatchAsync(documents, cancellationToken);
-            
-            _logger.LogInformation("Batch indexing completed: {IndexedCount}/{EmbeddingCount}/{TotalCount} chunks indexed", 
+
+            _logger.LogInformation("Batch indexing completed: {IndexedCount}/{EmbeddingCount}/{TotalCount} chunks indexed",
                 indexedCount, successfulEmbeddings, chunks.Count);
 
             return indexedCount;
@@ -151,7 +151,7 @@ public class IndexingService
 
         var sourceFile = fileChunks.First().SourceFile?.Path ?? "unknown";
         var firstChunk = fileChunks.First();
-        
+
         try
         {
             _logger.LogInformation("Checking if file needs reindexing: {SourceFile}", sourceFile);
@@ -161,7 +161,7 @@ public class IndexingService
             {
                 var fileHash = firstChunk.FileHash; // Use file hash for change detection
                 var lastModified = firstChunk.SourceFile.LastWriteTimeUtc;
-                
+
                 var needsReindexing = await _fileChangeDetection.ShouldReindexFileAsync(
                     sourceFile, fileHash, lastModified, cancellationToken);
 
@@ -172,7 +172,7 @@ public class IndexingService
                 }
             }
 
-            _logger.LogInformation("Indexing {ChunkCount} chunks from file: {SourceFile}", 
+            _logger.LogInformation("Indexing {ChunkCount} chunks from file: {SourceFile}",
                 fileChunks.Count, sourceFile);
 
             // Delete existing documents for this file first
@@ -184,7 +184,7 @@ public class IndexingService
 
             // Index chunks using batch processing if we have many chunks
             var indexedCount = 0;
-            
+
             if (fileChunks.Count <= _options.BulkBatchSize)
             {
                 // Process all chunks in one batch
@@ -194,7 +194,7 @@ public class IndexingService
             {
                 // Process in smaller batches
                 var batches = fileChunks.Chunk(_options.BulkBatchSize);
-                
+
                 foreach (var batch in batches)
                 {
                     var batchResult = await IndexChunksBatchAsync(batch.ToList(), cancellationToken);
@@ -206,14 +206,14 @@ public class IndexingService
             if (indexedCount > 0 && firstChunk.SourceFile != null)
             {
                 await _fileChangeDetection.RecordIndexedFileAsync(
-                    sourceFile, 
+                    sourceFile,
                     firstChunk.FileHash, // Use file hash
-                    firstChunk.SourceFile.LastWriteTimeUtc, 
-                    indexedCount, 
+                    firstChunk.SourceFile.LastWriteTimeUtc,
+                    indexedCount,
                     cancellationToken);
             }
 
-            _logger.LogInformation("Completed indexing file {SourceFile}: {IndexedCount}/{TotalCount} chunks indexed", 
+            _logger.LogInformation("Completed indexing file {SourceFile}: {IndexedCount}/{TotalCount} chunks indexed",
                 sourceFile, indexedCount, fileChunks.Count);
 
             return indexedCount;
@@ -260,7 +260,7 @@ public class IndexingService
                 return false;
             }
 
-            _logger.LogInformation("Indexing system is ready - embedding provider: {EmbeddingModel}, Elasticsearch: available", 
+            _logger.LogInformation("Indexing system is ready - embedding provider: {EmbeddingModel}, Elasticsearch: available",
                 _embeddingProvider.ModelName);
 
             return true;
@@ -281,7 +281,7 @@ public class IndexingService
         try
         {
             var indexStats = await _elasticsearchService.GetIndexStatsAsync();
-            
+
             if (indexStats != null)
             {
                 return new IndexingStats

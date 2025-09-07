@@ -19,7 +19,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("System.Net.Http.HttpClient", Serilog.Events.LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("logs/rag-collector-.txt", 
+    .WriteTo.File("logs/rag-collector-.txt",
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 30,
         shared: true,
@@ -38,7 +38,7 @@ try
     // Configure CollectorOptions with validation
     builder.Services.Configure<CollectorOptions>(
         builder.Configuration.GetSection(CollectorOptions.SectionName));
-    
+
     builder.Services.AddOptionsWithValidateOnStart<CollectorOptions>();
 
     // Add Windows Service support
@@ -50,7 +50,7 @@ try
     // Register services
     builder.Services.AddScoped<IFileEnumerator, FileEnumerator>();
     builder.Services.AddScoped<IAclResolver, NtfsAclResolver>();
-    
+
     // Register content extractors
     builder.Services.AddScoped<IContentExtractor, PlainTextExtractor>();
     builder.Services.AddScoped<IContentExtractor, PdfExtractor>();
@@ -62,7 +62,7 @@ try
 
     // Register HTTP client for embedding service
     builder.Services.AddHttpClient("EmbeddingService");
-    
+
     // Register configured HttpClient for HttpEmbeddingProvider
     builder.Services.AddScoped<HttpClient>(serviceProvider =>
     {
@@ -79,12 +79,12 @@ try
     {
         var options = serviceProvider.GetRequiredService<IOptions<CollectorOptions>>().Value;
         var settings = new ConnectionConfiguration(new Uri(options.ElasticsearchUrl));
-        
+
         if (!string.IsNullOrEmpty(options.ElasticsearchUsername) && !string.IsNullOrEmpty(options.ElasticsearchPassword))
         {
             settings = settings.BasicAuthentication(options.ElasticsearchUsername, options.ElasticsearchPassword);
         }
-        
+
         if (options.AllowSelfSignedCert)
         {
             settings = settings.ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
@@ -116,8 +116,8 @@ try
             Log.Error("Configuration validation failed:");
             foreach (var result in validationResults)
             {
-                Log.Error("  {ErrorMessage} (Properties: {Properties})", 
-                    result.ErrorMessage, 
+                Log.Error("  {ErrorMessage} (Properties: {Properties})",
+                    result.ErrorMessage,
                     string.Join(", ", result.MemberNames));
             }
             throw new InvalidOperationException("Invalid configuration. See logs for details.");

@@ -183,7 +183,7 @@ public class JwtService : IJwtService
         {
             _refreshTokens[userId] = new List<string>();
         }
-        
+
         _refreshTokens[userId].Add(refreshToken);
         return Task.CompletedTask;
     }

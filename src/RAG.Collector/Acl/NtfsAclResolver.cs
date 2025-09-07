@@ -51,7 +51,7 @@ public class NtfsAclResolver : IAclResolver
 
             // Get file/directory security info
             AuthorizationRuleCollection accessRules;
-            
+
             if (File.Exists(filePath))
             {
                 var fileSecurity = new FileSecurity(filePath, AccessControlSections.Access);
@@ -65,13 +65,13 @@ public class NtfsAclResolver : IAclResolver
 
             foreach (AuthorizationRule rule in accessRules)
             {
-                if (rule is FileSystemAccessRule accessRule && 
+                if (rule is FileSystemAccessRule accessRule &&
                     accessRule.AccessControlType == AccessControlType.Allow &&
                     (accessRule.FileSystemRights & FileSystemRights.Read) == FileSystemRights.Read)
                 {
                     var sid = (SecurityIdentifier)accessRule.IdentityReference;
                     var groupName = await ResolveSidToGroupNameAsync(sid, cancellationToken);
-                    
+
                     if (!string.IsNullOrEmpty(groupName))
                     {
                         aclGroups.Add(groupName);
@@ -80,7 +80,7 @@ public class NtfsAclResolver : IAclResolver
             }
 
             var result = aclGroups.ToList();
-            _logger.LogDebug("Resolved {Count} ACL groups for {FilePath}: {Groups}", 
+            _logger.LogDebug("Resolved {Count} ACL groups for {FilePath}: {Groups}",
                 result.Count, filePath, string.Join(", ", result));
 
             return result;
@@ -190,7 +190,7 @@ public class NtfsAclResolver : IAclResolver
             "BUILTIN\\CREATOR OWNER"
         };
 
-        return systemAccounts.Any(sysAccount => 
+        return systemAccounts.Any(sysAccount =>
             string.Equals(accountName, sysAccount, StringComparison.OrdinalIgnoreCase));
     }
 }

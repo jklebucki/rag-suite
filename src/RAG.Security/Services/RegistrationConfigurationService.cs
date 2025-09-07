@@ -43,40 +43,40 @@ public class RegistrationConfigurationService : IRegistrationConfigurationServic
             },
             UserFieldRequirements = new UserFieldRequirements
             {
-                Email = new FieldRequirement 
-                { 
-                    Required = true, 
+                Email = new FieldRequirement
+                {
+                    Required = true,
                     MaxLength = _passwordComplexityOptions.UserFields.EmailMaxLength,
                     Pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$",
                     ValidationMessage = "auth.validation.email_invalid"
                 },
-                UserName = new FieldRequirement 
-                { 
-                    Required = true, 
-                    MinLength = _passwordComplexityOptions.UserFields.UserNameMinLength, 
+                UserName = new FieldRequirement
+                {
+                    Required = true,
+                    MinLength = _passwordComplexityOptions.UserFields.UserNameMinLength,
                     MaxLength = _passwordComplexityOptions.UserFields.UserNameMaxLength,
                     ValidationMessage = "auth.validation.username_min_length"
                 },
-                FirstName = new FieldRequirement 
-                { 
-                    Required = true, 
+                FirstName = new FieldRequirement
+                {
+                    Required = true,
                     MaxLength = _passwordComplexityOptions.UserFields.FirstNameMaxLength,
                     ValidationMessage = "auth.validation.first_name_required"
                 },
-                LastName = new FieldRequirement 
-                { 
-                    Required = true, 
+                LastName = new FieldRequirement
+                {
+                    Required = true,
                     MaxLength = _passwordComplexityOptions.UserFields.LastNameMaxLength,
                     ValidationMessage = "auth.validation.last_name_required"
                 },
-                Password = new FieldRequirement 
-                { 
-                    Required = true, 
+                Password = new FieldRequirement
+                {
+                    Required = true,
                     MinLength = passwordOptions.RequiredLength,
                     ValidationMessage = "auth.validation.password_required"
                 },
-                ConfirmPassword = new FieldRequirement 
-                { 
+                ConfirmPassword = new FieldRequirement
+                {
                     Required = true,
                     ValidationMessage = "auth.validation.password_mismatch"
                 }
