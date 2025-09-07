@@ -1,5 +1,6 @@
 using RAG.Orchestrator.Api.Extensions;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
@@ -30,17 +31,17 @@ try
 {
     await app.Services.EnsureSecurityDatabaseCreatedAsync();
     app.Logger.LogInformation("Security database initialization completed successfully");
-    
+
     // Initialize Chat database
     using var scope = app.Services.CreateScope();
     var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
     await chatDbContext.Database.MigrateAsync();
     app.Logger.LogInformation("Chat database initialization completed successfully");
-    
+
     // Initialize Elasticsearch indices
     var indexManagement = scope.ServiceProvider.GetRequiredService<IIndexManagementService>();
     var elasticsearchOptions = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ElasticsearchOptions>>().Value;
-    
+
     if (elasticsearchOptions.AutoCreateIndices)
     {
         var indexCreated = await indexManagement.EnsureIndexExistsAsync(elasticsearchOptions.DefaultIndexName);
@@ -82,19 +83,22 @@ app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 
 // Simple health endpoint
-app.MapGet("/health", (HttpContext context) => {
-    try 
+app.MapGet("/health", (HttpContext context) =>
+{
+    try
     {
-        return Results.Ok(new { 
-            Status = "Healthy", 
+        return Results.Ok(new
+        {
+            Status = "Healthy",
             Timestamp = DateTime.UtcNow,
             Version = "2.0.0-semantic-kernel"
         });
     }
     catch
     {
-        return Results.Json(new { 
-            Status = "Error", 
+        return Results.Json(new
+        {
+            Status = "Error",
             Timestamp = DateTime.UtcNow,
             Version = "2.0.0-semantic-kernel"
         }, statusCode: 503);

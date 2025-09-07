@@ -12,8 +12,8 @@ public static class AnalyticsEndpoints
             .WithOpenApi();
 
         // Usage Statistics
-        group.MapGet("/usage", async (IAnalyticsService analyticsService, 
-            DateTime? startDate = null, 
+        group.MapGet("/usage", async (IAnalyticsService analyticsService,
+            DateTime? startDate = null,
             DateTime? endDate = null,
             string? endpoint = null) =>
         {
@@ -106,7 +106,7 @@ public static class AnalyticsEndpoints
             bool includeDetailedStats = false) =>
         {
             var filter = new AnalyticsFilter(IncludeDetailedStats: includeDetailedStats, IncludeSystemHealth: true);
-            
+
             var usageTask = analyticsService.GetUsageStatsAsync(filter);
             var performanceTask = analyticsService.GetPerformanceMetricsAsync(filter);
             var healthTask = analyticsService.GetSystemHealthAsync();
@@ -134,14 +134,14 @@ public static class AnalyticsEndpoints
         {
             var health = await analyticsService.GetSystemHealthAsync();
             var searchStats = await analyticsService.GetSearchStatisticsAsync();
-            
+
             var status = new
             {
                 Status = health.ElasticsearchAvailable && health.EmbeddingServiceAvailable ? "Healthy" : "Degraded",
                 Services = new
                 {
                     Elasticsearch = health.ElasticsearchAvailable ? "Online" : "Offline",
-                    EmbeddingService = health.EmbeddingServiceAvailable ? "Online" : "Offline", 
+                    EmbeddingService = health.EmbeddingServiceAvailable ? "Online" : "Offline",
                     LlmService = health.LlmServiceAvailable ? "Online" : "Offline"
                 },
                 QuickStats = new

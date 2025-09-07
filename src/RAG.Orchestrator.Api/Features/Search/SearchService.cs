@@ -1,3 +1,4 @@
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Reconstruction;
@@ -28,13 +29,6 @@ public class ElasticsearchUnavailableException : Exception
     public ElasticsearchUnavailableException(string message, Exception innerException) : base(message, innerException) { }
 }
 
-public interface ISearchService
-{
-    Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken = default);
-    Task<SearchResponse> SearchHybridAsync(SearchRequest request, CancellationToken cancellationToken = default);
-    Task<DocumentDetail> GetDocumentByIdAsync(string documentId, CancellationToken cancellationToken = default);
-}
-
 public class SearchService : ISearchService
 {
     private readonly IElasticLowLevelClient _client;
@@ -49,8 +43,8 @@ public class SearchService : ISearchService
 
     public SearchService(
         IElasticLowLevelClient client,
-        HttpClient httpClient, 
-        ILogger<SearchService> logger, 
+        HttpClient httpClient,
+        ILogger<SearchService> logger,
         IIndexManagementService indexManagement,
         IEmbeddingService embeddingService,
         IQueryProcessor queryProcessor,
@@ -66,7 +60,7 @@ public class SearchService : ISearchService
         _reconstructionService = reconstructionService;
         _options = options.Value;
         _indexName = _options.DefaultIndexName;
-        
+
         // Configure HTTP client for fallback operations
         var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_options.Username}:{_options.Password}"));
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
@@ -78,7 +72,7 @@ public class SearchService : ISearchService
         try
         {
             _logger.LogInformation("Starting search for query: '{Query}' with limit: {Limit}", request.Query, request.Limit);
-            
+
             // Check if index exists before searching
             var indexExists = await _indexManagement.IndexExistsAsync(_indexName, cancellationToken);
             if (!indexExists)
@@ -94,7 +88,7 @@ public class SearchService : ISearchService
                 _logger.LogInformation("Using hybrid BM25 + kNN search");
                 return await SearchHybridAsync(request, cancellationToken);
             }
-            
+
             _logger.LogInformation("Embedding service not available, using traditional search");
 
             // Create hybrid search query for better results
@@ -170,38 +164,38 @@ public class SearchService : ISearchService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", content, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogError("Elasticsearch search failed with status {StatusCode}. Error: {Error}", 
+                _logger.LogError("Elasticsearch search failed with status {StatusCode}. Error: {Error}",
                     response.StatusCode, errorContent);
                 return CreateUnavailableResponse(request.Query);
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
             using var doc = JsonDocument.Parse(responseJson);
-            
+
             var hits = doc.RootElement.GetProperty("hits");
             var totalHits = hits.GetProperty("total").GetProperty("value").GetInt32();
             var took = doc.RootElement.GetProperty("took").GetInt32();
-            
+
             var results = new List<SearchResult>();
-            
+
             // Group chunks by source file to reconstruct complete documents
             var chunksByFile = new Dictionary<string, List<ChunkInfo>>();
-            
+
             foreach (var hit in hits.GetProperty("hits").EnumerateArray())
             {
                 var source = hit.GetProperty("_source");
                 var score = hit.GetProperty("_score").GetSingle();
                 var id = hit.GetProperty("_id").GetString() ?? "";
-                
+
                 // Map fields from ChunkDocument structure
                 var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
                 var docContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
                 var fileExtension = source.TryGetProperty("fileExtension", out var extProp) ? extProp.GetString() ?? "" : "";
-                
+
                 // Get chunk information
                 var chunkIndex = 0;
                 var totalChunks = 1;
@@ -212,9 +206,9 @@ public class SearchService : ISearchService
                     if (positionProp.TryGetProperty("totalChunks", out var totalChunksProp))
                         totalChunks = totalChunksProp.GetInt32();
                 }
-                
-                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp) 
-                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now 
+
+                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp)
+                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now
                     : DateTime.Now;
 
                 // Group chunks by source file
@@ -222,9 +216,9 @@ public class SearchService : ISearchService
                 {
                     if (!chunksByFile.ContainsKey(sourceFile))
                         chunksByFile[sourceFile] = new List<ChunkInfo>();
-                    
+
                     var highlights = new List<string>();
-                    if (hit.TryGetProperty("highlight", out var highlight) && 
+                    if (hit.TryGetProperty("highlight", out var highlight) &&
                         highlight.TryGetProperty("content", out var contentHighlight))
                     {
                         foreach (var fragment in contentHighlight.EnumerateArray())
@@ -253,7 +247,7 @@ public class SearchService : ISearchService
                 .Select(kvp => new { File = kvp.Key, Chunks = kvp.Value, MaxScore = kvp.Value.Max(c => c.Score) })
                 .OrderByDescending(x => x.MaxScore)
                 .Take(request.Limit);
-                
+
             foreach (var fileGroup in filesByScore)
             {
                 var reconstructedDoc = await ReconstructDocumentFromChunks(fileGroup.File, fileGroup.Chunks, cancellationToken);
@@ -278,7 +272,7 @@ public class SearchService : ISearchService
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5)); // Quick health check
-            
+
             var response = await _httpClient.GetAsync($"{_options.Url}/", cts.Token);
             if (!response.IsSuccessStatusCode)
             {
@@ -306,13 +300,13 @@ public class SearchService : ISearchService
             {
                 await _indexManagement.EnsureIndexExistsAsync(_indexName, cancellationToken);
             }
-            
+
             // Check Elasticsearch availability first
             await CheckElasticsearchHealth(cancellationToken);
-            
+
             // First, get the chunk to find the source file
             var response = await _httpClient.GetAsync($"{_options.Url}/{_indexName}/_doc/{documentId}", cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -325,34 +319,34 @@ public class SearchService : ISearchService
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
             using var doc = JsonDocument.Parse(responseJson);
-            
+
             var source = doc.RootElement.GetProperty("_source");
             var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
-            
+
             if (string.IsNullOrEmpty(sourceFile))
             {
                 // Fallback to single chunk if sourceFile is not available
                 return await GetSingleChunkAsDocumentDetail(doc, documentId, cancellationToken);
             }
-            
+
             // Get all chunks for this document and reconstruct it
             var allChunks = await FetchAllChunksForDocument(sourceFile, cancellationToken);
-            
+
             if (allChunks.Count == 0)
             {
                 // Fallback to single chunk if no chunks found
                 return await GetSingleChunkAsDocumentDetail(doc, documentId, cancellationToken);
             }
-            
+
             // Reconstruct the document using the existing logic
             var firstChunk = allChunks.OrderBy(c => c.ChunkIndex).First();
             var reconstructedContent = _reconstructionService.ReconstructDocument(allChunks);
-            
+
             // Get metadata from first chunk
             var fileName = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
             var fileType = firstChunk.FileExtension ?? "";
             var filePath = sourceFile;
-            
+
             // Extract additional metadata
             var metadata = new Dictionary<string, object>
             {
@@ -365,43 +359,43 @@ public class SearchService : ISearchService
                 { "chunk_count", allChunks.Count },
                 { "total_chunks", firstChunk.TotalChunks }
             };
-            
+
             // Add file size and timestamps if available
             if (source.TryGetProperty("fileSize", out var fileSizeProp))
             {
                 metadata["file_size"] = fileSizeProp.ToString();
             }
-            
+
             if (source.TryGetProperty("lastModified", out var lastModifiedProp))
             {
                 metadata["last_modified"] = lastModifiedProp.ToString();
             }
-            
+
             if (source.TryGetProperty("indexedAt", out var indexedAtProp))
             {
                 metadata["indexed_at"] = indexedAtProp.ToString();
             }
-            
-            var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
-                ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+
+            var createdAt = source.TryGetProperty("createdAt", out var createdProp)
+                ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now
                 : DateTime.Now;
-                
-            var updatedAt = source.TryGetProperty("updatedAt", out var updatedProp) 
-                ? DateTime.TryParse(updatedProp.GetString(), out var updated) ? updated : DateTime.Now 
+
+            var updatedAt = source.TryGetProperty("updatedAt", out var updatedProp)
+                ? DateTime.TryParse(updatedProp.GetString(), out var updated) ? updated : DateTime.Now
                 : DateTime.Now;
 
             return new DocumentDetail(
-                documentId, 
-                fileName, 
+                documentId,
+                fileName,
                 reconstructedContent.Length > 500 ? reconstructedContent.Substring(0, 500) + "..." : reconstructedContent, // Summary
                 reconstructedContent, // Full content
-                1.0, 
-                fileType, 
-                "Document", 
-                filePath, 
-                fileName, 
-                metadata, 
-                createdAt, 
+                1.0,
+                fileType,
+                "Document",
+                filePath,
+                fileName,
+                metadata,
+                createdAt,
                 updatedAt
             );
         }
@@ -421,18 +415,18 @@ public class SearchService : ISearchService
         try
         {
             _logger.LogInformation("Reconstructing document from {ChunkCount} chunks for file: {SourceFile}", chunks.Count, sourceFile);
-            
+
             // Sort chunks by index to maintain proper order
             var sortedChunks = chunks.OrderBy(c => c.ChunkIndex).ToList();
             var firstChunk = sortedChunks.First();
-            
+
             // Determine if we should fetch all chunks for this document
             var shouldReconstructFullDocument = ShouldReconstructFullDocument(chunks);
-            
+
             string reconstructedContent;
             var allHighlights = new List<string>();
             var maxScore = chunks.Max(c => c.Score);
-            
+
             if (shouldReconstructFullDocument && firstChunk.TotalChunks > 1)
             {
                 // Fetch all chunks for this document to get complete context
@@ -442,19 +436,19 @@ public class SearchService : ISearchService
                     // Use the actual TotalChunks from fetched chunks (they should all be the same for one document)
                     var expectedChunks = allChunks.FirstOrDefault()?.TotalChunks ?? firstChunk.TotalChunks;
                     var actualChunks = allChunks.Count;
-                    
+
                     // Log discrepancy if TotalChunks values don't match
                     if (firstChunk.TotalChunks != expectedChunks)
                     {
-                        _logger.LogWarning("TotalChunks mismatch for {SourceFile}: original chunk says {OriginalTotal}, fetched chunks say {FetchedTotal}, actual count: {ActualCount}", 
+                        _logger.LogWarning("TotalChunks mismatch for {SourceFile}: original chunk says {OriginalTotal}, fetched chunks say {FetchedTotal}, actual count: {ActualCount}",
                             sourceFile, firstChunk.TotalChunks, expectedChunks, actualChunks);
                     }
-                    
+
                     if (actualChunks >= expectedChunks * _options.MinimumChunkCompleteness) // Use configurable threshold
                     {
                         // Filter out chunks with empty content before reconstruction
                         var validChunks = allChunks.Where(c => !string.IsNullOrWhiteSpace(c.Content)).ToList();
-                        
+
                         if (validChunks.Count == 0)
                         {
                             _logger.LogWarning("All fetched chunks for {SourceFile} have empty content! Falling back to matching chunks.", sourceFile);
@@ -463,28 +457,28 @@ public class SearchService : ISearchService
                         else
                         {
                             reconstructedContent = _reconstructionService.ReconstructDocument(validChunks);
-                            
+
                             if (validChunks.Count < allChunks.Count)
                             {
-                                _logger.LogWarning("Filtered out {EmptyCount} empty chunks from {TotalCount} for {SourceFile}", 
+                                _logger.LogWarning("Filtered out {EmptyCount} empty chunks from {TotalCount} for {SourceFile}",
                                     allChunks.Count - validChunks.Count, allChunks.Count, sourceFile);
                             }
                         }
-                        
+
                         allHighlights.AddRange(chunks.SelectMany(c => c.Highlights)); // Keep only highlights from matching chunks
-                        
-                        _logger.LogInformation("Successfully reconstructed full document with {ActualChunks}/{ExpectedChunks} chunks for {SourceFile}. Content length: {ContentLength} characters", 
+
+                        _logger.LogInformation("Successfully reconstructed full document with {ActualChunks}/{ExpectedChunks} chunks for {SourceFile}. Content length: {ContentLength} characters",
                             actualChunks, expectedChunks, sourceFile, reconstructedContent.Length);
-                            
+
                         // Additional debug info for troubleshooting
                         if (reconstructedContent.Length == 0)
                         {
-                            _logger.LogWarning("WARNING: Reconstructed content is empty! Chunks found: {ChunkCount}, First chunk content length: {FirstChunkLength}", 
+                            _logger.LogWarning("WARNING: Reconstructed content is empty! Chunks found: {ChunkCount}, First chunk content length: {FirstChunkLength}",
                                 allChunks.Count, allChunks.FirstOrDefault()?.Content?.Length ?? 0);
                         }
                         else if (reconstructedContent.Length < 100)
                         {
-                            _logger.LogWarning("WARNING: Reconstructed content is very short ({Length} chars): {Content}", 
+                            _logger.LogWarning("WARNING: Reconstructed content is very short ({Length} chars): {Content}",
                                 reconstructedContent.Length, reconstructedContent.Substring(0, Math.Min(100, reconstructedContent.Length)));
                         }
                     }
@@ -493,7 +487,7 @@ public class SearchService : ISearchService
                         // Too many missing chunks, fall back to found chunks only
                         reconstructedContent = _reconstructionService.ReconstructDocument(sortedChunks);
                         allHighlights.AddRange(chunks.SelectMany(c => c.Highlights));
-                        _logger.LogWarning("Document {SourceFile} has too many missing chunks ({ActualChunks}/{ExpectedChunks}), using only matching chunks", 
+                        _logger.LogWarning("Document {SourceFile} has too many missing chunks ({ActualChunks}/{ExpectedChunks}), using only matching chunks",
                             sourceFile, actualChunks, expectedChunks);
                     }
                 }
@@ -516,12 +510,12 @@ public class SearchService : ISearchService
             var fileExtension = firstChunk.FileExtension;
             var documentType = !string.IsNullOrEmpty(fileExtension) ? fileExtension.TrimStart('.').ToUpperInvariant() : "";
             var fileName = Path.GetFileName(sourceFile);
-            
+
             // Create source description
-            var sourceDescription = chunks.Count == 1 
+            var sourceDescription = chunks.Count == 1
                 ? $"{fileName}"
                 : $"{fileName} ({chunks.Count} chunks)";
-                
+
             if (shouldReconstructFullDocument && firstChunk.TotalChunks > chunks.Count)
             {
                 sourceDescription += $" [reconstructed from {firstChunk.TotalChunks} total chunks]";
@@ -571,23 +565,23 @@ public class SearchService : ISearchService
             _logger.LogDebug("Document reconstruction disabled in configuration");
             return false;
         }
-        
+
         // Always reconstruct if we have multiple chunks from the same document
         if (chunks.Count > 1)
         {
             _logger.LogDebug("Will reconstruct document: multiple matching chunks ({ChunkCount})", chunks.Count);
             return true;
         }
-        
+
         // Reconstruct if any chunk indicates it's part of a larger document
         var firstChunk = chunks.First();
         if (firstChunk.TotalChunks > 1)
         {
-            _logger.LogDebug("Will reconstruct document: chunk {ChunkIndex}/{TotalChunks} indicates multi-chunk document", 
+            _logger.LogDebug("Will reconstruct document: chunk {ChunkIndex}/{TotalChunks} indicates multi-chunk document",
                 firstChunk.ChunkIndex, firstChunk.TotalChunks);
             return true;
         }
-        
+
         // Don't reconstruct for single-chunk documents
         _logger.LogDebug("Will not reconstruct: single chunk document");
         return false;
@@ -598,7 +592,7 @@ public class SearchService : ISearchService
         try
         {
             _logger.LogDebug("Fetching all chunks for document: {SourceFile}", sourceFile);
-            
+
             // Use exact match query for sourceFile and sort by chunkIndex
             var searchQuery = new Dictionary<string, object>
             {
@@ -610,12 +604,12 @@ public class SearchService : ISearchService
                     }
                 },
                 ["size"] = _options.MaxChunksPerDocument, // Use configurable size for large documents
-                ["sort"] = new[] 
-                { 
-                    new Dictionary<string, object> 
-                    { 
-                        ["position.chunkIndex"] = new { order = "asc" } 
-                    } 
+                ["sort"] = new[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["position.chunkIndex"] = new { order = "asc" }
+                    }
                 },
                 ["_source"] = new[] { "content", "position", "sourceFile", "fileExtension", "indexedAt" }
             };
@@ -626,18 +620,18 @@ public class SearchService : ISearchService
             _logger.LogDebug("Fetching all chunks query for {SourceFile}: {Query}", sourceFile, json);
 
             var response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", content, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogWarning("Failed to fetch all chunks for document {SourceFile}. Status: {StatusCode}. Error: {Error}", 
+                _logger.LogWarning("Failed to fetch all chunks for document {SourceFile}. Status: {StatusCode}. Error: {Error}",
                     sourceFile, response.StatusCode, errorContent);
-                
+
                 // Try alternative query without .keyword suffix if first attempt failed
                 if (errorContent.Contains("field [sourceFile.keyword]"))
                 {
                     _logger.LogInformation("Retrying fetch with alternative query (without .keyword) for {SourceFile}", sourceFile);
-                    
+
                     var alternativeQuery = new Dictionary<string, object>
                     {
                         ["query"] = new Dictionary<string, object>
@@ -648,27 +642,27 @@ public class SearchService : ISearchService
                             }
                         },
                         ["size"] = _options.MaxChunksPerDocument,
-                        ["sort"] = new[] 
-                        { 
-                            new Dictionary<string, object> 
-                            { 
-                                ["position.chunkIndex"] = new { order = "asc" } 
-                            } 
+                        ["sort"] = new[]
+                        {
+                            new Dictionary<string, object>
+                            {
+                                ["position.chunkIndex"] = new { order = "asc" }
+                            }
                         },
                         ["_source"] = new[] { "content", "position", "sourceFile", "fileExtension", "indexedAt" }
                     };
-                    
+
                     var altJson = JsonSerializer.Serialize(alternativeQuery);
                     var altContent = new StringContent(altJson, Encoding.UTF8, "application/json");
                     _logger.LogDebug("Alternative query for {SourceFile}: {Query}", sourceFile, altJson);
-                    
+
                     response = await _httpClient.PostAsync($"{_options.Url}/{_indexName}/_search", altContent, cancellationToken);
                 }
-                
+
                 if (!response.IsSuccessStatusCode)
                 {
                     var finalErrorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                    _logger.LogWarning("Final attempt failed for document {SourceFile}. Status: {StatusCode}. Error: {Error}", 
+                    _logger.LogWarning("Final attempt failed for document {SourceFile}. Status: {StatusCode}. Error: {Error}",
                         sourceFile, response.StatusCode, finalErrorContent);
                     return new List<ChunkInfo>();
                 }
@@ -676,24 +670,24 @@ public class SearchService : ISearchService
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
             using var doc = JsonDocument.Parse(responseJson);
-            
+
             var hits = doc.RootElement.GetProperty("hits").GetProperty("hits");
             var totalFound = doc.RootElement.GetProperty("hits").GetProperty("total").GetProperty("value").GetInt32();
             var allChunks = new List<ChunkInfo>();
-            
+
             foreach (var hit in hits.EnumerateArray())
             {
                 var source = hit.GetProperty("_source");
                 var chunkContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
-                
+
                 // Debug empty content
                 if (string.IsNullOrEmpty(chunkContent))
                 {
-                    _logger.LogDebug("Empty content found in chunk {ChunkId} from document {SourceFile}. Available fields: {Fields}", 
-                        hit.GetProperty("_id").GetString() ?? "unknown", sourceFile, 
+                    _logger.LogDebug("Empty content found in chunk {ChunkId} from document {SourceFile}. Available fields: {Fields}",
+                        hit.GetProperty("_id").GetString() ?? "unknown", sourceFile,
                         string.Join(", ", source.EnumerateObject().Select(p => p.Name)));
                 }
-                
+
                 var chunkIndex = 0;
                 var totalChunks = 1;
                 if (source.TryGetProperty("position", out var positionProp))
@@ -704,8 +698,8 @@ public class SearchService : ISearchService
                         totalChunks = totalChunksProp.GetInt32();
                 }
 
-                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp) 
-                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now 
+                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp)
+                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now
                     : DateTime.Now;
 
                 allChunks.Add(new ChunkInfo
@@ -718,30 +712,30 @@ public class SearchService : ISearchService
                 });
             }
 
-            _logger.LogInformation("Successfully fetched {ChunkCount}/{TotalFound} chunks for document {SourceFile}", 
+            _logger.LogInformation("Successfully fetched {ChunkCount}/{TotalFound} chunks for document {SourceFile}",
                 allChunks.Count, totalFound, sourceFile);
-            
+
             // Debug chunk content lengths
             var chunkContentLengths = allChunks.Select(c => c.Content?.Length ?? 0).ToList();
             var totalContentLength = chunkContentLengths.Sum();
             var emptyChunks = chunkContentLengths.Count(l => l == 0);
-            
-            _logger.LogDebug("Chunk content analysis - Total content length: {TotalLength}, Empty chunks: {EmptyCount}/{TotalCount}, Avg chunk size: {AvgSize}", 
+
+            _logger.LogDebug("Chunk content analysis - Total content length: {TotalLength}, Empty chunks: {EmptyCount}/{TotalCount}, Avg chunk size: {AvgSize}",
                 totalContentLength, emptyChunks, allChunks.Count, chunkContentLengths.Count > 0 ? chunkContentLengths.Average() : 0);
-                
+
             if (emptyChunks > allChunks.Count * 0.1) // More than 10% empty chunks
             {
-                _logger.LogWarning("High number of empty chunks detected: {EmptyCount}/{TotalCount} for document {SourceFile}", 
+                _logger.LogWarning("High number of empty chunks detected: {EmptyCount}/{TotalCount} for document {SourceFile}",
                     emptyChunks, allChunks.Count, sourceFile);
             }
-            
+
             // Validate chunk sequence completeness
             if (allChunks.Count > 1)
             {
                 var sortedChunks = allChunks.OrderBy(c => c.ChunkIndex).ToList();
                 var expectedTotalChunks = sortedChunks.First().TotalChunks;
                 var missingChunks = new List<int>();
-                
+
                 for (int i = 0; i < expectedTotalChunks; i++)
                 {
                     if (!sortedChunks.Any(c => c.ChunkIndex == i))
@@ -749,19 +743,19 @@ public class SearchService : ISearchService
                         missingChunks.Add(i);
                     }
                 }
-                
+
                 if (missingChunks.Any())
                 {
-                    _logger.LogWarning("Document {SourceFile} is missing chunks: {MissingChunks}. Expected {ExpectedTotal}, found {ActualCount}", 
+                    _logger.LogWarning("Document {SourceFile} is missing chunks: {MissingChunks}. Expected {ExpectedTotal}, found {ActualCount}",
                         sourceFile, string.Join(", ", missingChunks), expectedTotalChunks, allChunks.Count);
                 }
                 else
                 {
-                    _logger.LogDebug("Document {SourceFile} has complete chunk sequence: {ChunkCount} chunks", 
+                    _logger.LogDebug("Document {SourceFile} has complete chunk sequence: {ChunkCount} chunks",
                         sourceFile, allChunks.Count);
                 }
             }
-            
+
             return allChunks;
         }
         catch (Exception ex)
@@ -782,13 +776,13 @@ public class SearchService : ISearchService
 
             // Process query to optimize for better results
             var queryProcessing = _queryProcessor.ProcessQuery(request.Query);
-            _logger.LogDebug("Query processed: Type={Type}, KeyTerms=[{KeyTerms}], Processed='{ProcessedQuery}'", 
+            _logger.LogDebug("Query processed: Type={Type}, KeyTerms=[{KeyTerms}], Processed='{ProcessedQuery}'",
                 queryProcessing.Type, string.Join(", ", queryProcessing.KeyTerms), queryProcessing.ProcessedQuery);
 
             // Use processed query for better keyword matching
             var searchQuery = request.Query;
             var embeddingQuery = request.Query;
-            
+
             // For conversational queries, prioritize processed version for BM25
             if (queryProcessing.Type == QueryType.Conversational && queryProcessing.KeyTerms.Any())
             {
@@ -890,7 +884,7 @@ public class SearchService : ISearchService
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogError("Hybrid search failed with status {StatusCode}. Error: {Error}", 
+                _logger.LogError("Hybrid search failed with status {StatusCode}. Error: {Error}",
                     response.StatusCode, errorContent);
                 throw new ElasticsearchUnavailableException($"Hybrid search failed: {errorContent}");
             }
@@ -901,7 +895,7 @@ public class SearchService : ISearchService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in hybrid search for query: '{Query}'", request.Query);
-            
+
             // Fallback to traditional search if hybrid fails
             _logger.LogInformation("Falling back to traditional search");
             return await SearchAsync(request, cancellationToken);
@@ -924,9 +918,9 @@ public class SearchService : ISearchService
         {
             var source = hit.GetProperty("_source");
             var score = hit.GetProperty("_score").GetDouble();
-            
+
             var highlights = new List<string>();
-            if (hit.TryGetProperty("highlight", out var highlightProperty) && 
+            if (hit.TryGetProperty("highlight", out var highlightProperty) &&
                 highlightProperty.TryGetProperty("content", out var contentHighlights))
             {
                 highlights.AddRange(contentHighlights.EnumerateArray().Select(h => h.GetString() ?? ""));
@@ -1001,26 +995,26 @@ public class SearchService : ISearchService
         }
 
         return new SearchResponse(
-            results.Take(request.Limit).ToArray(), 
-            totalHits, 
-            took, 
+            results.Take(request.Limit).ToArray(),
+            totalHits,
+            took,
             request.Query
         );
     }
-    
+
     private Task<DocumentDetail> GetSingleChunkAsDocumentDetail(JsonDocument doc, string documentId, CancellationToken cancellationToken)
     {
         var source = doc.RootElement.GetProperty("_source");
         var id = doc.RootElement.GetProperty("_id").GetString() ?? documentId;
-        
+
         var title = source.TryGetProperty("fileName", out var fileNameProp) ? fileNameProp.GetString() ?? "" : "";
         var content = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
         var category = source.TryGetProperty("fileType", out var fileTypeProp) ? fileTypeProp.GetString() ?? "" : "";
         var type = source.TryGetProperty("chunkIndex", out var chunkProp) ? $"Chunk {chunkProp.GetInt32()}" : "";
         var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
-        
-        var createdAt = source.TryGetProperty("createdAt", out var createdProp) 
-            ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now 
+
+        var createdAt = source.TryGetProperty("createdAt", out var createdProp)
+            ? DateTime.TryParse(createdProp.GetString(), out var created) ? created : DateTime.Now
             : DateTime.Now;
 
         var metadata = new Dictionary<string, object>
@@ -1046,5 +1040,63 @@ public class SearchService : ISearchService
             id, title, content, content, // Using content as both summary and full content
             1.0, category, type, sourceFile, title, metadata, createdAt, DateTime.Now
         ));
+    }
+
+    // Explicit interface implementation for RAG.Abstractions.Search.ISearchService
+    async Task<RAG.Abstractions.Search.SearchResponse> RAG.Abstractions.Search.ISearchService.SearchAsync(RAG.Abstractions.Search.SearchRequest request, CancellationToken cancellationToken)
+    {
+        var internalRequest = MapToInternalSearchRequest(request);
+        var internalResponse = await SearchAsync(internalRequest, cancellationToken);
+        return MapToAbstractionSearchResponse(internalResponse);
+    }
+
+    async Task<RAG.Abstractions.Search.SearchResponse> RAG.Abstractions.Search.ISearchService.SearchHybridAsync(RAG.Abstractions.Search.SearchRequest request, CancellationToken cancellationToken)
+    {
+        var internalRequest = MapToInternalSearchRequest(request);
+        var internalResponse = await SearchHybridAsync(internalRequest, cancellationToken);
+        return MapToAbstractionSearchResponse(internalResponse);
+    }
+
+    async Task<RAG.Abstractions.Search.DocumentDetail> RAG.Abstractions.Search.ISearchService.GetDocumentByIdAsync(string documentId, CancellationToken cancellationToken)
+    {
+        var internalDetail = await GetDocumentByIdAsync(documentId, cancellationToken);
+        return MapToAbstractionDocumentDetail(internalDetail);
+    }
+
+    // Mapping methods
+    private SearchRequest MapToInternalSearchRequest(RAG.Abstractions.Search.SearchRequest request)
+    {
+        var filters = request.Filters != null ? new SearchFilters(
+            request.Filters.DocumentType,
+            request.Filters.DateRange != null ? new DateRange(request.Filters.DateRange.From, request.Filters.DateRange.To) : null,
+            request.Filters.Source
+        ) : null;
+
+        return new SearchRequest(request.Query, filters, request.Limit, request.Offset);
+    }
+
+    private RAG.Abstractions.Search.SearchResponse MapToAbstractionSearchResponse(SearchResponse response)
+    {
+        var results = response.Results.Select(MapToAbstractionSearchResult).ToArray();
+        return new RAG.Abstractions.Search.SearchResponse(results, response.Total, response.Took, response.Query);
+    }
+
+    private RAG.Abstractions.Search.SearchResult MapToAbstractionSearchResult(SearchResult result)
+    {
+        return new RAG.Abstractions.Search.SearchResult(
+            result.Id, result.Title, result.Content, result.Score, result.Source,
+            result.DocumentType, result.FilePath, result.FileName, result.Metadata,
+            result.CreatedAt, result.UpdatedAt
+        );
+    }
+
+    private RAG.Abstractions.Search.DocumentDetail MapToAbstractionDocumentDetail(DocumentDetail detail)
+    {
+        var relatedDocs = detail.RelatedDocuments?.Select(MapToAbstractionSearchResult).ToArray();
+        return new RAG.Abstractions.Search.DocumentDetail(
+            detail.Id, detail.Title, detail.Content, detail.FullContent, detail.Score,
+            detail.Source, detail.DocumentType, detail.FilePath, detail.FileName,
+            detail.Metadata, detail.CreatedAt, detail.UpdatedAt, relatedDocs
+        );
     }
 }

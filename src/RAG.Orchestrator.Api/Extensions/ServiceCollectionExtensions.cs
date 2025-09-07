@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
@@ -29,10 +30,10 @@ public static class ServiceCollectionExtensions
                     Name = "RAG Suite Team"
                 }
             });
-            
+
             // Resolve type conflicts by using full names
             options.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
-            
+
             // Add JWT Bearer Authorization
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -82,14 +83,14 @@ public static class ServiceCollectionExtensions
     {
         // Add HttpClient factory
         services.AddHttpClient();
-        
+
         // Configure Elasticsearch Options
         services.Configure<ElasticsearchOptions>(options =>
         {
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
             configuration.GetSection(ElasticsearchOptions.SectionName).Bind(options);
         });
-        
+
         // Configure Elasticsearch Low Level Client
         services.AddSingleton<IElasticLowLevelClient>(provider =>
         {
@@ -98,52 +99,52 @@ public static class ServiceCollectionExtensions
             var username = configuration["Services:Elasticsearch:Username"] ?? "elastic";
             var password = configuration["Services:Elasticsearch:Password"] ?? "elastic";
             var timeoutMinutes = configuration.GetValue<int>("Services:Elasticsearch:TimeoutMinutes", 10);
-            
+
             var settings = new ConnectionConfiguration(new Uri(url))
                 .BasicAuthentication(username, password)
                 .RequestTimeout(TimeSpan.FromMinutes(timeoutMinutes));
-                
+
             return new ElasticLowLevelClient(settings);
         });
-        
+
         // Add HttpClient for LLM service (used by HealthAggregator) with SHORT timeout for health checks
         services.AddHttpClient<ILlmService, LlmService>(client =>
         {
             client.Timeout = TimeSpan.FromSeconds(30); // Short timeout for health operations
         });
-        
+
         // Add HttpClient for SearchService with reasonable timeout
-        services.AddHttpClient<ISearchService, SearchService>(client =>
+        services.AddHttpClient<RAG.Abstractions.Search.ISearchService, SearchService>(client =>
         {
             client.Timeout = TimeSpan.FromMinutes(2); // Reasonable timeout for search operations
         });
-        
+
         // Register feature services
         // ChatService now uses Kernel instead of ILlmService
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IUserChatService, UserChatService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
-        services.AddScoped<ISearchService, SearchService>();
+        services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();
         services.AddScoped<IQueryProcessor, QueryProcessor>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
-        
+
         return services;
     }
 
     public static IServiceCollection AddChatDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         // Use the same connection string as SecurityDatabase for simplicity
-        var connectionString = configuration.GetConnectionString("SecurityDatabase") 
+        var connectionString = configuration.GetConnectionString("SecurityDatabase")
             ?? "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
-        
+
         services.AddDbContext<ChatDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
-            
+
             // Enable sensitive data logging in development
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {

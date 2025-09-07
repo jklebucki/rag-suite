@@ -16,11 +16,11 @@ public static class LocalizationExtensions
         var languageConfig = new LanguageConfiguration();
         configuration.GetSection("Language").Bind(languageConfig);
         services.AddSingleton(languageConfig);
-        
+
         // Register core localization services
         services.AddSingleton<ILocalizedResources, LocalizedResources>();
         services.AddSingleton<ILanguageService, LanguageService>();
-        
+
         return services;
     }
 }

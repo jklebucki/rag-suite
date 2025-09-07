@@ -21,7 +21,7 @@ public class EmbeddingService : IEmbeddingService
         _httpClient = httpClient;
         _configuration = configuration;
         _logger = logger;
-        
+
         var embeddingServiceUrl = _configuration["Services:EmbeddingService:Url"] ?? "http://localhost:8580";
         _httpClient.BaseAddress = new Uri(embeddingServiceUrl);
         _httpClient.Timeout = TimeSpan.FromMinutes(2);
@@ -41,7 +41,7 @@ public class EmbeddingService : IEmbeddingService
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            
+
             // The response is a direct array of arrays: [[embedding_values]]
             var embeddingArrays = JsonSerializer.Deserialize<float[][]>(responseJson);
 

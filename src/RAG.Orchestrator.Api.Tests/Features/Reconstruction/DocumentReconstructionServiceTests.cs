@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using Microsoft.Extensions.Logging;
 using Moq;

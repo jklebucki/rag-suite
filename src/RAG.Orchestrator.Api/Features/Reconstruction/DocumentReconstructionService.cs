@@ -1,3 +1,4 @@
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,10 +11,10 @@ namespace RAG.Orchestrator.Api.Features.Reconstruction;
 public class DocumentReconstructionService : IDocumentReconstructionService
 {
     private readonly ILogger<DocumentReconstructionService> _logger;
-    
+
     // Regex for detecting sentence boundaries
     private static readonly Regex SentenceBoundaryRegex = new(@"[.!?]+\s+", RegexOptions.Compiled);
-    
+
     // Regex for detecting word boundaries
     private static readonly Regex WordBoundaryRegex = new(@"\s+", RegexOptions.Compiled);
 
@@ -28,7 +29,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
     public string ReconstructDocument(IEnumerable<ChunkInfo> chunks, bool removeOverlap = true)
     {
         var sortedChunks = chunks.OrderBy(c => c.ChunkIndex).ToList();
-        
+
         if (!sortedChunks.Any())
         {
             _logger.LogWarning("No chunks provided for reconstruction");
@@ -54,7 +55,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         {
             var currentChunk = sortedChunks[i];
             var currentContent = currentChunk.Content?.Trim() ?? string.Empty;
-            
+
             if (string.IsNullOrEmpty(currentContent))
             {
                 _logger.LogDebug("Skipping empty chunk {ChunkIndex} in document reconstruction", currentChunk.ChunkIndex);
@@ -71,13 +72,13 @@ public class DocumentReconstructionService : IDocumentReconstructionService
             {
                 // Remove overlap with previous chunk
                 var contentWithoutOverlap = RemoveOverlap(previousContent!, currentContent, 200);
-                
+
                 if (!string.IsNullOrEmpty(contentWithoutOverlap))
                 {
                     // Add separator between chunks if the content doesn't start with punctuation
-                    if (!string.IsNullOrEmpty(result.ToString()) && 
-                        !contentWithoutOverlap.StartsWith('.') && 
-                        !contentWithoutOverlap.StartsWith(',') && 
+                    if (!string.IsNullOrEmpty(result.ToString()) &&
+                        !contentWithoutOverlap.StartsWith('.') &&
+                        !contentWithoutOverlap.StartsWith(',') &&
                         !contentWithoutOverlap.StartsWith(';') &&
                         !contentWithoutOverlap.StartsWith('!') &&
                         !contentWithoutOverlap.StartsWith('?'))
@@ -89,7 +90,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
                             result.Append(' ');
                         }
                     }
-                    
+
                     result.Append(contentWithoutOverlap);
                     previousContent = currentContent; // Keep original for next overlap detection
                 }
@@ -97,11 +98,11 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         }
 
         var reconstructed = result.ToString().Trim();
-        
+
         _logger.LogDebug("Reconstructed document from {ChunkCount} chunks. Original total length: {OriginalLength}, " +
-                        "Reconstructed length: {ReconstructedLength}, Overlap removed: {OverlapRemoved}", 
-                        sortedChunks.Count, 
-                        sortedChunks.Sum(c => c.Content?.Length ?? 0), 
+                        "Reconstructed length: {ReconstructedLength}, Overlap removed: {OverlapRemoved}",
+                        sortedChunks.Count,
+                        sortedChunks.Sum(c => c.Content?.Length ?? 0),
                         reconstructed.Length,
                         removeOverlap);
 
@@ -120,7 +121,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
 
         // Limit the search area to improve performance
         var searchLength = Math.Min(maxOverlapLength, Math.Min(previousText.Length, currentText.Length));
-        
+
         if (searchLength < 10)
         {
             // Too short to have meaningful overlap
@@ -170,19 +171,19 @@ public class DocumentReconstructionService : IDocumentReconstructionService
     private int FindExactOverlap(string previousText, string currentText, int maxLength)
     {
         // Check for overlap starting from the longest possible match
-        for (int overlapLength = Math.Min(maxLength, Math.Min(previousText.Length, currentText.Length)); 
+        for (int overlapLength = Math.Min(maxLength, Math.Min(previousText.Length, currentText.Length));
              overlapLength >= 10; // Minimum meaningful overlap
              overlapLength--)
         {
             var previousSuffix = previousText.Substring(previousText.Length - overlapLength);
             var currentPrefix = currentText.Substring(0, overlapLength);
-            
+
             if (string.Equals(previousSuffix, currentPrefix, StringComparison.Ordinal))
             {
                 return overlapLength;
             }
         }
-        
+
         return 0;
     }
 
@@ -194,7 +195,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         // Find sentences in the overlap region of previous text
         var searchStart = Math.Max(0, previousText.Length - maxLength);
         var searchText = previousText.Substring(searchStart);
-        
+
         var sentences = SentenceBoundaryRegex.Split(searchText)
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .ToList();
@@ -207,12 +208,12 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         {
             var sentence = sentences[i].Trim();
             if (sentence.Length < 5) continue; // Skip very short fragments
-            
+
             if (currentText.StartsWith(sentence, StringComparison.OrdinalIgnoreCase))
             {
                 return sentence.Length;
             }
-            
+
             // Also check if sentence appears after some whitespace
             var sentencePattern = @"\s*" + Regex.Escape(sentence);
             var match = Regex.Match(currentText, sentencePattern, RegexOptions.IgnoreCase);
@@ -233,7 +234,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         // Extract words from the end of previous text
         var searchStart = Math.Max(0, previousText.Length - maxLength);
         var searchText = previousText.Substring(searchStart);
-        
+
         var words = WordBoundaryRegex.Split(searchText)
             .Where(w => !string.IsNullOrWhiteSpace(w) && w.Length > 2)
             .ToList();
@@ -245,12 +246,12 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         for (int wordCount = Math.Min(words.Count, 10); wordCount >= 3; wordCount--)
         {
             var wordSequence = string.Join(" ", words.TakeLast(wordCount));
-            
+
             if (currentText.StartsWith(wordSequence, StringComparison.OrdinalIgnoreCase))
             {
                 return wordSequence.Length;
             }
-            
+
             // Also check with some tolerance for whitespace differences
             var normalizedSequence = Regex.Replace(wordSequence, @"\s+", @"\s+");
             var pattern = @"^\s*" + normalizedSequence;
@@ -270,18 +271,18 @@ public class DocumentReconstructionService : IDocumentReconstructionService
     private int FindFuzzyOverlap(string previousText, string currentText, int maxLength)
     {
         var searchLength = Math.Min(maxLength / 2, 100); // Limit fuzzy search to avoid performance issues
-        
+
         for (int overlapLength = searchLength; overlapLength >= 20; overlapLength -= 5)
         {
             if (overlapLength > previousText.Length || overlapLength > currentText.Length)
                 continue;
-                
+
             var previousSuffix = previousText.Substring(previousText.Length - overlapLength);
             var currentPrefix = currentText.Substring(0, overlapLength);
-            
+
             // Calculate similarity (simple character-based)
             var similarity = CalculateSimilarity(previousSuffix, currentPrefix);
-            
+
             // If similarity is high enough (>80%), consider it an overlap
             if (similarity > 0.8)
             {
@@ -302,7 +303,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
 
         var maxLength = Math.Max(text1.Length, text2.Length);
         var minLength = Math.Min(text1.Length, text2.Length);
-        
+
         int matches = 0;
         for (int i = 0; i < minLength; i++)
         {

@@ -78,7 +78,7 @@ public class IndexManagementService : IIndexManagementService
             };
 
             var json = JsonSerializer.Serialize(indexMapping);
-            var response = await _client.Indices.CreateAsync<StringResponse>(indexName, 
+            var response = await _client.Indices.CreateAsync<StringResponse>(indexName,
                 PostData.String(json));
 
             if (!response.Success)
@@ -122,7 +122,7 @@ public class IndexManagementService : IIndexManagementService
         try
         {
             var response = await _client.Indices.GetAsync<StringResponse>("_all");
-            
+
             if (!response.Success)
             {
                 _logger.LogWarning("Failed to get available indices: {Error}", response.DebugInformation);
@@ -131,7 +131,7 @@ public class IndexManagementService : IIndexManagementService
 
             using var doc = JsonDocument.Parse(response.Body);
             var indices = new List<string>();
-            
+
             foreach (var property in doc.RootElement.EnumerateObject())
             {
                 // Filter out system indices (starting with .)

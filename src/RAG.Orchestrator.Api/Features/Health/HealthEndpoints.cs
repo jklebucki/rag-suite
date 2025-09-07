@@ -28,7 +28,7 @@ public static class HealthEndpoints
                     {
                         Api = "healthy", // if this code runs, API is up
                         Llm = "error",
-                        Elasticsearch = "error", 
+                        Elasticsearch = "error",
                         VectorStore = "unknown"
                     }
                 };

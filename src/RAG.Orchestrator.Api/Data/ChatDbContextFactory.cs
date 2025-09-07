@@ -9,7 +9,7 @@ public class ChatDbContextFactory : IDesignTimeDbContextFactory<ChatDbContext>
     public ChatDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<ChatDbContext>();
-        
+
         // Use default connection string for migrations
         var connectionString = "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
         optionsBuilder.UseNpgsql(connectionString);

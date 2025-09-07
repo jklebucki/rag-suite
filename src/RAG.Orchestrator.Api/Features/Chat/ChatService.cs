@@ -1,5 +1,5 @@
 using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Features.Search;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models;
 using System.Text;
@@ -36,10 +36,10 @@ public class LlmService : ILlmService
         _httpClient = httpClient;
         _configuration = configuration;
         _logger = logger;
-        
+
         var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:11434";
         _httpClient.BaseAddress = new Uri(baseUrl);
-        
+
         // HttpClient timeout is now configured in ServiceCollectionExtensions for health operations
         // Chat operations use Semantic Kernel with different timeout configuration
     }
@@ -95,9 +95,9 @@ public class LlmService : ILlmService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             _logger.LogDebug("Sending request to LLM service: {Json}", json);
-            
+
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -107,11 +107,11 @@ public class LlmService : ILlmService
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogDebug("Received response from LLM service: {ResponseJson}", responseJson);
-            
+
             using var doc = JsonDocument.Parse(responseJson);
-            
+
             string? result = null;
-            
+
             if (isOllama)
             {
                 // Ollama response format
@@ -151,10 +151,10 @@ public class LlmService : ILlmService
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
-            
+
             var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
             var endpoint = isOllama ? "/api/tags" : "/health";
-            
+
             var response = await _httpClient.GetAsync(endpoint, cts.Token);
             return response.IsSuccessStatusCode;
         }
@@ -233,7 +233,7 @@ public class ChatService : IChatService
 {
     private static readonly List<ChatSession> _sessions = new();
     private static readonly Dictionary<string, List<ChatMessage>> _messages = new();
-    
+
     private readonly Kernel _kernel;
     private readonly ISearchService _searchService;
     private readonly ILanguageService _languageService;
@@ -265,7 +265,7 @@ public class ChatService : IChatService
         var language = request.Language ?? _languageService.GetDefaultLanguage();
         var normalizedLanguage = _languageService.NormalizeLanguage(language);
         var sessionTitle = request.Title ?? _languageService.GetLocalizedString("session_labels", "new_conversation", normalizedLanguage);
-        
+
         var session = new ChatSession(
             sessionId,
             sessionTitle,
@@ -273,10 +273,10 @@ public class ChatService : IChatService
             DateTime.Now,
             DateTime.Now
         );
-        
+
         _sessions.Add(session);
         _messages[sessionId] = new List<ChatMessage>();
-        
+
         return Task.FromResult(session);
     }
 
@@ -284,7 +284,7 @@ public class ChatService : IChatService
     {
         var session = _sessions.FirstOrDefault(s => s.Id == sessionId);
         if (session == null) return Task.FromResult<ChatSession?>(null);
-        
+
         var messages = _messages.GetValueOrDefault(sessionId, new List<ChatMessage>());
         var sessionWithMessages = session with { Messages = messages.ToArray() };
         return Task.FromResult<ChatSession?>(sessionWithMessages);
@@ -325,7 +325,7 @@ public class ChatService : IChatService
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+            var aiResponseContent = aiResponse.GetValue<string>() ??
                 _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
 
             var aiMessage = new ChatMessage(
@@ -335,7 +335,7 @@ public class ChatService : IChatService
                 DateTime.Now,
                 searchResults.Results.Length > 0 ? searchResults.Results : null
             );
-            
+
             _messages[sessionId].Add(aiMessage);
 
             // Update session timestamp
@@ -350,14 +350,14 @@ public class ChatService : IChatService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating AI response for session {SessionId}", sessionId);
-            
+
             var errorMessage = new ChatMessage(
                 Guid.NewGuid().ToString(),
                 "assistant",
                 _languageService.GetLocalizedErrorMessage("processing_error", _languageService.GetDefaultLanguage()),
                 DateTime.Now
             );
-            
+
             _messages[sessionId].Add(errorMessage);
             return errorMessage;
         }
@@ -366,7 +366,7 @@ public class ChatService : IChatService
     public async Task<Models.MultilingualChatResponse> SendMultilingualMessageAsync(string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        
+
         if (!_messages.ContainsKey(sessionId))
             throw new ArgumentException("Session not found", nameof(sessionId));
 
@@ -377,7 +377,7 @@ public class ChatService : IChatService
         }
 
         // Detect message language if not provided
-        var detectedLanguage = string.IsNullOrEmpty(request.Language) 
+        var detectedLanguage = string.IsNullOrEmpty(request.Language)
             ? _languageService.DetectLanguage(request.Message)
             : _languageService.NormalizeLanguage(request.Language);
 
@@ -419,30 +419,30 @@ public class ChatService : IChatService
 
             // Build multilingual context-aware prompt
             var prompt = BuildMultilingualContextualPrompt(
-                request.Message, 
-                searchResults.Results, 
-                _messages[sessionId], 
-                detectedLanguage, 
+                request.Message,
+                searchResults.Results,
+                _messages[sessionId],
+                detectedLanguage,
                 responseLanguage,
                 documentsAvailable
             );
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+            var aiResponseContent = aiResponse.GetValue<string>() ??
                 _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
 
             // Translate response if needed
             var wasTranslated = false;
             double? translationConfidence = null;
-            
+
             if (request.EnableTranslation && detectedLanguage != responseLanguage)
             {
                 try
                 {
                     var translationResult = await _languageService.TranslateWithConfidenceAsync(
                         aiResponseContent, detectedLanguage, responseLanguage, cancellationToken);
-                    
+
                     aiResponseContent = translationResult.TranslatedText;
                     wasTranslated = true;
                     translationConfidence = translationResult.Confidence;
@@ -460,7 +460,7 @@ public class ChatService : IChatService
                 DateTime.Now,
                 searchResults.Results.Length > 0 ? searchResults.Results : null
             );
-            
+
             _messages[sessionId].Add(aiMessage);
 
             // Update session timestamp
@@ -481,7 +481,7 @@ public class ChatService : IChatService
                 WasTranslated = wasTranslated,
                 TranslationConfidence = translationConfidence,
                 Sources = searchResults.Results.Length > 0 && documentsAvailable
-                    ? searchResults.Results.Select(r => r.Source).ToList() 
+                    ? searchResults.Results.Select(r => r.Source).ToList()
                     : null,
                 ProcessingTimeMs = stopwatch.ElapsedMilliseconds,
                 Metadata = GetResponseMetadata(searchResults.Results.Length, request.EnableTranslation, documentsAvailable, responseLanguage)
@@ -490,9 +490,9 @@ public class ChatService : IChatService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating multilingual AI response for session {SessionId}", sessionId);
-            
+
             stopwatch.Stop();
-            
+
             return new Models.MultilingualChatResponse
             {
                 Response = _languageService.GetLocalizedErrorMessage("processing_error", responseLanguage),
@@ -519,11 +519,11 @@ public class ChatService : IChatService
     private static string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory)
     {
         var promptBuilder = new StringBuilder();
-        
+
         promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.");
         promptBuilder.AppendLine("Wykorzystuj kontekst z bazy wiedzy i historię rozmowy, aby udzielić dokładnej i przydatnej odpowiedzi.");
         promptBuilder.AppendLine();
-        
+
         // Add context from search results
         if (searchResults.Length > 0)
         {
@@ -531,11 +531,11 @@ public class ChatService : IChatService
             foreach (var result in searchResults.Take(3))
             {
                 promptBuilder.AppendLine($"Dokument: {result.Title}");
-                
+
                 // Check if this is a reconstructed document
-                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") && 
+                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") &&
                                      result.Metadata["reconstructed"] is bool reconstructed && reconstructed;
-                
+
                 if (isReconstructed)
                 {
                     // For reconstructed documents, use more content (up to 2000 chars)
@@ -543,7 +543,7 @@ public class ChatService : IChatService
                     promptBuilder.AppendLine($"Treść (pełny dokument): {result.Content.Substring(0, contentLength)}");
                     if (result.Content.Length > contentLength)
                         promptBuilder.AppendLine("...");
-                        
+
                     var chunksCount = result.Metadata.ContainsKey("chunksFound") ? result.Metadata["chunksFound"] : "unknown";
                     promptBuilder.AppendLine($"[Zrekonstruowany z {chunksCount} fragmentów]");
                 }
@@ -552,12 +552,12 @@ public class ChatService : IChatService
                     // For regular chunks, use the original 300 chars limit
                     promptBuilder.AppendLine($"Treść: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
                 }
-                
+
                 promptBuilder.AppendLine($"Źródło: {result.Source}");
                 promptBuilder.AppendLine();
             }
         }
-        
+
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(6).ToList();
         if (recentMessages.Count > 1)
@@ -570,7 +570,7 @@ public class ChatService : IChatService
             }
             promptBuilder.AppendLine();
         }
-        
+
         promptBuilder.AppendLine("=== AKTUALNE PYTANIE ===");
         promptBuilder.AppendLine(userMessage);
         promptBuilder.AppendLine();
@@ -582,46 +582,46 @@ public class ChatService : IChatService
         promptBuilder.AppendLine("- Bądź konkretny i pomocny");
         promptBuilder.AppendLine();
         promptBuilder.AppendLine("Odpowiedź:");
-        
+
         return promptBuilder.ToString();
     }
-    
+
     private string BuildMultilingualContextualPrompt(
-        string userMessage, 
-        Features.Search.SearchResult[] searchResults, 
+        string userMessage,
+        Features.Search.SearchResult[] searchResults,
         List<ChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
         bool documentsAvailable = true)
     {
         var promptBuilder = new StringBuilder();
-        
+
         // Get localized system prompt and instructions
         var systemPrompt = _languageService.GetLocalizedSystemPrompt("rag_assistant", responseLanguage);
         var instructions = _languageService.GetLocalizedInstructions(responseLanguage);
-        
+
         promptBuilder.AppendLine(systemPrompt);
         promptBuilder.AppendLine(instructions);
         promptBuilder.AppendLine();
-        
+
         // Add context from search results with translation note if needed
         if (documentsAvailable && searchResults.Length > 0)
         {
             var contextLabel = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage);
             promptBuilder.AppendLine($"=== {contextLabel} ===");
-            
+
             foreach (var result in searchResults.Take(3))
             {
                 var titleLabel = _languageService.GetLocalizedString("system_prompts", "document", responseLanguage);
                 var contentLabel = _languageService.GetLocalizedString("system_prompts", "content", responseLanguage);
                 var sourceLabel = _languageService.GetLocalizedString("system_prompts", "source", responseLanguage);
-                
+
                 promptBuilder.AppendLine($"{titleLabel}: {result.Title}");
-                
+
                 // Check if this is a reconstructed document
-                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") && 
+                bool isReconstructed = result.Metadata.ContainsKey("reconstructed") &&
                                      result.Metadata["reconstructed"] is bool reconstructed && reconstructed;
-                
+
                 if (isReconstructed)
                 {
                     // For reconstructed documents, use more content (up to 2000 chars)
@@ -629,7 +629,7 @@ public class ChatService : IChatService
                     promptBuilder.AppendLine($"{contentLabel} (pełny dokument): {result.Content.Substring(0, contentLength)}");
                     if (result.Content.Length > contentLength)
                         promptBuilder.AppendLine("...");
-                        
+
                     var chunksCount = result.Metadata.ContainsKey("chunksFound") ? result.Metadata["chunksFound"] : "unknown";
                     var reconstructedLabel = _languageService.GetLocalizedString("system_prompts", "reconstructed_from_chunks", responseLanguage)
                         ?? "[Zrekonstruowany z {0} fragmentów]";
@@ -640,7 +640,7 @@ public class ChatService : IChatService
                     // For regular chunks, use the original 300 chars limit
                     promptBuilder.AppendLine($"{contentLabel}: {result.Content.Substring(0, Math.Min(300, result.Content.Length))}...");
                 }
-                
+
                 promptBuilder.AppendLine($"{sourceLabel}: {result.Source}");
                 promptBuilder.AppendLine();
             }
@@ -648,23 +648,23 @@ public class ChatService : IChatService
         else if (!documentsAvailable)
         {
             // Add note about document database unavailability
-            var unavailableNote = _languageService.GetLocalizedString("system_prompts", "documents_unavailable", responseLanguage) 
+            var unavailableNote = _languageService.GetLocalizedString("system_prompts", "documents_unavailable", responseLanguage)
                 ?? "Note: The document database is currently unavailable. Responses will be generated without reference documents.";
             promptBuilder.AppendLine($"=== UWAGA ===");
             promptBuilder.AppendLine(unavailableNote);
             promptBuilder.AppendLine();
         }
-        
+
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(6).ToList();
         if (recentMessages.Count > 1)
         {
             var historyLabel = _languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage);
             promptBuilder.AppendLine($"=== {historyLabel} ===");
-            
+
             var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
             var assistantLabel = _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
-            
+
             foreach (var msg in recentMessages.TakeLast(4))
             {
                 var role = msg.Role == "user" ? userLabel : assistantLabel;
@@ -672,13 +672,13 @@ public class ChatService : IChatService
             }
             promptBuilder.AppendLine();
         }
-        
+
         // Add current question
         var questionLabel = _languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage);
         promptBuilder.AppendLine($"=== {questionLabel} ===");
         promptBuilder.AppendLine(userMessage);
         promptBuilder.AppendLine();
-        
+
         // Add language-specific note if translation is involved
         if (detectedLanguage != responseLanguage)
         {
@@ -686,10 +686,10 @@ public class ChatService : IChatService
             promptBuilder.AppendLine($"[{translationNote}: {detectedLanguage} → {responseLanguage}]");
             promptBuilder.AppendLine();
         }
-        
+
         var responseLabel = _languageService.GetLocalizedString("system_prompts", "response", responseLanguage);
         promptBuilder.AppendLine($"{responseLabel}:");
-        
+
         return promptBuilder.ToString();
     }
 
@@ -704,7 +704,7 @@ public class ChatService : IChatService
 
         if (!documentsAvailable)
         {
-            var unavailableMessage = _languageService.GetLocalizedString("error_messages", "documents_unavailable", responseLanguage) 
+            var unavailableMessage = _languageService.GetLocalizedString("error_messages", "documents_unavailable", responseLanguage)
                 ?? "Document database is currently unavailable";
             metadata["databaseUnavailableMessage"] = unavailableMessage;
         }

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RAG.Orchestrator.Api\RAG.Orchestrator.Api.csproj" />
+    <ProjectReference Include="..\RAG.Abstractions\RAG.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

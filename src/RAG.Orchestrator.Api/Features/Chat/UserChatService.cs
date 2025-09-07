@@ -1,5 +1,5 @@
 using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Features.Search;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Data;
@@ -52,7 +52,7 @@ public class UserChatService : IUserChatService
             .Where(s => s.UserId == userId)
             .OrderByDescending(s => s.UpdatedAt)
             .ToListAsync(cancellationToken);
-            
+
         return dbSessions.Select(s => new UserChatSession(
             s.Id,
             s.UserId,
@@ -69,7 +69,7 @@ public class UserChatService : IUserChatService
         var language = request.Language ?? _languageService.GetDefaultLanguage();
         var normalizedLanguage = _languageService.NormalizeLanguage(language);
         var sessionTitle = request.Title ?? _languageService.GetLocalizedString("session_labels", "new_conversation", normalizedLanguage);
-        
+
         var dbSession = new Data.Models.ChatSession
         {
             Id = sessionId,
@@ -78,10 +78,10 @@ public class UserChatService : IUserChatService
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         _chatDbContext.ChatSessions.Add(dbSession);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return new UserChatSession(
             dbSession.Id,
             dbSession.UserId,
@@ -97,9 +97,9 @@ public class UserChatService : IUserChatService
         var dbSession = await _chatDbContext.ChatSessions
             .Include(s => s.Messages)
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
-        
+
         if (dbSession == null) return null;
-        
+
         var messages = dbSession.Messages
             .OrderBy(m => m.Timestamp)
             .Select(m => new UserChatMessage(
@@ -111,7 +111,7 @@ public class UserChatService : IUserChatService
                 m.Metadata
             ))
             .ToArray();
-        
+
         return new UserChatSession(
             dbSession.Id,
             dbSession.UserId,
@@ -127,7 +127,7 @@ public class UserChatService : IUserChatService
         // Check if user has access to this session
         var dbSession = await _chatDbContext.ChatSessions
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
-            
+
         if (dbSession == null)
         {
             throw new ArgumentException("Session not found or access denied", nameof(sessionId));
@@ -162,7 +162,7 @@ public class UserChatService : IUserChatService
             Content = request.Message,
             Timestamp = DateTime.UtcNow
         };
-        
+
         _chatDbContext.ChatMessages.Add(userDbMessage);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
 
@@ -187,28 +187,28 @@ public class UserChatService : IUserChatService
 
             // Build context-aware prompt
             // Extract UI language from metadata if available
-            var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true 
-                ? uiLangObj?.ToString() 
+            var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true
+                ? uiLangObj?.ToString()
                 : null;
-            
+
             // Priority: Language from UI > UI Language from metadata > detected > default
             var userLanguage = request.Language ?? uiLanguage ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
             var normalizedLanguage = _languageService.NormalizeLanguage(userLanguage);
             var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage);
-            
+
             // Debug logging for search results content
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
             foreach (var result in searchResults.Results)
             {
-                _logger.LogDebug("Search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}", 
-                    result.Source, result.Content?.Length ?? 0, 
+                _logger.LogDebug("Search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}",
+                    result.Source, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
             _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+            var aiResponseContent = aiResponse.GetValue<string>() ??
                 _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
 
             // Save AI response to database
@@ -221,12 +221,12 @@ public class UserChatService : IUserChatService
                 Timestamp = DateTime.UtcNow,
                 Sources = searchResults.Results.Length > 0 ? searchResults.Results : null
             };
-            
+
             _chatDbContext.ChatMessages.Add(aiDbMessage);
-            
+
             // Update session timestamp
             dbSession.UpdatedAt = DateTime.UtcNow;
-            
+
             await _chatDbContext.SaveChangesAsync(cancellationToken);
 
             return new UserChatMessage(
@@ -241,7 +241,7 @@ public class UserChatService : IUserChatService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating AI response for user {UserId} session {SessionId}", userId, sessionId);
-            
+
             // Save error message to database
             var errorDbMessage = new Data.Models.ChatMessage
             {
@@ -251,10 +251,10 @@ public class UserChatService : IUserChatService
                 Content = _languageService.GetLocalizedErrorMessage("processing_error", _languageService.GetDefaultLanguage()),
                 Timestamp = DateTime.UtcNow
             };
-            
+
             _chatDbContext.ChatMessages.Add(errorDbMessage);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
-            
+
             return new UserChatMessage(
                 errorDbMessage.Id,
                 errorDbMessage.Role,
@@ -269,7 +269,7 @@ public class UserChatService : IUserChatService
         // Check if user has access to this session
         var dbSession = await _chatDbContext.ChatSessions
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
-            
+
         if (dbSession == null)
         {
             throw new ArgumentException("Session not found or access denied", nameof(sessionId));
@@ -282,19 +282,19 @@ public class UserChatService : IUserChatService
         }
 
         // Detect language if not provided, but prefer UI language
-        var detectedLanguage = string.IsNullOrEmpty(request.Language) 
+        var detectedLanguage = string.IsNullOrEmpty(request.Language)
             ? _languageService.DetectLanguage(request.Message)
             : request.Language;
 
         // Extract UI language from metadata if available
-        var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true 
-            ? uiLangObj?.ToString() 
+        var uiLanguage = request.Metadata?.TryGetValue("uiLanguage", out var uiLangObj) == true
+            ? uiLangObj?.ToString()
             : null;
 
         // Priority: ResponseLanguage from UI > Language from UI > UI Language from metadata > detected > default
         var responseLanguage = request.ResponseLanguage ?? request.Language ?? uiLanguage ?? detectedLanguage ?? _languageService.GetDefaultLanguage();
         var normalizedResponseLanguage = _languageService.NormalizeLanguage(responseLanguage);
-        
+
         // Get conversation history for context
         var conversationHistory = await _chatDbContext.ChatMessages
             .Where(m => m.SessionId == sessionId)
@@ -323,7 +323,7 @@ public class UserChatService : IUserChatService
                 ["originalLanguage"] = detectedLanguage ?? "unknown"
             }
         };
-        
+
         _chatDbContext.ChatMessages.Add(userDbMessage);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
 
@@ -350,8 +350,8 @@ public class UserChatService : IUserChatService
 
             // Build multilingual context-aware prompt
             var prompt = BuildMultilingualContextualPrompt(
-                request.Message, 
-                searchResults.Results, 
+                request.Message,
+                searchResults.Results,
                 conversationHistory,
                 detectedLanguage ?? "unknown",
                 normalizedResponseLanguage,
@@ -362,15 +362,15 @@ public class UserChatService : IUserChatService
             _logger.LogDebug("Multilingual search results for prompt: {ResultCount} results", searchResults.Results.Length);
             foreach (var result in searchResults.Results)
             {
-                _logger.LogDebug("Multilingual search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}", 
-                    result.Source, result.Content?.Length ?? 0, 
+                _logger.LogDebug("Multilingual search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}",
+                    result.Source, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
             _logger.LogDebug("Final multilingual prompt length: {PromptLength} characters", prompt.Length);
 
             // Generate AI response
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ?? 
+            var aiResponseContent = aiResponse.GetValue<string>() ??
                 _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
 
             // Save AI response to database
@@ -388,12 +388,12 @@ public class UserChatService : IUserChatService
                     ["documentsUsed"] = searchResults.Results.Length
                 }
             };
-            
+
             _chatDbContext.ChatMessages.Add(aiDbMessage);
-            
+
             // Update session timestamp
             dbSession.UpdatedAt = DateTime.UtcNow;
-            
+
             await _chatDbContext.SaveChangesAsync(cancellationToken);
 
             return new Models.MultilingualChatResponse
@@ -410,7 +410,7 @@ public class UserChatService : IUserChatService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating multilingual AI response for user {UserId} session {SessionId}", userId, sessionId);
-            
+
             // Save error message to database
             var errorDbMessage = new Data.Models.ChatMessage
             {
@@ -420,10 +420,10 @@ public class UserChatService : IUserChatService
                 Content = _languageService.GetLocalizedErrorMessage("processing_error", normalizedResponseLanguage),
                 Timestamp = DateTime.UtcNow
             };
-            
+
             _chatDbContext.ChatMessages.Add(errorDbMessage);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
-            
+
             return new Models.MultilingualChatResponse
             {
                 Response = errorDbMessage.Content,
@@ -441,27 +441,27 @@ public class UserChatService : IUserChatService
     {
         var dbSession = await _chatDbContext.ChatSessions
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
-        
+
         if (dbSession == null)
         {
             return false;
         }
-        
+
         // Delete the session (messages will be deleted automatically due to cascade delete)
         _chatDbContext.ChatSessions.Remove(dbSession);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return true;
     }
 
     private string BuildContextualPrompt(string userMessage, Features.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en")
     {
         var promptBuilder = new StringBuilder();
-        
+
         // Add system instruction using localization
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", language));
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", language));
-        
+
         // Add context from search results if available
         if (searchResults.Length > 0)
         {
@@ -472,7 +472,7 @@ public class UserChatService : IUserChatService
                 promptBuilder.AppendLine($"- {result.Content}");
             }
         }
-        
+
         // Add recent conversation history (last 5 messages)
         var recentMessages = conversationHistory.TakeLast(5).ToArray();
         if (recentMessages.Length > 1) // More than just the current message
@@ -481,13 +481,13 @@ public class UserChatService : IUserChatService
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
             foreach (var msg in recentMessages.SkipLast(1)) // Skip the current message we're responding to
             {
-                var roleLabel = msg.Role == "user" 
+                var roleLabel = msg.Role == "user"
                     ? _languageService.GetLocalizedString("ui_labels", "user", language)
                     : _languageService.GetLocalizedString("ui_labels", "assistant", language);
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
         }
-        
+
         // Add current user message
         promptBuilder.AppendLine();
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", language));
@@ -495,30 +495,30 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine($"{userLabel}: {userMessage}");
         promptBuilder.AppendLine();
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
-        
+
         return promptBuilder.ToString();
     }
-    
+
     private string BuildMultilingualContextualPrompt(
-        string userMessage, 
-        Features.Search.SearchResult[] searchResults, 
+        string userMessage,
+        Features.Search.SearchResult[] searchResults,
         List<UserChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
         bool documentsAvailable = true)
     {
         var promptBuilder = new StringBuilder();
-        
+
         // CRITICAL: Strong language instruction at the beginning
         var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage);
         promptBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
         promptBuilder.AppendLine($"MUST RESPOND IN: {responseLanguage.ToUpper()}");
         promptBuilder.AppendLine();
-        
+
         // Add system instruction with language information using localization
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage));
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage));
-        
+
         if (documentsAvailable && searchResults.Length > 0)
         {
             promptBuilder.AppendLine();
@@ -527,7 +527,7 @@ public class UserChatService : IUserChatService
             {
                 promptBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Reinforce language instruction after context
             promptBuilder.AppendLine();
             promptBuilder.AppendLine($"REMINDER: {languageInstruction}");
@@ -537,7 +537,7 @@ public class UserChatService : IUserChatService
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest", responseLanguage));
         }
-        
+
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(5).ToArray();
         if (recentMessages.Length > 1)
@@ -546,23 +546,23 @@ public class UserChatService : IUserChatService
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage));
             foreach (var msg in recentMessages.SkipLast(1))
             {
-                var roleLabel = msg.Role == "user" 
+                var roleLabel = msg.Role == "user"
                     ? _languageService.GetLocalizedString("ui_labels", "user", responseLanguage)
                     : _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
         }
-        
+
         promptBuilder.AppendLine();
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage));
         var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
         promptBuilder.AppendLine($"{userLabel} ({detectedLanguage}): {userMessage}");
         promptBuilder.AppendLine();
-        
+
         // FINAL CRITICAL REMINDER before response
         promptBuilder.AppendLine($"CRITICAL: {languageInstruction}");
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
-        
+
         return promptBuilder.ToString();
     }
 }

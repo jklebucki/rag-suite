@@ -72,10 +72,11 @@ public class IndexController : ControllerBase
         try
         {
             var created = await _indexManagement.EnsureIndexExistsAsync(indexName, cancellationToken);
-            return Ok(new { 
-                IndexName = indexName, 
+            return Ok(new
+            {
+                IndexName = indexName,
                 Action = created ? "Index verified/created" : "Index check failed",
-                Success = created 
+                Success = created
             });
         }
         catch (Exception ex)

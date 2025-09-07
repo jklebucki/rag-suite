@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Analytics;
 
@@ -47,15 +48,15 @@ public class AnalyticsService : IAnalyticsService
         {
             var searchStats = await GetSearchStatisticsAsync(cancellationToken);
             var indexStats = await GetIndexStatsAsync(cancellationToken: cancellationToken);
-            
+
             var totalQueries = (int)searchStats.TotalSearches;
             // Estimate sessions based on realistic assumptions: average 5-8 queries per session
             var totalSessions = Math.Max(1, totalQueries / 6);
             var avgResponseTime = searchStats.AverageSearchTime;
-            
+
             // Get top queries from actual search patterns (placeholder - would need search query logging)
             var topQueries = Array.Empty<string>(); // Remove hardcoded queries
-            
+
             // Calculate plugin usage based on actual API usage patterns
             var pluginUsage = new Dictionary<string, int>
             {
@@ -69,7 +70,7 @@ public class AnalyticsService : IAnalyticsService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving usage stats");
-            
+
             // Return fallback data
             return new UsageStats(
                 TotalQueries: 0,
@@ -97,7 +98,7 @@ public class AnalyticsService : IAnalyticsService
                     // Use actual search metrics instead of simulated data
                     var recentTimestamp = DateTime.Now.AddMinutes(-metrics.Count * 5); // 5 minute intervals
                     var activeSessions = Math.Min((int)(index.SearchTotal / 100), 50); // More realistic calculation
-                    
+
                     metrics.Add(new PerformanceMetrics(
                         recentTimestamp,
                         avgTime,
@@ -159,7 +160,7 @@ public class AnalyticsService : IAnalyticsService
         try
         {
             var response = await _httpClient.GetAsync($"{_elasticsearchOptions.Url}/_cluster/health", cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Failed to get cluster health: {response.StatusCode}");
@@ -190,12 +191,12 @@ public class AnalyticsService : IAnalyticsService
     {
         try
         {
-            var url = string.IsNullOrEmpty(indexName) 
-                ? $"{_elasticsearchOptions.Url}/_stats" 
+            var url = string.IsNullOrEmpty(indexName)
+                ? $"{_elasticsearchOptions.Url}/_stats"
                 : $"{_elasticsearchOptions.Url}/{indexName}/_stats";
-                
+
             var response = await _httpClient.GetAsync(url, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Failed to get index stats: {response.StatusCode}");
@@ -211,7 +212,7 @@ public class AnalyticsService : IAnalyticsService
             {
                 var indexData = indexProperty.Value;
                 var primaries = indexData.GetProperty("primaries");
-                
+
                 var docs = primaries.GetProperty("docs");
                 var store = primaries.GetProperty("store");
                 var indexing = primaries.GetProperty("indexing");
@@ -249,7 +250,7 @@ public class AnalyticsService : IAnalyticsService
         try
         {
             var response = await _httpClient.GetAsync($"{_elasticsearchOptions.Url}/_nodes/stats", cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Failed to get node stats: {response.StatusCode}");
@@ -305,19 +306,19 @@ public class AnalyticsService : IAnalyticsService
         try
         {
             var indexStats = await GetIndexStatsAsync(cancellationToken: cancellationToken);
-            
+
             var totalSearches = indexStats.Sum(i => i.SearchTotal);
             var totalSearchTime = indexStats.Sum(i => i.SearchTimeInMillis);
             var avgSearchTime = totalSearches > 0 ? (double)totalSearchTime / totalSearches : 0;
-            
+
             // Calculate recent activity based on index refresh rates (more realistic than hardcoded division)
             // Assumes higher search activity indicates more recent usage
-            var recentActivityRatio = indexStats.Any() ? 
+            var recentActivityRatio = indexStats.Any() ?
                 (double)indexStats.Max(i => i.SearchTotal) / Math.Max(totalSearches, 1) : 0.1;
             var searchesLast24h = (long)(totalSearches * Math.Min(recentActivityRatio * 2, 0.5)); // Cap at 50% of total
-            
+
             var mostActiveIndex = indexStats.OrderByDescending(i => i.SearchTotal).FirstOrDefault()?.IndexName ?? "";
-            
+
             var searchesByIndex = indexStats.ToDictionary(i => i.IndexName, i => i.SearchTotal);
 
             return new SearchStatistics(
@@ -342,7 +343,7 @@ public class AnalyticsService : IAnalyticsService
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5));
-            
+
             var response = await _httpClient.GetAsync($"{_elasticsearchOptions.Url}/", cts.Token);
             return response.IsSuccessStatusCode;
         }
@@ -361,7 +362,7 @@ public class AnalyticsService : IAnalyticsService
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5));
-            
+
             var response = await _httpClient.GetAsync($"{embeddingUrl}/health", cts.Token);
             return response.IsSuccessStatusCode;
         }
@@ -380,10 +381,10 @@ public class AnalyticsService : IAnalyticsService
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5));
-            
+
             var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
             var healthEndpoint = isOllama ? "/api/tags" : "/health";
-            
+
             var response = await _httpClient.GetAsync($"{llmUrl}{healthEndpoint}", cts.Token);
             return response.IsSuccessStatusCode;
         }
@@ -398,13 +399,13 @@ public class AnalyticsService : IAnalyticsService
         string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
         int i = 0;
         double dblSByte = bytes;
-        
+
         while (dblSByte >= 1024 && i < suffixes.Length - 1)
         {
             dblSByte /= 1024;
             i++;
         }
-        
+
         return $"{dblSByte:0.##} {suffixes[i]}";
     }
 }

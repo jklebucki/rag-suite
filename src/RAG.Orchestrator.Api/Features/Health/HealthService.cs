@@ -33,7 +33,7 @@ public class HealthAggregator : IHealthAggregator
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5)); // maximum timeout for entire health check
-            
+
             var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
 
             var llmStatus = await GetLlmStatusAsync(cts.Token);
@@ -47,13 +47,13 @@ public class HealthAggregator : IHealthAggregator
             // Fallback response if everything fails
             var apiStatus = new ServiceStatus("orchestrator-api", "healthy"); // if this code runs, API is up
             var errorStatus = new ServiceStatus("unknown", "error", ex.Message);
-            
+
             try
             {
                 _logger.LogError(ex, "System health check failed completely");
             }
             catch { /* Ignore logging errors */ }
-            
+
             return new SystemHealthResponse(apiStatus, errorStatus, errorStatus, errorStatus, DateTime.UtcNow);
         }
     }
@@ -64,7 +64,7 @@ public class HealthAggregator : IHealthAggregator
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
-            
+
             var healthy = await _llmService.IsHealthyAsync(cts.Token);
             var models = Array.Empty<string>();
             if (healthy)
@@ -98,20 +98,20 @@ public class HealthAggregator : IHealthAggregator
         var url = _configuration["Services:Elasticsearch:Url"] ?? "http://localhost:9200";
         var username = _configuration["Services:Elasticsearch:Username"];
         var password = _configuration["Services:Elasticsearch:Password"];
-        
+
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             cts.CancelAfter(TimeSpan.FromSeconds(2)); // very short timeout for health check
             var client = _httpClientFactory.CreateClient();
-            
+
             // Add basic authentication if credentials are provided
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
             }
-            
+
             var response = await client.GetAsync(url, cts.Token);
             if (!response.IsSuccessStatusCode)
             {

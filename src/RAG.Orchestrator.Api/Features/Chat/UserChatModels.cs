@@ -1,4 +1,4 @@
-using RAG.Orchestrator.Api.Features.Search;
+using RAG.Abstractions.Search;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
