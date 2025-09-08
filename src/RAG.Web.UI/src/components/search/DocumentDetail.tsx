@@ -13,7 +13,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
   const { language } = useI18n()
 
   // Extract metadata for the table
-  const fileExtension = document.metadata?.file_extension || document.source || ''
+  const fileExtension = document.metadata?.category || document.source || ''
   const fileSize = document.metadata?.file_size || 'Unknown'
   const lastModified = document.metadata?.last_modified || ''
   const indexedAt = document.metadata?.indexed_at || ''
