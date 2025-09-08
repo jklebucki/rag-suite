@@ -77,6 +77,22 @@ public interface IElasticsearchService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if index is ready</returns>
     Task<bool> EnsureCustomIndexExistsAsync(string indexName, string? mappingJson = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get all unique source file paths from the index with their chunk counts
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Dictionary mapping file paths to chunk counts</returns>
+    Task<Dictionary<string, int>> GetAllSourceFilePathsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete a document by ID from a specific index
+    /// </summary>
+    /// <param name="indexName">Index name</param>
+    /// <param name="documentId">Document ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if successful</returns>
+    Task<bool> DeleteDocumentByIdAsync(string indexName, string documentId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

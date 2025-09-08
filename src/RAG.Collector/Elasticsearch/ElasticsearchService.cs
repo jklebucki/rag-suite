@@ -173,9 +173,9 @@ public class ElasticsearchService : IElasticsearchService
             {
                 query = new
                 {
-                    term = new
+                    term = new Dictionary<string, object>
                     {
-                        sourceFile = new { value = sourceFile }
+                        { "sourceFile.keyword", sourceFile }
                     }
                 }
             };
@@ -532,5 +532,90 @@ public class ElasticsearchService : IElasticsearchService
 
         [JsonPropertyName("_source")]
         public T? Source { get; set; }
+    }
+
+    public async Task<Dictionary<string, int>> GetAllSourceFilePathsAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var aggregationQuery = new
+            {
+                size = 0,
+                aggs = new
+                {
+                    unique_files = new
+                    {
+                        terms = new
+                        {
+                            field = "sourceFile.keyword",
+                            size = 10000 // Adjust based on expected number of unique files
+                        }
+                    }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(aggregationQuery, GetJsonOptions());
+            var response = await _client.SearchAsync<StringResponse>(_indexName, PostData.String(json));
+
+            if (response.Success)
+            {
+                var searchResponse = JsonSerializer.Deserialize<JsonElement>(response.Body);
+                var filePaths = new Dictionary<string, int>();
+
+                if (searchResponse.TryGetProperty("aggregations", out var aggregations) &&
+                    aggregations.TryGetProperty("unique_files", out var uniqueFiles) &&
+                    uniqueFiles.TryGetProperty("buckets", out var buckets))
+                {
+                    foreach (var bucket in buckets.EnumerateArray())
+                    {
+                        if (bucket.TryGetProperty("key", out var key) &&
+                            bucket.TryGetProperty("doc_count", out var docCount))
+                        {
+                            var filePath = key.GetString();
+                            var chunkCount = docCount.GetInt32();
+                            
+                            if (!string.IsNullOrEmpty(filePath))
+                            {
+                                filePaths[filePath] = chunkCount;
+                            }
+                        }
+                    }
+                }
+
+                _logger.LogInformation("Retrieved {FileCount} unique source files from index", filePaths.Count);
+                return filePaths;
+            }
+
+            _logger.LogError("Failed to get source file paths from index: {Error}", response.DebugInformation);
+            return new Dictionary<string, int>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting source file paths from index");
+            return new Dictionary<string, int>();
+        }
+    }
+
+    public async Task<bool> DeleteDocumentByIdAsync(string indexName, string documentId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _client.DeleteAsync<StringResponse>(indexName, documentId);
+
+            if (response.Success)
+            {
+                _logger.LogDebug("Successfully deleted document {DocumentId} from index {IndexName}", documentId, indexName);
+                return true;
+            }
+
+            _logger.LogWarning("Failed to delete document {DocumentId} from index {IndexName}: {Error}", 
+                documentId, indexName, response.DebugInformation);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting document {DocumentId} from index {IndexName}", documentId, indexName);
+            return false;
+        }
     }
 }

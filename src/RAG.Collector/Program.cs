@@ -98,6 +98,7 @@ try
     builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
     builder.Services.AddScoped<IFileChangeDetectionService, FileChangeDetectionService>();
     builder.Services.AddScoped<IndexingService>();
+    builder.Services.AddScoped<IOrphanedDocumentCleanupService, OrphanedDocumentCleanupService>();
 
     // Register the main worker
     builder.Services.AddHostedService<CollectorWorker>();

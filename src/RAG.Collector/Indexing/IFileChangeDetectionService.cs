@@ -31,6 +31,14 @@ public interface IFileChangeDetectionService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Statistics about indexed files</returns>
     Task<FileIndexStats> GetFileIndexStatsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete metadata for a file (used during orphaned cleanup)
+    /// </summary>
+    /// <param name="filePath">Path to the file</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if metadata was deleted or didn't exist</returns>
+    Task<bool> DeleteFileMetadataAsync(string filePath, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

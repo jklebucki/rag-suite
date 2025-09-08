@@ -111,6 +111,36 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         }
     }
 
+    public async Task<bool> DeleteFileMetadataAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var fileId = GenerateFileId(filePath);
+            
+            // Ensure metadata index exists
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            
+            // Delete the metadata document
+            var deleted = await _elasticsearchService.DeleteDocumentByIdAsync(FILE_METADATA_INDEX, fileId, cancellationToken);
+
+            if (deleted)
+            {
+                _logger.LogDebug("Successfully deleted file metadata for: {FilePath}", filePath);
+            }
+            else
+            {
+                _logger.LogDebug("File metadata not found or already deleted: {FilePath}", filePath);
+            }
+
+            return true; // Return true even if document didn't exist
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting file metadata: {FilePath}", filePath);
+            return false;
+        }
+    }
+
     private async Task<FileMetadataDocument?> GetFileMetadataAsync(string filePath, CancellationToken cancellationToken)
     {
         try

@@ -95,6 +95,22 @@ public class CollectorOptions
     public int BulkBatchSize { get; set; } = 200;
 
     /// <summary>
+    /// Enable orphaned document cleanup (documents for files that no longer exist)
+    /// </summary>
+    public bool EnableOrphanedCleanup { get; set; } = true;
+
+    /// <summary>
+    /// Interval in hours between orphaned document cleanup operations
+    /// </summary>
+    [Range(1, 168, ErrorMessage = "Cleanup interval must be between 1 and 168 hours (1 week)")]
+    public int CleanupIntervalHours { get; set; } = 24;
+
+    /// <summary>
+    /// Run cleanup in dry-run mode (log what would be deleted without actually deleting)
+    /// </summary>
+    public bool DryRunMode { get; set; } = false;
+
+    /// <summary>
     /// Validates the configuration and returns validation results
     /// </summary>
     public IEnumerable<ValidationResult> Validate()
@@ -169,6 +185,9 @@ public class CollectorOptions
                $"EmbeddingServiceUrl: {EmbeddingServiceUrl}, " +
                $"EmbeddingModelName: {EmbeddingModelName}, " +
                $"ProcessingIntervalMinutes: {ProcessingIntervalMinutes}, " +
-               $"BulkBatchSize: {BulkBatchSize} }}";
+               $"BulkBatchSize: {BulkBatchSize}, " +
+               $"EnableOrphanedCleanup: {EnableOrphanedCleanup}, " +
+               $"CleanupIntervalHours: {CleanupIntervalHours}, " +
+               $"DryRunMode: {DryRunMode} }}";
     }
 }

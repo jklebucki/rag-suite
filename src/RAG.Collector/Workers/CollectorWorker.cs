@@ -18,6 +18,7 @@ public class CollectorWorker : BackgroundService
     private readonly ILogger<CollectorWorker> _logger;
     private readonly CollectorOptions _options;
     private readonly IServiceProvider _serviceProvider;
+    private DateTime _lastCleanupTime = DateTime.MinValue;
 
     public CollectorWorker(
         ILogger<CollectorWorker> logger,
@@ -37,6 +38,8 @@ public class CollectorWorker : BackgroundService
         _logger.LogInformation("Elasticsearch URL: {Url}", _options.ElasticsearchUrl);
         _logger.LogInformation("Index name: {Index}", _options.IndexName);
         _logger.LogInformation("Processing interval: {Interval} minutes", _options.ProcessingIntervalMinutes);
+        _logger.LogInformation("Orphaned cleanup enabled: {Enabled}, Interval: {Hours} hours, Dry run: {DryRun}", 
+            _options.EnableOrphanedCleanup, _options.CleanupIntervalHours, _options.DryRunMode);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -44,8 +47,15 @@ public class CollectorWorker : BackgroundService
             {
                 _logger.LogInformation("Starting document collection cycle at {Time}", DateTimeOffset.Now);
 
-                // TODO: Implement the actual collection logic in next steps
+                // Process documents
                 await ProcessDocumentsAsync(stoppingToken);
+
+                // Run orphaned document cleanup if enabled and due
+                if (_options.EnableOrphanedCleanup && ShouldRunCleanup())
+                {
+                    await RunOrphanedCleanupAsync(stoppingToken);
+                    _lastCleanupTime = DateTime.UtcNow;
+                }
 
                 _logger.LogInformation("Document collection cycle completed at {Time}", DateTimeOffset.Now);
             }
@@ -289,6 +299,80 @@ public class CollectorWorker : BackgroundService
         {
             _logger.LogWarning(ex, "Failed to generate hash for file: {FilePath}", filePath);
             return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Check if orphaned document cleanup should be run
+    /// </summary>
+    private bool ShouldRunCleanup()
+    {
+        if (_lastCleanupTime == DateTime.MinValue)
+        {
+            // Never run cleanup before, run it now
+            return true;
+        }
+
+        var timeSinceLastCleanup = DateTime.UtcNow - _lastCleanupTime;
+        var cleanupInterval = TimeSpan.FromHours(_options.CleanupIntervalHours);
+
+        return timeSinceLastCleanup >= cleanupInterval;
+    }
+
+    /// <summary>
+    /// Run orphaned document cleanup
+    /// </summary>
+    private async Task RunOrphanedCleanupAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation("Starting orphaned document cleanup...");
+
+            using var scope = _serviceProvider.CreateScope();
+            var cleanupService = scope.ServiceProvider.GetRequiredService<IOrphanedDocumentCleanupService>();
+
+            if (_options.DryRunMode)
+            {
+                var dryRunResult = await cleanupService.DryRunCleanupAsync(cancellationToken);
+                
+                _logger.LogInformation("Dry run cleanup completed: {OrphanedFiles} files would be cleaned, {TotalChunks} chunks would be deleted",
+                    dryRunResult.OrphanedFileCount, dryRunResult.TotalOrphanedChunks);
+
+                if (dryRunResult.Errors.Any())
+                {
+                    _logger.LogWarning("Dry run cleanup encountered {ErrorCount} errors: {Errors}",
+                        dryRunResult.Errors.Count, string.Join(", ", dryRunResult.Errors));
+                }
+            }
+            else
+            {
+                var findResult = await cleanupService.FindOrphanedDocumentsAsync(cancellationToken);
+                
+                if (findResult.OrphanedFileCount > 0)
+                {
+                    _logger.LogInformation("Found {OrphanedFiles} orphaned files with {TotalChunks} chunks",
+                        findResult.OrphanedFileCount, findResult.TotalOrphanedChunks);
+
+                    var deletedCount = await cleanupService.DeleteOrphanedDocumentsAsync(findResult.OrphanedFilePaths, cancellationToken);
+                    
+                    _logger.LogInformation("Orphaned cleanup completed: {DeletedCount} documents deleted",
+                        deletedCount);
+                }
+                else
+                {
+                    _logger.LogInformation("No orphaned documents found");
+                }
+
+                if (findResult.Errors.Any())
+                {
+                    _logger.LogWarning("Cleanup encountered {ErrorCount} errors: {Errors}",
+                        findResult.Errors.Count, string.Join(", ", findResult.Errors));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during orphaned document cleanup");
         }
     }
 }
