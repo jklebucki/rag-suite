@@ -9,7 +9,7 @@ interface DocumentDetailProps {
 }
 
 export function DocumentDetail({ document }: DocumentDetailProps) {
-  const formatScore = (score: number) => Math.round(score * 100)
+  const formatScore = (score: number) => Math.round(score)
   const { language } = useI18n()
 
   // Extract metadata for the table
@@ -18,6 +18,12 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
   const lastModified = document.metadata?.last_modified || ''
   const indexedAt = document.metadata?.indexed_at || ''
   const filePath = document.filePath || document.metadata?.file_path || document.metadata?.source_file || ''
+  
+  // Chunk information
+  const chunksFound = document.metadata?.chunksFound
+  const totalChunks = document.metadata?.totalChunks
+  const isReconstructed = document.metadata?.reconstructed
+  const elasticsearchIndex = document.metadata?.index
 
   const formatBytes = (bytes: string | number) => {
     if (!bytes || bytes === 'Unknown') return 'Unknown'
@@ -49,8 +55,30 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
           <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
             {filePath || 'Unknown path'}
           </span>
+          {isReconstructed && (
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+              Reconstructed Document
+            </span>
+          )}
+          {chunksFound && totalChunks && (
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
+              {chunksFound}/{totalChunks} chunks
+            </span>
+          )}
         </div>
         <h1 className="text-xl font-bold text-gray-900">{document.title || document.fileName}</h1>
+        <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
+          <span className="flex items-center">
+            <Tag className="h-4 w-4 mr-1" />
+            Score: {formatScore(document.score)}%
+          </span>
+          {elasticsearchIndex && (
+            <span className="flex items-center">
+              <Database className="h-4 w-4 mr-1" />
+              Index: {elasticsearchIndex}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Scrollable content area */}
@@ -77,6 +105,26 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
             <span className="font-medium text-gray-700">File Size:</span>
             <span className="text-gray-600">{formatBytes(fileSize)}</span>
           </div>
+          {chunksFound && totalChunks && (
+            <>
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-700">Chunks Found:</span>
+                <span className="text-gray-600">{chunksFound} of {totalChunks}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-700">Document Status:</span>
+                <span className={`text-gray-600 ${isReconstructed ? 'text-blue-600' : ''}`}>
+                  {isReconstructed ? 'Reconstructed' : 'Complete'}
+                </span>
+              </div>
+            </>
+          )}
+          {elasticsearchIndex && (
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-700">Search Index:</span>
+              <span className="text-gray-600 font-mono text-xs">{elasticsearchIndex}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="font-medium text-gray-700">Last Modified:</span>
             <span className="text-gray-600">{formatMetadataDate(lastModified)}</span>

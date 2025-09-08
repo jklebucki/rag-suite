@@ -137,7 +137,13 @@ interface SearchResultItemProps {
 }
 
 function SearchResultItem({ result, onViewDetails, language }: SearchResultItemProps) {
-  const formatScore = (score: number) => Math.round(score * 100)
+  const formatScore = (score: number) => Math.round(score)
+
+  // Check if document was reconstructed from chunks
+  const isReconstructed = result.metadata?.reconstructed
+  const chunksInfo = result.metadata?.chunksFound && result.metadata?.totalChunks 
+    ? `${result.metadata.chunksFound}/${result.metadata.totalChunks} chunks`
+    : null
 
   return (
     <div className="p-6 hover:bg-gray-50">
@@ -145,14 +151,26 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
         <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
           {result.title}
         </h3>
-        <span className="ml-4 px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
-          {formatScore(result.score)}% match
-        </span>
+        <div className="ml-4 flex items-center gap-2">
+          {isReconstructed && (
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+              Reconstructed
+            </span>
+          )}
+          <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
+            {formatScore(result.score)}% match
+          </span>
+        </div>
       </div>
 
-      <p className="text-gray-600 mb-3 line-clamp-3">
-        {result.content}
-      </p>
+      {/* Show highlights if available, otherwise show content */}
+      <div className="text-gray-600 mb-3 line-clamp-3 search-highlights">
+        {result.metadata?.highlights ? (
+          <div dangerouslySetInnerHTML={{ __html: result.metadata.highlights }} />
+        ) : (
+          <p>{result.content}</p>
+        )}
+      </div>
 
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center space-x-4">
@@ -160,6 +178,11 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
             {result.documentType}
           </span>
           <span>{result.source}</span>
+          {chunksInfo && (
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">
+              {chunksInfo}
+            </span>
+          )}
           <span>{result.filePath}</span>
           <span>{formatDate(result.updatedAt, language)}</span>
         </div>

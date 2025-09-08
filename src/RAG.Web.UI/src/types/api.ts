@@ -42,13 +42,25 @@ export interface SearchResult {
   documentType: string
   filePath?: string
   fileName?: string
-  metadata: Record<string, any>
+  metadata: SearchResultMetadata
   createdAt: Date
   updatedAt: Date
   // Multilingual fields
   originalLanguage?: string
   wasTranslated?: boolean
   translationConfidence?: number
+}
+
+export interface SearchResultMetadata {
+  category?: string
+  score?: number
+  index?: string
+  chunksFound?: number
+  totalChunks?: number
+  reconstructed?: boolean
+  highlights?: string
+  // Additional metadata fields
+  [key: string]: any
 }
 
 export interface SearchResponse {
@@ -74,7 +86,7 @@ export interface DocumentDetailResponse {
   documentType: string
   filePath?: string
   fileName?: string
-  metadata: Record<string, any>
+  metadata: SearchResultMetadata
   createdAt: Date
   updatedAt: Date
   relatedDocuments?: SearchResult[]

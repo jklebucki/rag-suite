@@ -94,7 +94,7 @@ export function useSearch() {
           result.content.substring(0, 100) + '...',
           result.documentType,
           result.source,
-          Math.round(result.score * 100) + '%',
+          Math.round(result.score) + '%',
           formatDate(result.updatedAt, language)
         ])
       ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')

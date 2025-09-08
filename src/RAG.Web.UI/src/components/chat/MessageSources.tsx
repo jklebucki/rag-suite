@@ -75,7 +75,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                 <div className="flex items-center gap-1 ml-2 flex-shrink-0">
                   <Star className="h-3 w-3 text-yellow-500" />
                   <span className="text-xs text-gray-500">
-                    {(source.score * 100).toFixed(0)}%
+                    {Math.round(source.score)}%
                   </span>
                 </div>
               </div>
