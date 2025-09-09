@@ -1,7 +1,9 @@
 {
   "system_prompts": {
     "rag_assistant": "Intelligens mesterséges intelligencia asszisztens vagy a RAG (Retrieval-Augmented Generation) rendszerhez a Ctronex cégnél. Válaszolj magyarul, szakszerűen és segítőkészen.",
+    "rag_assistant_no_docs": "Intelligens mesterséges intelligencia asszisztens vagy a Ctronex cégnél. Válaszolj magyarul, szakszerűen és segítőkészen, általános tudásod és a beszélgetés története alapján.",
     "context_instruction": "Használd a tudásbázis kontextusát és a beszélgetés történetét pontos és hasznos válaszok adásához.",
+    "context_instruction_no_docs": "Használd a beszélgetés történetét pontos és hasznos válaszok adásához általános tudásod alapján.",
     "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
     "conversation_history": "=== BESZÉLGETÉS TÖRTÉNETE ===",
     "current_question": "=== JELENLEGI KÉRDÉS ===",
@@ -9,7 +11,8 @@
     "document": "Dokumentum",
     "content": "Tartalom",
     "source": "Forrás",
-    "translation_note": "Megjegyzés: A válasz lefordítva {0} nyelvről {1} nyelvre"
+    "translation_note": "Megjegyzés: A válasz lefordítva {0} nyelvről {1} nyelvre",
+    "no_document_search_note": "Megjegyzés: A dokumentumkeresés ki van kapcsolva ebben a beszélgetésben."
   },
   "ui_labels": {
     "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
@@ -27,8 +30,10 @@
   "instructions": {
     "respond_in_language": "Válaszolj magyar nyelven",
     "use_knowledge_base": "Alapozd a válaszodat a tudásbázis kontextusára, ha elérhető",
+    "use_general_knowledge": "Alapozd a válaszodat általános tudásodra és képzettségre",
     "consider_history": "Vedd figyelembe a beszélgetés történetét a konzisztencia érdekében",
     "be_honest": "Ha nincs információd a kontextusban, mondd el őszintén",
+    "be_honest_no_docs": "Ha nincs információd a témáról, mondd el őszintén",
     "be_helpful": "Légy konkrét és segítőkész"
   },
   "error_messages": {
@@ -36,7 +41,8 @@
     "session_not_found": "A munkamenet nem található",
     "message_too_long": "Az üzenet túl hosszú. A maximális hossz {0} karakter.",
     "translation_failed": "A szöveg fordítása sikertelen",
-    "language_not_supported": "A(z) {0} nyelv nem támogatott"
+    "language_not_supported": "A(z) {0} nyelv nem támogatott",
+    "document_search_disabled": "A dokumentumkeresés ki van kapcsolva ebben a beszélgetésben. A válaszok csak az általános tudáson alapulnak."
   },
   "session_labels": {
     "new_conversation": "Új Beszélgetés",

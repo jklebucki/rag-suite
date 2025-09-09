@@ -1,7 +1,9 @@
 {
   "system_prompts": {
     "rag_assistant": "Je bent een intelligente AI-assistent voor het RAG (Retrieval-Augmented Generation) systeem bij het bedrijf Ctronex. Antwoord in het Nederlands, professioneel en behulpzaam.",
+    "rag_assistant_no_docs": "Je bent een intelligente AI-assistent bij het bedrijf Ctronex. Antwoord in het Nederlands, professioneel en behulpzaam, gebaseerd op je algemene kennis en gespreksgeschiedenis.",
     "context_instruction": "Gebruik context uit de kennisbank en gespreksgeschiedenis om nauwkeurige en nuttige antwoorden te geven.",
+    "context_instruction_no_docs": "Gebruik gespreksgeschiedenis om nauwkeurige en behulpzame antwoorden te geven gebaseerd op je algemene kennis.",
     "knowledge_base_context": "=== KENNISBANK CONTEXT ===",
     "conversation_history": "=== GESPREKSGESCHIEDENIS ===",
     "current_question": "=== HUIDIGE VRAAG ===",
@@ -9,7 +11,8 @@
     "document": "Document",
     "content": "Inhoud",
     "source": "Bron",
-    "translation_note": "Opmerking: Antwoord werd vertaald van {0} naar {1}"
+    "translation_note": "Opmerking: Antwoord werd vertaald van {0} naar {1}",
+    "no_document_search_note": "Opmerking: Documenten zoeken is uitgeschakeld voor dit gesprek."
   },
   "ui_labels": {
     "knowledge_base_context": "=== KENNISBANK CONTEXT ===",
@@ -27,8 +30,10 @@
   "instructions": {
     "respond_in_language": "Antwoord in het Nederlands",
     "use_knowledge_base": "Baseer je antwoord op de context van de kennisbank indien beschikbaar",
+    "use_general_knowledge": "Baseer je antwoord op je algemene kennis en training",
     "consider_history": "Houd rekening met de gespreksgeschiedenis voor consistentie",
     "be_honest": "Als je geen informatie hebt in de context, zeg dat eerlijk",
+    "be_honest_no_docs": "Als je geen informatie hebt over het onderwerp, zeg dat eerlijk",
     "be_helpful": "Wees specifiek en behulpzaam"
   },
   "error_messages": {
@@ -36,7 +41,8 @@
     "session_not_found": "Sessie niet gevonden",
     "message_too_long": "Bericht is te lang. Maximale lengte is {0} karakters.",
     "translation_failed": "Vertaling van tekst mislukt",
-    "language_not_supported": "Taal {0} wordt niet ondersteund"
+    "language_not_supported": "Taal {0} wordt niet ondersteund",
+    "document_search_disabled": "Documenten zoeken is uitgeschakeld voor dit gesprek. Antwoorden zijn alleen gebaseerd op algemene kennis."
   },
   "session_labels": {
     "new_conversation": "Nieuw Gesprek",

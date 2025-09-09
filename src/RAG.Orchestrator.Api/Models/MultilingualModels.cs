@@ -31,6 +31,11 @@ public class MultilingualChatRequest
     public bool EnableTranslation { get; set; } = true;
 
     /// <summary>
+    /// Whether to enable document search in Elasticsearch (defaults to true for backward compatibility)
+    /// </summary>
+    public bool UseDocumentSearch { get; set; } = true;
+
+    /// <summary>
     /// Additional context or metadata
     /// </summary>
     public Dictionary<string, object>? Metadata { get; set; }

@@ -1,7 +1,9 @@
 {
   "system_prompts": {
     "rag_assistant": "Ești un asistent AI inteligent pentru sistemul RAG (Retrieval-Augmented Generation) la compania Ctronex. Răspunde în română, profesional și util.",
+    "rag_assistant_no_docs": "Ești un asistent AI inteligent la compania Ctronex. Răspunde în română, profesional și util, pe baza cunoștințelor tale generale și istoricul conversației.",
     "context_instruction": "Folosește contextul din baza de cunoștințe și istoricul conversației pentru a oferi răspunsuri precise și utile.",
+    "context_instruction_no_docs": "Folosește istoricul conversației pentru a oferi răspunsuri precise și utile pe baza cunoștințelor tale generale.",
     "knowledge_base_context": "=== CONTEXT BAZĂ DE CUNOȘTINȚE ===",
     "conversation_history": "=== ISTORIC CONVERSAȚIE ===",
     "current_question": "=== ÎNTREBAREA CURENTĂ ===",
@@ -9,7 +11,8 @@
     "document": "Document",
     "content": "Conținut",
     "source": "Sursă",
-    "translation_note": "Notă: Răspunsul a fost tradus din {0} în {1}"
+    "translation_note": "Notă: Răspunsul a fost tradus din {0} în {1}",
+    "no_document_search_note": "Notă: Căutarea documentelor este dezactivată pentru această conversație."
   },
   "ui_labels": {
     "knowledge_base_context": "=== CONTEXT BAZĂ DE CUNOȘTINȚE ===",
@@ -27,8 +30,10 @@
   "instructions": {
     "respond_in_language": "Răspunde în limba română",
     "use_knowledge_base": "Bazează răspunsul pe contextul bazei de cunoștințe dacă este disponibil",
+    "use_general_knowledge": "Bazează răspunsul pe cunoștințele tale generale și antrenament",
     "consider_history": "Consideră istoricul conversației pentru consistență",
     "be_honest": "Dacă nu ai informații în context, spune-o sincer",
+    "be_honest_no_docs": "Dacă nu ai informații despre subiect, spune-o sincer",
     "be_helpful": "Fii specific și util"
   },
   "error_messages": {
@@ -36,7 +41,8 @@
     "session_not_found": "Sesiunea nu a fost găsită",
     "message_too_long": "Mesajul este prea lung. Lungimea maximă este de {0} caractere.",
     "translation_failed": "Nu s-a putut traduce textul",
-    "language_not_supported": "Limba {0} nu este suportată"
+    "language_not_supported": "Limba {0} nu este suportată",
+    "document_search_disabled": "Căutarea documentelor este dezactivată pentru această conversație. Răspunsurile se bazează doar pe cunoștințele generale."
   },
   "session_labels": {
     "new_conversation": "Conversație Nouă",

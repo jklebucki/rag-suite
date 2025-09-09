@@ -24,6 +24,7 @@ public record UserChatRequest(
     string Message,
     string? SessionId = null,
     bool UseRag = true,
+    bool UseDocumentSearch = true,
     string[]? Context = null,
     string? Language = null,
     Dictionary<string, object>? Metadata = null

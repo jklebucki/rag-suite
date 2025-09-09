@@ -177,13 +177,22 @@ public class UserChatService : IUserChatService
 
         try
         {
-            // Search for relevant context
-            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
-                request.Message,
-                Filters: null,
-                Limit: 1,
-                Offset: 0
-            ), cancellationToken);
+            // Search for relevant context only if document search is enabled
+            RAG.Abstractions.Search.SearchResponse searchResults;
+            if (request.UseDocumentSearch)
+            {
+                searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
+                    request.Message,
+                    Filters: null,
+                    Limit: 1,
+                    Offset: 0
+                ), cancellationToken);
+            }
+            else
+            {
+                // Empty search results when document search is disabled
+                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+            }
 
             // Build context-aware prompt
             // Extract UI language from metadata if available
@@ -194,7 +203,7 @@ public class UserChatService : IUserChatService
             // Priority: Language from UI > UI Language from metadata > detected > default
             var userLanguage = request.Language ?? uiLanguage ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
             var normalizedLanguage = _languageService.NormalizeLanguage(userLanguage);
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage);
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage, request.UseDocumentSearch);
 
             // Debug logging for search results content
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
@@ -219,7 +228,12 @@ public class UserChatService : IUserChatService
                 Role = "assistant",
                 Content = aiResponseContent,
                 Timestamp = DateTime.UtcNow,
-                Sources = searchResults.Results.Length > 0 ? searchResults.Results : null
+                Sources = searchResults.Results.Length > 0 && request.UseDocumentSearch ? searchResults.Results : null,
+                Metadata = new Dictionary<string, object>
+                {
+                    ["useDocumentSearch"] = request.UseDocumentSearch,
+                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0
+                }
             };
 
             _chatDbContext.ChatMessages.Add(aiDbMessage);
@@ -340,13 +354,22 @@ public class UserChatService : IUserChatService
 
         try
         {
-            // Search for relevant context
-            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
-                request.Message,
-                Filters: null,
-                Limit: 1, // Get only one document with the highest rating
-                Offset: 0
-            ), cancellationToken);
+            // Search for relevant context only if document search is enabled
+            RAG.Abstractions.Search.SearchResponse searchResults;
+            if (request.UseDocumentSearch)
+            {
+                searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
+                    request.Message,
+                    Filters: null,
+                    Limit: 1, // Get only one document with the highest rating
+                    Offset: 0
+                ), cancellationToken);
+            }
+            else
+            {
+                // Empty search results when document search is disabled
+                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+            }
 
             // Build multilingual context-aware prompt
             var prompt = BuildMultilingualContextualPrompt(
@@ -355,6 +378,7 @@ public class UserChatService : IUserChatService
                 conversationHistory,
                 detectedLanguage ?? "unknown",
                 normalizedResponseLanguage,
+                request.UseDocumentSearch,
                 searchResults.Results.Length > 0
             );
 
@@ -381,11 +405,12 @@ public class UserChatService : IUserChatService
                 Role = "assistant",
                 Content = aiResponseContent,
                 Timestamp = DateTime.UtcNow,
-                Sources = searchResults.Results.Length > 0 ? searchResults.Results : null,
+                Sources = searchResults.Results.Length > 0 && request.UseDocumentSearch ? searchResults.Results : null,
                 Metadata = new Dictionary<string, object>
                 {
                     ["responseLanguage"] = normalizedResponseLanguage,
-                    ["documentsUsed"] = searchResults.Results.Length
+                    ["documentsUsed"] = searchResults.Results.Length,
+                    ["useDocumentSearch"] = request.UseDocumentSearch
                 }
             };
 
@@ -403,8 +428,13 @@ public class UserChatService : IUserChatService
                 DetectedLanguage = detectedLanguage ?? "unknown",
                 ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false, // TODO: Implement translation logic when needed
-                Sources = searchResults.Results.Length > 0 ? searchResults.Results.Select(r => r.Content).ToList() : null,
-                ProcessingTimeMs = 0 // TODO: Add timing measurement if needed
+                Sources = searchResults.Results.Length > 0 && request.UseDocumentSearch ? searchResults.Results.Select(r => r.Content).ToList() : null,
+                ProcessingTimeMs = 0, // TODO: Add timing measurement if needed
+                Metadata = new Dictionary<string, object>
+                {
+                    ["useDocumentSearch"] = request.UseDocumentSearch,
+                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0
+                }
             };
         }
         catch (Exception ex)
@@ -454,16 +484,24 @@ public class UserChatService : IUserChatService
         return true;
     }
 
-    private string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en")
+    private string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en", bool useDocumentSearch = true)
     {
         var promptBuilder = new StringBuilder();
 
-        // Add system instruction using localization
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", language));
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", language));
+        // Add system instruction using localization based on document search setting
+        var systemPrompt = useDocumentSearch 
+            ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", language)
+            : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", language);
+            
+        var contextInstruction = useDocumentSearch
+            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", language)
+            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", language);
+            
+        promptBuilder.AppendLine(systemPrompt);
+        promptBuilder.AppendLine(contextInstruction);
 
-        // Add context from search results if available
-        if (searchResults.Length > 0)
+        // Add context from search results if available and enabled
+        if (useDocumentSearch && searchResults.Length > 0)
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
@@ -471,6 +509,14 @@ public class UserChatService : IUserChatService
             {
                 promptBuilder.AppendLine($"- {result.Content}");
             }
+        }
+        else if (!useDocumentSearch)
+        {
+            promptBuilder.AppendLine();
+            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", language)
+                ?? "Note: Document search is disabled for this conversation.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(noSearchNote);
         }
 
         // Add recent conversation history (last 5 messages)
@@ -505,6 +551,7 @@ public class UserChatService : IUserChatService
         List<UserChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
+        bool useDocumentSearch = true,
         bool documentsAvailable = true)
     {
         var promptBuilder = new StringBuilder();
@@ -515,11 +562,19 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine($"MUST RESPOND IN: {responseLanguage.ToUpper()}");
         promptBuilder.AppendLine();
 
-        // Add system instruction with language information using localization
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage));
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage));
+        // Add system instruction with language information using localization based on document search setting
+        var systemPrompt = useDocumentSearch 
+            ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage)
+            : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
+            
+        var contextInstruction = useDocumentSearch
+            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
+            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
 
-        if (documentsAvailable && searchResults.Length > 0)
+        promptBuilder.AppendLine(systemPrompt);
+        promptBuilder.AppendLine(contextInstruction);
+
+        if (useDocumentSearch && documentsAvailable && searchResults.Length > 0)
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
@@ -531,6 +586,16 @@ public class UserChatService : IUserChatService
             // Reinforce language instruction after context
             promptBuilder.AppendLine();
             promptBuilder.AppendLine($"REMINDER: {languageInstruction}");
+        }
+        else if (!useDocumentSearch)
+        {
+            promptBuilder.AppendLine();
+            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", responseLanguage)
+                ?? "Note: Document search is disabled for this conversation.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(noSearchNote);
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage));
         }
         else
         {

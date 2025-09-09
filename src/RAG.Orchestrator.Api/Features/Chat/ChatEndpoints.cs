@@ -52,7 +52,7 @@ public static class ChatEndpoints
         })
         .WithName("SendMessage")
         .WithSummary("Send a message in a chat session")
-        .WithDescription("Send a message to a chat session and receive an AI response");
+        .WithDescription("Send a message to a chat session and receive an AI response. Use 'UseDocumentSearch' parameter to enable/disable document search in knowledge base.");
 
         group.MapPost("/sessions/{sessionId}/messages/multilingual", async (string sessionId, Models.MultilingualChatRequest request, IChatService chatService) =>
         {
@@ -68,7 +68,7 @@ public static class ChatEndpoints
         })
         .WithName("SendMultilingualMessage")
         .WithSummary("Send a multilingual message in a chat session")
-        .WithDescription("Send a message with language detection, translation, and localized response generation");
+        .WithDescription("Send a message with language detection, translation, and localized response generation. Use 'UseDocumentSearch' parameter to enable/disable document search in knowledge base.");
 
         group.MapDelete("/sessions/{sessionId}", async (string sessionId, IChatService chatService) =>
         {

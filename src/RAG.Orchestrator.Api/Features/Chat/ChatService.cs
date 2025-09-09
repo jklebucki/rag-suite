@@ -312,16 +312,25 @@ public class ChatService : IChatService
 
         try
         {
-            // Search for relevant context - get only the best matching document
-            var searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
-                request.Message,
-                Filters: null,
-                Limit: 1, // Get only one document with the highest rating
-                Offset: 0
-            ), cancellationToken);
+            // Search for relevant context only if document search is enabled
+            RAG.Abstractions.Search.SearchResponse searchResults;
+            if (request.UseDocumentSearch)
+            {
+                searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
+                    request.Message,
+                    Filters: null,
+                    Limit: 1, // Get only one document with the highest rating
+                    Offset: 0
+                ), cancellationToken);
+            }
+            else
+            {
+                // Empty search results when document search is disabled
+                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+            }
 
-            // Build context-aware prompt
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, _messages[sessionId]);
+            // Build context-aware prompt based on document search setting
+            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, _messages[sessionId], request.UseDocumentSearch);
 
             // Generate AI response using Semantic Kernel
             var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
@@ -396,25 +405,35 @@ public class ChatService : IChatService
             );
             _messages[sessionId].Add(userMessage);
 
-            // Search for relevant context with language consideration
-            var searchRequest = new RAG.Abstractions.Search.SearchRequest(
-                request.Message,
-                Filters: null, // TODO: Map metadata to SearchFilters if needed
-                Limit: 1, // Get only one document with the highest rating
-                Offset: 0
-            );
-
+            // Search for relevant context with language consideration only if document search is enabled
             RAG.Abstractions.Search.SearchResponse searchResults;
             bool documentsAvailable = true;
-            try
+            
+            if (request.UseDocumentSearch)
             {
-                searchResults = await _searchService.SearchAsync(searchRequest, cancellationToken);
+                var searchRequest = new RAG.Abstractions.Search.SearchRequest(
+                    request.Message,
+                    Filters: null, // TODO: Map metadata to SearchFilters if needed
+                    Limit: 1, // Get only one document with the highest rating
+                    Offset: 0
+                );
+
+                try
+                {
+                    searchResults = await _searchService.SearchAsync(searchRequest, cancellationToken);
+                }
+                catch (Features.Search.ElasticsearchUnavailableException ex)
+                {
+                    _logger.LogWarning(ex, "Document database unavailable, proceeding without context");
+                    documentsAvailable = false;
+                    searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+                }
             }
-            catch (Features.Search.ElasticsearchUnavailableException ex)
+            else
             {
-                _logger.LogWarning(ex, "Document database unavailable, proceeding without context");
-                documentsAvailable = false;
+                // Empty search results when document search is disabled
                 searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+                documentsAvailable = false; // Consider as unavailable when disabled
             }
 
             // Build multilingual context-aware prompt
@@ -424,6 +443,7 @@ public class ChatService : IChatService
                 _messages[sessionId],
                 detectedLanguage,
                 responseLanguage,
+                request.UseDocumentSearch,
                 documentsAvailable
             );
 
@@ -480,11 +500,11 @@ public class ChatService : IChatService
                 ResponseLanguage = responseLanguage,
                 WasTranslated = wasTranslated,
                 TranslationConfidence = translationConfidence,
-                Sources = searchResults.Results.Length > 0 && documentsAvailable
+                Sources = searchResults.Results.Length > 0 && documentsAvailable && request.UseDocumentSearch
                     ? searchResults.Results.Select(r => r.Source).ToList()
                     : null,
                 ProcessingTimeMs = stopwatch.ElapsedMilliseconds,
-                Metadata = GetResponseMetadata(searchResults.Results.Length, request.EnableTranslation, documentsAvailable, responseLanguage)
+                Metadata = GetResponseMetadata(searchResults.Results.Length, request.EnableTranslation, documentsAvailable, responseLanguage, request.UseDocumentSearch)
             };
         }
         catch (Exception ex)
@@ -503,7 +523,8 @@ public class ChatService : IChatService
                 Metadata = new Dictionary<string, object>
                 {
                     ["error"] = true,
-                    ["errorMessage"] = ex.Message
+                    ["errorMessage"] = ex.Message,
+                    ["useDocumentSearch"] = request.UseDocumentSearch
                 }
             };
         }
@@ -516,16 +537,24 @@ public class ChatService : IChatService
         return Task.FromResult(removed);
     }
 
-    private static string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory)
+    private static string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<ChatMessage> conversationHistory, bool useDocumentSearch = true)
     {
         var promptBuilder = new StringBuilder();
 
-        promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.");
-        promptBuilder.AppendLine("Wykorzystuj kontekst z bazy wiedzy i historię rozmowy, aby udzielić dokładnej i przydatnej odpowiedzi.");
+        if (useDocumentSearch)
+        {
+            promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.");
+            promptBuilder.AppendLine("Wykorzystuj kontekst z bazy wiedzy i historię rozmowy, aby udzielić dokładnej i przydatnej odpowiedzi.");
+        }
+        else
+        {
+            promptBuilder.AppendLine("Jesteś inteligentnym asystentem AI w firmie Ctronex. Odpowiadaj po polsku, profesjonalnie i pomocnie, bazując na swojej ogólnej wiedzy i historii rozmowy.");
+            promptBuilder.AppendLine("Wykorzystuj historię rozmowy, aby udzielić dokładnej i pomocnej odpowiedzi bazując na swojej ogólnej wiedzy.");
+        }
         promptBuilder.AppendLine();
 
-        // Add context from search results
-        if (searchResults.Length > 0)
+        // Add context from search results only if document search is enabled
+        if (useDocumentSearch && searchResults.Length > 0)
         {
             promptBuilder.AppendLine("=== KONTEKST Z BAZY WIEDZY ===");
             foreach (var result in searchResults.Take(3))
@@ -557,6 +586,12 @@ public class ChatService : IChatService
                 promptBuilder.AppendLine();
             }
         }
+        else if (!useDocumentSearch)
+        {
+            promptBuilder.AppendLine("=== UWAGA ===");
+            promptBuilder.AppendLine("Wyszukiwanie dokumentów jest wyłączone w tej rozmowie. Odpowiedzi bazują tylko na ogólnej wiedzy.");
+            promptBuilder.AppendLine();
+        }
 
         // Add recent conversation history
         var recentMessages = conversationHistory.TakeLast(6).ToList();
@@ -576,9 +611,23 @@ public class ChatService : IChatService
         promptBuilder.AppendLine();
         promptBuilder.AppendLine("=== INSTRUKCJE ===");
         promptBuilder.AppendLine("- Odpowiadaj w języku polskim");
-        promptBuilder.AppendLine("- Bazuj na kontekście z bazy wiedzy, jeśli jest dostępny");
+        if (useDocumentSearch)
+        {
+            promptBuilder.AppendLine("- Bazuj na kontekście z bazy wiedzy, jeśli jest dostępny");
+        }
+        else
+        {
+            promptBuilder.AppendLine("- Bazuj na swojej ogólnej wiedzy i treningu");
+        }
         promptBuilder.AppendLine("- Uwzględnij historię rozmowy dla spójności");
-        promptBuilder.AppendLine("- Jeśli nie masz informacji w kontekście, powiedz o tym szczerze");
+        if (useDocumentSearch)
+        {
+            promptBuilder.AppendLine("- Jeśli nie masz informacji w kontekście, powiedz o tym szczerze");
+        }
+        else
+        {
+            promptBuilder.AppendLine("- Jeśli nie masz informacji na dany temat, powiedz o tym szczerze");
+        }
         promptBuilder.AppendLine("- Bądź konkretny i pomocny");
         promptBuilder.AppendLine();
         promptBuilder.AppendLine("Odpowiedź:");
@@ -592,20 +641,26 @@ public class ChatService : IChatService
         List<ChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
+        bool useDocumentSearch = true,
         bool documentsAvailable = true)
     {
         var promptBuilder = new StringBuilder();
 
-        // Get localized system prompt and instructions
-        var systemPrompt = _languageService.GetLocalizedSystemPrompt("rag_assistant", responseLanguage);
-        var instructions = _languageService.GetLocalizedInstructions(responseLanguage);
+        // Get localized system prompt and instructions based on document search setting
+        var systemPrompt = useDocumentSearch 
+            ? _languageService.GetLocalizedSystemPrompt("rag_assistant", responseLanguage)
+            : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
+            
+        var contextInstruction = useDocumentSearch
+            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
+            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
 
         promptBuilder.AppendLine(systemPrompt);
-        promptBuilder.AppendLine(instructions);
+        promptBuilder.AppendLine(contextInstruction);
         promptBuilder.AppendLine();
 
         // Add context from search results with translation note if needed
-        if (documentsAvailable && searchResults.Length > 0)
+        if (useDocumentSearch && documentsAvailable && searchResults.Length > 0)
         {
             var contextLabel = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage);
             promptBuilder.AppendLine($"=== {contextLabel} ===");
@@ -645,7 +700,16 @@ public class ChatService : IChatService
                 promptBuilder.AppendLine();
             }
         }
-        else if (!documentsAvailable)
+        else if (!useDocumentSearch)
+        {
+            // Add note about document search being disabled
+            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", responseLanguage)
+                ?? "Note: Document search is disabled for this conversation.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(noSearchNote);
+            promptBuilder.AppendLine();
+        }
+        else if (useDocumentSearch && !documentsAvailable)
         {
             // Add note about document database unavailability
             var unavailableNote = _languageService.GetLocalizedString("system_prompts", "documents_unavailable", responseLanguage)
@@ -679,6 +743,36 @@ public class ChatService : IChatService
         promptBuilder.AppendLine(userMessage);
         promptBuilder.AppendLine();
 
+        // Add localized instructions based on document search setting
+        var instructionsLabel = _languageService.GetLocalizedString("ui_labels", "instructions", responseLanguage);
+        promptBuilder.AppendLine($"=== {instructionsLabel} ===");
+        
+        var respondInLanguage = _languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage);
+        promptBuilder.AppendLine($"- {respondInLanguage}");
+        
+        if (useDocumentSearch)
+        {
+            var useKnowledgeBase = _languageService.GetLocalizedString("instructions", "use_knowledge_base", responseLanguage);
+            promptBuilder.AppendLine($"- {useKnowledgeBase}");
+        }
+        else
+        {
+            var useGeneralKnowledge = _languageService.GetLocalizedString("instructions", "use_general_knowledge", responseLanguage);
+            promptBuilder.AppendLine($"- {useGeneralKnowledge}");
+        }
+        
+        var considerHistory = _languageService.GetLocalizedString("instructions", "consider_history", responseLanguage);
+        promptBuilder.AppendLine($"- {considerHistory}");
+        
+        var beHonest = useDocumentSearch 
+            ? _languageService.GetLocalizedString("instructions", "be_honest", responseLanguage)
+            : _languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage);
+        promptBuilder.AppendLine($"- {beHonest}");
+        
+        var beHelpful = _languageService.GetLocalizedString("instructions", "be_helpful", responseLanguage);
+        promptBuilder.AppendLine($"- {beHelpful}");
+        promptBuilder.AppendLine();
+
         // Add language-specific note if translation is involved
         if (detectedLanguage != responseLanguage)
         {
@@ -693,16 +787,23 @@ public class ChatService : IChatService
         return promptBuilder.ToString();
     }
 
-    private Dictionary<string, object> GetResponseMetadata(int searchResultsCount, bool enabledTranslation, bool documentsAvailable, string responseLanguage)
+    private Dictionary<string, object> GetResponseMetadata(int searchResultsCount, bool enabledTranslation, bool documentsAvailable, string responseLanguage, bool useDocumentSearch = true)
     {
         var metadata = new Dictionary<string, object>
         {
             ["searchResultsCount"] = searchResultsCount,
             ["enabledTranslation"] = enabledTranslation,
-            ["documentsAvailable"] = documentsAvailable
+            ["documentsAvailable"] = documentsAvailable,
+            ["useDocumentSearch"] = useDocumentSearch
         };
 
-        if (!documentsAvailable)
+        if (!useDocumentSearch)
+        {
+            var disabledMessage = _languageService.GetLocalizedString("error_messages", "document_search_disabled", responseLanguage)
+                ?? "Document search is disabled for this conversation";
+            metadata["documentSearchDisabledMessage"] = disabledMessage;
+        }
+        else if (!documentsAvailable)
         {
             var unavailableMessage = _languageService.GetLocalizedString("error_messages", "documents_unavailable", responseLanguage)
                 ?? "Document database is currently unavailable";

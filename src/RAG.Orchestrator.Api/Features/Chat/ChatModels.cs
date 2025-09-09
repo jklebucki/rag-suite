@@ -23,6 +23,7 @@ public record ChatRequest(
     string Message,
     string? SessionId = null,
     bool UseRag = true,
+    bool UseDocumentSearch = true,
     string[]? Context = null
 );
 
