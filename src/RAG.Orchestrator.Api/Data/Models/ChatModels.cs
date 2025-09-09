@@ -48,6 +48,9 @@ public class ChatMessage
     [Column("metadata")]
     public string? MetadataJson { get; set; }
 
+    [Column("ollama_context")]
+    public string? OllamaContextJson { get; set; }
+
     // Navigation property
     public virtual ChatSession Session { get; set; } = null!;
 
@@ -64,5 +67,12 @@ public class ChatMessage
     {
         get => string.IsNullOrEmpty(MetadataJson) ? null : JsonSerializer.Deserialize<Dictionary<string, object>>(MetadataJson);
         set => MetadataJson = value == null ? null : JsonSerializer.Serialize(value);
+    }
+
+    [NotMapped]
+    public int[]? OllamaContext
+    {
+        get => string.IsNullOrEmpty(OllamaContextJson) ? null : JsonSerializer.Deserialize<int[]>(OllamaContextJson);
+        set => OllamaContextJson = value == null ? null : JsonSerializer.Serialize(value);
     }
 }

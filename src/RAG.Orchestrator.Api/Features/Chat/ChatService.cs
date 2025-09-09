@@ -21,6 +21,7 @@ public interface IChatService
 public interface ILlmService
 {
     Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default);
+    Task<(string response, int[]? context)> GenerateResponseWithContextAsync(string prompt, int[]? context = null, CancellationToken cancellationToken = default);
     Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
     Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default);
 }
@@ -46,6 +47,12 @@ public class LlmService : ILlmService
 
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
     {
+        var (response, _) = await GenerateResponseWithContextAsync(prompt, null, cancellationToken);
+        return response;
+    }
+
+    public async Task<(string response, int[]? context)> GenerateResponseWithContextAsync(string prompt, int[]? context = null, CancellationToken cancellationToken = default)
+    {
         try
         {
             var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 200);
@@ -58,8 +65,8 @@ public class LlmService : ILlmService
 
             if (isOllama)
             {
-                // Ollama API format
-                request = new
+                // Ollama API format with context support
+                var requestObj = new
                 {
                     model = model,
                     prompt = prompt,
@@ -70,11 +77,29 @@ public class LlmService : ILlmService
                         num_predict = maxTokens
                     }
                 };
+
+                // Add context if provided (for Ollama token cache)
+                if (context != null && context.Length > 0)
+                {
+                    request = new
+                    {
+                        model = requestObj.model,
+                        prompt = requestObj.prompt,
+                        stream = requestObj.stream,
+                        context = context, // Ollama context for token cache
+                        options = requestObj.options
+                    };
+                }
+                else
+                {
+                    request = requestObj;
+                }
+                
                 endpoint = "/api/generate";
             }
             else
             {
-                // TGI API format
+                // TGI API format (no context support)
                 var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
                 request = new
                 {
@@ -94,7 +119,7 @@ public class LlmService : ILlmService
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            _logger.LogDebug("Sending request to LLM service: {Json}", json);
+            _logger.LogDebug("Sending request to LLM service with context: {Json}", json);
 
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
 
@@ -102,7 +127,7 @@ public class LlmService : ILlmService
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogError("LLM service returned error: {StatusCode}, Content: {ErrorContent}", response.StatusCode, errorContent);
-                return "Sorry, there was a problem generating the response. Please try again.";
+                return ("Sorry, there was a problem generating the response. Please try again.", null);
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -111,6 +136,7 @@ public class LlmService : ILlmService
             using var doc = JsonDocument.Parse(responseJson);
 
             string? result = null;
+            int[]? responseContext = null;
 
             if (isOllama)
             {
@@ -119,10 +145,25 @@ public class LlmService : ILlmService
                 {
                     result = ollamaResponse.GetString();
                 }
+
+                // Extract context from Ollama response for token cache
+                if (doc.RootElement.TryGetProperty("context", out var contextElement))
+                {
+                    try
+                    {
+                        var contextArray = contextElement.EnumerateArray().Select(x => x.GetInt32()).ToArray();
+                        responseContext = contextArray.Length > 0 ? contextArray : null;
+                        _logger.LogDebug("Received context from Ollama with {ContextLength} tokens", contextArray.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to parse context from Ollama response");
+                    }
+                }
             }
             else
             {
-                // TGI response format
+                // TGI response format (no context)
                 if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
                 {
                     result = generatedText.GetString();
@@ -132,16 +173,16 @@ public class LlmService : ILlmService
             if (!string.IsNullOrEmpty(result))
             {
                 _logger.LogDebug("Extracted generated text: {GeneratedText}", result);
-                return result;
+                return (result, responseContext);
             }
 
             _logger.LogWarning("Unexpected response format from LLM service. Response: {ResponseJson}", responseJson);
-            return "Otrzymano niepoprawną odpowiedź z serwisu LLM.";
+            return ("Otrzymano niepoprawną odpowiedź z serwisu LLM.", null);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calling LLM service");
-            return "Error occurred during LLM service communication.";
+            _logger.LogError(ex, "Error calling LLM service with context");
+            return ("Error occurred during LLM service communication.", null);
         }
     }
 
@@ -239,19 +280,22 @@ public class ChatService : IChatService
     private readonly ILanguageService _languageService;
     private readonly ILogger<ChatService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly ILlmService _llmService;
 
     public ChatService(
         Kernel kernel,
         ISearchService searchService,
         ILanguageService languageService,
         ILogger<ChatService> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILlmService llmService)
     {
         _kernel = kernel;
         _searchService = searchService;
         _languageService = languageService;
         _logger = logger;
         _configuration = configuration;
+        _llmService = llmService;
     }
 
     public Task<ChatSession[]> GetSessionsAsync(CancellationToken cancellationToken = default)
@@ -332,17 +376,42 @@ public class ChatService : IChatService
             // Build context-aware prompt based on document search setting
             var prompt = BuildContextualPrompt(request.Message, searchResults.Results, _messages[sessionId], request.UseDocumentSearch);
 
-            // Generate AI response using Semantic Kernel
-            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ??
-                _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
+            // Get previous Ollama context from the last assistant message for token cache continuation
+            var lastAssistantMessage = _messages[sessionId]
+                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
+                .LastOrDefault();
+            var previousContext = lastAssistantMessage?.OllamaContext;
+
+            // Check if Ollama is configured, if so use LLM service with context support
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            string aiResponseContent;
+            int[]? newOllamaContext = null;
+
+            if (isOllama)
+            {
+                // Use LlmService with Ollama context support for token cache
+                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
+                aiResponseContent = response;
+                newOllamaContext = context;
+                _logger.LogDebug("Generated response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
+                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+            }
+            else
+            {
+                // Fallback to Semantic Kernel for non-Ollama providers
+                var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+                aiResponseContent = aiResponse.GetValue<string>() ??
+                    _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
+            }
 
             var aiMessage = new ChatMessage(
                 Guid.NewGuid().ToString(),
                 "assistant",
                 aiResponseContent,
                 DateTime.Now,
-                searchResults.Results.Length > 0 ? searchResults.Results : null
+                searchResults.Results.Length > 0 ? searchResults.Results : null,
+                null,  // Metadata
+                newOllamaContext  // Save Ollama context for future token cache usage
             );
 
             _messages[sessionId].Add(aiMessage);
@@ -447,10 +516,33 @@ public class ChatService : IChatService
                 documentsAvailable
             );
 
-            // Generate AI response using Semantic Kernel
-            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ??
-                _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
+            // Get previous Ollama context from the last assistant message for token cache continuation
+            var lastAssistantMessage = _messages[sessionId]
+                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
+                .LastOrDefault();
+            var previousContext = lastAssistantMessage?.OllamaContext;
+
+            // Check if Ollama is configured, if so use LLM service with context support
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            string aiResponseContent;
+            int[]? newOllamaContext = null;
+
+            if (isOllama)
+            {
+                // Use LlmService with Ollama context support for token cache
+                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
+                aiResponseContent = response;
+                newOllamaContext = context;
+                _logger.LogDebug("Generated multilingual response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
+                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+            }
+            else
+            {
+                // Fallback to Semantic Kernel for non-Ollama providers
+                var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+                aiResponseContent = aiResponse.GetValue<string>() ??
+                    _languageService.GetLocalizedErrorMessage("generation_failed", responseLanguage);
+            }
 
             // Translate response if needed
             var wasTranslated = false;
@@ -478,7 +570,9 @@ public class ChatService : IChatService
                 "assistant",
                 aiResponseContent,
                 DateTime.Now,
-                searchResults.Results.Length > 0 ? searchResults.Results : null
+                searchResults.Results.Length > 0 ? searchResults.Results : null,
+                null,  // Metadata
+                newOllamaContext  // Save Ollama context for future token cache usage
             );
 
             _messages[sessionId].Add(aiMessage);

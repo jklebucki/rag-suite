@@ -8,7 +8,8 @@ public record UserChatMessage(
     string Content,
     DateTime Timestamp,
     SearchResult[]? Sources = null,
-    Dictionary<string, object>? Metadata = null
+    Dictionary<string, object>? Metadata = null,
+    int[]? OllamaContext = null
 );
 
 public record UserChatSession(

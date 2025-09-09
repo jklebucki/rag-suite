@@ -29,6 +29,7 @@ public class UserChatService : IUserChatService
     private readonly ILanguageService _languageService;
     private readonly ILogger<UserChatService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly ILlmService _llmService;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -36,7 +37,8 @@ public class UserChatService : IUserChatService
         ISearchService searchService,
         ILanguageService languageService,
         ILogger<UserChatService> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILlmService llmService)
     {
         _chatDbContext = chatDbContext;
         _kernel = kernel;
@@ -44,6 +46,7 @@ public class UserChatService : IUserChatService
         _languageService = languageService;
         _logger = logger;
         _configuration = configuration;
+        _llmService = llmService;
     }
 
     public async Task<UserChatSession[]> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default)
@@ -108,7 +111,8 @@ public class UserChatService : IUserChatService
                 m.Content,
                 m.Timestamp,
                 m.Sources,
-                m.Metadata
+                m.Metadata,
+                m.OllamaContext
             ))
             .ToArray();
 
@@ -149,7 +153,8 @@ public class UserChatService : IUserChatService
                 m.Content,
                 m.Timestamp,
                 m.Sources,
-                m.Metadata
+                m.Metadata,
+                m.OllamaContext
             ))
             .ToListAsync(cancellationToken);
 
@@ -171,7 +176,10 @@ public class UserChatService : IUserChatService
             userDbMessage.Id,
             userDbMessage.Role,
             userDbMessage.Content,
-            userDbMessage.Timestamp
+            userDbMessage.Timestamp,
+            null, // Sources
+            null, // Metadata  
+            null  // OllamaContext
         );
         conversationHistory.Add(userMessage);
 
@@ -215,10 +223,33 @@ public class UserChatService : IUserChatService
             }
             _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
 
-            // Generate AI response using Semantic Kernel
-            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ??
-                _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
+            // Get previous Ollama context from the last assistant message for token cache continuation
+            var lastAssistantMessage = conversationHistory
+                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
+                .LastOrDefault();
+            var previousContext = lastAssistantMessage?.OllamaContext;
+
+            // Check if Ollama is configured, if so use LLM service with context support
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            string aiResponseContent;
+            int[]? newOllamaContext = null;
+
+            if (isOllama)
+            {
+                // Use LlmService with Ollama context support for token cache
+                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
+                aiResponseContent = response;
+                newOllamaContext = context;
+                _logger.LogDebug("Generated user response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
+                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+            }
+            else
+            {
+                // Fallback to Semantic Kernel for non-Ollama providers
+                var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+                aiResponseContent = aiResponse.GetValue<string>() ??
+                    _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
+            }
 
             // Save AI response to database
             var aiDbMessage = new Data.Models.ChatMessage
@@ -233,7 +264,8 @@ public class UserChatService : IUserChatService
                 {
                     ["useDocumentSearch"] = request.UseDocumentSearch,
                     ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0
-                }
+                },
+                OllamaContext = newOllamaContext  // Save Ollama context for future token cache usage
             };
 
             _chatDbContext.ChatMessages.Add(aiDbMessage);
@@ -249,7 +281,8 @@ public class UserChatService : IUserChatService
                 aiDbMessage.Content,
                 aiDbMessage.Timestamp,
                 aiDbMessage.Sources,
-                aiDbMessage.Metadata
+                aiDbMessage.Metadata,
+                aiDbMessage.OllamaContext
             );
         }
         catch (Exception ex)
@@ -273,7 +306,10 @@ public class UserChatService : IUserChatService
                 errorDbMessage.Id,
                 errorDbMessage.Role,
                 errorDbMessage.Content,
-                errorDbMessage.Timestamp
+                errorDbMessage.Timestamp,
+                null, // Sources
+                null, // Metadata
+                null  // OllamaContext
             );
         }
     }
@@ -319,7 +355,8 @@ public class UserChatService : IUserChatService
                 m.Content,
                 m.Timestamp,
                 m.Sources,
-                m.Metadata
+                m.Metadata,
+                m.OllamaContext
             ))
             .ToListAsync(cancellationToken);
 
@@ -347,8 +384,9 @@ public class UserChatService : IUserChatService
             userDbMessage.Role,
             userDbMessage.Content,
             userDbMessage.Timestamp,
-            null,
-            userDbMessage.Metadata
+            null, // Sources
+            userDbMessage.Metadata,
+            null  // OllamaContext
         );
         conversationHistory.Add(userMessage);
 
@@ -392,10 +430,33 @@ public class UserChatService : IUserChatService
             }
             _logger.LogDebug("Final multilingual prompt length: {PromptLength} characters", prompt.Length);
 
-            // Generate AI response
-            var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
-            var aiResponseContent = aiResponse.GetValue<string>() ??
-                _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
+            // Get previous Ollama context from the last assistant message for token cache continuation
+            var lastAssistantMessage = conversationHistory
+                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
+                .LastOrDefault();
+            var previousContext = lastAssistantMessage?.OllamaContext;
+
+            // Check if Ollama is configured, if so use LLM service with context support
+            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            string aiResponseContent;
+            int[]? newOllamaContext = null;
+
+            if (isOllama)
+            {
+                // Use LlmService with Ollama context support for token cache
+                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
+                aiResponseContent = response;
+                newOllamaContext = context;
+                _logger.LogDebug("Generated user multilingual response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
+                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+            }
+            else
+            {
+                // Fallback to Semantic Kernel for non-Ollama providers
+                var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+                aiResponseContent = aiResponse.GetValue<string>() ??
+                    _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
+            }
 
             // Save AI response to database
             var aiDbMessage = new Data.Models.ChatMessage
@@ -411,7 +472,8 @@ public class UserChatService : IUserChatService
                     ["responseLanguage"] = normalizedResponseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length,
                     ["useDocumentSearch"] = request.UseDocumentSearch
-                }
+                },
+                OllamaContext = newOllamaContext  // Save Ollama context for future token cache usage
             };
 
             _chatDbContext.ChatMessages.Add(aiDbMessage);
