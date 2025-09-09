@@ -5,6 +5,8 @@ using RAG.Orchestrator.Api.Models;
 using System.Text;
 using System.Text.Json;
 using Microsoft.SemanticKernel;
+using Microsoft.Extensions.Options;
+using RAG.Orchestrator.Api.Models.Configuration;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -22,27 +24,46 @@ public interface ILlmService
 {
     Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default);
     Task<(string response, int[]? context)> GenerateResponseWithContextAsync(string prompt, int[]? context = null, CancellationToken cancellationToken = default);
+    
+    // New methods for /api/chat endpoint with system message support
+    Task<string> ChatAsync(string userMessage, string language = "en", CancellationToken cancellationToken = default);
+    Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", CancellationToken cancellationToken = default);
+    Task<string> GetSystemMessageAsync(string language = "en", CancellationToken cancellationToken = default);
+    
     Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
     Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default);
+}
+
+// Data model for LLM chat messages (compatible with Ollama /api/chat)
+public class LlmChatMessage
+{
+    public string Role { get; set; } = string.Empty; // "system", "user", "assistant"
+    public string Content { get; set; } = string.Empty;
+}
+
+// Data model for system message from JSON files
+public class SystemMessageModel
+{
+    public string system_message { get; set; } = string.Empty;
 }
 
 public class LlmService : ILlmService
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
+    private readonly LlmEndpointConfig _config;
     private readonly ILogger<LlmService> _logger;
 
-    public LlmService(HttpClient httpClient, IConfiguration configuration, ILogger<LlmService> logger)
+    public LlmService(HttpClient httpClient, IOptions<LlmEndpointConfig> config, ILogger<LlmService> logger)
     {
         _httpClient = httpClient;
-        _configuration = configuration;
+        _config = config.Value;
         _logger = logger;
 
-        var baseUrl = configuration["Services:LlmService:Url"] ?? "http://localhost:11434";
-        _httpClient.BaseAddress = new Uri(baseUrl);
+        _httpClient.BaseAddress = new Uri(_config.Url);
+        _httpClient.Timeout = TimeSpan.FromMinutes(_config.TimeoutMinutes);
 
-        // HttpClient timeout is now configured in ServiceCollectionExtensions for health operations
-        // Chat operations use Semantic Kernel with different timeout configuration
+        _logger.LogDebug("LlmService configured with URL: {Url}, Model: {Model}, Timeout: {Timeout}min", 
+            _config.Url, _config.Model, _config.TimeoutMinutes);
     }
 
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
@@ -55,10 +76,10 @@ public class LlmService : ILlmService
     {
         try
         {
-            var maxTokens = _configuration.GetValue<int>("Services:LlmService:MaxTokens", 200);
-            var temperature = _configuration.GetValue<double>("Services:LlmService:Temperature", 0.7);
-            var model = _configuration.GetValue<string>("Services:LlmService:Model", "qwen2:0.5b");
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            var maxTokens = _config.MaxTokens;
+            var temperature = _config.Temperature;
+            var model = _config.Model;
+            var isOllama = _config.IsOllama;
 
             object request;
             string endpoint;
@@ -100,7 +121,7 @@ public class LlmService : ILlmService
             else
             {
                 // TGI API format (no context support)
-                var topP = _configuration.GetValue<double>("Services:LlmService:TopP", 0.9);
+                var topP = 0.9; // Default value since not in LlmEndpointConfig
                 request = new
                 {
                     inputs = prompt,
@@ -193,7 +214,7 @@ public class LlmService : ILlmService
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
 
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            var isOllama = _config.IsOllama;
             var endpoint = isOllama ? "/api/tags" : "/health";
 
             var response = await _httpClient.GetAsync(endpoint, cts.Token);
@@ -225,7 +246,7 @@ public class LlmService : ILlmService
 
     public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
     {
-        var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+        var isOllama = _config.IsOllama;
         try
         {
             if (isOllama)
@@ -258,7 +279,7 @@ public class LlmService : ILlmService
             else
             {
                 // For non-Ollama (e.g. TGI) return configured model only
-                var model = _configuration.GetValue<string>("Services:LlmService:Model", "unknown-model") ?? "unknown-model";
+                var model = _config.Model;
                 return new[] { model };
             }
         }
@@ -267,6 +288,140 @@ public class LlmService : ILlmService
             _logger.LogError(ex, "Error retrieving available models from LLM service");
             return Array.Empty<string>();
         }
+    }
+
+    // New methods for /api/chat endpoint support
+
+    public async Task<string> ChatAsync(string userMessage, string language = "en", CancellationToken cancellationToken = default)
+    {
+        return await ChatWithHistoryAsync(Array.Empty<LlmChatMessage>(), userMessage, language, cancellationToken);
+    }
+
+    public async Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var maxTokens = _config.MaxTokens;
+            var temperature = _config.Temperature;
+            var model = _config.Model;
+            var isOllama = _config.IsOllama;
+
+            if (!isOllama)
+            {
+                _logger.LogWarning("Chat API is only supported for Ollama. Falling back to generate endpoint.");
+                return await GenerateResponseAsync(userMessage, cancellationToken);
+            }
+
+            // Build messages array for /api/chat
+            var messages = new List<LlmChatMessage>();
+
+            // Add system message first
+            var systemMessage = await GetSystemMessageAsync(language, cancellationToken);
+            if (!string.IsNullOrEmpty(systemMessage))
+            {
+                messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
+            }
+
+            // Add conversation history
+            messages.AddRange(messageHistory);
+
+            // Add current user message
+            messages.Add(new LlmChatMessage { Role = "user", Content = userMessage });
+
+            var request = new
+            {
+                model = model,
+                messages = messages.Select(m => new { role = m.Role, content = m.Content }).ToArray(),
+                stream = false,
+                options = new
+                {
+                    temperature = temperature,
+                    num_predict = maxTokens
+                }
+            };
+
+            var json = JsonSerializer.Serialize(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _logger.LogDebug("Sending chat request to Ollama with {MessageCount} messages", messages.Count);
+
+            var response = await _httpClient.PostAsync(_config.ChatEndpoint, content, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("Ollama chat API returned error: {StatusCode}, Content: {ErrorContent}", response.StatusCode, errorContent);
+                return "Sorry, there was a problem generating the response. Please try again.";
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogDebug("Received chat response from Ollama: {ResponseJson}", responseJson);
+
+            using var doc = JsonDocument.Parse(responseJson);
+
+            // Parse /api/chat response format
+            if (doc.RootElement.TryGetProperty("message", out var messageElement))
+            {
+                if (messageElement.TryGetProperty("content", out var contentElement))
+                {
+                    var result = contentElement.GetString();
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        _logger.LogDebug("Extracted chat response: {GeneratedText}", result);
+                        return result;
+                    }
+                }
+            }
+
+            _logger.LogWarning("Unexpected response format from Ollama chat API. Response: {ResponseJson}", responseJson);
+            return "Otrzymano niepoprawną odpowiedź z serwisu Ollama.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calling Ollama chat API");
+            return "Error occurred during Ollama chat communication.";
+        }
+    }
+
+    public async Task<string> GetSystemMessageAsync(string language = "en", CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Map language codes to supported languages
+            var supportedLanguages = new[] { "pl", "en", "hu", "nl", "ro" };
+            var targetLanguage = supportedLanguages.Contains(language.ToLower()) ? language.ToLower() : "en";
+
+            var fileName = $"system_{targetLanguage}.json";
+            var filePath = Path.Combine("Localization", fileName);
+
+            if (!File.Exists(filePath))
+            {
+                _logger.LogWarning("System message file not found: {FilePath}. Using fallback.", filePath);
+                return GetFallbackSystemMessage();
+            }
+
+            var jsonContent = await File.ReadAllTextAsync(filePath, cancellationToken);
+            var systemMessageModel = JsonSerializer.Deserialize<SystemMessageModel>(jsonContent);
+
+            if (systemMessageModel?.system_message != null)
+            {
+                _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
+                return systemMessageModel.system_message;
+            }
+
+            _logger.LogWarning("Invalid system message format in file: {FilePath}", filePath);
+            return GetFallbackSystemMessage();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading system message for language: {Language}", language);
+            return GetFallbackSystemMessage();
+        }
+    }
+
+    private string GetFallbackSystemMessage()
+    {
+        return "I am Ctronex's AI assistant, specializing in the RAG Suite system - an advanced tool for organizational knowledge management. I can assist in finding information in the organizational knowledge base, answering questions about procedures, policies, and technical documentation.";
     }
 }
 
@@ -280,6 +435,7 @@ public class ChatService : IChatService
     private readonly ILanguageService _languageService;
     private readonly ILogger<ChatService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly LlmEndpointConfig _llmConfig;
     private readonly ILlmService _llmService;
 
     public ChatService(
@@ -288,6 +444,7 @@ public class ChatService : IChatService
         ILanguageService languageService,
         ILogger<ChatService> logger,
         IConfiguration configuration,
+        IOptions<LlmEndpointConfig> llmConfig,
         ILlmService llmService)
     {
         _kernel = kernel;
@@ -295,6 +452,7 @@ public class ChatService : IChatService
         _languageService = languageService;
         _logger = logger;
         _configuration = configuration;
+        _llmConfig = llmConfig.Value;
         _llmService = llmService;
     }
 
@@ -322,6 +480,19 @@ public class ChatService : IChatService
         _messages[sessionId] = new List<ChatMessage>();
 
         return Task.FromResult(session);
+    }
+
+    // Helper method to convert ChatMessage history to LlmChatMessage format
+    private List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<ChatMessage> messages)
+    {
+        return messages
+            .Where(m => m.Role == "user" || m.Role == "assistant") // Exclude system messages
+            .Select(m => new LlmChatMessage 
+            { 
+                Role = m.Role, 
+                Content = m.Content 
+            })
+            .ToList();
     }
 
     public Task<ChatSession?> GetSessionAsync(string sessionId, CancellationToken cancellationToken = default)
@@ -382,19 +553,25 @@ public class ChatService : IChatService
                 .LastOrDefault();
             var previousContext = lastAssistantMessage?.OllamaContext;
 
-            // Check if Ollama is configured, if so use LLM service with context support
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            // Check if Ollama is configured, if so use LLM service with chat API and system message
+            var isOllama = _llmConfig.IsOllama;
             string aiResponseContent;
             int[]? newOllamaContext = null;
 
             if (isOllama)
             {
-                // Use LlmService with Ollama context support for token cache
-                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
-                aiResponseContent = response;
-                newOllamaContext = context;
-                _logger.LogDebug("Generated response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
-                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+                // Get conversation history and convert to LLM format
+                var existingMessages = _messages[sessionId].Take(_messages[sessionId].Count - 1); // Exclude the just-added user message
+                var messageHistory = ConvertToLlmChatMessages(existingMessages);
+                
+                // Use new Chat API with system message and conversation history
+                aiResponseContent = await _llmService.ChatWithHistoryAsync(
+                    messageHistory, 
+                    request.Message, 
+                    _languageService.GetDefaultLanguage(), 
+                    cancellationToken);
+                    
+                _logger.LogDebug("Generated response using Chat API with {HistoryCount} previous messages and system message", messageHistory.Count);
             }
             else
             {
@@ -522,19 +699,26 @@ public class ChatService : IChatService
                 .LastOrDefault();
             var previousContext = lastAssistantMessage?.OllamaContext;
 
-            // Check if Ollama is configured, if so use LLM service with context support
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            // Check if Ollama is configured, if so use LLM service with chat API and localized system message
+            var isOllama = _llmConfig.IsOllama;
             string aiResponseContent;
             int[]? newOllamaContext = null;
 
             if (isOllama)
             {
-                // Use LlmService with Ollama context support for token cache
-                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
-                aiResponseContent = response;
-                newOllamaContext = context;
-                _logger.LogDebug("Generated multilingual response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
-                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+                // Get conversation history and convert to LLM format
+                var existingMessages = _messages[sessionId].Take(_messages[sessionId].Count - 1); // Exclude the just-added user message
+                var messageHistory = ConvertToLlmChatMessages(existingMessages);
+                
+                // Use new Chat API with system message in response language and conversation history
+                aiResponseContent = await _llmService.ChatWithHistoryAsync(
+                    messageHistory, 
+                    request.Message, 
+                    responseLanguage, 
+                    cancellationToken);
+                    
+                _logger.LogDebug("Generated multilingual response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
+                    messageHistory.Count, responseLanguage);
             }
             else
             {

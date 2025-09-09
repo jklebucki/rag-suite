@@ -8,6 +8,8 @@ using RAG.Security.Services;
 using System.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.EntityFrameworkCore;
+using RAG.Orchestrator.Api.Models.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -30,6 +32,7 @@ public class UserChatService : IUserChatService
     private readonly ILogger<UserChatService> _logger;
     private readonly IConfiguration _configuration;
     private readonly ILlmService _llmService;
+    private readonly LlmEndpointConfig _llmConfig;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -38,7 +41,8 @@ public class UserChatService : IUserChatService
         ILanguageService languageService,
         ILogger<UserChatService> logger,
         IConfiguration configuration,
-        ILlmService llmService)
+        ILlmService llmService,
+        IOptions<LlmEndpointConfig> llmOptions)
     {
         _chatDbContext = chatDbContext;
         _kernel = kernel;
@@ -47,6 +51,20 @@ public class UserChatService : IUserChatService
         _logger = logger;
         _configuration = configuration;
         _llmService = llmService;
+        _llmConfig = llmOptions.Value;
+    }
+
+    // Helper method to convert UserChatMessage history to LlmChatMessage format
+    private List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<UserChatMessage> messages)
+    {
+        return messages
+            .Where(m => m.Role == "user" || m.Role == "assistant") // Exclude system messages
+            .Select(m => new LlmChatMessage 
+            { 
+                Role = m.Role, 
+                Content = m.Content 
+            })
+            .ToList();
     }
 
     public async Task<UserChatSession[]> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default)
@@ -211,7 +229,6 @@ public class UserChatService : IUserChatService
             // Priority: Language from UI > UI Language from metadata > detected > default
             var userLanguage = request.Language ?? uiLanguage ?? _languageService.DetectLanguage(request.Message) ?? _languageService.GetDefaultLanguage();
             var normalizedLanguage = _languageService.NormalizeLanguage(userLanguage);
-            var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage, request.UseDocumentSearch);
 
             // Debug logging for search results content
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
@@ -229,32 +246,35 @@ public class UserChatService : IUserChatService
                 var sources = searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) ? r.FileName : r.Source).Distinct().ToArray();
                 _logger.LogInformation("Using documents as sources: {Sources}", string.Join(", ", sources));
             }
-            
-            _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
 
-            // Get previous Ollama context from the last assistant message for token cache continuation
-            var lastAssistantMessage = conversationHistory
-                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
-                .LastOrDefault();
-            var previousContext = lastAssistantMessage?.OllamaContext;
-
-            // Check if Ollama is configured, if so use LLM service with context support
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
+            // Use new chat architecture with conversation history and system messages
             string aiResponseContent;
             int[]? newOllamaContext = null;
 
-            if (isOllama)
+            if (_llmConfig.IsOllama)
             {
-                // Use LlmService with Ollama context support for token cache
-                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
-                aiResponseContent = response;
-                newOllamaContext = context;
-                _logger.LogDebug("Generated user response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
-                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+                // Use new Chat API with system message and conversation history
+                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
+                
+                // Use new Chat API with system message in response language and conversation history
+                aiResponseContent = await _llmService.ChatWithHistoryAsync(
+                    messageHistory, 
+                    request.Message, 
+                    normalizedLanguage, 
+                    cancellationToken);
+                    
+                _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
+                    messageHistory.Count(), normalizedLanguage);
+                
+                // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
+                newOllamaContext = null;
             }
             else
             {
                 // Fallback to Semantic Kernel for non-Ollama providers
+                var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage, request.UseDocumentSearch);
+                _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
+                
                 var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
                 aiResponseContent = aiResponse.GetValue<string>() ??
                     _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
@@ -425,17 +445,6 @@ public class UserChatService : IUserChatService
                 searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
             }
 
-            // Build multilingual context-aware prompt
-            var prompt = BuildMultilingualContextualPrompt(
-                request.Message,
-                searchResults.Results,
-                conversationHistory,
-                detectedLanguage ?? "unknown",
-                normalizedResponseLanguage,
-                request.UseDocumentSearch,
-                searchResults.Results.Length > 0
-            );
-
             // Debug logging for multilingual search results content
             _logger.LogDebug("Multilingual search results for prompt: {ResultCount} results", searchResults.Results.Length);
             foreach (var result in searchResults.Results)
@@ -452,8 +461,6 @@ public class UserChatService : IUserChatService
                 var sources = searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) ? r.FileName : r.Source).Distinct().ToArray();
                 _logger.LogInformation("Using documents as sources for multilingual response: {Sources}", string.Join(", ", sources));
             }
-            
-            _logger.LogDebug("Final multilingual prompt length: {PromptLength} characters", prompt.Length);
 
             // Get previous Ollama context from the last assistant message for token cache continuation
             var lastAssistantMessage = conversationHistory
@@ -462,23 +469,43 @@ public class UserChatService : IUserChatService
             var previousContext = lastAssistantMessage?.OllamaContext;
 
             // Check if Ollama is configured, if so use LLM service with context support
-            var isOllama = _configuration.GetValue<bool>("Services:LlmService:IsOllama", false);
             string aiResponseContent;
             int[]? newOllamaContext = null;
 
-            if (isOllama)
+            if (_llmConfig.IsOllama)
             {
-                // Use LlmService with Ollama context support for token cache
-                var (response, context) = await _llmService.GenerateResponseWithContextAsync(prompt, previousContext, cancellationToken);
-                aiResponseContent = response;
-                newOllamaContext = context;
-                _logger.LogDebug("Generated user multilingual response with Ollama context. Previous context length: {PreviousLength}, New context length: {NewLength}", 
-                    previousContext?.Length ?? 0, newOllamaContext?.Length ?? 0);
+                // Use new Chat API with system message and conversation history
+                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
+                
+                // Use new Chat API with system message in response language and conversation history
+                aiResponseContent = await _llmService.ChatWithHistoryAsync(
+                    messageHistory, 
+                    request.Message, 
+                    normalizedResponseLanguage, 
+                    cancellationToken);
+                    
+                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
+                    messageHistory.Count(), normalizedResponseLanguage);
+                
+                // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
+                newOllamaContext = null;
             }
             else
             {
                 // Fallback to Semantic Kernel for non-Ollama providers
-                var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+                var fallbackPrompt = BuildMultilingualContextualPrompt(
+                    request.Message,
+                    searchResults.Results,
+                    conversationHistory,
+                    detectedLanguage ?? "unknown",
+                    normalizedResponseLanguage,
+                    request.UseDocumentSearch,
+                    searchResults.Results.Length > 0
+                );
+                
+                _logger.LogDebug("Final multilingual fallback prompt length: {PromptLength} characters", fallbackPrompt.Length);
+                
+                var aiResponse = await _kernel.InvokePromptAsync(fallbackPrompt, cancellationToken: cancellationToken);
                 aiResponseContent = aiResponse.GetValue<string>() ??
                     _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
             }
@@ -806,5 +833,183 @@ public class UserChatService : IUserChatService
         summary.AppendLine(string.Format(multipleSourcesNote, sourceNames.Length) + ": " + string.Join(", ", sourceNames));
         
         return summary.ToString();
+    }
+
+    /// <summary>
+    /// Builds a prompt for chat API using system message from localized JSON files
+    /// </summary>
+    private async Task<string> BuildChatPromptWithSystemMessageAsync(
+        string userMessage,
+        RAG.Abstractions.Search.SearchResult[] searchResults,
+        List<UserChatMessage> conversationHistory,
+        string language,
+        bool useDocumentSearch)
+    {
+        var promptBuilder = new StringBuilder();
+
+        // Get system message from localized JSON file
+        var systemMessage = await _llmService.GetSystemMessageAsync(language);
+        promptBuilder.AppendLine(systemMessage);
+        promptBuilder.AppendLine();
+
+        // Add context instruction based on document search setting
+        var contextInstruction = useDocumentSearch
+            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", language)
+            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", language);
+        promptBuilder.AppendLine(contextInstruction);
+
+        // Add context from search results if available and enabled
+        if (useDocumentSearch && searchResults.Length > 0)
+        {
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
+            
+            // Add each document with its source information
+            foreach (var result in searchResults)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.AppendLine(FormatDocumentSource(result, language));
+                promptBuilder.AppendLine($"- {result.Content}");
+            }
+            
+            // Add summary of sources used
+            if (searchResults.Length > 1)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.Append(FormatSourcesSummary(searchResults, language));
+            }
+        }
+        else if (!useDocumentSearch)
+        {
+            promptBuilder.AppendLine();
+            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", language)
+                ?? "Note: Document search is disabled for this conversation.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(noSearchNote);
+        }
+
+        // Add recent conversation history (last 5 messages)
+        var recentMessages = conversationHistory.TakeLast(5).ToArray();
+        if (recentMessages.Length > 1) // More than just the current message
+        {
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
+            foreach (var msg in recentMessages.SkipLast(1)) // Skip the current message we're responding to
+            {
+                var roleLabel = msg.Role == "user"
+                    ? _languageService.GetLocalizedString("ui_labels", "user", language)
+                    : _languageService.GetLocalizedString("ui_labels", "assistant", language);
+                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
+            }
+        }
+
+        // Add current user message
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", language));
+        var userLabel = _languageService.GetLocalizedString("ui_labels", "user", language);
+        promptBuilder.AppendLine($"{userLabel}: {userMessage}");
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
+
+        return promptBuilder.ToString();
+    }
+
+    /// <summary>
+    /// Builds a multilingual prompt for chat API using system message from localized JSON files
+    /// </summary>
+    private async Task<string> BuildMultilingualChatPromptWithSystemMessageAsync(
+        string userMessage,
+        RAG.Abstractions.Search.SearchResult[] searchResults,
+        List<UserChatMessage> conversationHistory,
+        string detectedLanguage,
+        string responseLanguage,
+        bool useDocumentSearch,
+        bool documentsAvailable)
+    {
+        var promptBuilder = new StringBuilder();
+
+        // CRITICAL: Strong language instruction at the beginning
+        var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage);
+        promptBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
+        promptBuilder.AppendLine($"MUST RESPOND IN: {responseLanguage.ToUpper()}");
+        promptBuilder.AppendLine();
+
+        // Get system message from localized JSON file
+        var systemMessage = await _llmService.GetSystemMessageAsync(responseLanguage);
+        promptBuilder.AppendLine(systemMessage);
+        promptBuilder.AppendLine();
+
+        // Add context instruction based on document search setting
+        var contextInstruction = useDocumentSearch
+            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
+            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
+        promptBuilder.AppendLine(contextInstruction);
+
+        if (useDocumentSearch && documentsAvailable && searchResults.Length > 0)
+        {
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
+            
+            // Add each document with its source information
+            foreach (var result in searchResults)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.AppendLine(FormatDocumentSource(result, responseLanguage));
+                promptBuilder.AppendLine($"- {result.Content}");
+            }
+            
+            // Add summary of sources used
+            if (searchResults.Length > 1)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.Append(FormatSourcesSummary(searchResults, responseLanguage));
+            }
+
+            // Reinforce language instruction after context
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine($"REMINDER: {languageInstruction}");
+        }
+        else if (!useDocumentSearch)
+        {
+            promptBuilder.AppendLine();
+            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", responseLanguage)
+                ?? "Note: Document search is disabled for this conversation.";
+            promptBuilder.AppendLine($"=== UWAGA ===");
+            promptBuilder.AppendLine(noSearchNote);
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage));
+        }
+        else
+        {
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest", responseLanguage));
+        }
+
+        // Add recent conversation history
+        var recentMessages = conversationHistory.TakeLast(5).ToArray();
+        if (recentMessages.Length > 1)
+        {
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage));
+            foreach (var msg in recentMessages.SkipLast(1))
+            {
+                var roleLabel = msg.Role == "user"
+                    ? _languageService.GetLocalizedString("ui_labels", "user", responseLanguage)
+                    : _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
+                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
+            }
+        }
+
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage));
+        var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
+        promptBuilder.AppendLine($"{userLabel} ({detectedLanguage}): {userMessage}");
+        promptBuilder.AppendLine();
+
+        // FINAL CRITICAL REMINDER before response
+        promptBuilder.AppendLine($"CRITICAL: {languageInstruction}");
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
+
+        return promptBuilder.ToString();
     }
 }

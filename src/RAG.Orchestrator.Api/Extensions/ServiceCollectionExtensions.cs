@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Abstractions.Search;
@@ -9,6 +10,7 @@ using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Models.Configuration;
 using Elasticsearch.Net;
 
 namespace RAG.Orchestrator.Api.Extensions;
@@ -84,6 +86,14 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
 
+        // Configure LLM endpoint configuration  
+        services.AddOptions<LlmEndpointConfig>()
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                configuration.GetSection(LlmEndpointConfig.SectionName).Bind(options);
+                options.Validate(); // Validate on configuration binding
+            });
+
         // Configure Elasticsearch Options
         services.Configure<ElasticsearchOptions>(options =>
         {
@@ -107,10 +117,12 @@ public static class ServiceCollectionExtensions
             return new ElasticLowLevelClient(settings);
         });
 
-        // Add HttpClient for LLM service (used by HealthAggregator) with SHORT timeout for health checks
-        services.AddHttpClient<ILlmService, LlmService>(client =>
+        // Add HttpClient for LLM service with configuration from LlmEndpointConfig
+        services.AddHttpClient<ILlmService, LlmService>((serviceProvider, client) =>
         {
-            client.Timeout = TimeSpan.FromSeconds(30); // Short timeout for health operations
+            var config = serviceProvider.GetRequiredService<IOptions<LlmEndpointConfig>>().Value;
+            client.BaseAddress = new Uri(config.Url);
+            client.Timeout = TimeSpan.FromMinutes(config.TimeoutMinutes);
         });
 
         // Add HttpClient for SearchService with reasonable timeout
