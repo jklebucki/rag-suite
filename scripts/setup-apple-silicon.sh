@@ -103,7 +103,7 @@ check_services_health() {
     fi
     
     # Check Embedding Service
-    if curl -s http://localhost:8580/health > /dev/null; then
+    if curl -s http://192.168.21.14:8580/health > /dev/null; then
         print_success "Embedding Service is healthy"
     else
         print_warning "Embedding Service may not be ready yet"
@@ -144,7 +144,7 @@ main() {
         echo "  • Elasticsearch: http://localhost:9200"
         echo "  • Kibana: http://localhost:5601"
         echo "  • Ollama (LLM): http://localhost:11434"
-        echo "  • Embedding Service: http://localhost:8580"
+        echo "  • Embedding Service: http://192.168.21.14:8580"
         echo
         echo "Next steps:"
         echo "  1. Update ChatService.cs to use Ollama API"

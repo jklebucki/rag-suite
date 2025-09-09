@@ -143,7 +143,7 @@ show_status() {
     fi
     
     # Embedding Service
-    if curl -s http://localhost:8580/health > /dev/null 2>&1; then
+    if curl -s http://192.168.21.14:8580/health > /dev/null 2>&1; then
         echo -e "  Embedding Service: ${GREEN}✓ Healthy${NC}"
     else
         echo -e "  Embedding Service: ${YELLOW}⚠ Not ready${NC}"
@@ -167,7 +167,7 @@ show_status() {
     echo "Access URLs:"
     echo "  • Elasticsearch: http://localhost:9200"
     echo "  • Kibana: http://localhost:5601"
-    echo "  • Embedding Service: http://localhost:8580"
+    echo "  • Embedding Service: http://192.168.21.14:8580"
     echo "  • LLM Service: http://localhost:8581"
     echo "  • Orchestrator API: http://localhost:7107"
     echo "  • Web UI: http://localhost:5173 (if running)"

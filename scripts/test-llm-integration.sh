@@ -43,7 +43,7 @@ test_services() {
     
     # Test Embedding Service
     print_status "Testing Embedding Service..."
-    if curl -s http://localhost:8580/health > /dev/null; then
+    if curl -s http://192.168.21.14:8580/health > /dev/null; then
         print_success "Embedding Service is responding"
     else
         print_warning "Embedding Service may not be ready"

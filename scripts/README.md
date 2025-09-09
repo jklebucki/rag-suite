@@ -167,7 +167,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ### Health Checks
 - `GET /health` - Status API
 - `http://localhost:9200/_cluster/health` - Elasticsearch
-- `http://localhost:8580/health` - Embedding Service
+- `http://192.168.21.14:8580/health` - Embedding Service
 - `http://localhost:8581/health` - LLM Service
 
 ## 🌐 Dostęp do usług
@@ -180,7 +180,7 @@ docker-compose -f docker-compose.prod.yml up -d
 | Elasticsearch | http://localhost:9200 | elastic / elastic |
 | Kibana | http://localhost:5601 | elastic / elastic |
 | LLM Service | http://localhost:8581 | - |
-| Embedding Service | http://localhost:8580 | - |
+| Embedding Service | http://192.168.21.14:8580 | - |
 
 ## 🧪 Testowanie
 

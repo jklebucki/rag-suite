@@ -255,7 +255,7 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
       "TimeoutMinutes": 10
     },
     "EmbeddingService": {
-      "Url": "http://localhost:8580"
+      "Url": "http://192.168.21.14:8580"
     },
     "LlmService": {
       "Url": "http://192.168.21.14:11434",

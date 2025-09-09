@@ -134,7 +134,7 @@ function Test-ServicesHealth {
         @{ Name = "Elasticsearch"; Url = "http://localhost:9200"; Auth = "elastic:elastic" },
         @{ Name = "Kibana"; Url = "http://localhost:5601" },
         @{ Name = "Ollama"; Url = "http://localhost:11434/api/tags" },
-        @{ Name = "Embedding Service"; Url = "http://localhost:8580/health" }
+        @{ Name = "Embedding Service"; Url = "http://192.168.21.14:8580/health" }
     )
     
     foreach ($service in $services) {
@@ -254,7 +254,7 @@ function Show-Help {
     Write-Host "  • Elasticsearch: http://localhost:9200 (elastic/elastic)"
     Write-Host "  • Kibana: http://localhost:5601"
     Write-Host "  • Ollama (LLM): http://localhost:11434"
-    Write-Host "  • Embedding Service: http://localhost:8580"
+    Write-Host "  • Embedding Service: http://192.168.21.14:8580"
     Write-Host ""
 }
 

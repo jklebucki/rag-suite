@@ -96,7 +96,7 @@ Aplikacja została skonfigurowana z następującymi ustawieniami:
       "Password": "elastic"
     },
     "EmbeddingService": {
-      "Url": "http://localhost:8580"
+      "Url": "http://192.168.21.14:8580"
     },
     "LlmService": {
       "Url": "http://localhost:8581",

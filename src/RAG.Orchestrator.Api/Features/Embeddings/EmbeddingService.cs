@@ -11,7 +11,7 @@ public class EmbeddingService : IEmbeddingService
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmbeddingService> _logger;
 
-    public int EmbeddingDimension => 768; // all-MiniLM-L6-v2 embedding dimension
+    public int EmbeddingDimension => 768; 
 
     public EmbeddingService(
         HttpClient httpClient,
@@ -22,7 +22,7 @@ public class EmbeddingService : IEmbeddingService
         _configuration = configuration;
         _logger = logger;
 
-        var embeddingServiceUrl = _configuration["Services:EmbeddingService:Url"] ?? "http://localhost:8580";
+        var embeddingServiceUrl = _configuration["Services:EmbeddingService:Url"] ?? "http://192.168.21.14:8580";
         _httpClient.BaseAddress = new Uri(embeddingServiceUrl);
         _httpClient.Timeout = TimeSpan.FromMinutes(2);
     }

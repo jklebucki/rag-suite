@@ -74,7 +74,7 @@ public class CollectorOptions
     /// </summary>
     [Required]
     [Url(ErrorMessage = "Embedding service URL must be a valid URL")]
-    public string EmbeddingServiceUrl { get; set; } = "http://localhost:8580";
+    public string EmbeddingServiceUrl { get; set; } = "http://192.168.21.14:8580";
 
     /// <summary>
     /// Embedding model name

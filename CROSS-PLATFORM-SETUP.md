@@ -87,7 +87,7 @@ docker-compose -f docker-compose.cross-platform.yml up -d
 # Check if services are ready
 curl http://localhost:9200  # Elasticsearch
 curl http://localhost:11434/api/tags  # Ollama
-curl http://localhost:8580/health  # Embedding Service
+curl http://192.168.21.14:8580/health  # Embedding Service
 ```
 
 #### 3. Create Data Directory
@@ -127,7 +127,7 @@ Once setup is complete, services will be available at:
 - **Elasticsearch**: http://localhost:9200 (elastic/elastic)
 - **Kibana**: http://localhost:5601
 - **Ollama (LLM)**: http://localhost:11434
-- **Embedding Service**: http://localhost:8580
+- **Embedding Service**: http://192.168.21.14:8580
 
 ## Configuration
 

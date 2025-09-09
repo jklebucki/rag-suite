@@ -29,7 +29,7 @@ echo "5. Sprawdzanie statusu serwisu..."
 sleep 10
 
 # Sprawdź czy serwis jest dostępny
-if curl -f http://localhost:8580/health >/dev/null 2>&1; then
+if curl -f http://192.168.21.14:8580/health >/dev/null 2>&1; then
     echo "✅ Serwis embedding działa poprawnie"
 else
     echo "❌ Serwis embedding nie odpowiada"
@@ -39,7 +39,7 @@ fi
 
 echo "6. Sprawdzanie nowej konfiguracji..."
 echo "Aktualna konfiguracja serwisu:"
-curl -s http://localhost:8580/info | jq '.'
+curl -s http://192.168.21.14:8580/info | jq '.'
 
 echo ""
 echo "✅ Reinstalacja zakończona pomyślnie!"

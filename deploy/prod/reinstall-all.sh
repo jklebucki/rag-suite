@@ -38,10 +38,10 @@ fi
 
 # Sprawdź embedding service
 echo "Sprawdzanie serwisu embedding..."
-if curl -f http://localhost:8580/health >/dev/null 2>&1; then
+if curl -f http://192.168.21.14:8580/health >/dev/null 2>&1; then
     echo "✅ Serwis embedding działa poprawnie"
     echo "Nowa konfiguracja:"
-    curl -s http://localhost:8580/info | jq '.max_input_length, .auto_truncate'
+    curl -s http://192.168.21.14:8580/info | jq '.max_input_length, .auto_truncate'
 else
     echo "❌ Serwis embedding nie odpowiada"
 fi
