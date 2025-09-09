@@ -18,18 +18,18 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
   const lastModified = document.metadata?.last_modified || ''
   const indexedAt = document.metadata?.indexed_at || ''
   const filePath = document.filePath || document.metadata?.file_path || document.metadata?.source_file || ''
-  
+
   // Chunk information
-  const chunksFound = document.metadata?.chunksFound
-  const totalChunks = document.metadata?.totalChunks
-  const isReconstructed = document.metadata?.reconstructed
+  const chunksFound = document.metadata?.chunksFound || document.metadata?.chunk_count
+  const totalChunks = document.metadata?.totalChunks || document.metadata?.total_chunks
+  const isReconstructed = document.metadata?.reconstructed || (chunksFound && totalChunks && chunksFound === totalChunks)
   const elasticsearchIndex = document.metadata?.index
 
   const formatBytes = (bytes: string | number) => {
     if (!bytes || bytes === 'Unknown') return 'Unknown'
     const num = typeof bytes === 'string' ? parseInt(bytes) : bytes
     if (isNaN(num)) return 'Unknown'
-    
+
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     if (num === 0) return '0 Bytes'
     const i = Math.floor(Math.log(num) / Math.log(1024))
@@ -68,10 +68,6 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
         </div>
         <h1 className="text-xl font-bold text-gray-900">{document.title || document.fileName}</h1>
         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
-          <span className="flex items-center">
-            <Tag className="h-4 w-4 mr-1" />
-            Score: {formatScore(document.score)}%
-          </span>
           {elasticsearchIndex && (
             <span className="flex items-center">
               <Database className="h-4 w-4 mr-1" />
@@ -118,12 +114,6 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
                 </span>
               </div>
             </>
-          )}
-          {elasticsearchIndex && (
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Search Index:</span>
-              <span className="text-gray-600 font-mono text-xs">{elasticsearchIndex}</span>
-            </div>
           )}
           <div className="flex justify-between">
             <span className="font-medium text-gray-700">Last Modified:</span>

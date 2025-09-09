@@ -357,7 +357,11 @@ public class SearchService : ISearchService
                 { "file_path", filePath },
                 { "file_extension", fileType },
                 { "chunk_count", allChunks.Count },
-                { "total_chunks", firstChunk.TotalChunks }
+                { "total_chunks", firstChunk.TotalChunks },
+                // Add frontend-compatible field names
+                { "chunksFound", allChunks.Count },
+                { "totalChunks", firstChunk.TotalChunks },
+                { "reconstructed", true } // Since this method always reconstructs from chunks
             };
 
             // Add file size and timestamps if available
@@ -1024,7 +1028,11 @@ public class SearchService : ISearchService
             { "document_id", id },
             { "source_file", sourceFile },
             { "file_path", sourceFile },
-            { "file_extension", category }
+            { "file_extension", category },
+            // Single chunk - not reconstructed
+            { "chunksFound", 1 },
+            { "totalChunks", 1 },
+            { "reconstructed", false }
         };
 
         // Add all source fields to metadata

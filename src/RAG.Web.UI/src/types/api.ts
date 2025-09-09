@@ -59,7 +59,17 @@ export interface SearchResultMetadata {
   totalChunks?: number
   reconstructed?: boolean
   highlights?: string
+  // Backend compatibility fields
+  chunk_count?: number
+  total_chunks?: number
   // Additional metadata fields
+  file_size?: string | number
+  last_modified?: string
+  indexed_at?: string
+  file_path?: string
+  source_file?: string
+  file_extension?: string
+  document_id?: string
   [key: string]: any
 }
 
