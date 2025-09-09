@@ -12,7 +12,8 @@
     "content": "Content",
     "source": "Source",
     "translation_note": "Note: Response was translated from {0} to {1}",
-    "no_document_search_note": "Note: Document search is disabled for this conversation."
+    "no_document_search_note": "Note: Document search is disabled for this conversation.",
+    "reconstructed_from_chunks": "[reconstructed from {0} total chunks]"
   },
   "ui_labels": {
     "knowledge_base_context": "=== KNOWLEDGE BASE CONTEXT ===",

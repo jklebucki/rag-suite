@@ -12,7 +12,8 @@
     "content": "Conținut",
     "source": "Sursă",
     "translation_note": "Notă: Răspunsul a fost tradus din {0} în {1}",
-    "no_document_search_note": "Notă: Căutarea documentelor este dezactivată pentru această conversație."
+    "no_document_search_note": "Notă: Căutarea documentelor este dezactivată pentru această conversație.",
+    "reconstructed_from_chunks": "[reconstituit din {0} fragmente]"
   },
   "ui_labels": {
     "knowledge_base_context": "=== CONTEXT BAZĂ DE CUNOȘTINȚE ===",

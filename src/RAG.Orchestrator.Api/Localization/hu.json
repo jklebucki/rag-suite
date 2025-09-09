@@ -12,7 +12,8 @@
     "content": "Tartalom",
     "source": "Forrás",
     "translation_note": "Megjegyzés: A válasz lefordítva {0} nyelvről {1} nyelvre",
-    "no_document_search_note": "Megjegyzés: A dokumentumkeresés ki van kapcsolva ebben a beszélgetésben."
+    "no_document_search_note": "Megjegyzés: A dokumentumkeresés ki van kapcsolva ebben a beszélgetésben.",
+    "reconstructed_from_chunks": "[újraépítve {0} részletből]"
   },
   "ui_labels": {
     "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
