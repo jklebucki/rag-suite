@@ -125,6 +125,7 @@ export interface ChatRequest {
   message: string
   sessionId?: string
   useRag?: boolean
+  useDocumentSearch?: boolean
   context?: string[]
 }
 
@@ -135,6 +136,7 @@ export interface MultilingualChatRequest {
   language?: string
   responseLanguage?: string
   enableTranslation?: boolean
+  useDocumentSearch?: boolean
   metadata?: Record<string, any>
 }
 

@@ -22,6 +22,7 @@ export function ChatInterface() {
     lastMessageLanguage,
     translationStatus,
     documentsAvailable,
+    useDocumentSearch,
     sendMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
@@ -32,6 +33,7 @@ export function ChatInterface() {
     cancelDeleteSession,
     setMessage,
     setCurrentSessionId,
+    setUseDocumentSearch,
   } = useMultilingualChat()
 
   return (
@@ -142,6 +144,8 @@ export function ChatInterface() {
               onMessageChange={setMessage}
               onSendMessage={handleSendMessage}
               isSending={sendMessageMutation.isPending}
+              useDocumentSearch={useDocumentSearch}
+              onUseDocumentSearchChange={setUseDocumentSearch}
             />
           </>
         ) : (

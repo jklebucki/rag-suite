@@ -12,6 +12,7 @@ export function useMultilingualChat() {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const [lastResponse, setLastResponse] = useState<MultilingualChatResponse | null>(null)
   const [documentsAvailable, setDocumentsAvailable] = useState<boolean>(true)
+  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
@@ -152,6 +153,7 @@ export function useMultilingualChat() {
       language: currentLanguage,
       responseLanguage: currentLanguage,
       enableTranslation: true,
+      useDocumentSearch: useDocumentSearch,
       metadata: {
         uiLanguage: currentLanguage,
         timestamp: messageTimestamp.toISOString()
@@ -235,6 +237,7 @@ export function useMultilingualChat() {
     lastMessageLanguage: lastResponse?.detectedLanguage,
     translationStatus: lastResponse?.wasTranslated ? 'translated' : 'original',
     documentsAvailable,
+    useDocumentSearch,
 
     // Mutations for compatibility with ChatInterface
     sendMessageMutation: sendMultilingualMessageMutation,
@@ -249,6 +252,7 @@ export function useMultilingualChat() {
     confirmDeleteSession,
     cancelDeleteSession,
     handleKeyPress,
+    setUseDocumentSearch,
 
     // Loading states
     isCreatingSession: createSessionMutation.isPending,

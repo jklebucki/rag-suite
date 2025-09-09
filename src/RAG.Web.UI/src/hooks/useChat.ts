@@ -9,6 +9,7 @@ export function useChat() {
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
+  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
@@ -100,6 +101,7 @@ export function useChat() {
       request: {
         message: message.trim(),
         useRag: true,
+        useDocumentSearch: useDocumentSearch,
       },
     })
   }
@@ -149,6 +151,7 @@ export function useChat() {
     isTyping,
     messagesEndRef,
     sessionToDelete,
+    useDocumentSearch,
 
     // Data
     sessions,
@@ -167,5 +170,6 @@ export function useChat() {
     cancelDeleteSession,
     setMessage,
     setCurrentSessionId,
+    setUseDocumentSearch,
   }
 }

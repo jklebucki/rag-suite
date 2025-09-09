@@ -73,6 +73,7 @@ export const ro: TranslationKeys = {
   'chat.sources': 'Surse',
   'chat.sources.title': 'Surse ({0})',
   'chat.sources.summary': 'Afișează {0} documente sursă',
+  'chat.useDocumentSearch': 'Caută în documente',
 
   // Document database status
   'chat.documents_unavailable': 'Baza de date documentelor indisponibilă',

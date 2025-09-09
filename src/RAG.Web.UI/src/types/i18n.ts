@@ -90,6 +90,7 @@ export interface TranslationKeys {
   'chat.sources': string;
   'chat.sources.title': string;
   'chat.sources.summary': string;
+  'chat.useDocumentSearch': string;
 
   // Document database status
   'chat.documents_unavailable': string;

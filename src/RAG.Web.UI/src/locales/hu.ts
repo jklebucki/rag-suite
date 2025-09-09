@@ -73,6 +73,7 @@ export const hu: TranslationKeys = {
   'chat.sources': 'Források',
   'chat.sources.title': 'Források ({0})',
   'chat.sources.summary': '{0} forrásdokumentum megjelenítése',
+  'chat.useDocumentSearch': 'Dokumentumok keresése',
 
   // Document database status
   'chat.documents_unavailable': 'Dokumentum adatbázis nem elérhető',

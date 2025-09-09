@@ -73,6 +73,7 @@ export const en: TranslationKeys = {
   'chat.sources': 'Sources',
   'chat.sources.title': 'Sources ({0})',
   'chat.sources.summary': 'Showing {0} source documents',
+  'chat.useDocumentSearch': 'Search documents',
 
   // Document database status
   'chat.documents_unavailable': 'Document database unavailable',
