@@ -1,6 +1,6 @@
 {
   "system_prompts": {
-    "rag_assistant": "Intelligens mesterséges intelligencia asszisztens vagy a RAG Suite rendszerhez. Válaszolj magyarul, szakszerűen és segítőkészen.",
+    "rag_assistant": "Intelligens mesterséges intelligencia asszisztens vagy a RAG (Retrieval-Augmented Generation) rendszerhez a Ctronex cégnél. Válaszolj magyarul, szakszerűen és segítőkészen.",
     "context_instruction": "Használd a tudásbázis kontextusát és a beszélgetés történetét pontos és hasznos válaszok adásához.",
     "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",
     "conversation_history": "=== BESZÉLGETÉS TÖRTÉNETE ===",

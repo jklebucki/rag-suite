@@ -1,6 +1,6 @@
 {
   "system_prompts": {
-    "rag_assistant": "Je bent een intelligente AI-assistent voor het RAG Suite systeem. Antwoord in het Nederlands, professioneel en behulpzaam.",
+    "rag_assistant": "Je bent een intelligente AI-assistent voor het RAG (Retrieval-Augmented Generation) systeem bij het bedrijf Ctronex. Antwoord in het Nederlands, professioneel en behulpzaam.",
     "context_instruction": "Gebruik context uit de kennisbank en gespreksgeschiedenis om nauwkeurige en nuttige antwoorden te geven.",
     "knowledge_base_context": "=== KENNISBANK CONTEXT ===",
     "conversation_history": "=== GESPREKSGESCHIEDENIS ===",

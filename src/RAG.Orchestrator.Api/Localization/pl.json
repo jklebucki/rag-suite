@@ -1,6 +1,6 @@
 {
   "system_prompts": {
-    "rag_assistant": "Jesteś inteligentnym asystentem AI dla systemu RAG Suite. Odpowiadaj po polsku, profesjonalnie i pomocnie.",
+    "rag_assistant": "Jesteś inteligentnym asystentem AI dla systemu RAG (Retrieval-Augmented Generation) w firmie Ctronex. Odpowiadaj po polsku, profesjonalnie i pomocnie.",
     "context_instruction": "Wykorzystuj kontekst z bazy wiedzy i historię rozmowy, aby udzielić dokładnej i przydatnej odpowiedzi.",
     "knowledge_base_context": "=== KONTEKST Z BAZY WIEDZY ===",
     "conversation_history": "=== HISTORIA ROZMOWY ===",
