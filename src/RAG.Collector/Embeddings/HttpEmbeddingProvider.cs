@@ -28,7 +28,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
 
     public string ModelName => _options.EmbeddingModelName;
     public int MaxTokens => 512; // Safe default for most models
-    public int VectorDimensions => 384; // Common dimension for multilingual-e5-small
+    public int VectorDimensions => 768; // Common dimension for multilingual-e5-small
 
     public async Task<EmbeddingResult> GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken = default)
     {

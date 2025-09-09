@@ -11,7 +11,7 @@ public class EmbeddingService : IEmbeddingService
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmbeddingService> _logger;
 
-    public int EmbeddingDimension => 384; // all-MiniLM-L6-v2 embedding dimension
+    public int EmbeddingDimension => 768; // all-MiniLM-L6-v2 embedding dimension
 
     public EmbeddingService(
         HttpClient httpClient,
