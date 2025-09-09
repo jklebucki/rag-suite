@@ -1,0 +1,37 @@
+# docker-compose.yml (tylko embedding-service na GPU)
+services:
+  embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:1.8
+    container_name: embedding-service-srv
+    restart: unless-stopped
+    ports:
+      - "8580:80"
+    volumes:
+      - embedding-srv-data:/data
+    environment:
+      - MODEL_ID=Alibaba-NLP/gte-multilingual-base
+      # (opcjonalnie) szybciej i oszczędniej na VRAM:
+      - DTYPE=float16
+    command:
+      - --model-id
+      - "Alibaba-NLP/gte-multilingual-base"
+      - --auto-truncate
+      - --dtype
+      - "float16"
+    # Rezerwacja GPU w Compose (oficjalny sposób)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1          # lub "all"
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  embedding-srv-data:
