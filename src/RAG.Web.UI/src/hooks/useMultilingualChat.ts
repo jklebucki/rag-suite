@@ -40,20 +40,20 @@ export function useMultilingualChat() {
     onSuccess: (response) => {
       console.log('sendMultilingualMessage success:', response)
       setLastResponse(response)
-      
+
       // Check if documents are available from metadata
       if (response.metadata && response.metadata.documentsAvailable !== undefined) {
         setDocumentsAvailable(response.metadata.documentsAvailable as boolean)
       }
-      
+
       // Refresh the entire session to get the real messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
       setIsTyping(false)
-      
+
       // Show language detection info if available
       if (response.detectedLanguage !== currentLanguage) {
         showSuccess(
-          'Language detected', 
+          'Language detected',
           `Message detected as ${response.detectedLanguage}, responded in ${response.responseLanguage}`
         )
       }
@@ -82,11 +82,14 @@ export function useMultilingualChat() {
   // Delete session mutation (reuse existing endpoint)
   const deleteSessionMutation = useMutation({
     mutationFn: (sessionId: string) => apiClient.deleteChatSession(sessionId),
-    onSuccess: () => {
+    onSuccess: (_, deletedSessionId) => {
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setSessionToDelete(null)
-      if (currentSessionId === sessionToDelete) {
+      // Clear current session if it was the one that got deleted
+      if (currentSessionId === deletedSessionId) {
         setCurrentSessionId(null)
+        // Also clear the current session data from cache
+        queryClient.setQueryData(['chat-session', deletedSessionId], null)
       }
       showSuccess('Session deleted', 'Chat session has been deleted successfully')
     },
@@ -101,14 +104,14 @@ export function useMultilingualChat() {
     if (e) {
       e.preventDefault()
     }
-    
+
     console.log('handleSendMessage called', { message: message.trim(), currentSessionId, isTyping })
-    
+
     if (!message.trim()) {
       console.log('Message is empty, aborting')
       return
     }
-    
+
     if (!currentSessionId) {
       console.log('No current session, aborting')
       return
@@ -122,7 +125,7 @@ export function useMultilingualChat() {
 
     const userMessage = message.trim()
     const messageTimestamp = new Date()
-    
+
     // Create temporary user message to show immediately
     const tempUserMessage: ChatMessage = {
       id: `temp-${Date.now()}`,
@@ -143,7 +146,7 @@ export function useMultilingualChat() {
     console.log('Setting isTyping to true')
     setIsTyping(true)
     setMessage('') // Clear input immediately
-    
+
     const request: MultilingualChatRequest = {
       message: userMessage,
       language: currentLanguage,
@@ -202,6 +205,19 @@ export function useMultilingualChat() {
     }
   }, [sessions, currentSessionId])
 
+  // Clear current session if it no longer exists in the sessions list
+  useEffect(() => {
+    if (currentSessionId && sessions.length > 0) {
+      const sessionExists = sessions.some(session => session.id === currentSessionId)
+      if (!sessionExists) {
+        console.log('Current session no longer exists, clearing:', currentSessionId)
+        setCurrentSessionId(null)
+        // Clear the session data from cache
+        queryClient.setQueryData(['chat-session', currentSessionId], null)
+      }
+    }
+  }, [sessions, currentSessionId, queryClient])
+
   return {
     // State
     currentSessionId,
@@ -214,17 +230,17 @@ export function useMultilingualChat() {
     lastResponse,
     messagesEndRef,
     sessionToDelete,
-    
+
     // Multilingual specific data
     lastMessageLanguage: lastResponse?.detectedLanguage,
     translationStatus: lastResponse?.wasTranslated ? 'translated' : 'original',
     documentsAvailable,
-    
+
     // Mutations for compatibility with ChatInterface
     sendMessageMutation: sendMultilingualMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
-    
+
     // Actions
     handleSendMessage,
     handleCreateSession,
@@ -233,7 +249,7 @@ export function useMultilingualChat() {
     confirmDeleteSession,
     cancelDeleteSession,
     handleKeyPress,
-    
+
     // Loading states
     isCreatingSession: createSessionMutation.isPending,
     isDeletingSession: deleteSessionMutation.isPending,

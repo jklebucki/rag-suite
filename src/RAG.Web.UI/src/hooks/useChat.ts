@@ -60,10 +60,13 @@ export function useChat() {
   // Delete session mutation
   const deleteSessionMutation = useMutation({
     mutationFn: (sessionId: string) => apiClient.deleteChatSession(sessionId),
-    onSuccess: () => {
+    onSuccess: (_, deletedSessionId) => {
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
-      if (currentSessionId && deleteSessionMutation.variables === currentSessionId) {
+      // Clear current session if it was the one that got deleted
+      if (currentSessionId === deletedSessionId) {
         setCurrentSessionId(null)
+        // Also clear the current session data from cache
+        queryClient.setQueryData(['chat-session', deletedSessionId], null)
       }
       showSuccess('Chat session deleted', 'Conversation has been removed successfully')
     },
@@ -126,6 +129,19 @@ export function useChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentSession?.messages])
 
+  // Clear current session if it no longer exists in the sessions list
+  useEffect(() => {
+    if (currentSessionId && sessions.length > 0) {
+      const sessionExists = sessions.some(session => session.id === currentSessionId)
+      if (!sessionExists) {
+        console.log('Current session no longer exists, clearing:', currentSessionId)
+        setCurrentSessionId(null)
+        // Clear the session data from cache
+        queryClient.setQueryData(['chat-session', currentSessionId], null)
+      }
+    }
+  }, [sessions, currentSessionId, queryClient])
+
   return {
     // State
     currentSessionId,
@@ -133,16 +149,16 @@ export function useChat() {
     isTyping,
     messagesEndRef,
     sessionToDelete,
-    
+
     // Data
     sessions,
     currentSession,
-    
+
     // Mutations
     sendMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
-    
+
     // Handlers
     handleSendMessage,
     handleNewSession,
