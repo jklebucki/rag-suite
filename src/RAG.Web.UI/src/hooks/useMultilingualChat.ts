@@ -12,7 +12,7 @@ export function useMultilingualChat() {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const [lastResponse, setLastResponse] = useState<MultilingualChatResponse | null>(null)
   const [documentsAvailable, setDocumentsAvailable] = useState<boolean>(true)
-  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(true)
+  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()

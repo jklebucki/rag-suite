@@ -9,7 +9,7 @@ export function useChat() {
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
-  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(true)
+  const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
