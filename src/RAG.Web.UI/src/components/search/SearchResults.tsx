@@ -25,7 +25,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
 
   console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
-  
+
   const renderError = (err: unknown) => {
     if (!err) return null
     return (
@@ -34,7 +34,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       </div>
     )
   }
-  
+
   if (isLoading && hasSearched) {
     return (
       <div className="text-center py-8">
@@ -90,9 +90,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 
       <div className="divide-y divide-gray-200">
         {searchResults.results.map((result) => (
-          <SearchResultItem 
-            key={result.id} 
-            result={result} 
+          <SearchResultItem
+            key={result.id}
+            result={result}
             onViewDetails={() => setSelectedDocumentId(result.id)}
             language={language}
           />
@@ -107,8 +107,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       )}
 
       {/* Document Detail Modal */}
-      <Modal 
-        isOpen={!!selectedDocumentId} 
+      <Modal
+        isOpen={!!selectedDocumentId}
         onClose={() => setSelectedDocumentId(null)}
         title="Document Details"
         size="xl"
@@ -119,9 +119,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
             <p className="mt-4 text-gray-600">Loading document details...</p>
           </div>
         )}
-        
+
         {renderError(detailError)}
-        
+
         {documentDetail && (
           <DocumentDetail document={documentDetail} />
         )}
@@ -141,7 +141,7 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
 
   // Check if document was reconstructed from chunks
   const isReconstructed = result.metadata?.reconstructed
-  const chunksInfo = result.metadata?.chunksFound && result.metadata?.totalChunks 
+  const chunksInfo = result.metadata?.chunksFound && result.metadata?.totalChunks
     ? `${result.metadata.chunksFound}/${result.metadata.totalChunks} chunks`
     : null
 
@@ -183,10 +183,10 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
               {chunksInfo}
             </span>
           )}
-          <span>{result.filePath}</span>
+          {/* <span>{result.filePath}</span> */}
           <span>{formatDate(result.updatedAt, language)}</span>
         </div>
-        <button 
+        <button
           onClick={onViewDetails}
           className="text-primary-600 hover:text-primary-700 font-medium"
         >
