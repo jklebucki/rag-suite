@@ -13,7 +13,12 @@
     "source": "Sursă",
     "translation_note": "Notă: Răspunsul a fost tradus din {0} în {1}",
     "no_document_search_note": "Notă: Căutarea documentelor este dezactivată pentru această conversație.",
-    "reconstructed_from_chunks": "[reconstituit din {0} fragmente]"
+    "reconstructed_from_chunks": "[reconstituit din {0} fragmente]",
+    "document_source_intro": "=== SURSE DOCUMENTE ===",
+    "document_source_format": "Sursă: {0}",
+    "multiple_sources_note": "Răspuns bazat pe {0} documente",
+    "source_reference": "Bazat pe documentul: {0}",
+    "sources_used_summary": "=== SURSE UTILIZATE ==="
   },
   "ui_labels": {
     "knowledge_base_context": "=== CONTEXT BAZĂ DE CUNOȘTINȚE ===",

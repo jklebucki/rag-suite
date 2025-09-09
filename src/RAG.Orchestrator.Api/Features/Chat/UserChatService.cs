@@ -217,10 +217,19 @@ public class UserChatService : IUserChatService
             _logger.LogDebug("Search results for prompt: {ResultCount} results", searchResults.Results.Length);
             foreach (var result in searchResults.Results)
             {
-                _logger.LogDebug("Search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}",
-                    result.Source, result.Content?.Length ?? 0,
+                var displayName = !string.IsNullOrEmpty(result.FileName) ? result.FileName : result.Source;
+                _logger.LogDebug("Search result - Source: {Source}, FileName: {FileName}, Content length: {ContentLength}, Content preview: {ContentPreview}",
+                    result.Source, displayName, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
+            
+            // Log sources being used
+            if (searchResults.Results.Length > 0 && request.UseDocumentSearch)
+            {
+                var sources = searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) ? r.FileName : r.Source).Distinct().ToArray();
+                _logger.LogInformation("Using documents as sources: {Sources}", string.Join(", ", sources));
+            }
+            
             _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
 
             // Get previous Ollama context from the last assistant message for token cache continuation
@@ -263,7 +272,14 @@ public class UserChatService : IUserChatService
                 Metadata = new Dictionary<string, object>
                 {
                     ["useDocumentSearch"] = request.UseDocumentSearch,
-                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0
+                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0,
+                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0 
+                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) 
+                            ? r.FileName 
+                            : !string.IsNullOrEmpty(r.FilePath) 
+                                ? Path.GetFileName(r.FilePath) 
+                                : r.Source ?? "Unknown").Distinct().ToArray()
+                        : new string[0]
                 },
                 OllamaContext = newOllamaContext  // Save Ollama context for future token cache usage
             };
@@ -424,10 +440,19 @@ public class UserChatService : IUserChatService
             _logger.LogDebug("Multilingual search results for prompt: {ResultCount} results", searchResults.Results.Length);
             foreach (var result in searchResults.Results)
             {
-                _logger.LogDebug("Multilingual search result - Source: {Source}, Content length: {ContentLength}, Content preview: {ContentPreview}",
-                    result.Source, result.Content?.Length ?? 0,
+                var displayName = !string.IsNullOrEmpty(result.FileName) ? result.FileName : result.Source;
+                _logger.LogDebug("Multilingual search result - Source: {Source}, FileName: {FileName}, Content length: {ContentLength}, Content preview: {ContentPreview}",
+                    result.Source, displayName, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
+            
+            // Log sources being used in multilingual context
+            if (searchResults.Results.Length > 0 && request.UseDocumentSearch)
+            {
+                var sources = searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) ? r.FileName : r.Source).Distinct().ToArray();
+                _logger.LogInformation("Using documents as sources for multilingual response: {Sources}", string.Join(", ", sources));
+            }
+            
             _logger.LogDebug("Final multilingual prompt length: {PromptLength} characters", prompt.Length);
 
             // Get previous Ollama context from the last assistant message for token cache continuation
@@ -471,7 +496,14 @@ public class UserChatService : IUserChatService
                 {
                     ["responseLanguage"] = normalizedResponseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length,
-                    ["useDocumentSearch"] = request.UseDocumentSearch
+                    ["useDocumentSearch"] = request.UseDocumentSearch,
+                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0 
+                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) 
+                            ? r.FileName 
+                            : !string.IsNullOrEmpty(r.FilePath) 
+                                ? Path.GetFileName(r.FilePath) 
+                                : r.Source ?? "Unknown").Distinct().ToArray()
+                        : new string[0]
                 },
                 OllamaContext = newOllamaContext  // Save Ollama context for future token cache usage
             };
@@ -567,9 +599,20 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
+            
+            // Add each document with its source information
             foreach (var result in searchResults)
             {
+                promptBuilder.AppendLine();
+                promptBuilder.AppendLine(FormatDocumentSource(result, language));
                 promptBuilder.AppendLine($"- {result.Content}");
+            }
+            
+            // Add summary of sources used
+            if (searchResults.Length > 1)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.Append(FormatSourcesSummary(searchResults, language));
             }
         }
         else if (!useDocumentSearch)
@@ -640,9 +683,20 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
+            
+            // Add each document with its source information
             foreach (var result in searchResults)
             {
+                promptBuilder.AppendLine();
+                promptBuilder.AppendLine(FormatDocumentSource(result, responseLanguage));
                 promptBuilder.AppendLine($"- {result.Content}");
+            }
+            
+            // Add summary of sources used
+            if (searchResults.Length > 1)
+            {
+                promptBuilder.AppendLine();
+                promptBuilder.Append(FormatSourcesSummary(searchResults, responseLanguage));
             }
 
             // Reinforce language instruction after context
@@ -691,5 +745,66 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
 
         return promptBuilder.ToString();
+    }
+
+    /// <summary>
+    /// Formats document source information for inclusion in prompts
+    /// </summary>
+    private string FormatDocumentSource(RAG.Abstractions.Search.SearchResult result, string language)
+    {
+        // Prefer FileName over FilePath for cleaner display
+        var displayName = !string.IsNullOrEmpty(result.FileName) 
+            ? result.FileName 
+            : !string.IsNullOrEmpty(result.FilePath) 
+                ? Path.GetFileName(result.FilePath) 
+                : result.Source ?? "Unknown Document";
+
+        // Check if document was reconstructed from chunks
+        var isReconstructed = result.Metadata?.ContainsKey("reconstructed") == true 
+            && result.Metadata["reconstructed"] is bool reconstructed 
+            && reconstructed;
+
+        var sourceInfo = displayName;
+        
+        if (isReconstructed && result.Metadata != null)
+        {
+            // Add chunk information for reconstructed documents
+            if (result.Metadata.TryGetValue("chunksFound", out var chunksFound) &&
+                result.Metadata.TryGetValue("totalChunks", out var totalChunks))
+            {
+                var reconstructedNote = _languageService.GetLocalizedString("system_prompts", "reconstructed_from_chunks", language);
+                sourceInfo += $" {string.Format(reconstructedNote, totalChunks)}";
+            }
+        }
+
+        return _languageService.GetLocalizedString("system_prompts", "document_source_format", language)
+            .Replace("{0}", sourceInfo);
+    }
+
+    /// <summary>
+    /// Creates a formatted list of all document sources used
+    /// </summary>
+    private string FormatSourcesSummary(RAG.Abstractions.Search.SearchResult[] searchResults, string language)
+    {
+        if (searchResults.Length == 0)
+            return string.Empty;
+
+        var sourceNames = searchResults
+            .Select(result => !string.IsNullOrEmpty(result.FileName) 
+                ? result.FileName 
+                : !string.IsNullOrEmpty(result.FilePath) 
+                    ? Path.GetFileName(result.FilePath) 
+                    : result.Source ?? "Unknown")
+            .Distinct()
+            .ToArray();
+
+        var summaryHeader = _languageService.GetLocalizedString("system_prompts", "sources_used_summary", language);
+        var multipleSourcesNote = _languageService.GetLocalizedString("system_prompts", "multiple_sources_note", language);
+        
+        var summary = new StringBuilder();
+        summary.AppendLine(summaryHeader);
+        summary.AppendLine(string.Format(multipleSourcesNote, sourceNames.Length) + ": " + string.Join(", ", sourceNames));
+        
+        return summary.ToString();
     }
 }

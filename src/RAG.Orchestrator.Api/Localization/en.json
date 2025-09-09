@@ -13,7 +13,12 @@
     "source": "Source",
     "translation_note": "Note: Response was translated from {0} to {1}",
     "no_document_search_note": "Note: Document search is disabled for this conversation.",
-    "reconstructed_from_chunks": "[reconstructed from {0} total chunks]"
+    "reconstructed_from_chunks": "[reconstructed from {0} total chunks]",
+    "document_source_intro": "=== DOCUMENT SOURCES ===",
+    "document_source_format": "Source: {0}",
+    "multiple_sources_note": "Response based on {0} documents",
+    "source_reference": "Based on document: {0}",
+    "sources_used_summary": "=== SOURCES USED ==="
   },
   "ui_labels": {
     "knowledge_base_context": "=== KNOWLEDGE BASE CONTEXT ===",

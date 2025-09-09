@@ -13,7 +13,12 @@
     "source": "Bron",
     "translation_note": "Opmerking: Antwoord werd vertaald van {0} naar {1}",
     "no_document_search_note": "Opmerking: Documenten zoeken is uitgeschakeld voor dit gesprek.",
-    "reconstructed_from_chunks": "[gereconstrueerd uit {0} fragmenten]"
+    "reconstructed_from_chunks": "[gereconstrueerd uit {0} fragmenten]",
+    "document_source_intro": "=== DOCUMENTBRONNEN ===",
+    "document_source_format": "Bron: {0}",
+    "multiple_sources_note": "Antwoord gebaseerd op {0} documenten",
+    "source_reference": "Gebaseerd op document: {0}",
+    "sources_used_summary": "=== GEBRUIKTE BRONNEN ==="
   },
   "ui_labels": {
     "knowledge_base_context": "=== KENNISBANK CONTEXT ===",

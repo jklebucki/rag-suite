@@ -13,7 +13,12 @@
     "source": "Forrás",
     "translation_note": "Megjegyzés: A válasz lefordítva {0} nyelvről {1} nyelvre",
     "no_document_search_note": "Megjegyzés: A dokumentumkeresés ki van kapcsolva ebben a beszélgetésben.",
-    "reconstructed_from_chunks": "[újraépítve {0} részletből]"
+    "reconstructed_from_chunks": "[újraépítve {0} részletből]",
+    "document_source_intro": "=== DOKUMENTUM FORRÁSOK ===",
+    "document_source_format": "Forrás: {0}",
+    "multiple_sources_note": "Válasz {0} dokumentum alapján",
+    "source_reference": "Dokumentum alapján: {0}",
+    "sources_used_summary": "=== FELHASZNÁLT FORRÁSOK ==="
   },
   "ui_labels": {
     "knowledge_base_context": "=== TUDÁSBÁZIS KONTEXTUS ===",

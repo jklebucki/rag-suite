@@ -13,7 +13,12 @@
     "source": "Źródło",
     "translation_note": "Nota: Odpowiedź została przetłumaczona z {0} na {1}",
     "no_document_search_note": "Nota: Wyszukiwanie dokumentów jest wyłączone w tej rozmowie.",
-    "reconstructed_from_chunks": "[zrekonstruowany z {0} fragmentów]"
+    "reconstructed_from_chunks": "[zrekonstruowany z {0} fragmentów]",
+    "document_source_intro": "=== ŹRÓDŁA DOKUMENTÓW ===",
+    "document_source_format": "Źródło: {0}",
+    "multiple_sources_note": "Odpowiedź oparta na {0} dokumentach",
+    "source_reference": "Na podstawie dokumentu: {0}",
+    "sources_used_summary": "=== UŻYTE ŹRÓDŁA ==="
   },
   "ui_labels": {
     "knowledge_base_context": "=== KONTEKST Z BAZY WIEDZY ===",
