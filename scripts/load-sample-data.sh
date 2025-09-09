@@ -42,7 +42,7 @@ curl -s -u $ES_USER:$ES_PASS -X PUT "$ES_HOST/$ES_INDEX" \
         },
         "embedding": {
           "type": "dense_vector",
-          "dims": 384
+          "dims": 768
         }
       }
     },

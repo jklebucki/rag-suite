@@ -263,7 +263,7 @@ public class ElasticsearchService : IElasticsearchService
                     embedding = new
                     {
                         type = "dense_vector",
-                        dims = 384, // For multilingual-e5-small
+                        dims = 768, // For multilingual-e5-small
                         index = true,
                         similarity = "cosine"
                     },
