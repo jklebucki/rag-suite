@@ -265,9 +265,6 @@ public class UserChatService : IUserChatService
 
             if (_llmConfig.IsOllama)
             {
-                // Use new Chat API with system message and conversation history
-                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
-
                 // Inject documents into user message if document search is enabled and results found
                 string enhancedUserMessage = request.Message;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
@@ -282,12 +279,15 @@ public class UserChatService : IUserChatService
                 // Check if this is the first user message in the session (excluding system messages)
                 var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
 
-                // Use new Chat API with system message in response language and conversation history
+                // Build message history (system message will be added by ChatService if needed)
+                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
+
+                // Use new Chat API with system message handled by ChatService
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
                     messageHistory,
                     enhancedUserMessage,
                     normalizedLanguage,
-                    includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
+                    includeSystemMessage: isFirstUserMessage, // Let ChatService handle system message
                     cancellationToken);
 
                 _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
@@ -501,9 +501,6 @@ public class UserChatService : IUserChatService
 
             if (_llmConfig.IsOllama)
             {
-                // Use new Chat API with system message and conversation history
-                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
-
                 // Inject documents into user message if document search is enabled and results found
                 string enhancedUserMessage = request.Message;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
@@ -518,12 +515,15 @@ public class UserChatService : IUserChatService
                 // Check if this is the first user message in the session (excluding system messages)
                 var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
 
-                // Use new Chat API with system message in response language and conversation history
+                // Build message history (system message will be added by ChatService if needed)
+                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
+
+                // Use new Chat API with system message handled by ChatService
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
                     messageHistory,
                     enhancedUserMessage,
                     normalizedResponseLanguage,
-                    includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
+                    includeSystemMessage: isFirstUserMessage, // Let ChatService handle system message
                     cancellationToken);
 
                 _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
