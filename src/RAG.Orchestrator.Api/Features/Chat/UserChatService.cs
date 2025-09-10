@@ -289,7 +289,6 @@ public class UserChatService : IUserChatService
                     messageHistory,
                     enhancedUserMessage,
                     normalizedLanguage,
-                    includeSystemMessage: isFirstUserMessage, // Let ChatService handle system message
                     cancellationToken);
 
                 _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
