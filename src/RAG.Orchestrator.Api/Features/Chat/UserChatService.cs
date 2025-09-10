@@ -514,8 +514,6 @@ public class UserChatService : IUserChatService
                         searchResults.Results.Length, enhancedUserMessage.Length);
                 }
 
-                // Check if this is the first user message in the session (excluding system messages)
-                var isFirstUserMessage = conversationHistory.Count() == 1;
 
                 // Build message history (system message will be added by ChatService if needed)
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
@@ -524,12 +522,10 @@ public class UserChatService : IUserChatService
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
                     messageHistory,
                     enhancedUserMessage,
-                    normalizedResponseLanguage,
-                    includeSystemMessage: isFirstUserMessage, // Let ChatService handle system message
+                    normalizedResponseLanguage, // Let ChatService handle system message
                     cancellationToken);
 
-                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
-                    messageHistory.Count(), isFirstUserMessage);
+                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages",messageHistory.Count());
 
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;

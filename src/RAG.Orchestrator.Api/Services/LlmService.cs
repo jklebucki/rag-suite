@@ -248,14 +248,7 @@ public class LlmService : ILlmService
         }
     }
 
-    // New methods for /api/chat endpoint support
-
-    public async Task<string> ChatAsync(string userMessage, string language = "en", CancellationToken cancellationToken = default)
-    {
-        return await ChatWithHistoryAsync(Array.Empty<LlmChatMessage>(), userMessage, language, includeSystemMessage: true, cancellationToken);
-    }
-
-    public async Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", bool includeSystemMessage = false, CancellationToken cancellationToken = default)
+    public async Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", CancellationToken cancellationToken = default)
     {
         try
         {
@@ -274,14 +267,12 @@ public class LlmService : ILlmService
             var messages = new List<LlmChatMessage>();
 
             // Add system message as first message if needed
-            if (includeSystemMessage)
+
+            var systemMessage = await GetSystemMessageAsync(language, cancellationToken);
+            if (!string.IsNullOrEmpty(systemMessage))
             {
-                var systemMessage = await GetSystemMessageAsync(language, cancellationToken);
-                if (!string.IsNullOrEmpty(systemMessage))
-                {
-                    messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
-                    _logger.LogDebug("Added system message as first message in chat history");
-                }
+                messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
+                _logger.LogDebug("Added system message as first message in chat history");
             }
 
             // Add conversation history
