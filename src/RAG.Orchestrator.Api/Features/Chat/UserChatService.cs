@@ -5,6 +5,8 @@ using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models.Configuration;
+using RAG.Orchestrator.Api.Services;
+using RAG.Orchestrator.Api.Models;
 using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
@@ -100,7 +102,7 @@ public class UserChatService : IUserChatService
         var normalizedLanguage = _languageService.NormalizeLanguage(language);
         var sessionTitle = request.Title ?? _languageService.GetLocalizedString("session_labels", "new_conversation", normalizedLanguage);
 
-        var dbSession = new Data.Models.ChatSession
+        var dbSession = new ChatSession
         {
             Id = sessionId,
             UserId = userId,
@@ -189,7 +191,7 @@ public class UserChatService : IUserChatService
             .ToListAsync(cancellationToken);
 
         // Add user message to database
-        var userDbMessage = new Data.Models.ChatMessage
+        var userDbMessage = new ChatMessage
         {
             Id = Guid.NewGuid().ToString(),
             SessionId = sessionId,
@@ -308,7 +310,7 @@ public class UserChatService : IUserChatService
             }
 
             // Save AI response to database
-            var aiDbMessage = new Data.Models.ChatMessage
+            var aiDbMessage = new ChatMessage
             {
                 Id = Guid.NewGuid().ToString(),
                 SessionId = sessionId,
@@ -353,7 +355,7 @@ public class UserChatService : IUserChatService
             _logger.LogError(ex, "Error generating AI response for user {UserId} session {SessionId}", userId, sessionId);
 
             // Save error message to database
-            var errorDbMessage = new Data.Models.ChatMessage
+            var errorDbMessage = new ChatMessage
             {
                 Id = Guid.NewGuid().ToString(),
                 SessionId = sessionId,
@@ -424,7 +426,7 @@ public class UserChatService : IUserChatService
             .ToListAsync(cancellationToken);
 
         // Add user message to database
-        var userDbMessage = new Data.Models.ChatMessage
+        var userDbMessage = new ChatMessage
         {
             Id = Guid.NewGuid().ToString(),
             SessionId = sessionId,
@@ -553,7 +555,7 @@ public class UserChatService : IUserChatService
             }
 
             // Save AI response to database
-            var aiDbMessage = new Data.Models.ChatMessage
+            var aiDbMessage = new ChatMessage
             {
                 Id = Guid.NewGuid().ToString(),
                 SessionId = sessionId,
@@ -605,7 +607,7 @@ public class UserChatService : IUserChatService
             _logger.LogError(ex, "Error generating multilingual AI response for user {UserId} session {SessionId}", userId, sessionId);
 
             // Save error message to database
-            var errorDbMessage = new Data.Models.ChatMessage
+            var errorDbMessage = new ChatMessage
             {
                 Id = Guid.NewGuid().ToString(),
                 SessionId = sessionId,

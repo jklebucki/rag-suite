@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using RAG.Orchestrator.Api.Data.Models;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Data;
 

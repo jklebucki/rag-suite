@@ -74,7 +74,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Map feature endpoints
-app.MapChatEndpoints();
+//app.MapChatEndpoints();
 app.MapUserChatEndpoints();
 app.MapSearchEndpoints();
 app.MapHealthEndpoints();

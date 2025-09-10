@@ -1,5 +1,6 @@
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Localization;
+using RAG.Orchestrator.Api.Models;
 using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Chat;

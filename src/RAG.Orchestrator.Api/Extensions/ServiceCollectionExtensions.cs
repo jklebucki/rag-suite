@@ -11,6 +11,7 @@ using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Models.Configuration;
+using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
@@ -132,7 +133,7 @@ public static class ServiceCollectionExtensions
 
         // Register feature services
         // ChatService now uses Kernel instead of ILlmService
-        services.AddScoped<IChatService, ChatService>();
+        //services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IUserChatService, UserChatService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();

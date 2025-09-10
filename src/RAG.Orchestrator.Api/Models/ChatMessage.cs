@@ -2,28 +2,7 @@ using RAG.Abstractions.Search;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-
-namespace RAG.Orchestrator.Api.Data.Models;
-
-public class ChatSession
-{
-    [Key]
-    public string Id { get; set; } = null!;
-
-    [Required]
-    public string UserId { get; set; } = null!;
-
-    [Required]
-    [MaxLength(500)]
-    public string Title { get; set; } = null!;
-
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-
-    // Navigation property
-    public virtual ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
-}
-
+namespace RAG.Orchestrator.Api.Models;
 public class ChatMessage
 {
     [Key]
