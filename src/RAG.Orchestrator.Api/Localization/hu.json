@@ -31,6 +31,9 @@
     "document": "Dokumentum",
     "content": "Tartalom",
     "source": "Forrás",
+    "type": "Típus",
+    "path": "Útvonal",
+    "score": "Pontszám",
     "translated_from": "Lefordítva {0} nyelvről {1} nyelvre"
   },
   "instructions": {

@@ -31,6 +31,9 @@
     "document": "Document",
     "content": "Inhoud",
     "source": "Bron",
+    "type": "Type",
+    "path": "Pad",
+    "score": "Score",
     "translated_from": "Vertaald van {0} naar {1}"
   },
   "instructions": {

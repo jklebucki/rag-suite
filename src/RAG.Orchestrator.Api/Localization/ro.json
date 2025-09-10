@@ -31,6 +31,9 @@
     "document": "Document",
     "content": "Conținut",
     "source": "Sursă",
+    "type": "Tip",
+    "path": "Cale",
+    "score": "Scor",
     "translated_from": "Tradus din {0} în {1}"
   },
   "instructions": {

@@ -67,6 +67,41 @@ public class UserChatService : IUserChatService
             .ToList();
     }
 
+    /// <summary>
+    /// Initializes a new chat session with system message for Ollama /api/chat
+    /// </summary>
+    private async Task InitializeSessionWithSystemMessageAsync(string sessionId, string language, CancellationToken cancellationToken)
+    {
+        if (!_llmConfig.IsOllama)
+            return;
+            
+        // Get system message from localized JSON
+        var systemMessage = await _llmService.GetSystemMessageAsync(language, cancellationToken);
+        
+        if (!string.IsNullOrEmpty(systemMessage))
+        {
+            // Save system message to database as first message
+            var systemDbMessage = new Data.Models.ChatMessage
+            {
+                Id = Guid.NewGuid().ToString(),
+                SessionId = sessionId,
+                Role = "system",
+                Content = systemMessage,
+                Timestamp = DateTime.UtcNow,
+                Metadata = new Dictionary<string, object>
+                {
+                    ["isSystemMessage"] = true,
+                    ["language"] = language
+                }
+            };
+            
+            _chatDbContext.ChatMessages.Add(systemDbMessage);
+            await _chatDbContext.SaveChangesAsync(cancellationToken);
+            
+            _logger.LogDebug("Initialized session {SessionId} with system message in language: {Language}", sessionId, language);
+        }
+    }
+
     public async Task<UserChatSession[]> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default)
     {
         var dbSessions = await _chatDbContext.ChatSessions
@@ -102,6 +137,9 @@ public class UserChatService : IUserChatService
 
         _chatDbContext.ChatSessions.Add(dbSession);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
+
+        // Initialize with system message for Ollama
+        await InitializeSessionWithSystemMessageAsync(sessionId, normalizedLanguage, cancellationToken);
 
         return new UserChatSession(
             dbSession.Id,
@@ -256,15 +294,30 @@ public class UserChatService : IUserChatService
                 // Use new Chat API with system message and conversation history
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
                 
+                // Inject documents into user message if document search is enabled and results found
+                string enhancedUserMessage = request.Message;
+                if (request.UseDocumentSearch && searchResults.Results.Length > 0)
+                {
+                    var documentsContext = BuildDocumentsContext(searchResults.Results, normalizedLanguage);
+                    enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
+                    
+                    _logger.LogDebug("Enhanced user message with {DocumentCount} documents, total length: {MessageLength}", 
+                        searchResults.Results.Length, enhancedUserMessage.Length);
+                }
+                
+                // Check if this is the first user message in the session (excluding system messages)
+                var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
+                
                 // Use new Chat API with system message in response language and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
                     messageHistory, 
-                    request.Message, 
+                    enhancedUserMessage, 
                     normalizedLanguage, 
+                    includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
                     cancellationToken);
                     
-                _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
-                    messageHistory.Count(), normalizedLanguage);
+                _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}", 
+                    messageHistory.Count(), isFirstUserMessage);
                 
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;
@@ -477,15 +530,30 @@ public class UserChatService : IUserChatService
                 // Use new Chat API with system message and conversation history
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
                 
+                // Inject documents into user message if document search is enabled and results found
+                string enhancedUserMessage = request.Message;
+                if (request.UseDocumentSearch && searchResults.Results.Length > 0)
+                {
+                    var documentsContext = BuildDocumentsContext(searchResults.Results, normalizedResponseLanguage);
+                    enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
+                    
+                    _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}", 
+                        searchResults.Results.Length, enhancedUserMessage.Length);
+                }
+                
+                // Check if this is the first user message in the session (excluding system messages)
+                var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
+                
                 // Use new Chat API with system message in response language and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
                     messageHistory, 
-                    request.Message, 
+                    enhancedUserMessage, 
                     normalizedResponseLanguage, 
+                    includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
                     cancellationToken);
                     
-                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
-                    messageHistory.Count(), normalizedResponseLanguage);
+                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}", 
+                    messageHistory.Count(), isFirstUserMessage);
                 
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;
@@ -1011,5 +1079,105 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", responseLanguage));
 
         return promptBuilder.ToString();
+    }
+
+    /// <summary>
+    /// Build documents context for injection into user message with multilingual support
+    /// </summary>
+    private string BuildDocumentsContext(RAG.Abstractions.Search.SearchResult[] searchResults, string language = "en")
+    {
+        if (searchResults.Length == 0)
+            return string.Empty;
+
+        var contextBuilder = new StringBuilder();
+        
+        // Add language instruction if multilingual
+        if (!string.IsNullOrEmpty(language) && language != "en")
+        {
+            var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", language);
+            contextBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
+            contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
+            contextBuilder.AppendLine();
+        }
+        
+        // Add context header using localization
+        var contextHeader = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language)
+            ?? "=== KNOWLEDGE BASE CONTEXT ===";
+        contextBuilder.AppendLine(contextHeader);
+        contextBuilder.AppendLine();
+        
+        foreach (var result in searchResults)
+        {
+            // Use FormatDocumentSource for consistent formatting
+            contextBuilder.AppendLine(FormatDocumentSource(result, language));
+            
+            // Add document type and file path information
+            var documentLabel = _languageService.GetLocalizedString("ui_labels", "document", language) ?? "Document";
+            var typeLabel = _languageService.GetLocalizedString("ui_labels", "type", language) ?? "Type";
+            var pathLabel = _languageService.GetLocalizedString("ui_labels", "path", language) ?? "Path";
+            
+            contextBuilder.AppendLine($"{documentLabel}: {result.DocumentType}");
+            if (!string.IsNullOrEmpty(result.FilePath))
+            {
+                contextBuilder.AppendLine($"{pathLabel}: {result.FilePath}");
+            }
+            
+            // Add score information if available
+            if (result.Metadata.TryGetValue("score", out var scoreObj) && scoreObj is double score)
+            {
+                var scoreLabel = _languageService.GetLocalizedString("ui_labels", "score", language) ?? "Score";
+                contextBuilder.AppendLine($"{scoreLabel}: {score:F2}");
+            }
+            
+            // Add content with highlights if available
+            if (result.Metadata.TryGetValue("highlights", out var highlightsObj) && highlightsObj is string highlights)
+            {
+                contextBuilder.AppendLine($"- {highlights}");
+            }
+            else
+            {
+                contextBuilder.AppendLine($"- {result.Content}");
+            }
+            
+            // Add reconstruction info if applicable
+            if (result.Metadata.TryGetValue("reconstructed", out var reconstructedObj) && 
+                reconstructedObj is bool reconstructed && reconstructed)
+            {
+                if (result.Metadata.TryGetValue("chunksFound", out var chunksFoundObj) && 
+                    result.Metadata.TryGetValue("totalChunks", out var totalChunksObj))
+                {
+                    var chunksFound = chunksFoundObj is int cf ? cf : 0;
+                    var totalChunks = totalChunksObj is int tc ? tc : 0;
+                    var reconstructionNote = _languageService.GetLocalizedString("system_prompts", "reconstructed_from_chunks", language);
+                    if (!string.IsNullOrEmpty(reconstructionNote))
+                    {
+                        contextBuilder.AppendLine(string.Format(reconstructionNote, totalChunks));
+                    }
+                }
+            }
+            
+            contextBuilder.AppendLine();
+        }
+        
+        // Add summary of sources used if multiple
+        if (searchResults.Length > 1)
+        {
+            contextBuilder.Append(FormatSourcesSummary(searchResults, language));
+            contextBuilder.AppendLine();
+            
+            // Add honesty instruction
+            var beHonestInstruction = _languageService.GetLocalizedString("instructions", "be_honest", language);
+            if (!string.IsNullOrEmpty(beHonestInstruction))
+            {
+                contextBuilder.AppendLine($"REMINDER: {beHonestInstruction}");
+            }
+        }
+        
+        // Add context footer using localization
+        var contextFooter = _languageService.GetLocalizedString("system_prompts", "document_source_intro", language)
+            ?? "=== END OF KNOWLEDGE BASE CONTEXT ===";
+        contextBuilder.AppendLine(contextFooter);
+        
+        return contextBuilder.ToString();
     }
 }

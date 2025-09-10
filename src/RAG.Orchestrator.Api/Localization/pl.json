@@ -31,6 +31,9 @@
     "document": "Dokument",
     "content": "Treść",
     "source": "Źródło",
+    "type": "Typ",
+    "path": "Ścieżka",
+    "score": "Wynik",
     "translated_from": "Przetłumaczone z {0} na {1}"
   },
   "instructions": {
