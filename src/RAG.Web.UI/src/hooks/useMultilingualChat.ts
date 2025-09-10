@@ -68,7 +68,7 @@ export function useMultilingualChat() {
 
   // Create new session mutation (reuse existing endpoint)
   const createSessionMutation = useMutation({
-    mutationFn: (title?: string) => apiClient.createChatSession(title),
+    mutationFn: ({ title, language }: { title?: string; language?: string }) => apiClient.createChatSession(title, language),
     onSuccess: (newSession) => {
       console.log('Session created:', newSession)
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
@@ -165,11 +165,11 @@ export function useMultilingualChat() {
   }
 
   const handleCreateSession = async () => {
-    createSessionMutation.mutate(undefined)
+    createSessionMutation.mutate({ title: undefined, language: currentLanguage })
   }
 
   const handleNewSession = async () => {
-    createSessionMutation.mutate(undefined)
+    createSessionMutation.mutate({ title: undefined, language: currentLanguage })
   }
 
   const handleDeleteSession = (sessionId: string) => {

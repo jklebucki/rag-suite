@@ -136,8 +136,8 @@ class ApiClient {
     return response.data.data
   }
 
-  async createChatSession(title?: string): Promise<ChatSession> {
-    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.post('/user-chat/sessions', { title })
+  async createChatSession(title?: string, language?: string): Promise<ChatSession> {
+    const response: AxiosResponse<ApiResponse<ChatSession>> = await this.client.post('/user-chat/sessions', { title, language })
     return response.data.data
   }
 
