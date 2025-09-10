@@ -57,29 +57,7 @@ public static class UserChatEndpoints
         .WithSummary("Get a specific chat session for the current user")
         .WithDescription("Retrieve a chat session by its ID if it belongs to the authenticated user");
 
-        group.MapPost("/sessions/{sessionId}/messages", async (string sessionId, UserChatRequest request, ClaimsPrincipal user, IUserChatService chatService) =>
-        {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            try
-            {
-                var message = await chatService.SendUserMessageAsync(userId, sessionId, request);
-                return message.ToApiResponse();
-            }
-            catch (ArgumentException)
-            {
-                return ApiResponseExtensions.ToApiNotFoundResponse<UserChatMessage>("Session not found or access denied");
-            }
-        })
-        .WithName("SendUserMessage")
-        .WithSummary("Send a message in a user's chat session")
-        .WithDescription("Send a message to a chat session belonging to the authenticated user and receive an AI response. Use 'UseDocumentSearch' parameter to enable/disable document search in knowledge base.");
-
-        group.MapPost("/sessions/{sessionId}/messages/multilingual", async (string sessionId, Models.MultilingualChatRequest request, ClaimsPrincipal user, IUserChatService chatService) =>
+        group.MapPost("/sessions/{sessionId}/messages/multilingual", async (string sessionId, MultilingualChatRequest request, ClaimsPrincipal user, IUserChatService chatService) =>
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -94,7 +72,7 @@ public static class UserChatEndpoints
             }
             catch (ArgumentException)
             {
-                return ApiResponseExtensions.ToApiNotFoundResponse<Models.MultilingualChatResponse>("Session not found or access denied");
+                return ApiResponseExtensions.ToApiNotFoundResponse<MultilingualChatResponse>("Session not found or access denied");
             }
         })
         .WithName("SendUserMultilingualMessage")
