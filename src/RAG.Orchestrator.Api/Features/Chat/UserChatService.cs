@@ -291,6 +291,11 @@ public class UserChatService : IUserChatService
                     _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}",
                         searchResults.Results.Length, enhancedUserMessage.Length);
                 }
+                else if (!request.UseDocumentSearch)
+                {
+                    enhancedUserMessage = BuildMultilingualContextualPrompt(request.Message, normalizedResponseLanguage);
+                    _logger.LogWarning("No documents found for multilingual user message, but document search was requested");
+                }
 
 
                 // Build message history (system message will be added by ChatService if needed)
@@ -303,7 +308,7 @@ public class UserChatService : IUserChatService
                     normalizedResponseLanguage, // Let ChatService handle system message
                     cancellationToken);
 
-                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages",messageHistory.Count());
+                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages", messageHistory.Count());
 
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;
@@ -313,12 +318,7 @@ public class UserChatService : IUserChatService
                 // Fallback to Semantic Kernel for non-Ollama providers
                 var fallbackPrompt = BuildMultilingualContextualPrompt(
                     request.Message,
-                    searchResults.Results,
-                    conversationHistory,
-                    detectedLanguage ?? "unknown",
-                    normalizedResponseLanguage,
-                    request.UseDocumentSearch,
-                    searchResults.Results.Length > 0
+                    detectedLanguage = detectedLanguage ?? "en"
                 );
 
                 _logger.LogDebug("Final multilingual fallback prompt length: {PromptLength} characters", fallbackPrompt.Length);
@@ -423,86 +423,9 @@ public class UserChatService : IUserChatService
         return true;
     }
 
-    private string BuildContextualPrompt(string userMessage, SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en", bool useDocumentSearch = true)
-    {
-        var promptBuilder = new StringBuilder();
-
-        // Add system instruction using localization based on document search setting
-        var systemPrompt = useDocumentSearch
-            ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", language)
-            : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", language);
-
-        var contextInstruction = useDocumentSearch
-            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", language)
-            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", language);
-
-        promptBuilder.AppendLine(systemPrompt);
-        promptBuilder.AppendLine(contextInstruction);
-
-        // Add context from search results if available and enabled
-        if (useDocumentSearch && searchResults.Length > 0)
-        {
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
-
-            // Add each document with its source information
-            foreach (var result in searchResults)
-            {
-                promptBuilder.AppendLine();
-                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
-                promptBuilder.AppendLine($"- {result.Content}");
-            }
-
-            // Add summary of sources used
-            if (searchResults.Length > 1)
-            {
-                promptBuilder.AppendLine();
-                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, language));
-            }
-        }
-        else if (!useDocumentSearch)
-        {
-            promptBuilder.AppendLine();
-            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", language)
-                ?? "Note: Document search is disabled for this conversation.";
-            promptBuilder.AppendLine($"=== UWAGA ===");
-            promptBuilder.AppendLine(noSearchNote);
-        }
-
-        // Add recent conversation history (last 5 messages)
-        var recentMessages = conversationHistory.TakeLast(5).ToArray();
-        if (recentMessages.Length > 1) // More than just the current message
-        {
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
-            foreach (var msg in recentMessages.SkipLast(1)) // Skip the current message we're responding to
-            {
-                var roleLabel = msg.Role == "user"
-                    ? _languageService.GetLocalizedString("ui_labels", "user", language)
-                    : _languageService.GetLocalizedString("ui_labels", "assistant", language);
-                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
-            }
-        }
-
-        // Add current user message
-        promptBuilder.AppendLine();
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", language));
-        var userLabel = _languageService.GetLocalizedString("ui_labels", "user", language);
-        promptBuilder.AppendLine($"{userLabel}: {userMessage}");
-        promptBuilder.AppendLine();
-        promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
-
-        return promptBuilder.ToString();
-    }
-
     private string BuildMultilingualContextualPrompt(
         string userMessage,
-        SearchResult[] searchResults,
-        List<UserChatMessage> conversationHistory,
-        string detectedLanguage,
-        string responseLanguage,
-        bool useDocumentSearch = true,
-        bool documentsAvailable = true)
+        string responseLanguage)
     {
         var promptBuilder = new StringBuilder();
 
@@ -513,76 +436,29 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine();
 
         // Add system instruction with language information using localization based on document search setting
-        var systemPrompt = useDocumentSearch
-            ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage)
-            : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
+        var systemPrompt = _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
 
-        var contextInstruction = useDocumentSearch
-            ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
-            : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
+        var contextInstruction = _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
 
         promptBuilder.AppendLine(systemPrompt);
         promptBuilder.AppendLine(contextInstruction);
 
-        if (useDocumentSearch && documentsAvailable && searchResults.Length > 0)
-        {
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
 
-            // Add each document with its source information
-            foreach (var result in searchResults)
-            {
-                promptBuilder.AppendLine();
-                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, responseLanguage));
-                promptBuilder.AppendLine($"- {result.Content}");
-            }
+        promptBuilder.AppendLine();
+        var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", responseLanguage)
+            ?? "Note: Document search is disabled for this conversation.";
+        promptBuilder.AppendLine($"=== UWAGA ===");
+        promptBuilder.AppendLine(noSearchNote);
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage));
 
-            // Add summary of sources used
-            if (searchResults.Length > 1)
-            {
-                promptBuilder.AppendLine();
-                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, responseLanguage));
-            }
-
-            // Reinforce language instruction after context
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine($"REMINDER: {languageInstruction}");
-        }
-        else if (!useDocumentSearch)
-        {
-            promptBuilder.AppendLine();
-            var noSearchNote = _languageService.GetLocalizedString("system_prompts", "no_document_search_note", responseLanguage)
-                ?? "Note: Document search is disabled for this conversation.";
-            promptBuilder.AppendLine($"=== UWAGA ===");
-            promptBuilder.AppendLine(noSearchNote);
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage));
-        }
-        else
-        {
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest", responseLanguage));
-        }
-
-        // Add recent conversation history
-        var recentMessages = conversationHistory.TakeLast(5).ToArray();
-        if (recentMessages.Length > 1)
-        {
-            promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", responseLanguage));
-            foreach (var msg in recentMessages.SkipLast(1))
-            {
-                var roleLabel = msg.Role == "user"
-                    ? _languageService.GetLocalizedString("ui_labels", "user", responseLanguage)
-                    : _languageService.GetLocalizedString("ui_labels", "assistant", responseLanguage);
-                promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
-            }
-        }
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine(_languageService.GetLocalizedString("instructions", "be_honest", responseLanguage));
 
         promptBuilder.AppendLine();
         promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "current_question", responseLanguage));
         var userLabel = _languageService.GetLocalizedString("ui_labels", "user", responseLanguage);
-        promptBuilder.AppendLine($"{userLabel} ({detectedLanguage}): {userMessage}");
+        promptBuilder.AppendLine($"{userLabel} ({responseLanguage}): {userMessage}");
         promptBuilder.AppendLine();
 
         // FINAL CRITICAL REMINDER before response
@@ -782,14 +658,9 @@ public class UserChatService : IUserChatService
 
         var contextBuilder = new StringBuilder();
 
-        // Add language instruction if multilingual
-        if (!string.IsNullOrEmpty(language) && language != "en")
-        {
-            var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", language);
-            contextBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
-            contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
-            contextBuilder.AppendLine();
-        }
+        var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", language);
+        contextBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
+        contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
 
         // Add context header using localization
         var contextHeader = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language)
@@ -871,6 +742,8 @@ public class UserChatService : IUserChatService
         var contextFooter = _languageService.GetLocalizedString("system_prompts", "document_source_intro", language)
             ?? "=== END OF KNOWLEDGE BASE CONTEXT ===";
         contextBuilder.AppendLine(contextFooter);
+        contextBuilder.AppendLine($"CRITICAL: {languageInstruction}");
+        contextBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
 
         return contextBuilder.ToString();
     }
