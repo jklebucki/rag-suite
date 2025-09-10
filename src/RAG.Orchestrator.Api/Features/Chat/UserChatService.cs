@@ -218,10 +218,10 @@ public class UserChatService : IUserChatService
         try
         {
             // Search for relevant context only if document search is enabled
-            RAG.Abstractions.Search.SearchResponse searchResults;
+            SearchResponse searchResults;
             if (request.UseDocumentSearch)
             {
-                searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
+                searchResults = await _searchService.SearchAsync(new SearchRequest(
                     request.Message,
                     Filters: null,
                     Limit: 1,
@@ -231,7 +231,7 @@ public class UserChatService : IUserChatService
             else
             {
                 // Empty search results when document search is disabled
-                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+                searchResults = new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Message);
             }
 
             // Build context-aware prompt
@@ -458,10 +458,10 @@ public class UserChatService : IUserChatService
         try
         {
             // Search for relevant context only if document search is enabled
-            RAG.Abstractions.Search.SearchResponse searchResults;
+            SearchResponse searchResults;
             if (request.UseDocumentSearch)
             {
-                searchResults = await _searchService.SearchAsync(new RAG.Abstractions.Search.SearchRequest(
+                searchResults = await _searchService.SearchAsync(new SearchRequest(
                     request.Message,
                     Filters: null,
                     Limit: 1, // Get only one document with the highest rating
@@ -471,7 +471,7 @@ public class UserChatService : IUserChatService
             else
             {
                 // Empty search results when document search is disabled
-                searchResults = new RAG.Abstractions.Search.SearchResponse(Array.Empty<RAG.Abstractions.Search.SearchResult>(), 0, 0, request.Message);
+                searchResults = new SearchResponse(Array.Empty<SearchResult>(), 0, 0, request.Message);
             }
 
             // Debug logging for multilingual search results content
@@ -515,7 +515,7 @@ public class UserChatService : IUserChatService
                 }
 
                 // Check if this is the first user message in the session (excluding system messages)
-                var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
+                var isFirstUserMessage = conversationHistory.Count() == 1;
 
                 // Build message history (system message will be added by ChatService if needed)
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
@@ -649,7 +649,7 @@ public class UserChatService : IUserChatService
         return true;
     }
 
-    private string BuildContextualPrompt(string userMessage, RAG.Abstractions.Search.SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en", bool useDocumentSearch = true)
+    private string BuildContextualPrompt(string userMessage, SearchResult[] searchResults, List<UserChatMessage> conversationHistory, string language = "en", bool useDocumentSearch = true)
     {
         var promptBuilder = new StringBuilder();
 
@@ -723,7 +723,7 @@ public class UserChatService : IUserChatService
 
     private string BuildMultilingualContextualPrompt(
         string userMessage,
-        RAG.Abstractions.Search.SearchResult[] searchResults,
+        SearchResult[] searchResults,
         List<UserChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
@@ -821,12 +821,11 @@ public class UserChatService : IUserChatService
     /// <summary>
     /// Formats document source information for inclusion in prompts
     /// <summary>
-    /// Builds a prompt for chat API using system message from localized JSON files
+    /// Builds a prompt for chat API from localized JSON files
     /// </summary>
-    [Obsolete("This method is no longer used. System messages are handled via ChatWithHistoryAsync with includeSystemMessage parameter.")]
-    private async Task<string> BuildChatPromptWithSystemMessageAsync(
+    private async Task<string> BuildChatPromptAsync(
         string userMessage,
-        RAG.Abstractions.Search.SearchResult[] searchResults,
+        SearchResult[] searchResults,
         List<UserChatMessage> conversationHistory,
         string language,
         bool useDocumentSearch)
@@ -879,7 +878,7 @@ public class UserChatService : IUserChatService
         if (recentMessages.Length > 1) // More than just the current message
         {
             promptBuilder.AppendLine();
-            promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
+            //promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "conversation_history", language));
             foreach (var msg in recentMessages.SkipLast(1)) // Skip the current message we're responding to
             {
                 var roleLabel = msg.Role == "user"
@@ -901,12 +900,11 @@ public class UserChatService : IUserChatService
     }
 
     /// <summary>
-    /// Builds a multilingual prompt for chat API using system message from localized JSON files
+    /// Builds a multilingual prompt for chat API using from localized JSON files
     /// </summary>
-    [Obsolete("This method is no longer used. System messages are handled via ChatWithHistoryAsync with includeSystemMessage parameter.")]
-    private async Task<string> BuildMultilingualChatPromptWithSystemMessageAsync(
+    private async Task<string> BuildMultilingualChatPromptAsync(
         string userMessage,
-        RAG.Abstractions.Search.SearchResult[] searchResults,
+        SearchResult[] searchResults,
         List<UserChatMessage> conversationHistory,
         string detectedLanguage,
         string responseLanguage,
@@ -1003,7 +1001,7 @@ public class UserChatService : IUserChatService
     /// <summary>
     /// Build documents context for injection into user message with multilingual support
     /// </summary>
-    private string BuildDocumentsContext(RAG.Abstractions.Search.SearchResult[] searchResults, string language = "en")
+    private string BuildDocumentsContext(SearchResult[] searchResults, string language = "en")
     {
         if (searchResults.Length == 0)
             return string.Empty;
@@ -1051,7 +1049,10 @@ public class UserChatService : IUserChatService
             // Add content with highlights if available
             if (result.Metadata.TryGetValue("highlights", out var highlightsObj) && highlightsObj is string highlights)
             {
+                contextBuilder.AppendLine($"{_languageService.GetLocalizedString("ui_labels", "highlights", language) ?? "Highlights"}:");
                 contextBuilder.AppendLine($"- {highlights}");
+                contextBuilder.AppendLine($"{_languageService.GetLocalizedString("ui_labels", "full_content", language) ?? "Full Content"}:");
+                contextBuilder.AppendLine($"- {result.Content}");
             }
             else
             {
