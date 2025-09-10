@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Logging;
 using RAG.Collector.Elasticsearch;
-using System.Text.Json;
 
 namespace RAG.Collector.Indexing;
 
@@ -116,10 +114,10 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         try
         {
             var fileId = GenerateFileId(filePath);
-            
+
             // Ensure metadata index exists
             await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
-            
+
             // Delete the metadata document
             var deleted = await _elasticsearchService.DeleteDocumentByIdAsync(FILE_METADATA_INDEX, fileId, cancellationToken);
 

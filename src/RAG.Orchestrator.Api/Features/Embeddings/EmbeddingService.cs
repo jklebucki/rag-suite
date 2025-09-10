@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using RAG.Orchestrator.Api.Features.Embeddings.Models;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +10,7 @@ public class EmbeddingService : IEmbeddingService
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmbeddingService> _logger;
 
-    public int EmbeddingDimension => 768; 
+    public int EmbeddingDimension => 768;
 
     public EmbeddingService(
         HttpClient httpClient,

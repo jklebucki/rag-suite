@@ -1,12 +1,10 @@
-using RAG.Orchestrator.Api.Features.Chat;
+using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Localization;
-using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Models.Configuration;
 using System.Text;
 using System.Text.Json;
-using Microsoft.SemanticKernel;
-using Microsoft.Extensions.Options;
-using RAG.Orchestrator.Api.Models.Configuration;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -24,12 +22,12 @@ public interface ILlmService
 {
     Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default);
     Task<(string response, int[]? context)> GenerateResponseWithContextAsync(string prompt, int[]? context = null, CancellationToken cancellationToken = default);
-    
+
     // New methods for /api/chat endpoint with system message support
     Task<string> ChatAsync(string userMessage, string language = "en", CancellationToken cancellationToken = default);
     Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", bool includeSystemMessage = false, CancellationToken cancellationToken = default);
     Task<string> GetSystemMessageAsync(string language = "en", CancellationToken cancellationToken = default);
-    
+
     Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
     Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default);
 }
@@ -62,7 +60,7 @@ public class LlmService : ILlmService
         _httpClient.BaseAddress = new Uri(_config.Url);
         _httpClient.Timeout = TimeSpan.FromMinutes(_config.TimeoutMinutes);
 
-        _logger.LogDebug("LlmService configured with URL: {Url}, Model: {Model}, Timeout: {Timeout}min", 
+        _logger.LogDebug("LlmService configured with URL: {Url}, Model: {Model}, Timeout: {Timeout}min",
             _config.Url, _config.Model, _config.TimeoutMinutes);
     }
 
@@ -115,7 +113,7 @@ public class LlmService : ILlmService
                 {
                     request = requestObj;
                 }
-                
+
                 endpoint = "/api/generate";
             }
             else
@@ -559,15 +557,15 @@ public class ChatService : IChatService
                 // Get conversation history and convert to LLM format
                 var existingMessages = _messages[sessionId].Take(_messages[sessionId].Count - 1); // Exclude the just-added user message
                 var messageHistory = ConvertToLlmChatMessages(existingMessages);
-                
+
                 // Use new Chat API with system message and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
-                    messageHistory, 
-                    request.Message, 
-                    _languageService.GetDefaultLanguage(), 
+                    messageHistory,
+                    request.Message,
+                    _languageService.GetDefaultLanguage(),
                     includeSystemMessage: true,
                     cancellationToken);
-                    
+
                 _logger.LogDebug("Generated response using Chat API with {HistoryCount} previous messages and system message", messageHistory.Count);
             }
             else
@@ -651,7 +649,7 @@ public class ChatService : IChatService
             // Search for relevant context with language consideration only if document search is enabled
             RAG.Abstractions.Search.SearchResponse searchResults;
             bool documentsAvailable = true;
-            
+
             if (request.UseDocumentSearch)
             {
                 var searchRequest = new RAG.Abstractions.Search.SearchRequest(
@@ -706,16 +704,16 @@ public class ChatService : IChatService
                 // Get conversation history and convert to LLM format
                 var existingMessages = _messages[sessionId].Take(_messages[sessionId].Count - 1); // Exclude the just-added user message
                 var messageHistory = ConvertToLlmChatMessages(existingMessages);
-                
+
                 // Use new Chat API with system message in response language and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
-                    messageHistory, 
-                    request.Message, 
-                    responseLanguage, 
+                    messageHistory,
+                    request.Message,
+                    responseLanguage,
                     includeSystemMessage: true,
                     cancellationToken);
-                    
-                _logger.LogDebug("Generated multilingual response using Chat API with {HistoryCount} previous messages and system message in language: {Language}", 
+
+                _logger.LogDebug("Generated multilingual response using Chat API with {HistoryCount} previous messages and system message in language: {Language}",
                     messageHistory.Count, responseLanguage);
             }
             else
@@ -923,10 +921,10 @@ public class ChatService : IChatService
         var promptBuilder = new StringBuilder();
 
         // Get localized system prompt and instructions based on document search setting
-        var systemPrompt = useDocumentSearch 
+        var systemPrompt = useDocumentSearch
             ? _languageService.GetLocalizedSystemPrompt("rag_assistant", responseLanguage)
             : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
-            
+
         var contextInstruction = useDocumentSearch
             ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
             : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
@@ -1022,10 +1020,10 @@ public class ChatService : IChatService
         // Add localized instructions based on document search setting
         var instructionsLabel = _languageService.GetLocalizedString("ui_labels", "instructions", responseLanguage);
         promptBuilder.AppendLine($"=== {instructionsLabel} ===");
-        
+
         var respondInLanguage = _languageService.GetLocalizedString("instructions", "respond_in_language", responseLanguage);
         promptBuilder.AppendLine($"- {respondInLanguage}");
-        
+
         if (useDocumentSearch)
         {
             var useKnowledgeBase = _languageService.GetLocalizedString("instructions", "use_knowledge_base", responseLanguage);
@@ -1036,15 +1034,15 @@ public class ChatService : IChatService
             var useGeneralKnowledge = _languageService.GetLocalizedString("instructions", "use_general_knowledge", responseLanguage);
             promptBuilder.AppendLine($"- {useGeneralKnowledge}");
         }
-        
+
         var considerHistory = _languageService.GetLocalizedString("instructions", "consider_history", responseLanguage);
         promptBuilder.AppendLine($"- {considerHistory}");
-        
-        var beHonest = useDocumentSearch 
+
+        var beHonest = useDocumentSearch
             ? _languageService.GetLocalizedString("instructions", "be_honest", responseLanguage)
             : _languageService.GetLocalizedString("instructions", "be_honest_no_docs", responseLanguage);
         promptBuilder.AppendLine($"- {beHonest}");
-        
+
         var beHelpful = _languageService.GetLocalizedString("instructions", "be_helpful", responseLanguage);
         promptBuilder.AppendLine($"- {beHelpful}");
         promptBuilder.AppendLine();

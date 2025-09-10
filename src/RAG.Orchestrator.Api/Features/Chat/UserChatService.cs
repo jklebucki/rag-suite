@@ -1,15 +1,11 @@
-using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Localization;
-using RAG.Orchestrator.Api.Models;
-using RAG.Orchestrator.Api.Data;
-using RAG.Orchestrator.Api.Data.Models;
-using RAG.Security.Services;
-using System.Text;
-using Microsoft.SemanticKernel;
 using Microsoft.EntityFrameworkCore;
-using RAG.Orchestrator.Api.Models.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
+using RAG.Abstractions.Search;
+using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Localization;
+using RAG.Orchestrator.Api.Models.Configuration;
+using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 
@@ -67,10 +63,10 @@ public class UserChatService : IUserChatService
     {
         if (!_llmConfig.IsOllama)
             return;
-            
+
         // Get system message from localized JSON
         var systemMessage = await _llmService.GetSystemMessageAsync(language, cancellationToken);
-        
+
         if (!string.IsNullOrEmpty(systemMessage))
         {
             // Save system message to database as first message
@@ -87,10 +83,10 @@ public class UserChatService : IUserChatService
                     ["language"] = language
                 }
             };
-            
+
             _chatDbContext.ChatMessages.Add(systemDbMessage);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
-            
+
             _logger.LogDebug("Initialized session {SessionId} with system message in language: {Language}", sessionId, language);
         }
     }
@@ -270,7 +266,7 @@ public class UserChatService : IUserChatService
                     result.Source, displayName, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
-            
+
             // Log sources being used
             if (searchResults.Results.Length > 0 && request.UseDocumentSearch)
             {
@@ -286,32 +282,32 @@ public class UserChatService : IUserChatService
             {
                 // Use new Chat API with system message and conversation history
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
-                
+
                 // Inject documents into user message if document search is enabled and results found
                 string enhancedUserMessage = request.Message;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
                 {
                     var documentsContext = BuildDocumentsContext(searchResults.Results, normalizedLanguage);
                     enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
-                    
-                    _logger.LogDebug("Enhanced user message with {DocumentCount} documents, total length: {MessageLength}", 
+
+                    _logger.LogDebug("Enhanced user message with {DocumentCount} documents, total length: {MessageLength}",
                         searchResults.Results.Length, enhancedUserMessage.Length);
                 }
-                
+
                 // Check if this is the first user message in the session (excluding system messages)
                 var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
-                
+
                 // Use new Chat API with system message in response language and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
-                    messageHistory, 
-                    enhancedUserMessage, 
-                    normalizedLanguage, 
+                    messageHistory,
+                    enhancedUserMessage,
+                    normalizedLanguage,
                     includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
                     cancellationToken);
-                    
-                _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}", 
+
+                _logger.LogDebug("Generated user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
                     messageHistory.Count(), isFirstUserMessage);
-                
+
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;
             }
@@ -320,7 +316,7 @@ public class UserChatService : IUserChatService
                 // Fallback to Semantic Kernel for non-Ollama providers
                 var prompt = BuildContextualPrompt(request.Message, searchResults.Results, conversationHistory, normalizedLanguage, request.UseDocumentSearch);
                 _logger.LogDebug("Final prompt length: {PromptLength} characters", prompt.Length);
-                
+
                 var aiResponse = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
                 aiResponseContent = aiResponse.GetValue<string>() ??
                     _languageService.GetLocalizedErrorMessage("generation_failed", _languageService.GetDefaultLanguage());
@@ -339,11 +335,11 @@ public class UserChatService : IUserChatService
                 {
                     ["useDocumentSearch"] = request.UseDocumentSearch,
                     ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0,
-                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0 
-                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) 
-                            ? r.FileName 
-                            : !string.IsNullOrEmpty(r.FilePath) 
-                                ? Path.GetFileName(r.FilePath) 
+                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0
+                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName)
+                            ? r.FileName
+                            : !string.IsNullOrEmpty(r.FilePath)
+                                ? Path.GetFileName(r.FilePath)
                                 : r.Source ?? "Unknown").Distinct().ToArray()
                         : new string[0]
                 },
@@ -500,7 +496,7 @@ public class UserChatService : IUserChatService
                     result.Source, displayName, result.Content?.Length ?? 0,
                     result.Content?.Length > 100 ? result.Content[..100] + "..." : result.Content ?? "NULL");
             }
-            
+
             // Log sources being used in multilingual context
             if (searchResults.Results.Length > 0 && request.UseDocumentSearch)
             {
@@ -522,32 +518,32 @@ public class UserChatService : IUserChatService
             {
                 // Use new Chat API with system message and conversation history
                 var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
-                
+
                 // Inject documents into user message if document search is enabled and results found
                 string enhancedUserMessage = request.Message;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
                 {
                     var documentsContext = BuildDocumentsContext(searchResults.Results, normalizedResponseLanguage);
                     enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
-                    
-                    _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}", 
+
+                    _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}",
                         searchResults.Results.Length, enhancedUserMessage.Length);
                 }
-                
+
                 // Check if this is the first user message in the session (excluding system messages)
                 var isFirstUserMessage = !conversationHistory.Any(m => m.Role == "user");
-                
+
                 // Use new Chat API with system message in response language and conversation history
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
-                    messageHistory, 
-                    enhancedUserMessage, 
-                    normalizedResponseLanguage, 
+                    messageHistory,
+                    enhancedUserMessage,
+                    normalizedResponseLanguage,
                     includeSystemMessage: isFirstUserMessage, // Include system message only for first user message
                     cancellationToken);
-                    
-                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}", 
+
+                _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages, system message included: {IncludeSystem}",
                     messageHistory.Count(), isFirstUserMessage);
-                
+
                 // Note: /api/chat doesn't return context tokens, so we can't preserve Ollama context
                 newOllamaContext = null;
             }
@@ -563,9 +559,9 @@ public class UserChatService : IUserChatService
                     request.UseDocumentSearch,
                     searchResults.Results.Length > 0
                 );
-                
+
                 _logger.LogDebug("Final multilingual fallback prompt length: {PromptLength} characters", fallbackPrompt.Length);
-                
+
                 var aiResponse = await _kernel.InvokePromptAsync(fallbackPrompt, cancellationToken: cancellationToken);
                 aiResponseContent = aiResponse.GetValue<string>() ??
                     _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
@@ -585,11 +581,11 @@ public class UserChatService : IUserChatService
                     ["responseLanguage"] = normalizedResponseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length,
                     ["useDocumentSearch"] = request.UseDocumentSearch,
-                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0 
-                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName) 
-                            ? r.FileName 
-                            : !string.IsNullOrEmpty(r.FilePath) 
-                                ? Path.GetFileName(r.FilePath) 
+                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0
+                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName)
+                            ? r.FileName
+                            : !string.IsNullOrEmpty(r.FilePath)
+                                ? Path.GetFileName(r.FilePath)
                                 : r.Source ?? "Unknown").Distinct().ToArray()
                         : new string[0]
                 },
@@ -671,14 +667,14 @@ public class UserChatService : IUserChatService
         var promptBuilder = new StringBuilder();
 
         // Add system instruction using localization based on document search setting
-        var systemPrompt = useDocumentSearch 
+        var systemPrompt = useDocumentSearch
             ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", language)
             : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", language);
-            
+
         var contextInstruction = useDocumentSearch
             ? _languageService.GetLocalizedString("system_prompts", "context_instruction", language)
             : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", language);
-            
+
         promptBuilder.AppendLine(systemPrompt);
         promptBuilder.AppendLine(contextInstruction);
 
@@ -687,7 +683,7 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
-            
+
             // Add each document with its source information
             foreach (var result in searchResults)
             {
@@ -695,7 +691,7 @@ public class UserChatService : IUserChatService
                 promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Add summary of sources used
             if (searchResults.Length > 1)
             {
@@ -756,10 +752,10 @@ public class UserChatService : IUserChatService
         promptBuilder.AppendLine();
 
         // Add system instruction with language information using localization based on document search setting
-        var systemPrompt = useDocumentSearch 
+        var systemPrompt = useDocumentSearch
             ? _languageService.GetLocalizedString("system_prompts", "rag_assistant", responseLanguage)
             : _languageService.GetLocalizedString("system_prompts", "rag_assistant_no_docs", responseLanguage);
-            
+
         var contextInstruction = useDocumentSearch
             ? _languageService.GetLocalizedString("system_prompts", "context_instruction", responseLanguage)
             : _languageService.GetLocalizedString("system_prompts", "context_instruction_no_docs", responseLanguage);
@@ -771,7 +767,7 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
-            
+
             // Add each document with its source information
             foreach (var result in searchResults)
             {
@@ -779,7 +775,7 @@ public class UserChatService : IUserChatService
                 promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, responseLanguage));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Add summary of sources used
             if (searchResults.Length > 1)
             {
@@ -866,7 +862,7 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language));
-            
+
             // Add each document with its source information
             foreach (var result in searchResults)
             {
@@ -874,7 +870,7 @@ public class UserChatService : IUserChatService
                 promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Add summary of sources used
             if (searchResults.Length > 1)
             {
@@ -953,7 +949,7 @@ public class UserChatService : IUserChatService
         {
             promptBuilder.AppendLine();
             promptBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "knowledge_base_context", responseLanguage));
-            
+
             // Add each document with its source information
             foreach (var result in searchResults)
             {
@@ -961,7 +957,7 @@ public class UserChatService : IUserChatService
                 promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, responseLanguage));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Add summary of sources used
             if (searchResults.Length > 1)
             {
@@ -1026,7 +1022,7 @@ public class UserChatService : IUserChatService
             return string.Empty;
 
         var contextBuilder = new StringBuilder();
-        
+
         // Add language instruction if multilingual
         if (!string.IsNullOrEmpty(language) && language != "en")
         {
@@ -1035,36 +1031,36 @@ public class UserChatService : IUserChatService
             contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
             contextBuilder.AppendLine();
         }
-        
+
         // Add context header using localization
         var contextHeader = _languageService.GetLocalizedString("system_prompts", "knowledge_base_context", language)
             ?? "=== KNOWLEDGE BASE CONTEXT ===";
         contextBuilder.AppendLine(contextHeader);
         contextBuilder.AppendLine();
-        
+
         foreach (var result in searchResults)
         {
             // Use FormatDocumentSource for consistent formatting
             contextBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
-            
+
             // Add document type and file path information
             var documentLabel = _languageService.GetLocalizedString("ui_labels", "document", language) ?? "Document";
             var typeLabel = _languageService.GetLocalizedString("ui_labels", "type", language) ?? "Type";
             var pathLabel = _languageService.GetLocalizedString("ui_labels", "path", language) ?? "Path";
-            
+
             contextBuilder.AppendLine($"{documentLabel}: {result.DocumentType}");
             if (!string.IsNullOrEmpty(result.FilePath))
             {
                 contextBuilder.AppendLine($"{pathLabel}: {result.FilePath}");
             }
-            
+
             // Add score information if available
             if (result.Metadata.TryGetValue("score", out var scoreObj) && scoreObj is double score)
             {
                 var scoreLabel = _languageService.GetLocalizedString("ui_labels", "score", language) ?? "Score";
                 contextBuilder.AppendLine($"{scoreLabel}: {score:F2}");
             }
-            
+
             // Add content with highlights if available
             if (result.Metadata.TryGetValue("highlights", out var highlightsObj) && highlightsObj is string highlights)
             {
@@ -1074,12 +1070,12 @@ public class UserChatService : IUserChatService
             {
                 contextBuilder.AppendLine($"- {result.Content}");
             }
-            
+
             // Add reconstruction info if applicable
-            if (result.Metadata.TryGetValue("reconstructed", out var reconstructedObj) && 
+            if (result.Metadata.TryGetValue("reconstructed", out var reconstructedObj) &&
                 reconstructedObj is bool reconstructed && reconstructed)
             {
-                if (result.Metadata.TryGetValue("chunksFound", out var chunksFoundObj) && 
+                if (result.Metadata.TryGetValue("chunksFound", out var chunksFoundObj) &&
                     result.Metadata.TryGetValue("totalChunks", out var totalChunksObj))
                 {
                     var chunksFound = chunksFoundObj is int cf ? cf : 0;
@@ -1091,16 +1087,16 @@ public class UserChatService : IUserChatService
                     }
                 }
             }
-            
+
             contextBuilder.AppendLine();
         }
-        
+
         // Add summary of sources used if multiple
         if (searchResults.Length > 1)
         {
             contextBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, language));
             contextBuilder.AppendLine();
-            
+
             // Add honesty instruction
             var beHonestInstruction = _languageService.GetLocalizedString("instructions", "be_honest", language);
             if (!string.IsNullOrEmpty(beHonestInstruction))
@@ -1108,12 +1104,12 @@ public class UserChatService : IUserChatService
                 contextBuilder.AppendLine($"REMINDER: {beHonestInstruction}");
             }
         }
-        
+
         // Add context footer using localization
         var contextFooter = _languageService.GetLocalizedString("system_prompts", "document_source_intro", language)
             ?? "=== END OF KNOWLEDGE BASE CONTEXT ===";
         contextBuilder.AppendLine(contextFooter);
-        
+
         return contextBuilder.ToString();
     }
 }

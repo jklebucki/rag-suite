@@ -1,7 +1,4 @@
 using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.IndexManagement;
-using Elastic.Clients.Elasticsearch.Mapping;
-using Microsoft.Extensions.Logging;
 using RAG.Ingestion.Worker.Models;
 
 namespace RAG.Ingestion.Worker.Services;

@@ -1,5 +1,3 @@
-using RAG.Orchestrator.Api.Features.Plugins;
-
 namespace RAG.Orchestrator.Api.Features.Plugins;
 
 public interface IPluginService

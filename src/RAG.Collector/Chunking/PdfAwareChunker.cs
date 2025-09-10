@@ -1,6 +1,6 @@
+using RAG.Collector.Models;
 using System.Text;
 using System.Text.RegularExpressions;
-using RAG.Collector.Models;
 
 namespace RAG.Collector.Chunking;
 

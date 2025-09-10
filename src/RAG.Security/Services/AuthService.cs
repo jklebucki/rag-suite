@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using RAG.Security.Data;
 using RAG.Security.DTOs;
 using RAG.Security.Models;

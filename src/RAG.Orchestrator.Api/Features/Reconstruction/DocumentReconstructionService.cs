@@ -1,4 +1,3 @@
-using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 using System.Text;
 using System.Text.RegularExpressions;

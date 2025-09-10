@@ -1,7 +1,5 @@
-using Microsoft.Extensions.Logging;
 using RAG.Connectors.Files.Services;
 using RAG.Ingestion.Worker.Models;
-using RAG.Ingestion.Worker.Services;
 
 namespace RAG.Ingestion.Worker.Services;
 

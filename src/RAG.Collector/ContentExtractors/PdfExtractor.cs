@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Logging;
 using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
 
 namespace RAG.Collector.ContentExtractors;
 

@@ -1,4 +1,3 @@
-using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Plugins;

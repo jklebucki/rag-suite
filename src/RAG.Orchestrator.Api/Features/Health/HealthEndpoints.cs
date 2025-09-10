@@ -1,4 +1,3 @@
-using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Features.Health;

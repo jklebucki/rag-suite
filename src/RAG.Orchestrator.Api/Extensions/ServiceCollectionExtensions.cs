@@ -1,17 +1,16 @@
-using Microsoft.OpenApi.Models;
+using Elasticsearch.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
-using RAG.Orchestrator.Api.Features.Analytics;
-using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Models.Configuration;
-using Elasticsearch.Net;
 
 namespace RAG.Orchestrator.Api.Extensions;
 

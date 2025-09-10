@@ -1,7 +1,7 @@
+using RAG.Abstractions.Search;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-using RAG.Abstractions.Search;
 
 namespace RAG.Orchestrator.Api.Data.Models;
 

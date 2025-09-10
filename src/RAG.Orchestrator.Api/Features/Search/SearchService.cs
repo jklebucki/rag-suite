@@ -1,12 +1,10 @@
-using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Features.Search;
-using RAG.Orchestrator.Api.Features.Embeddings;
-using RAG.Orchestrator.Api.Features.Reconstruction;
-using System.Text.Json;
-using System.Text;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Options;
-using System.IO;
+using RAG.Abstractions.Search;
+using RAG.Orchestrator.Api.Features.Embeddings;
+using RAG.Orchestrator.Api.Features.Reconstruction;
+using System.Text;
+using System.Text.Json;
 
 namespace RAG.Orchestrator.Api.Features.Search;
 

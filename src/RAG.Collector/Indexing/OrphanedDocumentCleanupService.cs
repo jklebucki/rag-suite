@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
 using RAG.Collector.Elasticsearch;
@@ -32,7 +31,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
     public async Task<OrphanedDocumentCleanupResult> FindOrphanedDocumentsAsync(CancellationToken cancellationToken = default)
     {
         var result = new OrphanedDocumentCleanupResult { IsDryRun = false };
-        
+
         try
         {
             _logger.LogInformation("Starting orphaned document detection...");
@@ -62,7 +61,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
                     {
                         orphanedFiles.Add(filePath);
                         chunksPerFile[filePath] = indexedFilePaths[filePath];
-                        _logger.LogDebug("File no longer exists: {FilePath} (had {ChunkCount} chunks)", 
+                        _logger.LogDebug("File no longer exists: {FilePath} (had {ChunkCount} chunks)",
                             filePath, indexedFilePaths[filePath]);
                     }
                 }
@@ -77,7 +76,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
             result.ChunksPerFile = chunksPerFile;
             result.TotalOrphanedChunks = chunksPerFile.Values.Sum();
 
-            _logger.LogInformation("Found {OrphanedFileCount} orphaned files with {TotalChunks} chunks total", 
+            _logger.LogInformation("Found {OrphanedFileCount} orphaned files with {TotalChunks} chunks total",
                 result.OrphanedFileCount, result.TotalOrphanedChunks);
 
             return result;
@@ -115,7 +114,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
                     var deletedForFile = await _elasticsearchService.DeleteDocumentsBySourceFileAsync(filePath, cancellationToken);
                     deletedCount += deletedForFile;
 
-                    _logger.LogInformation("Deleted {Count} documents for orphaned file: {FilePath}", 
+                    _logger.LogInformation("Deleted {Count} documents for orphaned file: {FilePath}",
                         deletedForFile, filePath);
 
                     // Also delete the file metadata
@@ -138,7 +137,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
             // Record cleanup operation
             _cleanupHistory.TryAdd(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.UtcNow);
 
-            _logger.LogInformation("Orphaned document cleanup completed: {DeletedCount} documents deleted for {FileCount} files", 
+            _logger.LogInformation("Orphaned document cleanup completed: {DeletedCount} documents deleted for {FileCount} files",
                 deletedCount, filePaths.Count);
 
             return deletedCount;
@@ -153,19 +152,19 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
     public async Task<OrphanedDocumentCleanupResult> DryRunCleanupAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting dry run orphaned document cleanup...");
-        
+
         var result = await FindOrphanedDocumentsAsync(cancellationToken);
         result.IsDryRun = true;
         result.DocumentsDeleted = 0; // No actual deletions in dry run
 
         if (result.OrphanedFileCount > 0)
         {
-            _logger.LogInformation("DRY RUN: Would delete {TotalChunks} chunks from {FileCount} orphaned files:", 
+            _logger.LogInformation("DRY RUN: Would delete {TotalChunks} chunks from {FileCount} orphaned files:",
                 result.TotalOrphanedChunks, result.OrphanedFileCount);
 
             foreach (var orphanedFile in result.ChunksPerFile)
             {
-                _logger.LogInformation("  - {FilePath}: {ChunkCount} chunks", 
+                _logger.LogInformation("  - {FilePath}: {ChunkCount} chunks",
                     orphanedFile.Key, orphanedFile.Value);
             }
         }
@@ -211,7 +210,7 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
         {
             // Use the ElasticsearchService method to get all indexed file paths
             var filePaths = await _elasticsearchService.GetAllSourceFilePathsAsync(cancellationToken);
-            
+
             _logger.LogDebug("Retrieved {FileCount} unique files from Elasticsearch", filePaths.Count);
             return filePaths;
         }

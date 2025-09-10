@@ -1,9 +1,8 @@
-using RAG.Collector.Models;
-using RAG.Collector.Embeddings;
-using RAG.Collector.Elasticsearch;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
+using RAG.Collector.Elasticsearch;
+using RAG.Collector.Embeddings;
+using RAG.Collector.Models;
 
 namespace RAG.Collector.Indexing;
 

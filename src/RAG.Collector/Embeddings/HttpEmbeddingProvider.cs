@@ -1,9 +1,8 @@
-using System.Text;
-using System.Text.Json;
-using RAG.Collector.Models;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
+using RAG.Collector.Models;
+using System.Text;
+using System.Text.Json;
 
 namespace RAG.Collector.Embeddings;
 

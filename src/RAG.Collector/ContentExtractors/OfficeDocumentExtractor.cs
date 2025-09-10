@@ -1,8 +1,7 @@
-using Microsoft.Extensions.Logging;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text;
 
 namespace RAG.Collector.ContentExtractors;

@@ -1,5 +1,4 @@
 using RAG.Collector.Models;
-using Microsoft.Extensions.Logging;
 
 namespace RAG.Collector.Chunking;
 

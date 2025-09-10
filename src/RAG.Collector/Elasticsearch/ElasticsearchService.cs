@@ -1,8 +1,7 @@
-using System.Text;
 using Elasticsearch.Net;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RAG.Collector.Config;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -573,7 +572,7 @@ public class ElasticsearchService : IElasticsearchService
                         {
                             var filePath = key.GetString();
                             var chunkCount = docCount.GetInt32();
-                            
+
                             if (!string.IsNullOrEmpty(filePath))
                             {
                                 filePaths[filePath] = chunkCount;
@@ -608,7 +607,7 @@ public class ElasticsearchService : IElasticsearchService
                 return true;
             }
 
-            _logger.LogWarning("Failed to delete document {DocumentId} from index {IndexName}: {Error}", 
+            _logger.LogWarning("Failed to delete document {DocumentId} from index {IndexName}: {Error}",
                 documentId, indexName, response.DebugInformation);
             return false;
         }

@@ -1,4 +1,3 @@
-using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Search;
 
 namespace RAG.Orchestrator.Api.Features.Reconstruction;

@@ -1,9 +1,7 @@
+using Microsoft.Extensions.Options;
+using RAG.Orchestrator.Api.Features.Search;
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
-using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Features.Search;
-using RAG.Orchestrator.Api.Features.Analytics;
 
 namespace RAG.Orchestrator.Api.Features.Analytics;
 

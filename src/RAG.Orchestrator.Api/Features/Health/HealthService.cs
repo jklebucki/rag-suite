@@ -1,9 +1,5 @@
-using System.Net.Http.Json;
-using System.Text.Json;
 using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Features.Health;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace RAG.Orchestrator.Api.Features.Health;
 

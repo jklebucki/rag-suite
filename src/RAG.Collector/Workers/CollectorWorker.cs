@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
-using RAG.Collector.Config;
-using RAG.Collector.Enumerators;
-using RAG.Collector.ContentExtractors;
 using RAG.Collector.Chunking;
+using RAG.Collector.Config;
+using RAG.Collector.ContentExtractors;
+using RAG.Collector.Enumerators;
 using RAG.Collector.Indexing;
 using RAG.Collector.Models;
 
@@ -38,7 +37,7 @@ public class CollectorWorker : BackgroundService
         _logger.LogInformation("Elasticsearch URL: {Url}", _options.ElasticsearchUrl);
         _logger.LogInformation("Index name: {Index}", _options.IndexName);
         _logger.LogInformation("Processing interval: {Interval} minutes", _options.ProcessingIntervalMinutes);
-        _logger.LogInformation("Orphaned cleanup enabled: {Enabled}, Interval: {Hours} hours, Dry run: {DryRun}", 
+        _logger.LogInformation("Orphaned cleanup enabled: {Enabled}, Interval: {Hours} hours, Dry run: {DryRun}",
             _options.EnableOrphanedCleanup, _options.CleanupIntervalHours, _options.DryRunMode);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -334,7 +333,7 @@ public class CollectorWorker : BackgroundService
             if (_options.DryRunMode)
             {
                 var dryRunResult = await cleanupService.DryRunCleanupAsync(cancellationToken);
-                
+
                 _logger.LogInformation("Dry run cleanup completed: {OrphanedFiles} files would be cleaned, {TotalChunks} chunks would be deleted",
                     dryRunResult.OrphanedFileCount, dryRunResult.TotalOrphanedChunks);
 
@@ -347,14 +346,14 @@ public class CollectorWorker : BackgroundService
             else
             {
                 var findResult = await cleanupService.FindOrphanedDocumentsAsync(cancellationToken);
-                
+
                 if (findResult.OrphanedFileCount > 0)
                 {
                     _logger.LogInformation("Found {OrphanedFiles} orphaned files with {TotalChunks} chunks",
                         findResult.OrphanedFileCount, findResult.TotalOrphanedChunks);
 
                     var deletedCount = await cleanupService.DeleteOrphanedDocumentsAsync(findResult.OrphanedFilePaths, cancellationToken);
-                    
+
                     _logger.LogInformation("Orphaned cleanup completed: {DeletedCount} documents deleted",
                         deletedCount);
                 }

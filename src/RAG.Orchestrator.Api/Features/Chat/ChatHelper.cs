@@ -1,4 +1,3 @@
-using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Localization;
 using System.Text;

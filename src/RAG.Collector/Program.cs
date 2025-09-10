@@ -1,15 +1,15 @@
-using RAG.Collector.Config;
-using RAG.Collector.Workers;
-using RAG.Collector.Enumerators;
-using RAG.Collector.Acl;
-using RAG.Collector.ContentExtractors;
-using RAG.Collector.Chunking;
-using RAG.Collector.Embeddings;
-using RAG.Collector.Elasticsearch;
-using RAG.Collector.Indexing;
-using Microsoft.Extensions.Options;
-using Serilog;
 using Elasticsearch.Net;
+using Microsoft.Extensions.Options;
+using RAG.Collector.Acl;
+using RAG.Collector.Chunking;
+using RAG.Collector.Config;
+using RAG.Collector.ContentExtractors;
+using RAG.Collector.Elasticsearch;
+using RAG.Collector.Embeddings;
+using RAG.Collector.Enumerators;
+using RAG.Collector.Indexing;
+using RAG.Collector.Workers;
+using Serilog;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()

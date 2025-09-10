@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Logging;
-using RAG.Ingestion.Worker.Models;
-
 namespace RAG.Ingestion.Worker.Services;
 
 public interface IEmbeddingService

@@ -1,14 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Extensions;
+using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
-using RAG.Orchestrator.Api.Features.Analytics;
-using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Features.Search;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
-using Microsoft.Extensions.Configuration;
 
 #pragma warning disable SKEXP0070 // Type is for evaluation purposes only
 
