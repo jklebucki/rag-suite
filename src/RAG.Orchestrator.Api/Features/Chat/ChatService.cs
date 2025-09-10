@@ -395,7 +395,7 @@ public class LlmService : ILlmService
             var targetLanguage = supportedLanguages.Contains(language.ToLower()) ? language.ToLower() : "en";
 
             var fileName = $"system_{targetLanguage}.json";
-            var filePath = Path.Combine("Localization", fileName);
+            var filePath = Path.Combine(AppContext.BaseDirectory, "Localization", fileName);
 
             if (!File.Exists(filePath))
             {
