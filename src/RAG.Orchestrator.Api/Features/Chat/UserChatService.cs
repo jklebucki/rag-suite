@@ -57,14 +57,7 @@ public class UserChatService : IUserChatService
     // Helper method to convert UserChatMessage history to LlmChatMessage format
     private List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<UserChatMessage> messages)
     {
-        return messages
-            .Where(m => m.Role == "user" || m.Role == "assistant") // Exclude system messages
-            .Select(m => new LlmChatMessage 
-            { 
-                Role = m.Role, 
-                Content = m.Content 
-            })
-            .ToList();
+        return ChatHelper.ConvertToLlmChatMessages(messages);
     }
 
     /// <summary>
@@ -699,7 +692,7 @@ public class UserChatService : IUserChatService
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.AppendLine(FormatDocumentSource(result, language));
+                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
             
@@ -707,7 +700,7 @@ public class UserChatService : IUserChatService
             if (searchResults.Length > 1)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.Append(FormatSourcesSummary(searchResults, language));
+                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, language));
             }
         }
         else if (!useDocumentSearch)
@@ -783,7 +776,7 @@ public class UserChatService : IUserChatService
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.AppendLine(FormatDocumentSource(result, responseLanguage));
+                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, responseLanguage));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
             
@@ -791,7 +784,7 @@ public class UserChatService : IUserChatService
             if (searchResults.Length > 1)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.Append(FormatSourcesSummary(searchResults, responseLanguage));
+                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, responseLanguage));
             }
 
             // Reinforce language instruction after context
@@ -844,68 +837,10 @@ public class UserChatService : IUserChatService
 
     /// <summary>
     /// Formats document source information for inclusion in prompts
-    /// </summary>
-    private string FormatDocumentSource(RAG.Abstractions.Search.SearchResult result, string language)
-    {
-        // Prefer FileName over FilePath for cleaner display
-        var displayName = !string.IsNullOrEmpty(result.FileName) 
-            ? result.FileName 
-            : !string.IsNullOrEmpty(result.FilePath) 
-                ? Path.GetFileName(result.FilePath) 
-                : result.Source ?? "Unknown Document";
-
-        // Check if document was reconstructed from chunks
-        var isReconstructed = result.Metadata?.ContainsKey("reconstructed") == true 
-            && result.Metadata["reconstructed"] is bool reconstructed 
-            && reconstructed;
-
-        var sourceInfo = displayName;
-        
-        if (isReconstructed && result.Metadata != null)
-        {
-            // Add chunk information for reconstructed documents
-            if (result.Metadata.TryGetValue("chunksFound", out var chunksFound) &&
-                result.Metadata.TryGetValue("totalChunks", out var totalChunks))
-            {
-                var reconstructedNote = _languageService.GetLocalizedString("system_prompts", "reconstructed_from_chunks", language);
-                sourceInfo += $" {string.Format(reconstructedNote, totalChunks)}";
-            }
-        }
-
-        return _languageService.GetLocalizedString("system_prompts", "document_source_format", language)
-            .Replace("{0}", sourceInfo);
-    }
-
-    /// <summary>
-    /// Creates a formatted list of all document sources used
-    /// </summary>
-    private string FormatSourcesSummary(RAG.Abstractions.Search.SearchResult[] searchResults, string language)
-    {
-        if (searchResults.Length == 0)
-            return string.Empty;
-
-        var sourceNames = searchResults
-            .Select(result => !string.IsNullOrEmpty(result.FileName) 
-                ? result.FileName 
-                : !string.IsNullOrEmpty(result.FilePath) 
-                    ? Path.GetFileName(result.FilePath) 
-                    : result.Source ?? "Unknown")
-            .Distinct()
-            .ToArray();
-
-        var summaryHeader = _languageService.GetLocalizedString("system_prompts", "sources_used_summary", language);
-        var multipleSourcesNote = _languageService.GetLocalizedString("system_prompts", "multiple_sources_note", language);
-        
-        var summary = new StringBuilder();
-        summary.AppendLine(summaryHeader);
-        summary.AppendLine(string.Format(multipleSourcesNote, sourceNames.Length) + ": " + string.Join(", ", sourceNames));
-        
-        return summary.ToString();
-    }
-
     /// <summary>
     /// Builds a prompt for chat API using system message from localized JSON files
     /// </summary>
+    [Obsolete("This method is no longer used. System messages are handled via ChatWithHistoryAsync with includeSystemMessage parameter.")]
     private async Task<string> BuildChatPromptWithSystemMessageAsync(
         string userMessage,
         RAG.Abstractions.Search.SearchResult[] searchResults,
@@ -936,7 +871,7 @@ public class UserChatService : IUserChatService
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.AppendLine(FormatDocumentSource(result, language));
+                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
             
@@ -944,7 +879,7 @@ public class UserChatService : IUserChatService
             if (searchResults.Length > 1)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.Append(FormatSourcesSummary(searchResults, language));
+                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, language));
             }
         }
         else if (!useDocumentSearch)
@@ -985,6 +920,7 @@ public class UserChatService : IUserChatService
     /// <summary>
     /// Builds a multilingual prompt for chat API using system message from localized JSON files
     /// </summary>
+    [Obsolete("This method is no longer used. System messages are handled via ChatWithHistoryAsync with includeSystemMessage parameter.")]
     private async Task<string> BuildMultilingualChatPromptWithSystemMessageAsync(
         string userMessage,
         RAG.Abstractions.Search.SearchResult[] searchResults,
@@ -1022,7 +958,7 @@ public class UserChatService : IUserChatService
             foreach (var result in searchResults)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.AppendLine(FormatDocumentSource(result, responseLanguage));
+                promptBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, responseLanguage));
                 promptBuilder.AppendLine($"- {result.Content}");
             }
             
@@ -1030,7 +966,7 @@ public class UserChatService : IUserChatService
             if (searchResults.Length > 1)
             {
                 promptBuilder.AppendLine();
-                promptBuilder.Append(FormatSourcesSummary(searchResults, responseLanguage));
+                promptBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, responseLanguage));
             }
 
             // Reinforce language instruction after context
@@ -1109,7 +1045,7 @@ public class UserChatService : IUserChatService
         foreach (var result in searchResults)
         {
             // Use FormatDocumentSource for consistent formatting
-            contextBuilder.AppendLine(FormatDocumentSource(result, language));
+            contextBuilder.AppendLine(ChatHelper.FormatDocumentSource(result, _languageService, language));
             
             // Add document type and file path information
             var documentLabel = _languageService.GetLocalizedString("ui_labels", "document", language) ?? "Document";
@@ -1162,7 +1098,7 @@ public class UserChatService : IUserChatService
         // Add summary of sources used if multiple
         if (searchResults.Length > 1)
         {
-            contextBuilder.Append(FormatSourcesSummary(searchResults, language));
+            contextBuilder.Append(ChatHelper.FormatSourcesSummary(searchResults, _languageService, language));
             contextBuilder.AppendLine();
             
             // Add honesty instruction

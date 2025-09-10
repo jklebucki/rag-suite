@@ -488,14 +488,7 @@ public class ChatService : IChatService
     // Helper method to convert ChatMessage history to LlmChatMessage format
     private List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<ChatMessage> messages)
     {
-        return messages
-            .Where(m => m.Role == "user" || m.Role == "assistant") // Exclude system messages
-            .Select(m => new LlmChatMessage 
-            { 
-                Role = m.Role, 
-                Content = m.Content 
-            })
-            .ToList();
+        return ChatHelper.ConvertToLlmChatMessages(messages);
     }
 
     public Task<ChatSession?> GetSessionAsync(string sessionId, CancellationToken cancellationToken = default)
