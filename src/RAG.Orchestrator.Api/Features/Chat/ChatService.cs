@@ -313,13 +313,14 @@ public class LlmService : ILlmService
             // Build messages array for /api/chat
             var messages = new List<LlmChatMessage>();
 
-            // Add system message first only if requested
+            // Add system message as first message if needed
             if (includeSystemMessage)
             {
                 var systemMessage = await GetSystemMessageAsync(language, cancellationToken);
                 if (!string.IsNullOrEmpty(systemMessage))
                 {
                     messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
+                    _logger.LogDebug("Added system message as first message in chat history");
                 }
             }
 

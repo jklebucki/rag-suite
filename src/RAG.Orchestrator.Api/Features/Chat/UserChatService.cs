@@ -58,36 +58,21 @@ public class UserChatService : IUserChatService
 
     /// <summary>
     /// Initializes a new chat session with system message for Ollama /api/chat
+    /// Note: System message is not stored in database, it's used only internally by LLM API
     /// </summary>
     private async Task InitializeSessionWithSystemMessageAsync(string sessionId, string language, CancellationToken cancellationToken)
     {
         if (!_llmConfig.IsOllama)
             return;
 
-        // Get system message from localized JSON
+        // Get system message from localized JSON to validate it exists
         var systemMessage = await _llmService.GetSystemMessageAsync(language, cancellationToken);
 
         if (!string.IsNullOrEmpty(systemMessage))
         {
-            // Save system message to database as first message
-            var systemDbMessage = new Data.Models.ChatMessage
-            {
-                Id = Guid.NewGuid().ToString(),
-                SessionId = sessionId,
-                Role = "system",
-                Content = systemMessage,
-                Timestamp = DateTime.UtcNow,
-                Metadata = new Dictionary<string, object>
-                {
-                    ["isSystemMessage"] = true,
-                    ["language"] = language
-                }
-            };
-
-            _chatDbContext.ChatMessages.Add(systemDbMessage);
-            await _chatDbContext.SaveChangesAsync(cancellationToken);
-
-            _logger.LogDebug("Initialized session {SessionId} with system message in language: {Language}", sessionId, language);
+            // System message is used internally by ChatWithHistoryAsync when includeSystemMessage=true
+            // It's not stored in database as it's not part of user-visible conversation history
+            _logger.LogDebug("Initialized session {SessionId} with system message available in language: {Language}", sessionId, language);
         }
     }
 
