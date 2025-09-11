@@ -269,12 +269,6 @@ public class UserChatService : IUserChatService
                 _logger.LogInformation("Using documents as sources for multilingual response: {Sources}", string.Join(", ", sources));
             }
 
-            // Get previous Ollama context from the last assistant message for token cache continuation
-            var lastAssistantMessage = conversationHistory
-                .Where(m => m.Role == "assistant" && m.OllamaContext != null)
-                .LastOrDefault();
-            var previousContext = lastAssistantMessage?.OllamaContext;
-
             // Check if Ollama is configured, if so use LLM service with context support
             string aiResponseContent;
             int[]? newOllamaContext = null;

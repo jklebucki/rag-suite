@@ -344,7 +344,7 @@ public class LlmService : ILlmService
             var supportedLanguages = new[] { "pl", "en", "hu", "nl", "ro" };
             var targetLanguage = supportedLanguages.Contains(language.ToLower()) ? language.ToLower() : "en";
 
-            var fileName = $"system_{targetLanguage}.json";
+            var fileName = $"system_{targetLanguage}.md";
             var filePath = Path.Combine(AppContext.BaseDirectory, "Localization", fileName);
 
             if (!File.Exists(filePath))
