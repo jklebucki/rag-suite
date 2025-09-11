@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Localization/*.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RAG.Security\RAG.Security.csproj" />
     <ProjectReference Include="..\RAG.Abstractions\RAG.Abstractions.csproj" />
   </ItemGroup>

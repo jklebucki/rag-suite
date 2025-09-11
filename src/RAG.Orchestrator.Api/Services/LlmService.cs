@@ -353,13 +353,13 @@ public class LlmService : ILlmService
                 return GetFallbackSystemMessage();
             }
 
-            var jsonContent = await File.ReadAllTextAsync(filePath, cancellationToken);
-            var systemMessageModel = JsonSerializer.Deserialize<SystemMessageModel>(jsonContent);
+            var systemMessageModel = await File.ReadAllTextAsync(filePath, cancellationToken);
+            
 
-            if (systemMessageModel?.system_message != null)
+            if (systemMessageModel != null)
             {
                 _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
-                return systemMessageModel.system_message;
+                return systemMessageModel;
             }
 
             _logger.LogWarning("Invalid system message format in file: {FilePath}", filePath);
