@@ -48,7 +48,6 @@ Dzięki tym cechom firma należy do liderów w swojej branży w Polsce i Europie
 
 ## Kierownictwo
 Prezesem i najważniejszą osobą w Citronex jest Rafał Zarzecki.
-Dyrektorem 
 Dyrektorem IT w firmie Citronex jest Jarosław Kłębucki.
 
 ## Ważne
