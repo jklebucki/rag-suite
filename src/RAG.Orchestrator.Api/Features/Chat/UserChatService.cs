@@ -651,7 +651,13 @@ public class UserChatService : IUserChatService
             return string.Empty;
 
         var contextBuilder = new StringBuilder();
-
+        var prePrompt = _languageService.GetLocalizedString("system_prompts", "rag_assistant", language)
+            ?? "";
+        if (!string.IsNullOrEmpty(prePrompt))
+        {
+            contextBuilder.AppendLine(prePrompt);
+            contextBuilder.AppendLine();
+        }
         var languageInstruction = _languageService.GetLocalizedString("instructions", "respond_in_language", language);
         contextBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
         contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
