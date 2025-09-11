@@ -93,6 +93,7 @@ public static class ServiceCollectionExtensions
         // Add custom services
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IUserContextService, UserContextService>();
         services.AddScoped<IRegistrationConfigurationService, RegistrationConfigurationService>();
         services.AddHttpContextAccessor();

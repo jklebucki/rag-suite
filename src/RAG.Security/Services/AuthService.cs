@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RAG.Security.Data;
 using RAG.Security.DTOs;
 using RAG.Security.Models;
+using System.Linq;
 
 namespace RAG.Security.Services;
 
@@ -16,6 +18,8 @@ public interface IAuthService
     Task<bool> AssignRoleAsync(string userId, string roleName);
     Task<bool> RemoveRoleAsync(string userId, string roleName);
     Task<IList<string>> GetUserRolesAsync(string userId);
+    Task<bool> ForgotPasswordAsync(string email);
+    Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
 }
 
 public class AuthService : IAuthService
@@ -25,19 +29,22 @@ public class AuthService : IAuthService
     private readonly SignInManager<User> _signInManager;
     private readonly IJwtService _jwtService;
     private readonly SecurityDbContext _context;
+    private readonly IEmailService _emailService;
 
     public AuthService(
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
         SignInManager<User> signInManager,
         IJwtService jwtService,
-        SecurityDbContext context)
+        SecurityDbContext context,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
         _jwtService = jwtService;
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
@@ -254,5 +261,66 @@ public class AuthService : IAuthService
         }
 
         return await _userManager.GetRolesAsync(user);
+    }
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null || !user.IsActive)
+        {
+            // Return true to avoid revealing if email exists
+            return true;
+        }
+
+        // Generate reset token
+        var resetToken = Guid.NewGuid().ToString();
+        var passwordResetToken = new PasswordResetToken
+        {
+            UserId = user.Id,
+            Token = resetToken,
+            ExpiresAt = DateTime.UtcNow.AddHours(1) // Token valid for 1 hour
+        };
+
+        _context.PasswordResetTokens.Add(passwordResetToken);
+        await _context.SaveChangesAsync();
+
+        // Generate reset link (assuming frontend URL)
+        var resetLink = $"https://yourapp.com/reset-password?token={resetToken}";
+
+        // Send email
+        await _emailService.SendPasswordResetEmailAsync(email, resetLink);
+
+        return true;
+    }
+
+    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var passwordResetToken = await _context.PasswordResetTokens
+            .FirstOrDefaultAsync(prt => prt.Token == request.Token && !prt.IsUsed && prt.ExpiresAt > DateTime.UtcNow);
+
+        if (passwordResetToken == null)
+        {
+            return false;
+        }
+
+        var user = await _userManager.FindByIdAsync(passwordResetToken.UserId);
+        if (user == null || !user.IsActive)
+        {
+            return false;
+        }
+
+        // Reset password
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, request.NewPassword);
+
+        if (result.Succeeded)
+        {
+            // Mark token as used
+            passwordResetToken.IsUsed = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
     }
 }

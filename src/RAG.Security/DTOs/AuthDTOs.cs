@@ -89,3 +89,24 @@ public record TokenValidationResponse
     public string[] Roles { get; init; } = Array.Empty<string>();
     public string? ErrorMessage { get; init; }
 }
+
+public record ForgotPasswordRequest
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; init; } = string.Empty;
+}
+
+public record ResetPasswordRequest
+{
+    [Required]
+    public string Token { get; init; } = string.Empty;
+
+    [Required]
+    [MinLength(6)]
+    public string NewPassword { get; init; } = string.Empty;
+
+    [Required]
+    [Compare("NewPassword")]
+    public string ConfirmNewPassword { get; init; } = string.Empty;
+}

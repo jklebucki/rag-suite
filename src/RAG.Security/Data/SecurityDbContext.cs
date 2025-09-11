@@ -11,6 +11,8 @@ public class SecurityDbContext : IdentityDbContext<User, Role, string, UserClaim
     {
     }
 
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -103,6 +105,19 @@ public class SecurityDbContext : IdentityDbContext<User, Role, string, UserClaim
                 .WithMany(r => r.RoleClaims)
                 .HasForeignKey(rc => rc.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure PasswordResetToken relationship
+        builder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(prt => prt.Id);
+            entity.HasOne(prt => prt.User)
+                .WithMany()
+                .HasForeignKey(prt => prt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(prt => prt.Token).IsRequired();
+            entity.Property(prt => prt.CreatedAt).IsRequired();
+            entity.Property(prt => prt.ExpiresAt).IsRequired();
         });
 
         // Seed default roles

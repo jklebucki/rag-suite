@@ -174,6 +174,40 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Role removed successfully" });
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var success = await _authService.ForgotPasswordAsync(request.Email);
+        if (!success)
+        {
+            return BadRequest(new { message = "Failed to process password reset request" });
+        }
+
+        return Ok(new { message = "If the email exists, a password reset link has been sent" });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var success = await _authService.ResetPasswordAsync(request);
+        if (!success)
+        {
+            return BadRequest(new { message = "Invalid or expired reset token" });
+        }
+
+        return Ok(new { message = "Password has been reset successfully" });
+    }
 }
 
 public record AssignRoleRequest

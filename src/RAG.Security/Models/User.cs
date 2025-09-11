@@ -50,3 +50,16 @@ public class RoleClaim : IdentityRoleClaim<string>
     // Navigation properties
     public virtual Role Role { get; set; } = null!;
 }
+
+public class PasswordResetToken
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string UserId { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime ExpiresAt { get; set; }
+    public bool IsUsed { get; set; } = false;
+
+    // Navigation property
+    public virtual User User { get; set; } = null!;
+}
