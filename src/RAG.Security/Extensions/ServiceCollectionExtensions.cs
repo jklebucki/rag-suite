@@ -119,7 +119,10 @@ public static class ServiceCollectionExtensions
             // and won't throw exception if it already exists
             await context.Database.EnsureCreatedAsync();
 
-            logger.LogInformation("PostgreSQL database creation successful");
+            // Also run migrations to ensure all tables are created
+            await context.Database.MigrateAsync();
+
+            logger.LogInformation("PostgreSQL database creation and migration successful");
 
             // Ensure admin user exists
             await EnsureAdminUserAsync(scope.ServiceProvider);

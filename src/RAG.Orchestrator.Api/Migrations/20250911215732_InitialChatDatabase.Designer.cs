@@ -12,8 +12,8 @@ using RAG.Orchestrator.Api.Data;
 namespace RAG.Orchestrator.Api.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20250909181921_AddOllamaContextToChatMessage")]
-    partial class AddOllamaContextToChatMessage
+    [Migration("20250911215732_InitialChatDatabase")]
+    partial class InitialChatDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace RAG.Orchestrator.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("RAG.Orchestrator.Api.Data.Models.ChatMessage", b =>
+            modelBuilder.Entity("RAG.Orchestrator.Api.Models.ChatMessage", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(36)
@@ -80,7 +80,7 @@ namespace RAG.Orchestrator.Api.Migrations
                     b.ToTable("chat_messages", (string)null);
                 });
 
-            modelBuilder.Entity("RAG.Orchestrator.Api.Data.Models.ChatSession", b =>
+            modelBuilder.Entity("RAG.Orchestrator.Api.Models.ChatSession", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(36)
@@ -119,9 +119,9 @@ namespace RAG.Orchestrator.Api.Migrations
                     b.ToTable("chat_sessions", (string)null);
                 });
 
-            modelBuilder.Entity("RAG.Orchestrator.Api.Data.Models.ChatMessage", b =>
+            modelBuilder.Entity("RAG.Orchestrator.Api.Models.ChatMessage", b =>
                 {
-                    b.HasOne("RAG.Orchestrator.Api.Data.Models.ChatSession", "Session")
+                    b.HasOne("RAG.Orchestrator.Api.Models.ChatSession", "Session")
                         .WithMany("Messages")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -131,7 +131,7 @@ namespace RAG.Orchestrator.Api.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("RAG.Orchestrator.Api.Data.Models.ChatSession", b =>
+            modelBuilder.Entity("RAG.Orchestrator.Api.Models.ChatSession", b =>
                 {
                     b.Navigation("Messages");
                 });

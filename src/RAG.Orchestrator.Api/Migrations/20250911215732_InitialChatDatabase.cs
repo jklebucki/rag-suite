@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -35,7 +36,8 @@ namespace RAG.Orchestrator.Api.Migrations
                     content = table.Column<string>(type: "text", nullable: false),
                     timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     sources = table.Column<string>(type: "jsonb", nullable: true),
-                    metadata = table.Column<string>(type: "jsonb", nullable: true)
+                    metadata = table.Column<string>(type: "jsonb", nullable: true),
+                    ollama_context = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
