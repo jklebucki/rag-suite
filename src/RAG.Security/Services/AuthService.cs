@@ -13,6 +13,7 @@ public interface IAuthService
     Task<bool> RegisterAsync(RegisterRequest request);
     Task<LoginResponse?> RefreshTokenAsync(RefreshTokenRequest request);
     Task<bool> LogoutAsync(string userId, string refreshToken);
+    Task<bool> LogoutAllDevicesAsync(string userId);
     Task<bool> ChangePasswordAsync(string userId, ChangePasswordRequest request);
     Task<UserInfo?> GetUserInfoAsync(string userId);
     Task<bool> AssignRoleAsync(string userId, string roleName);
@@ -184,6 +185,12 @@ public class AuthService : IAuthService
     public async Task<bool> LogoutAsync(string userId, string refreshToken)
     {
         await _jwtService.RevokeRefreshTokenAsync(userId, refreshToken);
+        return true;
+    }
+
+    public async Task<bool> LogoutAllDevicesAsync(string userId)
+    {
+        await _jwtService.RevokeAllRefreshTokensAsync(userId);
         return true;
     }
 

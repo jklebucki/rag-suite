@@ -12,7 +12,7 @@ interface TopBarProps {
 
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { t } = useI18n()
-  const { user, logout, refreshError, forceLogout, clearRefreshError } = useAuth()
+  const { user, logout, refreshError, logoutAllDevices, clearRefreshError } = useAuth()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -135,7 +135,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         isOpen={refreshError}
         onClose={clearRefreshError}
         onTryAgain={handleTryAgain}
-        onLogout={forceLogout}
+        onLogout={logoutAllDevices}
       />
     </header>
   )

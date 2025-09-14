@@ -12,7 +12,7 @@ interface UserAccountModalProps {
 
 export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const { t } = useI18n()
-  const { user, forceLogout } = useAuth()
+  const { user, logoutAllDevices } = useAuth()
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -46,7 +46,7 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true)
     try {
-      await forceLogout()
+      await logoutAllDevices()
       setShowLogoutConfirm(false)
       onClose()
     } catch (error) {

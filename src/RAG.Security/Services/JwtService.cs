@@ -18,6 +18,7 @@ public interface IJwtService
     Task<bool> ValidateRefreshTokenAsync(string userId, string refreshToken);
     Task SaveRefreshTokenAsync(string userId, string refreshToken);
     Task RevokeRefreshTokenAsync(string userId, string refreshToken);
+    Task RevokeAllRefreshTokensAsync(string userId);
 }
 
 public class JwtService : IJwtService
@@ -198,6 +199,12 @@ public class JwtService : IJwtService
                 _refreshTokens.Remove(userId);
             }
         }
+        return Task.CompletedTask;
+    }
+
+    public Task RevokeAllRefreshTokensAsync(string userId)
+    {
+        _refreshTokens.Remove(userId);
         return Task.CompletedTask;
     }
 }

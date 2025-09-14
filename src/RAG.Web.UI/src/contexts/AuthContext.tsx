@@ -9,7 +9,7 @@ interface AuthContextType extends AuthState {
   register: (userData: RegisterRequest) => Promise<boolean>
   resetPassword: (data: ResetPasswordRequest) => Promise<void>
   logout: () => Promise<void>
-  forceLogout: () => Promise<void>
+  logoutAllDevices: () => Promise<void>
   refreshAuth: () => Promise<void>
   clearError: () => void
   clearRefreshError: () => void
@@ -284,13 +284,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null })
   }
 
-  const forceLogout = async (): Promise<void> => {
+  const logoutAllDevices = async (): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
     
     try {
-      await authService.logout()
+      await authService.logoutAllDevices()
     } catch (error) {
-      console.error('Force logout error:', error)
+      console.error('Logout from all devices error:', error)
     } finally {
       // Clear storage and update state
       clearAuthData()
@@ -309,7 +309,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     resetPassword,
     logout,
-    forceLogout,
+    logoutAllDevices,
     refreshAuth,
     clearError,
     clearRefreshError,

@@ -123,6 +123,19 @@ class AuthService {
     }
   }
 
+  async logoutAllDevices(): Promise<void> {
+    try {
+      console.debug('🔐 Logout from all devices attempt')
+      await this.client.post('/logout-all-devices')
+      console.debug('🔐 Logout from all devices request successful')
+    } catch (error) {
+      // Continue with logout even if server request fails
+      console.warn('🔐 Logout from all devices request failed:', error)
+    } finally {
+      this.clearStorage()
+    }
+  }
+
   async refreshToken(): Promise<boolean> {
     try {
       const refreshToken = this.getRefreshToken()

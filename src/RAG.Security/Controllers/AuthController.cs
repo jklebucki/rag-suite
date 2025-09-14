@@ -84,6 +84,20 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Logged out successfully" });
     }
 
+    [HttpPost("logout-all-devices")]
+    [Authorize]
+    public async Task<ActionResult> LogoutAllDevices()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        await _authService.LogoutAllDevicesAsync(userId);
+        return Ok(new { message = "Logged out from all devices successfully" });
+    }
+
     [HttpPost("change-password")]
     [Authorize]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
