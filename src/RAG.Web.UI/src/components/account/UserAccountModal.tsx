@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { User as UserType } from '@/types/auth'
 
 interface UserAccountModalProps {
@@ -13,6 +14,8 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const { t } = useI18n()
   const { user, forceLogout } = useAuth()
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile')
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   if (!isOpen || !user) return null
 
@@ -36,15 +39,25 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
     console.log('Delete account clicked')
   }
 
-  const handleLogoutAllDevices = async () => {
-    if (window.confirm(t('account.logout_all_devices_confirm'))) {
-      try {
-        await forceLogout()
-        onClose()
-      } catch (error) {
-        console.error('Failed to logout from all devices:', error)
-      }
+  const handleLogoutAllDevices = () => {
+    setShowLogoutConfirm(true)
+  }
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await forceLogout()
+      setShowLogoutConfirm(false)
+      onClose()
+    } catch (error) {
+      console.error('Failed to logout from all devices:', error)
+    } finally {
+      setIsLoggingOut(false)
     }
+  }
+
+  const handleCancelLogout = () => {
+    setShowLogoutConfirm(false)
   }
 
   return (
@@ -233,6 +246,19 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
           )}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        onClose={handleCancelLogout}
+        onConfirm={handleConfirmLogout}
+        title={t('account.logout_all_devices')}
+        message={t('account.logout_all_devices_confirm')}
+        confirmText={t('account.logout_all_devices')}
+        cancelText={t('common.cancel')}
+        variant="warning"
+        isLoading={isLoggingOut}
+      />
     </div>
   )
 }
