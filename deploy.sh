@@ -273,7 +273,7 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
   },
   "DefaultAdmin": {
     "Email": "admin@citronex.pl",
-    "Password": "Citro123"
+    "Password": "Citro@123"
   },
   "Security": {
     "AllowedOrigins": [
