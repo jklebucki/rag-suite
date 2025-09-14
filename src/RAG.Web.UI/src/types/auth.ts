@@ -18,6 +18,7 @@ export interface AuthState {
   refreshToken: string | null
   loading: boolean
   error: string | null
+  refreshError: boolean
 }
 
 export interface LoginRequest {

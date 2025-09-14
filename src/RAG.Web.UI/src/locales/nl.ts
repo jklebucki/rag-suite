@@ -138,6 +138,12 @@ export const nl: TranslationKeys = {
   'auth.reset.success_title': 'Instructies verstuurd!',
   'auth.reset.success_message': 'Wachtwoord reset instructies zijn naar je e-mail verstuurd.',
 
+  // Session expired
+  'session.expired.title': 'Sessie Verlopen',
+  'session.expired.message': 'Je sessie is verlopen. Probeer opnieuw in te loggen of log volledig uit.',
+  'session.expired.try_again': 'Probeer Opnieuw',
+  'session.expired.logout': 'Uitloggen',
+
   'auth.change_password.title': 'Wachtwoord Wijzigen',
   'auth.change_password.subtitle': 'Update je wachtwoord voor veiligheid.',
   'auth.change_password.change': 'Wachtwoord Wijzigen',
@@ -199,4 +205,7 @@ export const nl: TranslationKeys = {
   'account.danger_zone': 'Gevaarlijke zone',
   'account.delete_warning': 'Het verwijderen van je account is onomkeerbaar. Alle gegevens gaan definitief verloren.',
   'account.delete_account': 'Account verwijderen',
+  'account.logout_all_devices': 'Uitloggen op alle apparaten',
+  'account.logout_all_devices_description': 'Dit logt je uit van alle apparaten waar je momenteel bent ingelogd.',
+  'account.logout_all_devices_confirm': 'Weet je zeker dat je wilt uitloggen op alle apparaten?',
 };

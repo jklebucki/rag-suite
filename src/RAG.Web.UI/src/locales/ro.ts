@@ -138,6 +138,12 @@ export const ro: TranslationKeys = {
   'auth.reset.success_title': 'Instrucțiuni trimise!',
   'auth.reset.success_message': 'Instrucțiunile de resetare parolă au fost trimise la email.',
 
+  // Session expired
+  'session.expired.title': 'Sesiune Expirată',
+  'session.expired.message': 'Sesiunea ta a expirat. Încearcă să te autentifici din nou sau deconectează-te complet.',
+  'session.expired.try_again': 'Încearcă Din Nou',
+  'session.expired.logout': 'Deconectează-te',
+
   'auth.change_password.title': 'Schimbă Parola',
   'auth.change_password.subtitle': 'Actualizează parola pentru securitate.',
   'auth.change_password.change': 'Schimbă Parola',
@@ -199,4 +205,7 @@ export const ro: TranslationKeys = {
   'account.danger_zone': 'Zonă periculoasă',
   'account.delete_warning': 'Ștergerea contului este ireversibilă. Toate datele vor fi pierdute definitiv.',
   'account.delete_account': 'Șterge contul',
+  'account.logout_all_devices': 'Deconectare de pe toate dispozitivele',
+  'account.logout_all_devices_description': 'Aceasta vă va deconecta de pe toate dispozitivele pe care sunteți conectat în prezent.',
+  'account.logout_all_devices_confirm': 'Sigur doriți să vă deconectați de pe toate dispozitivele?',
 };

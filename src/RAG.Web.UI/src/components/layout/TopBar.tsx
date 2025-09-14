@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Menu, User, LogOut, ChevronDown, Settings } from 'lucide-react'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
 import { UserAccountModal } from '@/components/account/UserAccountModal'
+import { SessionExpiredModal } from '@/components/ui/SessionExpiredModal'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -11,7 +12,7 @@ interface TopBarProps {
 
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { t } = useI18n()
-  const { user, logout } = useAuth()
+  const { user, logout, refreshError, forceLogout, clearRefreshError } = useAuth()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -44,6 +45,12 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   const handleAccountClick = () => {
     setIsAccountModalOpen(true)
     setIsUserMenuOpen(false)
+  }
+
+  const handleTryAgain = () => {
+    // Clear the refresh error and try to refresh auth
+    clearRefreshError()
+    // The auth context will automatically try to refresh tokens
   }
 
   return (
@@ -121,6 +128,14 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       <UserAccountModal 
         isOpen={isAccountModalOpen} 
         onClose={() => setIsAccountModalOpen(false)} 
+      />
+
+      {/* Session Expired Modal */}
+      <SessionExpiredModal
+        isOpen={refreshError}
+        onClose={clearRefreshError}
+        onTryAgain={handleTryAgain}
+        onLogout={forceLogout}
       />
     </header>
   )

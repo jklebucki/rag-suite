@@ -138,6 +138,12 @@ export const hu: TranslationKeys = {
   'auth.reset.success_title': 'Utasítások elküldve!',
   'auth.reset.success_message': 'A jelszó visszaállítási utasítások el lettek küldve.',
 
+  // Session expired
+  'session.expired.title': 'Munkamenet Lejárt',
+  'session.expired.message': 'A munkameneted lejárt. Próbálj újra bejelentkezni vagy jelentkezz ki teljesen.',
+  'session.expired.try_again': 'Próbáld Újra',
+  'session.expired.logout': 'Kijelentkezés',
+
   'auth.change_password.title': 'Jelszó Módosítása',
   'auth.change_password.subtitle': 'Frissítsd a jelszavad a biztonság érdekében.',
   'auth.change_password.change': 'Jelszó Módosítása',
@@ -199,4 +205,7 @@ export const hu: TranslationKeys = {
   'account.danger_zone': 'Veszélyes zóna',
   'account.delete_warning': 'A fiók törlése visszafordíthatatlan. Minden adat véglegesen elvész.',
   'account.delete_account': 'Fiók törlése',
+  'account.logout_all_devices': 'Kijelentkezés minden eszközről',
+  'account.logout_all_devices_description': 'Ez kijelentkezteti Önt az összes eszközről, ahol jelenleg be van jelentkezve.',
+  'account.logout_all_devices_confirm': 'Biztosan ki szeretne jelentkezni minden eszközről?',
 };

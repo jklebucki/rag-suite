@@ -59,6 +59,12 @@ class AuthService {
           } catch (refreshError) {
             console.warn('🔄 Token refresh failed in interceptor:', refreshError)
             this.clearStorage()
+            
+            // Dispatch custom event to notify AuthContext about refresh error
+            window.dispatchEvent(new CustomEvent('authRefreshError', {
+              detail: { hasError: true }
+            }))
+            
             // Don't force navigation here - let React Router handle it
             // The auth context will detect the missing token and redirect appropriately
           }

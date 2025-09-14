@@ -8,7 +8,8 @@ import { useOnlineStatus } from './useOnlineStatus'
 export const useTokenRefresh = (
   isAuthenticated: boolean,
   onTokenRefresh: (token: string, refreshToken: string) => void,
-  onLogout: () => void
+  onLogout: () => void,
+  onRefreshError?: () => void
 ) => {
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isRefreshingRef = useRef(false)
@@ -71,20 +72,23 @@ export const useTokenRefresh = (
           console.debug('🔄 Token refreshed successfully')
         } else {
           console.warn('🔄 Token refresh succeeded but tokens are missing')
+          onRefreshError?.()
           onLogout()
         }
       } else {
         console.warn('🔄 Token refresh failed, logging out')
+        onRefreshError?.()
         onLogout()
       }
     } catch (error) {
       console.error('🔄 Token refresh error:', error)
+      onRefreshError?.()
       onLogout()
     } finally {
       isRefreshingRef.current = false
       console.debug('🔄 Token refresh process completed')
     }
-  }, [onTokenRefresh, onLogout, isOnline, MIN_REFRESH_INTERVAL])
+  }, [onTokenRefresh, onLogout, onRefreshError, isOnline, MIN_REFRESH_INTERVAL])
 
   // Schedule next token refresh
   const scheduleTokenRefresh = useCallback(() => {

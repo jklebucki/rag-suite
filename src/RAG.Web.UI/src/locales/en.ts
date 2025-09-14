@@ -138,6 +138,12 @@ export const en: TranslationKeys = {
   'auth.reset.success_title': 'Instructions sent!',
   'auth.reset.success_message': 'Password reset instructions have been sent to your email.',
 
+  // Session expired
+  'session.expired.title': 'Session Expired',
+  'session.expired.message': 'Your session has expired. Try logging in again or sign out completely.',
+  'session.expired.try_again': 'Try Again',
+  'session.expired.logout': 'Sign Out',
+
   'auth.change_password.title': 'Change Password',
   'auth.change_password.subtitle': 'Update your password for security.',
   'auth.change_password.change': 'Change Password',
@@ -199,4 +205,7 @@ export const en: TranslationKeys = {
   'account.danger_zone': 'Danger Zone',
   'account.delete_warning': 'Account deletion is irreversible. All data will be permanently lost.',
   'account.delete_account': 'Delete Account',
+  'account.logout_all_devices': 'Logout from all devices',
+  'account.logout_all_devices_description': 'This will log you out from all devices where you are currently signed in.',
+  'account.logout_all_devices_confirm': 'Are you sure you want to logout from all devices?',
 };

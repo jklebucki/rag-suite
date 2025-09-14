@@ -138,6 +138,12 @@ export const pl: TranslationKeys = {
   'auth.reset.success_title': 'Instrukcje wysłane!',
   'auth.reset.success_message': 'Instrukcje resetowania hasła zostały wysłane na Twój email.',
 
+  // Session expired
+  'session.expired.title': 'Sesja wygasła',
+  'session.expired.message': 'Twoja sesja wygasła. Spróbuj się ponownie zalogować lub wyloguj się całkowicie.',
+  'session.expired.try_again': 'Spróbuj ponownie',
+  'session.expired.logout': 'Wyloguj się',
+
   'auth.change_password.title': 'Zmień hasło',
   'auth.change_password.subtitle': 'Zaktualizuj swoje hasło dla bezpieczeństwa.',
   'auth.change_password.change': 'Zmień hasło',
@@ -199,4 +205,7 @@ export const pl: TranslationKeys = {
   'account.danger_zone': 'Strefa niebezpieczna',
   'account.delete_warning': 'Usunięcie konta jest nieodwracalne. Wszystkie dane zostaną trwale utracone.',
   'account.delete_account': 'Usuń konto',
+  'account.logout_all_devices': 'Wyloguj ze wszystkich urządzeń',
+  'account.logout_all_devices_description': 'Spowoduje to wylogowanie z wszystkich urządzeń, na których jesteś obecnie zalogowany.',
+  'account.logout_all_devices_confirm': 'Czy na pewno chcesz się wylogować ze wszystkich urządzeń?',
 };

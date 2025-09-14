@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, User, Mail, Calendar, Shield, Edit, Trash2 } from 'lucide-react'
+import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import type { User as UserType } from '@/types/auth'
@@ -11,7 +11,7 @@ interface UserAccountModalProps {
 
 export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const { t } = useI18n()
-  const { user } = useAuth()
+  const { user, forceLogout } = useAuth()
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile')
 
   if (!isOpen || !user) return null
@@ -34,6 +34,17 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const handleDeleteAccount = () => {
     // TODO: Implement account deletion functionality
     console.log('Delete account clicked')
+  }
+
+  const handleLogoutAllDevices = async () => {
+    if (window.confirm(t('account.logout_all_devices_confirm'))) {
+      try {
+        await forceLogout()
+        onClose()
+      } catch (error) {
+        console.error('Failed to logout from all devices:', error)
+      }
+    }
   }
 
   return (
@@ -186,6 +197,23 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
 
           {activeTab === 'security' && (
             <div className="space-y-6">
+              {/* Logout from all devices */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="text-sm font-medium text-blue-800 mb-2">
+                  {t('account.logout_all_devices')}
+                </h3>
+                <p className="text-sm text-blue-700 mb-4">
+                  {t('account.logout_all_devices_description')}
+                </p>
+                <button
+                  onClick={handleLogoutAllDevices}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t('account.logout_all_devices')}
+                </button>
+              </div>
+
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <h3 className="text-sm font-medium text-yellow-800 mb-2">
                   {t('account.danger_zone')}

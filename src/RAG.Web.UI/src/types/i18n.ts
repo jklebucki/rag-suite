@@ -200,6 +200,12 @@ export interface TranslationKeys {
   'auth.logout.signing_out': string;
   'auth.logout.success': string;
 
+  // Session expired
+  'session.expired.title': string;
+  'session.expired.message': string;
+  'session.expired.try_again': string;
+  'session.expired.logout': string;
+
   // Account Management
   'account.title': string;
   'account.profile_tab': string;
@@ -216,6 +222,9 @@ export interface TranslationKeys {
   'account.danger_zone': string;
   'account.delete_warning': string;
   'account.delete_account': string;
+  'account.logout_all_devices': string;
+  'account.logout_all_devices_description': string;
+  'account.logout_all_devices_confirm': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;

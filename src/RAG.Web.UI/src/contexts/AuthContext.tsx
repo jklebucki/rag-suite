@@ -9,8 +9,10 @@ interface AuthContextType extends AuthState {
   register: (userData: RegisterRequest) => Promise<boolean>
   resetPassword: (data: ResetPasswordRequest) => Promise<void>
   logout: () => Promise<void>
+  forceLogout: () => Promise<void>
   refreshAuth: () => Promise<void>
   clearError: () => void
+  clearRefreshError: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -21,6 +23,7 @@ type AuthAction =
   | { type: 'SET_TOKEN'; payload: string | null }
   | { type: 'SET_REFRESH_TOKEN'; payload: string | null }
   | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_REFRESH_ERROR'; payload: boolean }
   | { type: 'LOGOUT' }
 
 const initialState: AuthState = {
@@ -30,6 +33,7 @@ const initialState: AuthState = {
   refreshToken: null,
   loading: true,
   error: null,
+  refreshError: false,
 }
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
@@ -53,6 +57,8 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       return { ...state, refreshToken: action.payload }
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false }
+    case 'SET_REFRESH_ERROR':
+      return { ...state, refreshError: action.payload }
     case 'LOGOUT':
       console.debug('🔄 LOGOUT action')
       return { 
@@ -94,9 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'LOGOUT' })
   }, [])
 
+  const handleRefreshError = useCallback(() => {
+    dispatch({ type: 'SET_REFRESH_ERROR', payload: true })
+  }, [])
+
   // Use custom hooks
   const { storeAuthData, clearAuthData } = useAuthStorage(handleStorageLogin, handleStorageLogout)
-  const { performTokenRefresh } = useTokenRefresh(state.isAuthenticated, handleTokenRefresh, handleLogout)
+  const { performTokenRefresh } = useTokenRefresh(state.isAuthenticated, handleTokenRefresh, handleLogout, handleRefreshError)
 
   // Initialize auth state - simplified and more reliable approach
   useEffect(() => {
@@ -173,6 +183,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Run initialization immediately (synchronously)
     initializeAuth()
   }, [performTokenRefresh])
+
+  // Handle refresh error events from auth service
+  useEffect(() => {
+    const handleRefreshError = (event: CustomEvent) => {
+      console.debug('🔄 Refresh error event received:', event.detail)
+      dispatch({ type: 'SET_REFRESH_ERROR', payload: true })
+    }
+
+    window.addEventListener('authRefreshError', handleRefreshError as EventListener)
+
+    return () => {
+      window.removeEventListener('authRefreshError', handleRefreshError as EventListener)
+    }
+  }, [])
 
   const login = async (credentials: LoginRequest): Promise<boolean> => {
     dispatch({ type: 'SET_LOADING', payload: true })
@@ -260,14 +284,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null })
   }
 
+  const forceLogout = async (): Promise<void> => {
+    dispatch({ type: 'SET_LOADING', payload: true })
+    
+    try {
+      await authService.logout()
+    } catch (error) {
+      console.error('Force logout error:', error)
+    } finally {
+      // Clear storage and update state
+      clearAuthData()
+      dispatch({ type: 'LOGOUT' })
+      dispatch({ type: 'SET_REFRESH_ERROR', payload: false })
+    }
+  }
+
+  const clearRefreshError = (): void => {
+    dispatch({ type: 'SET_REFRESH_ERROR', payload: false })
+  }
+
   const value: AuthContextType = {
     ...state,
     login,
     register,
     resetPassword,
     logout,
+    forceLogout,
     refreshAuth,
     clearError,
+    clearRefreshError,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
