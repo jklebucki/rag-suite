@@ -158,7 +158,7 @@ public class UserChatService : IUserChatService
         );
     }
 
-    public async Task<Models.MultilingualChatResponse> SendUserMultilingualMessageAsync(string userId, string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
+    public async Task<MultilingualChatResponse> SendUserMultilingualMessageAsync(string userId, string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
     {
         // Check if user has access to this session
         var dbSession = await _chatDbContext.ChatSessions
@@ -365,7 +365,7 @@ public class UserChatService : IUserChatService
 
             await _chatDbContext.SaveChangesAsync(cancellationToken);
 
-            return new Models.MultilingualChatResponse
+            return new MultilingualChatResponse
             {
                 Response = aiDbMessage.Content,
                 SessionId = sessionId,
@@ -398,7 +398,7 @@ public class UserChatService : IUserChatService
             _chatDbContext.ChatMessages.Add(errorDbMessage);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
 
-            return new Models.MultilingualChatResponse
+            return new MultilingualChatResponse
             {
                 Response = errorDbMessage.Content,
                 SessionId = sessionId,
