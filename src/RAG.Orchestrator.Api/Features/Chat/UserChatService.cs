@@ -7,6 +7,7 @@ using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
 using RAG.Orchestrator.Api.Models;
+using System.IO;
 using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
@@ -289,6 +290,16 @@ public class UserChatService : IUserChatService
                 {
                     enhancedUserMessage = BuildMultilingualContextualPrompt(request.Message, normalizedResponseLanguage);
                     _logger.LogWarning("No documents found for multilingual user message, but document search was requested");
+                }
+
+                // Extract sources from conversation history and add to prompt
+                var conversationSources = ExtractConversationSources(conversationHistory);
+                if (conversationSources.Length > 0)
+                {
+                    var sourcesContext = BuildConversationSourcesContext(conversationSources);
+                    enhancedUserMessage = $"{sourcesContext}\n\n{enhancedUserMessage}";
+                    
+                    _logger.LogDebug("Added {SourceCount} conversation sources to prompt", conversationSources.Length);
                 }
 
 
@@ -745,6 +756,60 @@ public class UserChatService : IUserChatService
         contextBuilder.AppendLine($"CRITICAL: {languageInstruction}");
         contextBuilder.AppendLine(_languageService.GetLocalizedString("system_prompts", "response", language));
 
+        return contextBuilder.ToString();
+    }
+
+    /// <summary>
+    /// Extract distinct source names from conversation history
+    /// </summary>
+    private string[] ExtractConversationSources(List<UserChatMessage> conversationHistory)
+    {
+        var sources = new HashSet<string>();
+        
+        foreach (var message in conversationHistory)
+        {
+            if (message.Sources != null)
+            {
+                foreach (var result in message.Sources)
+                {
+                    var sourceName = !string.IsNullOrEmpty(result.FileName) 
+                        ? result.FileName 
+                        : !string.IsNullOrEmpty(result.FilePath)
+                            ? Path.GetFileName(result.FilePath)
+                            : result.Source ?? "Unknown";
+                    
+                    if (!string.IsNullOrEmpty(sourceName))
+                    {
+                        sources.Add(sourceName);
+                    }
+                }
+            }
+        }
+        
+        return sources.ToArray();
+    }
+
+    /// <summary>
+    /// Build conversation sources context for injection into prompt
+    /// </summary>
+    private string BuildConversationSourcesContext(string[] sources)
+    {
+        if (sources.Length == 0)
+            return string.Empty;
+
+        var contextBuilder = new StringBuilder();
+        contextBuilder.AppendLine("sources used in this conversation");
+        contextBuilder.AppendLine();
+        
+        foreach (var source in sources)
+        {
+            contextBuilder.AppendLine($"- {source}");
+        }
+        
+        contextBuilder.AppendLine();
+        contextBuilder.AppendLine("end of sources used in this conversation");
+        contextBuilder.AppendLine();
+        
         return contextBuilder.ToString();
     }
 }
