@@ -120,23 +120,7 @@ public class SecurityDbContext : IdentityDbContext<User, Role, string, UserClaim
             entity.Property(prt => prt.ExpiresAt).IsRequired();
         });
 
-        // Seed default roles
-        SeedDefaultRoles(builder);
-    }
-
-    private static void SeedDefaultRoles(ModelBuilder builder)
-    {
-        var roles = Models.UserRoles.AllRoles.Select((roleName, index) => new Role
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = roleName,
-            NormalizedName = roleName.ToUpperInvariant(),
-            Description = Models.UserRoles.RoleDescriptions[roleName],
-            CreatedAt = DateTime.UtcNow,
-            ConcurrencyStamp = Guid.NewGuid().ToString()
-        }).ToArray();
-
-        builder.Entity<Role>().HasData(roles);
+        // Note: Role seeding is now handled during application startup for consistency across environments
     }
 }
 

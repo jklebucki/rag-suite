@@ -12,8 +12,8 @@ using RAG.Orchestrator.Api.Data;
 namespace RAG.Orchestrator.Api.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20250911215732_InitialChatDatabase")]
-    partial class InitialChatDatabase
+    [Migration("20250914075807_InitialCreateChat")]
+    partial class InitialCreateChat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

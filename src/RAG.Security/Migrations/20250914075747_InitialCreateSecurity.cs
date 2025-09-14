@@ -4,12 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace RAG.Security.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSecurityDatabase : Migration
+    public partial class InitialCreateSecurity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -190,16 +188,6 @@ namespace RAG.Security.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "roles",
-                columns: new[] { "id", "concurrency_stamp", "created_at", "description", "name", "normalized_name" },
-                values: new object[,]
-                {
-                    { "43cdb8c2-4eff-4a81-9eed-4318fe2d0cea", "666b7c9a-0d8b-40b5-af66-a2706d23edb9", new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7540), "Advanced user with extended features and capabilities", "PowerUser", "POWERUSER" },
-                    { "6d240ca8-5789-4cc5-8ae5-147dfdf5a14c", "4a2ae4ba-f20f-4bea-b0cd-469a1d428bc0", new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7550), "Administrator with full system access and user management", "Admin", "ADMIN" },
-                    { "d4257469-5a23-42d2-835d-cf18b56bf767", "83313ae2-dadb-439f-ab83-3653efebc841", new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7530), "Basic user with standard access to chat functionality", "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

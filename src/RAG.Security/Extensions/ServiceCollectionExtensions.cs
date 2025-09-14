@@ -112,17 +112,17 @@ public static class ServiceCollectionExtensions
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<SecurityDbContext>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<SecurityDbContext>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
             logger.LogInformation("Attempting to ensure PostgreSQL database is created...");
 
-            // Ensure database is created - this will create the database if it doesn't exist
-            // and won't throw exception if it already exists
-            await context.Database.EnsureCreatedAsync();
-
-            // Also run migrations to ensure all tables are created
+            // Run migrations to ensure all tables are created and up-to-date
             await context.Database.MigrateAsync();
 
-            logger.LogInformation("PostgreSQL database creation and migration successful");
+            logger.LogInformation("PostgreSQL database migration successful");
+
+            // Ensure default roles exist
+            await EnsureDefaultRolesAsync(roleManager, logger);
 
             // Ensure admin user exists
             await EnsureAdminUserAsync(scope.ServiceProvider);
@@ -131,6 +131,42 @@ public static class ServiceCollectionExtensions
         {
             // General database initialization error
             throw new InvalidOperationException($"PostgreSQL database initialization failed: {ex.Message}", ex);
+        }
+    }
+
+    private static async Task EnsureDefaultRolesAsync(RoleManager<Role> roleManager, ILogger logger)
+    {
+        logger.LogInformation("Ensuring default roles exist...");
+
+        foreach (var roleName in Models.UserRoles.AllRoles)
+        {
+            var roleExists = await roleManager.RoleExistsAsync(roleName);
+            if (!roleExists)
+            {
+                logger.LogInformation("Creating role: {RoleName}", roleName);
+
+                var role = new Role
+                {
+                    Name = roleName,
+                    Description = Models.UserRoles.RoleDescriptions[roleName],
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var result = await roleManager.CreateAsync(role);
+                if (result.Succeeded)
+                {
+                    logger.LogInformation("Role '{RoleName}' created successfully", roleName);
+                }
+                else
+                {
+                    logger.LogError("Failed to create role '{RoleName}': {Errors}",
+                        roleName, string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+            else
+            {
+                logger.LogInformation("Role '{RoleName}' already exists", roleName);
+            }
         }
     }
 
@@ -175,6 +211,14 @@ public static class ServiceCollectionExtensions
         else
         {
             logger.LogInformation("Default admin user already exists: {AdminEmail}", adminEmail);
+
+            // Ensure admin has Admin role
+            var isInAdminRole = await userManager.IsInRoleAsync(adminUser, Models.UserRoles.Admin);
+            if (!isInAdminRole)
+            {
+                logger.LogInformation("Adding Admin role to existing admin user: {AdminEmail}", adminEmail);
+                await userManager.AddToRoleAsync(adminUser, Models.UserRoles.Admin);
+            }
         }
     }
 }

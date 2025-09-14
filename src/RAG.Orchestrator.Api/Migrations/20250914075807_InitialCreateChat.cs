@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RAG.Orchestrator.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialChatDatabase : Migration
+    public partial class InitialCreateChat : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

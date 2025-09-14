@@ -17,7 +17,7 @@ namespace RAG.Security.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -153,35 +153,6 @@ namespace RAG.Security.Migrations
                         .HasDatabaseName("role_name_index");
 
                     b.ToTable("roles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "d4257469-5a23-42d2-835d-cf18b56bf767",
-                            ConcurrencyStamp = "83313ae2-dadb-439f-ab83-3653efebc841",
-                            CreatedAt = new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7530),
-                            Description = "Basic user with standard access to chat functionality",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
-                            Id = "43cdb8c2-4eff-4a81-9eed-4318fe2d0cea",
-                            ConcurrencyStamp = "666b7c9a-0d8b-40b5-af66-a2706d23edb9",
-                            CreatedAt = new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7540),
-                            Description = "Advanced user with extended features and capabilities",
-                            Name = "PowerUser",
-                            NormalizedName = "POWERUSER"
-                        },
-                        new
-                        {
-                            Id = "6d240ca8-5789-4cc5-8ae5-147dfdf5a14c",
-                            ConcurrencyStamp = "4a2ae4ba-f20f-4bea-b0cd-469a1d428bc0",
-                            CreatedAt = new DateTime(2025, 9, 11, 21, 57, 23, 623, DateTimeKind.Utc).AddTicks(7550),
-                            Description = "Administrator with full system access and user management",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("RAG.Security.Models.RoleClaim", b =>

@@ -271,6 +271,10 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
     "MaxMessagesPerSession": 100,
     "SessionTimeoutMinutes": 60
   },
+  "DefaultAdmin": {
+    "Email": "admin@citronex.pl",
+    "Password": "Citro123"
+  },
   "Security": {
     "AllowedOrigins": [
       "http://localhost:3000",
