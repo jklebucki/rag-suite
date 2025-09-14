@@ -174,11 +174,17 @@ public static class ServiceCollectionExtensions
     {
         var userManager = services.GetRequiredService<UserManager<User>>();
         var logger = services.GetRequiredService<ILogger<SecurityDbContext>>();
-        var adminConfig = services.GetRequiredService<DefaultAdminConfiguration>();
-
+        var configuration = services.GetRequiredService<IConfiguration>();
         // Get admin credentials from configuration
-        var adminEmail = adminConfig.Email;
-        var adminPassword = adminConfig.Password;
+        var adminEmail = configuration["DefaultAdmin:Email"];
+        var adminPassword = configuration["DefaultAdmin:Password"];
+        logger.LogInformation("Ensuring default admin user exists...");
+
+        if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
+        {
+            logger.LogError("DefaultAdmin email or password not configured in appsettings");
+            return;
+        }
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
