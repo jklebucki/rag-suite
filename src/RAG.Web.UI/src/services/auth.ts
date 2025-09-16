@@ -36,7 +36,7 @@ class AuthService {
       (response) => response,
       async (error) => {
         const originalRequest = error.config
-        
+
         console.debug('🔄 HTTP error intercepted:', {
           status: error.response?.status,
           url: originalRequest?.url,
@@ -59,12 +59,12 @@ class AuthService {
           } catch (refreshError) {
             console.warn('🔄 Token refresh failed in interceptor:', refreshError)
             this.clearStorage()
-            
+
             // Dispatch custom event to notify AuthContext about refresh error
             window.dispatchEvent(new CustomEvent('authRefreshError', {
               detail: { hasError: true }
             }))
-            
+
             // Don't force navigation here - let React Router handle it
             // The auth context will detect the missing token and redirect appropriately
           }
@@ -77,10 +77,10 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     console.debug('🔐 Login attempt with credentials:', { email: credentials.email })
-    
+
     const response = await this.client.post<LoginResponse>('/login', credentials)
     const loginData = response.data
-    
+
     console.debug('🔐 Login response received:', {
       hasToken: !!loginData.token,
       hasRefreshToken: !!loginData.refreshToken,
@@ -106,7 +106,7 @@ class AuthService {
     try {
       const refreshToken = this.getRefreshToken()
       console.debug('🔐 Logout attempt with:', { hasRefreshToken: !!refreshToken })
-      
+
       if (refreshToken) {
         await this.client.post('/logout', {
           RefreshToken: refreshToken
@@ -140,7 +140,7 @@ class AuthService {
     try {
       const refreshToken = this.getRefreshToken()
       console.debug('🔄 Attempting token refresh with:', { hasRefreshToken: !!refreshToken })
-      
+
       if (!refreshToken) {
         console.warn('🔄 No refresh token available')
         return false
@@ -191,8 +191,8 @@ class AuthService {
     }
   }
 
-  async requestPasswordReset(request: ResetPasswordRequest): Promise<void> {
-    await this.client.post<ApiResponse<void>>('/reset-password', request)
+  async requestPasswordReset(email: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/forgot-password', { email })
   }
 
   async changePassword(request: ChangePasswordRequest): Promise<void> {
@@ -237,7 +237,7 @@ class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken()
     console.debug('🔑 Checking authentication:', { hasToken: !!token })
-    
+
     if (!token) {
       console.debug('🔑 No token found')
       return false
@@ -247,21 +247,21 @@ class AuthService {
       // Validate token expiry
       const payload = JSON.parse(atob(token.split('.')[1]))
       const isExpired = payload.exp * 1000 <= Date.now()
-      
+
       console.debug('🔑 Token validation:', {
         exp: payload.exp,
         expTime: new Date(payload.exp * 1000),
         now: new Date(),
         isExpired
       })
-      
+
       if (isExpired) {
         // Token expired, clear storage
         console.warn('🔑 Token expired, clearing storage')
         this.clearStorage()
         return false
       }
-      
+
       console.debug('🔑 Token is valid')
       return true
     } catch (error) {
@@ -280,7 +280,7 @@ class AuthService {
       const payload = JSON.parse(atob(token.split('.')[1]))
       const expiryTime = payload.exp * 1000
       const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000)
-      
+
       return expiryTime <= fiveMinutesFromNow
     } catch {
       return false

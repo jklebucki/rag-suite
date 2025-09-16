@@ -64,12 +64,10 @@ export function ResetPasswordForm() {
     setLoading(true)
 
     try {
-      await resetPassword({
-        email: formData.email
-      })
+      await resetPassword({ email: formData.email })
 
       setIsSuccess(true)
-      
+
       addToast({
         type: 'success',
         title: t('auth.reset.success_title'),
@@ -133,7 +131,7 @@ export function ResetPasswordForm() {
             {t('auth.reset.subtitle')}
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="sr-only">

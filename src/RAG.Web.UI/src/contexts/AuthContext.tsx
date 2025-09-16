@@ -38,16 +38,16 @@ const initialState: AuthState = {
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   console.debug('🔄 Auth reducer action:', action.type, 'payload' in action ? action.payload : 'no payload')
-  
+
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload }
     case 'SET_USER':
-      const newState = { 
-        ...state, 
+      const newState = {
+        ...state,
         user: action.payload,
         isAuthenticated: !!action.payload,
-        loading: false 
+        loading: false
       }
       console.debug('🔄 SET_USER new state:', { isAuthenticated: newState.isAuthenticated, loading: newState.loading })
       return newState
@@ -61,9 +61,9 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       return { ...state, refreshError: action.payload }
     case 'LOGOUT':
       console.debug('🔄 LOGOUT action')
-      return { 
-        ...initialState, 
-        loading: false 
+      return {
+        ...initialState,
+        loading: false
       }
     default:
       return state
@@ -114,28 +114,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.debug('🔐 Auth already initialized, skipping')
       return
     }
-    
+
     const initializeAuth = () => {
       console.debug('🔐 Auth initialization started (synchronous)')
       isInitializedRef.current = true
-      
+
       try {
         // Synchronous check of localStorage - no async calls here
         const hasValidAuth = authService.isAuthenticated()
-        
+
         if (hasValidAuth) {
           const token = authService.getToken()
           const refreshToken = authService.getRefreshToken()
           const userData = authService.getUser()
-          
+
           console.debug('🔐 Valid auth found, setting state immediately')
-          
+
           // Set state immediately - this should prevent login redirect
           dispatch({ type: 'SET_TOKEN', payload: token })
           dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
           dispatch({ type: 'SET_USER', payload: userData })
           // Loading is automatically set to false in SET_USER action
-          
+
           // Schedule background verification (don't block initial render)
           setTimeout(() => {
             verifyAuthInBackground()
@@ -149,15 +149,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'LOGOUT' })
       }
     }
-    
+
     const verifyAuthInBackground = async () => {
       if (isVerifyingRef.current) {
         console.debug('🔐 Background verification already in progress, skipping')
         return
       }
-      
+
       isVerifyingRef.current = true
-      
+
       try {
         console.debug('🔐 Background auth verification started')
         const user = await authService.getCurrentUser()
@@ -204,10 +204,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       const loginData = await authService.login(credentials)
-      
+
       // Store auth data using our secure storage method
       storeAuthData(loginData.token, loginData.refreshToken, loginData.user)
-      
+
       // Update context state
       dispatch({ type: 'SET_TOKEN', payload: loginData.token })
       dispatch({ type: 'SET_REFRESH_TOKEN', payload: loginData.refreshToken })
@@ -238,12 +238,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const resetPassword = async (data: ResetPasswordRequest): Promise<void> => {
+  const resetPassword = async (data: { email: string }): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
     dispatch({ type: 'SET_ERROR', payload: null })
 
     try {
-      await authService.requestPasswordReset(data)
+      await authService.requestPasswordReset(data.email)
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Password reset failed'
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
@@ -255,7 +255,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async (): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
-    
+
     try {
       await authService.logout()
     } catch (error) {
@@ -286,7 +286,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logoutAllDevices = async (): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
-    
+
     try {
       await authService.logoutAllDevices()
     } catch (error) {
