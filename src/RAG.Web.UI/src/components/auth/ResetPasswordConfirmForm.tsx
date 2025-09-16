@@ -92,8 +92,8 @@ export function ResetPasswordConfirmForm() {
     try {
       await confirmPasswordReset({
         token,
-        newPassword: formData.newPassword,
-        confirmPassword: formData.confirmPassword
+        NewPassword: formData.newPassword,
+        ConfirmNewPassword: formData.confirmPassword
       })
 
       setIsSuccess(true)

@@ -8,7 +8,7 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<boolean>
   register: (userData: RegisterRequest) => Promise<boolean>
   resetPassword: (data: { email: string; uiUrl: string }) => Promise<void>
-  confirmPasswordReset: (data: { token: string; newPassword: string; confirmPassword: string }) => Promise<void>
+  confirmPasswordReset: (data: { token: string; NewPassword: string; ConfirmNewPassword: string }) => Promise<void>
   logout: () => Promise<void>
   logoutAllDevices: () => Promise<void>
   refreshAuth: () => Promise<void>
@@ -254,12 +254,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const confirmPasswordReset = async (data: { token: string; newPassword: string; confirmPassword: string }): Promise<void> => {
+  const confirmPasswordReset = async (data: { token: string; NewPassword: string; ConfirmNewPassword: string }): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
     dispatch({ type: 'SET_ERROR', payload: null })
 
     try {
-      await authService.confirmPasswordReset(data.token, data.newPassword, data.confirmPassword)
+      await authService.confirmPasswordReset(data.token, data.NewPassword, data.ConfirmNewPassword)
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Password reset confirmation failed'
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
