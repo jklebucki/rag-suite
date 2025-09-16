@@ -138,6 +138,15 @@ export const pl: TranslationKeys = {
   'auth.reset.success_title': 'Instrukcje wysłane!',
   'auth.reset.success_message': 'Instrukcje resetowania hasła zostały wysłane na Twój email.',
 
+  'auth.reset_confirm.title': 'Ustaw nowe hasło',
+  'auth.reset_confirm.subtitle': 'Wprowadź nowe hasło poniżej.',
+  'auth.reset_confirm.reset_password': 'Resetuj hasło',
+  'auth.reset_confirm.resetting': 'Resetowanie...',
+  'auth.reset_confirm.back_to_login': 'Powrót do logowania',
+  'auth.reset_confirm.success_title': 'Hasło zresetowane!',
+  'auth.reset_confirm.success_message': 'Twoje hasło zostało pomyślnie zresetowane.',
+  'auth.reset_confirm.redirect_message': 'Za chwilę zostaniesz przekierowany na stronę logowania.',
+
   // Session expired
   'session.expired.title': 'Sesja wygasła',
   'session.expired.message': 'Twoja sesja wygasła. Spróbuj się ponownie zalogować lub wyloguj się całkowicie.',
@@ -178,6 +187,8 @@ export const pl: TranslationKeys = {
   'auth.validation.password_require_lowercase': 'Hasło musi zawierać co najmniej jedną małą literę',
   'auth.validation.password_require_special': 'Hasło musi zawierać co najmniej jeden znak specjalny',
   'auth.validation.password_mismatch': 'Hasła nie są identyczne',
+  'auth.validation.confirm_password_required': 'Potwierdzenie hasła jest wymagane',
+  'auth.validation.passwords_do_not_match': 'Hasła nie są identyczne',
   'auth.validation.first_name_required': 'Imię jest wymagane',
   'auth.validation.last_name_required': 'Nazwisko jest wymagane',
   'auth.validation.username_required': 'Nazwa użytkownika jest wymagana',

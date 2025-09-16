@@ -197,7 +197,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var success = await _authService.ForgotPasswordAsync(request.Email);
+        var success = await _authService.ForgotPasswordAsync(request.Email, request.UiUrl);
         if (!success)
         {
             return BadRequest(new { message = "Failed to process password reset request" });

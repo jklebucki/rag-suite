@@ -138,6 +138,15 @@ export const en: TranslationKeys = {
   'auth.reset.success_title': 'Instructions sent!',
   'auth.reset.success_message': 'Password reset instructions have been sent to your email.',
 
+  'auth.reset_confirm.title': 'Set New Password',
+  'auth.reset_confirm.subtitle': 'Enter your new password below.',
+  'auth.reset_confirm.reset_password': 'Reset Password',
+  'auth.reset_confirm.resetting': 'Resetting...',
+  'auth.reset_confirm.back_to_login': 'Back to sign in',
+  'auth.reset_confirm.success_title': 'Password Reset!',
+  'auth.reset_confirm.success_message': 'Your password has been reset successfully.',
+  'auth.reset_confirm.redirect_message': 'You will be redirected to the login page shortly.',
+
   // Session expired
   'session.expired.title': 'Session Expired',
   'session.expired.message': 'Your session has expired. Try logging in again or sign out completely.',
@@ -178,6 +187,8 @@ export const en: TranslationKeys = {
   'auth.validation.password_require_lowercase': 'Password must contain at least one lowercase letter',
   'auth.validation.password_require_special': 'Password must contain at least one special character',
   'auth.validation.password_mismatch': 'Passwords do not match',
+  'auth.validation.confirm_password_required': 'Confirm password is required',
+  'auth.validation.passwords_do_not_match': 'Passwords do not match',
   'auth.validation.first_name_required': 'First name is required',
   'auth.validation.last_name_required': 'Last name is required',
   'auth.validation.username_required': 'Username is required',

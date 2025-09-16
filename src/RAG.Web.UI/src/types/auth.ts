@@ -39,6 +39,7 @@ export interface RegisterRequest {
 
 export interface ResetPasswordRequest {
   email: string
+  uiUrl: string
 }
 
 export interface ChangePasswordRequest {

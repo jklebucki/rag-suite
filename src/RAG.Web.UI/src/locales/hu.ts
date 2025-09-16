@@ -138,6 +138,15 @@ export const hu: TranslationKeys = {
   'auth.reset.success_title': 'Utasítások elküldve!',
   'auth.reset.success_message': 'A jelszó visszaállítási utasítások el lettek küldve.',
 
+  'auth.reset_confirm.title': 'Új Jelszó Beállítása',
+  'auth.reset_confirm.subtitle': 'Add meg az új jelszavad alább.',
+  'auth.reset_confirm.reset_password': 'Jelszó Visszaállítása',
+  'auth.reset_confirm.resetting': 'Visszaállítás...',
+  'auth.reset_confirm.back_to_login': 'Vissza a bejelentkezéshez',
+  'auth.reset_confirm.success_title': 'Jelszó visszaállítva!',
+  'auth.reset_confirm.success_message': 'A jelszavad sikeresen vissza lett állítva.',
+  'auth.reset_confirm.redirect_message': 'Hamarosan átirányítunk a bejelentkezési oldalra.',
+
   // Session expired
   'session.expired.title': 'Munkamenet Lejárt',
   'session.expired.message': 'A munkameneted lejárt. Próbálj újra bejelentkezni vagy jelentkezz ki teljesen.',
@@ -178,6 +187,8 @@ export const hu: TranslationKeys = {
   'auth.validation.password_require_lowercase': 'A jelszónak tartalmaznia kell kisbetűt',
   'auth.validation.password_require_special': 'A jelszónak tartalmaznia kell speciális karaktert',
   'auth.validation.password_mismatch': 'A jelszavak nem egyeznek',
+  'auth.validation.confirm_password_required': 'A jelszó megerősítése kötelező',
+  'auth.validation.passwords_do_not_match': 'A jelszavak nem egyeznek',
   'auth.validation.first_name_required': 'A keresztnév kötelező',
     'auth.validation.last_name_required': 'A vezetéknév kötelező',
   'auth.validation.username_required': 'A felhasználónév kötelező',

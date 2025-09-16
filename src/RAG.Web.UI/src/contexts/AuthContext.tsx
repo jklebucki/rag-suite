@@ -2,12 +2,13 @@ import React, { createContext, useContext, useEffect, useReducer, ReactNode, use
 import { authService } from '@/services/auth'
 import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 import { useAuthStorage } from '@/hooks/useAuthStorage'
-import type { AuthState, User, LoginRequest, RegisterRequest, ResetPasswordRequest } from '@/types/auth'
+import type { AuthState, User, LoginRequest, RegisterRequest } from '@/types/auth'
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<boolean>
   register: (userData: RegisterRequest) => Promise<boolean>
-  resetPassword: (data: ResetPasswordRequest) => Promise<void>
+  resetPassword: (data: { email: string; uiUrl: string }) => Promise<void>
+  confirmPasswordReset: (data: { token: string; newPassword: string; confirmPassword: string }) => Promise<void>
   logout: () => Promise<void>
   logoutAllDevices: () => Promise<void>
   refreshAuth: () => Promise<void>
@@ -238,14 +239,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const resetPassword = async (data: { email: string }): Promise<void> => {
+  const resetPassword = async (data: { email: string; uiUrl: string }): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true })
     dispatch({ type: 'SET_ERROR', payload: null })
 
     try {
-      await authService.requestPasswordReset(data.email)
+      await authService.requestPasswordReset(data.email, data.uiUrl)
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Password reset failed'
+      dispatch({ type: 'SET_ERROR', payload: errorMessage })
+      throw error
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false })
+    }
+  }
+
+  const confirmPasswordReset = async (data: { token: string; newPassword: string; confirmPassword: string }): Promise<void> => {
+    dispatch({ type: 'SET_LOADING', payload: true })
+    dispatch({ type: 'SET_ERROR', payload: null })
+
+    try {
+      await authService.confirmPasswordReset(data.token, data.newPassword, data.confirmPassword)
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Password reset confirmation failed'
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
       throw error
     } finally {
@@ -308,6 +324,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     resetPassword,
+    confirmPasswordReset,
     logout,
     logoutAllDevices,
     refreshAuth,

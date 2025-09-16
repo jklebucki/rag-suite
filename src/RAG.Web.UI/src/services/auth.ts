@@ -191,8 +191,12 @@ class AuthService {
     }
   }
 
-  async requestPasswordReset(email: string): Promise<void> {
-    await this.client.post<ApiResponse<void>>('/forgot-password', { email })
+  async requestPasswordReset(email: string, uiUrl: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/forgot-password', { email, uiUrl })
+  }
+
+  async confirmPasswordReset(token: string, newPassword: string, confirmPassword: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/reset-password', { token, newPassword, confirmPassword })
   }
 
   async changePassword(request: ChangePasswordRequest): Promise<void> {

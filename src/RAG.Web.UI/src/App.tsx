@@ -3,7 +3,7 @@ import { Layout } from '@/components/Layout'
 import { Dashboard } from '@/components/dashboard/Dashboard'
 import { ChatInterface } from '@/components/chat/ChatInterface'
 import { SearchInterface } from '@/components/search/SearchInterface'
-import { LoginForm, RegisterForm, ResetPasswordForm, ProtectedRoute, AuthRoute } from '@/components/auth'
+import { LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm, ProtectedRoute, AuthRoute } from '@/components/auth'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -58,10 +58,18 @@ function App() {
                 }
               />
               <Route
-                path="/reset-password"
+                path="/forgot-password"
                 element={
                   <AuthRoute>
                     <ResetPasswordForm />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <AuthRoute>
+                    <ResetPasswordConfirmForm />
                   </AuthRoute>
                 }
               />

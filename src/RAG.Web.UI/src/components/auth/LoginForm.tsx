@@ -15,7 +15,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const { login, loading, error, clearError } = useAuth()
   const { t } = useI18n()
   const { addToast } = useToast()
-  
+
   const [formData, setFormData] = useState<LoginRequest>({
     email: '',
     password: '',
@@ -30,7 +30,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
       setValidationErrors(prev => ({
@@ -38,7 +38,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         [name]: ''
       }))
     }
-    
+
     // Clear general error
     if (error) {
       clearError()
@@ -66,13 +66,13 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
 
     const success = await login(formData)
-    
+
     if (success) {
       addToast({
         type: 'success',
@@ -179,9 +179,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               {t('auth.login.remember_me')}
             </span>
           </label>
-          
+
           <Link
-            to="/reset-password"
+            to="/forgot-password"
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
             {t('auth.login.forgot_password')}

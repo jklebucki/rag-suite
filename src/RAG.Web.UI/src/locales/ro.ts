@@ -138,6 +138,15 @@ export const ro: TranslationKeys = {
   'auth.reset.success_title': 'Instrucțiuni trimise!',
   'auth.reset.success_message': 'Instrucțiunile de resetare parolă au fost trimise la email.',
 
+  'auth.reset_confirm.title': 'Setează Parolă Nouă',
+  'auth.reset_confirm.subtitle': 'Introdu parola nouă mai jos.',
+  'auth.reset_confirm.reset_password': 'Resetează Parola',
+  'auth.reset_confirm.resetting': 'Se resetează...',
+  'auth.reset_confirm.back_to_login': 'Înapoi la autentificare',
+  'auth.reset_confirm.success_title': 'Parolă Resetată!',
+  'auth.reset_confirm.success_message': 'Parola ta a fost resetată cu succes.',
+  'auth.reset_confirm.redirect_message': 'Vei fi redirecționat către pagina de autentificare în curând.',
+
   // Session expired
   'session.expired.title': 'Sesiune Expirată',
   'session.expired.message': 'Sesiunea ta a expirat. Încearcă să te autentifici din nou sau deconectează-te complet.',
@@ -178,6 +187,8 @@ export const ro: TranslationKeys = {
   'auth.validation.password_require_lowercase': 'Parola trebuie să conțină o literă mică',
   'auth.validation.password_require_special': 'Parola trebuie să conțină un caracter special',
   'auth.validation.password_mismatch': 'Parolele nu se potrivesc',
+  'auth.validation.confirm_password_required': 'Confirmarea parolei este obligatorie',
+  'auth.validation.passwords_do_not_match': 'Parolele nu se potrivesc',
   'auth.validation.first_name_required': 'Prenumele este obligatoriu',
   'auth.validation.last_name_required': 'Numele este obligatoriu',
   'auth.validation.username_required': 'Numele de utilizator este obligatoriu',

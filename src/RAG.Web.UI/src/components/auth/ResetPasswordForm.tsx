@@ -64,7 +64,7 @@ export function ResetPasswordForm() {
     setLoading(true)
 
     try {
-      await resetPassword({ email: formData.email })
+      await resetPassword({ email: formData.email, uiUrl: window.location.origin })
 
       setIsSuccess(true)
 

@@ -19,7 +19,7 @@ public interface IAuthService
     Task<bool> AssignRoleAsync(string userId, string roleName);
     Task<bool> RemoveRoleAsync(string userId, string roleName);
     Task<IList<string>> GetUserRolesAsync(string userId);
-    Task<bool> ForgotPasswordAsync(string email);
+    Task<bool> ForgotPasswordAsync(string email, string uiUrl);
     Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
 }
 
@@ -270,7 +270,7 @@ public class AuthService : IAuthService
         return await _userManager.GetRolesAsync(user);
     }
 
-    public async Task<bool> ForgotPasswordAsync(string email)
+    public async Task<bool> ForgotPasswordAsync(string email, string uiUrl) 
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null || !user.IsActive)
@@ -292,7 +292,7 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
 
         // Generate reset link (assuming frontend URL)
-        var resetLink = $"https://yourapp.com/reset-password?token={resetToken}";
+        var resetLink = $"{uiUrl}/reset-password?token={resetToken}";
 
         // Send email
         await _emailService.SendPasswordResetEmailAsync(email, resetLink);

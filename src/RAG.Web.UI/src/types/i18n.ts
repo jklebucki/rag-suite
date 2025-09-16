@@ -155,6 +155,15 @@ export interface TranslationKeys {
   'auth.reset.success_title': string;
   'auth.reset.success_message': string;
 
+  'auth.reset_confirm.title': string;
+  'auth.reset_confirm.subtitle': string;
+  'auth.reset_confirm.reset_password': string;
+  'auth.reset_confirm.resetting': string;
+  'auth.reset_confirm.back_to_login': string;
+  'auth.reset_confirm.success_title': string;
+  'auth.reset_confirm.success_message': string;
+  'auth.reset_confirm.redirect_message': string;
+
   'auth.change_password.title': string;
   'auth.change_password.subtitle': string;
   'auth.change_password.change': string;
@@ -189,6 +198,8 @@ export interface TranslationKeys {
   'auth.validation.password_require_lowercase': string;
   'auth.validation.password_require_special': string;
   'auth.validation.password_mismatch': string;
+  'auth.validation.confirm_password_required': string;
+  'auth.validation.passwords_do_not_match': string;
   'auth.validation.first_name_required': string;
   'auth.validation.last_name_required': string;
   'auth.validation.username_required': string;

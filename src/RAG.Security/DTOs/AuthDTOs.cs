@@ -95,6 +95,9 @@ public record ForgotPasswordRequest
     [Required]
     [EmailAddress]
     public string Email { get; init; } = string.Empty;
+
+    [Required]
+    public string UiUrl { get; init; } = string.Empty;
 }
 
 public record ResetPasswordRequest

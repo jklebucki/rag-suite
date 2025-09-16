@@ -138,6 +138,15 @@ export const nl: TranslationKeys = {
   'auth.reset.success_title': 'Instructies verstuurd!',
   'auth.reset.success_message': 'Wachtwoord reset instructies zijn naar je e-mail verstuurd.',
 
+  'auth.reset_confirm.title': 'Nieuw Wachtwoord Instellen',
+  'auth.reset_confirm.subtitle': 'Voer je nieuwe wachtwoord hieronder in.',
+  'auth.reset_confirm.reset_password': 'Wachtwoord Resetten',
+  'auth.reset_confirm.resetting': 'Resetten...',
+  'auth.reset_confirm.back_to_login': 'Terug naar inloggen',
+  'auth.reset_confirm.success_title': 'Wachtwoord Gereset!',
+  'auth.reset_confirm.success_message': 'Je wachtwoord is succesvol gereset.',
+  'auth.reset_confirm.redirect_message': 'Je wordt binnenkort doorgestuurd naar de inlogpagina.',
+
   // Session expired
   'session.expired.title': 'Sessie Verlopen',
   'session.expired.message': 'Je sessie is verlopen. Probeer opnieuw in te loggen of log volledig uit.',
@@ -178,6 +187,8 @@ export const nl: TranslationKeys = {
   'auth.validation.password_require_lowercase': 'Wachtwoord moet een kleine letter bevatten',
   'auth.validation.password_require_special': 'Wachtwoord moet een speciaal teken bevatten',
   'auth.validation.password_mismatch': 'Wachtwoorden komen niet overeen',
+  'auth.validation.confirm_password_required': 'Wachtwoord bevestiging is verplicht',
+  'auth.validation.passwords_do_not_match': 'Wachtwoorden komen niet overeen',
   'auth.validation.first_name_required': 'Voornaam is verplicht',
   'auth.validation.last_name_required': 'Achternaam is verplicht',
   'auth.validation.username_required': 'Gebruikersnaam is verplicht',
