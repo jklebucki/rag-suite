@@ -3,6 +3,7 @@ using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Extensions;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
@@ -19,6 +20,9 @@ builder.Services.AddLocalization(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddCorsPolicy();
 builder.Services.AddControllers();
+
+// Configure FileDownload options
+builder.Services.Configure<SharedFoldersOptions>(builder.Configuration.GetSection("Services"));
 
 // Add feature services
 builder.Services.AddFeatureServices();
@@ -80,6 +84,7 @@ app.MapSearchEndpoints();
 app.MapHealthEndpoints();
 app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
+app.MapFileDownloadEndpoints();
 
 // Simple health endpoint
 app.MapGet("/health", (HttpContext context) =>

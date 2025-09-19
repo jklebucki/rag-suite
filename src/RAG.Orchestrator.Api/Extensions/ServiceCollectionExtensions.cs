@@ -6,6 +6,7 @@ using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Embeddings;
+using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
@@ -143,6 +144,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
+        services.AddScoped<IFileDownloadService, FileDownloadService>();
 
         return services;
     }
