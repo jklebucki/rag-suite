@@ -260,6 +260,17 @@ class ApiClient {
     link.remove()
     window.URL.revokeObjectURL(url)
   }
+
+  async downloadFileWithConversion(filePath: string, forceConvert: boolean = false): Promise<AxiosResponse<Blob>> {
+    const params = new URLSearchParams()
+    if (forceConvert) {
+      params.append('forceConvert', 'true')
+    }
+
+    return await this.client.get(`/filedownload/convert/${encodeURIComponent(filePath)}?${params.toString()}`, {
+      responseType: 'blob'
+    })
+  }
 }
 
 export const apiClient = new ApiClient()

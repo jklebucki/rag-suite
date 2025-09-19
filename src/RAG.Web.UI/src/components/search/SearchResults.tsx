@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Download, Search } from 'lucide-react'
+import { Download, Search, Eye } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { Modal } from '@/components/ui/Modal'
+import { PDFViewerModal } from '@/components/ui/PDFViewerModal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from './hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
@@ -23,6 +24,7 @@ interface SearchResultsProps {
 export function SearchResults({ searchResults, isLoading, error, hasSearched, onExport }: SearchResultsProps) {
   const { t, language } = useI18n()
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
+  const [pdfViewerFilePath, setPdfViewerFilePath] = useState<string | null>(null)
   const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
 
   console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
@@ -95,6 +97,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
             key={result.id}
             result={result}
             onViewDetails={() => setSelectedDocumentId(result.id)}
+            onViewPDF={(filePath) => setPdfViewerFilePath(filePath)}
             language={language}
           />
         ))}
@@ -127,6 +130,14 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
           <DocumentDetail document={documentDetail} />
         )}
       </Modal>
+
+      {/* PDF Viewer Modal */}
+      <PDFViewerModal
+        isOpen={!!pdfViewerFilePath}
+        onClose={() => setPdfViewerFilePath(null)}
+        filePath={pdfViewerFilePath || ''}
+        title="PDF Viewer"
+      />
     </div>
   )
 }
@@ -134,10 +145,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 interface SearchResultItemProps {
   result: SearchResult
   onViewDetails: () => void
+  onViewPDF?: (filePath: string) => void
   language: import('@/types/i18n').LanguageCode
 }
 
-function SearchResultItem({ result, onViewDetails, language }: SearchResultItemProps) {
+function SearchResultItem({ result, onViewDetails, onViewPDF, language }: SearchResultItemProps) {
   const formatScore = (score: number) => Math.round(score)
 
   // Check if document was reconstructed from chunks
@@ -200,13 +212,22 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
         </div>
         <div className="flex items-center gap-2">
           {result.filePath && (
-            <button
-              onClick={handleDownload}
-              className="text-primary-600 hover:text-primary-700 p-1 rounded"
-              title="Download file"
-            >
-              <Download className="h-4 w-4" />
-            </button>
+            <>
+              <button
+                onClick={() => onViewPDF?.(result.filePath!)}
+                className="text-primary-600 hover:text-primary-700 p-1 rounded"
+                title="View PDF"
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleDownload}
+                className="text-primary-600 hover:text-primary-700 p-1 rounded"
+                title="Download file"
+              >
+                <Download className="h-4 w-4" />
+              </button>
+            </>
           )}
           <button
             onClick={onViewDetails}

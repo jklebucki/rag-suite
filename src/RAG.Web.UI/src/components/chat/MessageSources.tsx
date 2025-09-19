@@ -1,8 +1,9 @@
 import React from 'react'
-import { FileText, ExternalLink, Clock, Star, Folder, Download } from 'lucide-react'
+import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
+import { PDFViewerModal } from '@/components/ui/PDFViewerModal'
 import type { SearchResult } from '@/types/api'
 
 interface MessageSourcesProps {
@@ -12,6 +13,7 @@ interface MessageSourcesProps {
 
 export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
   const { t, language: currentLanguage } = useI18n()
+  const [pdfViewerFilePath, setPdfViewerFilePath] = React.useState<string | null>(null)
 
   const handleDownload = async (filePath: string) => {
     try {
@@ -130,15 +132,26 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
             {/* External Link Icon */}
             <div className="flex-shrink-0 flex items-center gap-1">
               {source.filePath && (
-                <button
-                  onClick={() => handleDownload(source.filePath!)}
-                  className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
-                    messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
-                  }`}
-                  title="Download file"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
+                <>
+                  <button
+                    onClick={() => setPdfViewerFilePath(source.filePath!)}
+                    className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
+                      messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                    }`}
+                    title="View PDF"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDownload(source.filePath!)}
+                    className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
+                      messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                    }`}
+                    title="Download file"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                </>
               )}
               <ExternalLink className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity ${
                 messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
@@ -156,6 +169,14 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           {t('chat.sources.summary', sources.length.toString())}
         </div>
       )}
+
+      {/* PDF Viewer Modal */}
+      <PDFViewerModal
+        isOpen={!!pdfViewerFilePath}
+        onClose={() => setPdfViewerFilePath(null)}
+        filePath={pdfViewerFilePath || ''}
+        title="PDF Viewer"
+      />
     </div>
   )
 }
