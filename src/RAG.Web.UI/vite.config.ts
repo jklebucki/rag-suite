@@ -33,5 +33,20 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor chunks
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-utils': ['clsx', 'tailwind-merge', 'axios'],
+          // PDF viewer in separate chunk
+          'pdf-viewer': ['react-pdf', 'pdfjs-dist'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600, // Increase warning limit to 600kB
   },
 })

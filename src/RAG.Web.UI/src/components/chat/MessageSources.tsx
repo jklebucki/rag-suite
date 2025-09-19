@@ -3,8 +3,10 @@ import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'luci
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
-import { PDFViewerModal } from '@/components/ui/PDFViewerModal'
 import type { SearchResult } from '@/types/api'
+
+// Lazy load PDFViewerModal
+const PDFViewerModal = React.lazy(() => import('@/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
 
 interface MessageSourcesProps {
   sources: SearchResult[]
@@ -171,12 +173,23 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
       )}
 
       {/* PDF Viewer Modal */}
-      <PDFViewerModal
-        isOpen={!!pdfViewerFilePath}
-        onClose={() => setPdfViewerFilePath(null)}
-        filePath={pdfViewerFilePath || ''}
-        title="PDF Viewer"
-      />
+      <React.Suspense fallback={
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl p-8">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+              <span className="ml-2 text-gray-600">Loading PDF viewer...</span>
+            </div>
+          </div>
+        </div>
+      }>
+        <PDFViewerModal
+          isOpen={!!pdfViewerFilePath}
+          onClose={() => setPdfViewerFilePath(null)}
+          filePath={pdfViewerFilePath || ''}
+          title="PDF Viewer"
+        />
+      </React.Suspense>
     </div>
   )
 }

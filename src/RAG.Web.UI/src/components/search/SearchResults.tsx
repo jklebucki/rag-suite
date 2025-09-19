@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { Download, Search, Eye } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { Modal } from '@/components/ui/Modal'
-import { PDFViewerModal } from '@/components/ui/PDFViewerModal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from './hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
 import { apiClient } from '@/services/api'
 import type { SearchResult } from '@/types'
+
+// Lazy load PDFViewerModal
+const PDFViewerModal = React.lazy(() => import('@/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
 
 interface SearchResultsProps {
   searchResults?: {
@@ -132,12 +134,25 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       </Modal>
 
       {/* PDF Viewer Modal */}
-      <PDFViewerModal
-        isOpen={!!pdfViewerFilePath}
-        onClose={() => setPdfViewerFilePath(null)}
-        filePath={pdfViewerFilePath || ''}
-        title="PDF Viewer"
-      />
+      <Suspense fallback={
+        <Modal
+          isOpen={!!pdfViewerFilePath}
+          onClose={() => setPdfViewerFilePath(null)}
+          title="Loading PDF Viewer..."
+        >
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <span className="ml-2 text-gray-600">Loading PDF viewer...</span>
+          </div>
+        </Modal>
+      }>
+        <PDFViewerModal
+          isOpen={!!pdfViewerFilePath}
+          onClose={() => setPdfViewerFilePath(null)}
+          filePath={pdfViewerFilePath || ''}
+          title="PDF Viewer"
+        />
+      </Suspense>
     </div>
   )
 }
