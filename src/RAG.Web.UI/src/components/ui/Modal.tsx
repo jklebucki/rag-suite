@@ -7,9 +7,10 @@ interface ModalProps {
   title: string
   children: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl'
+  fullscreen?: boolean
 }
 
-export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscreen = false }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -46,22 +47,32 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
       />
       
       {/* Modal */}
-      <div className={`relative bg-white rounded-lg shadow-xl w-full mx-4 ${sizeClasses[size]} max-h-[90vh] overflow-hidden`}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Close modal"
-            title="Close modal"
-          >
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
-        </div>
+      <div className={`relative bg-white w-full h-full overflow-hidden ${
+        fullscreen 
+          ? 'rounded-none' 
+          : `rounded-lg shadow-xl mx-4 ${sizeClasses[size]} max-h-[90vh]`
+      }`}>
+        {/* Header - ukryty w fullscreen */}
+        {!fullscreen && (
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Close modal"
+              title="Close modal"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+        )}
         
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className={`overflow-y-auto ${
+          fullscreen 
+            ? 'h-full' 
+            : 'max-h-[calc(90vh-120px)]'
+        }`}>
           {children}
         </div>
       </div>
