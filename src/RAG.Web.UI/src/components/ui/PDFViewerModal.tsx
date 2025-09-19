@@ -213,6 +213,8 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
                   pageNumber={pageNumber}
                   scale={scale}
                   rotate={rotation}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
                   loading={
                     <div className="flex items-center justify-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
