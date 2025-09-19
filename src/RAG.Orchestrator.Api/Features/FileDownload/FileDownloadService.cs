@@ -1,24 +1,37 @@
 using Microsoft.Extensions.Options;
 using RAG.Orchestrator.Api.Features.FileDownload;
+using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Orchestrator.Api.Features.FileDownload;
+
+public record FileDownloadInfo(
+    string FullPath,
+    string ContentType,
+    long FileSize,
+    string FileName
+);
 
 public interface IFileDownloadService
 {
     Task<IResult> DownloadFileAsync(string filePath, CancellationToken cancellationToken = default);
+    Task<FileDownloadInfo?> GetFileInfoAsync(string filePath, CancellationToken cancellationToken = default);
+    Task<IResult> DownloadFileWithConversionAsync(string filePath, bool forceConvert, CancellationToken cancellationToken = default);
 }
 
 public class FileDownloadService : IFileDownloadService
 {
     private readonly SharedFoldersOptions _options;
     private readonly ILogger<FileDownloadService> _logger;
+    private readonly IGotenbergService _gotenbergService;
 
     public FileDownloadService(
         IOptions<SharedFoldersOptions> options,
-        ILogger<FileDownloadService> logger)
+        ILogger<FileDownloadService> logger,
+        IGotenbergService gotenbergService)
     {
         _options = options.Value;
         _logger = logger;
+        _gotenbergService = gotenbergService;
     }
 
     public Task<IResult> DownloadFileAsync(string filePath, CancellationToken cancellationToken = default)
@@ -35,6 +48,10 @@ public class FileDownloadService : IFileDownloadService
                     FilePath = filePath
                 }));
             }
+
+            // Decode URL-encoded path
+            filePath = Uri.UnescapeDataString(filePath);
+            _logger.LogDebug("Decoded file path: {DecodedPath}", filePath);
 
             // Find matching shared folder configuration
             var matchingConfig = FindMatchingSharedFolder(filePath);
@@ -118,7 +135,71 @@ public class FileDownloadService : IFileDownloadService
         return fullPath;
     }
 
-    private static string GetContentType(string filePath)
+    public Task<FileDownloadInfo?> GetFileInfoAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Validate file path
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                _logger.LogWarning("Empty file path provided");
+                return Task.FromResult<FileDownloadInfo?>(null);
+            }
+
+            // Decode URL-encoded path
+            filePath = Uri.UnescapeDataString(filePath);
+
+            // Find matching shared folder configuration
+            var matchingConfig = FindMatchingSharedFolder(filePath);
+            if (matchingConfig == null)
+            {
+                _logger.LogWarning("No matching shared folder configuration found for path: {FilePath}", filePath);
+                return Task.FromResult<FileDownloadInfo?>(null);
+            }
+
+            // Replace path prefix
+            var relativePath = GetRelativePath(filePath, matchingConfig.PathToReplace, matchingConfig.Path);
+            var fullPath = Path.Combine(matchingConfig.Path, relativePath);
+
+            // Ensure the resolved path is within the shared folder
+            var sharedFolderFullPath = Path.GetFullPath(matchingConfig.Path);
+            var requestedFileFullPath = Path.GetFullPath(fullPath);
+
+            if (!requestedFileFullPath.StartsWith(sharedFolderFullPath, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogWarning("Attempted directory traversal attack: {RequestedPath}", fullPath);
+                return Task.FromResult<FileDownloadInfo?>(null);
+            }
+
+            // Check if file exists
+            if (!File.Exists(fullPath))
+            {
+                _logger.LogWarning("File not found: {FilePath}", fullPath);
+                return Task.FromResult<FileDownloadInfo?>(null);
+            }
+
+            // Get file info
+            var fileInfo = new FileInfo(fullPath);
+            var contentType = GetContentType(filePath);
+
+            _logger.LogInformation("File info retrieved: {FileName} ({Size} bytes) from {OriginalPath} -> {ResolvedPath}",
+                Path.GetFileName(filePath), fileInfo.Length, filePath, fullPath);
+
+            return Task.FromResult<FileDownloadInfo?>(new FileDownloadInfo(
+                FullPath: fullPath,
+                ContentType: contentType,
+                FileSize: fileInfo.Length,
+                FileName: Path.GetFileName(filePath)
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting file info: {FilePath}", filePath);
+            return Task.FromResult<FileDownloadInfo?>(null);
+        }
+    }
+
+    private string GetContentType(string filePath)
     {
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
         return extension switch
@@ -140,5 +221,51 @@ public class FileDownloadService : IFileDownloadService
             ".xml" => "application/xml",
             _ => "application/octet-stream"
         };
+    }
+
+    public async Task<IResult> DownloadFileWithConversionAsync(string filePath, bool forceConvert, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Sprawdź czy możemy skonwertować plik na PDF
+            var fileExtension = Path.GetExtension(filePath);
+            var canConvert = await _gotenbergService.CanConvertAsync(fileExtension);
+
+            if (!canConvert && !forceConvert)
+            {
+                // Zwróć oryginalny plik jeśli konwersja nie jest możliwa
+                return await DownloadFileAsync(filePath, cancellationToken);
+            }
+
+            // Pobierz informacje o pliku
+            var fileInfo = await GetFileInfoAsync(filePath, cancellationToken);
+            if (fileInfo == null)
+            {
+                // Jeśli nie możemy pobrać informacji o pliku, zwróć oryginalny wynik
+                return await DownloadFileAsync(filePath, cancellationToken);
+            }
+
+            // Otwórz plik jako stream
+            await using var fileStream = File.OpenRead(fileInfo.FullPath);
+
+            // Spróbuj skonwertować plik na PDF
+            var pdfStream = await _gotenbergService.ConvertToPdfAsync(fileStream, fileInfo.FileName);
+
+            if (pdfStream == null)
+            {
+                // Konwersja się nie udała, zwróć oryginalny plik
+                return await DownloadFileAsync(filePath, cancellationToken);
+            }
+
+            // Zwróć skonwertowany plik PDF
+            var pdfFileName = Path.ChangeExtension(fileInfo.FileName, ".pdf");
+            return Results.File(pdfStream, "application/pdf", pdfFileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during file conversion for path: {FilePath}", filePath);
+            // W przypadku błędu, spróbuj zwrócić oryginalny plik
+            return await DownloadFileAsync(filePath, cancellationToken);
+        }
     }
 }

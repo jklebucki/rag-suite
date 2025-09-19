@@ -95,6 +95,13 @@ public static class ServiceCollectionExtensions
                 options.Validate(); // Validate on configuration binding
             });
 
+        // Configure Gotenberg configuration
+        services.AddOptions<GotenbergConfig>()
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                configuration.GetSection(GotenbergConfig.SectionName).Bind(options);
+            });
+
         // Configure Elasticsearch Options
         services.Configure<ElasticsearchOptions>(options =>
         {
@@ -132,6 +139,14 @@ public static class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromMinutes(2); // Reasonable timeout for search operations
         });
 
+        // Add HttpClient for GotenbergService
+        services.AddHttpClient<IGotenbergService, GotenbergService>((serviceProvider, client) =>
+        {
+            var config = serviceProvider.GetRequiredService<IOptions<GotenbergConfig>>().Value;
+            client.BaseAddress = new Uri(config.Url);
+            client.Timeout = TimeSpan.FromMinutes(config.TimeoutMinutes);
+        });
+
         // Register feature services
         // ChatService now uses Kernel instead of ILlmService
         //services.AddScoped<IChatService, ChatService>();
@@ -145,6 +160,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
+        services.AddScoped<IGotenbergService, GotenbergService>();
 
         return services;
     }
