@@ -136,7 +136,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
 
   const handleDownload = async () => {
     try {
-      await apiClient.downloadFile(filePath)
+      await apiClient.downloadFileWithConversion(filePath, false)
     } catch (err) {
       console.error('Download failed:', err)
     }
