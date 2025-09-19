@@ -22,6 +22,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null)
   const [optimalScale, setOptimalScale] = useState(1.0)
 
   // Calculate optimal scale based on window size
@@ -73,7 +74,11 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
     if (isOpen && filePath) {
       loadPDF()
     } else {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl)
+      }
       setPdfUrl(null)
+      setPdfBlob(null)
       setError(null)
       setPageNumber(1)
       setScale(1.0)
@@ -88,7 +93,9 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
       // Use the convert endpoint to get PDF
       const response = await apiClient.downloadFileWithConversion(filePath, false)
       if (response.data) {
-        // Create blob URL from the response
+        // Store the blob for download functionality
+        setPdfBlob(response.data)
+        // Create blob URL from the response for PDF viewer
         const url = URL.createObjectURL(response.data)
         setPdfUrl(url)
       }
@@ -135,8 +142,21 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
   }
 
   const handleDownload = async () => {
+    if (!pdfBlob) {
+      console.error('No PDF blob available for download')
+      return
+    }
+
     try {
-      await apiClient.downloadFileWithConversion(filePath, false)
+      // Create download link using the stored blob
+      const url = URL.createObjectURL(pdfBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `${filePath.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'document'}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
     } catch (err) {
       console.error('Download failed:', err)
     }
@@ -146,6 +166,12 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl)
     }
+    setPdfUrl(null)
+    setPdfBlob(null)
+    setError(null)
+    setPageNumber(1)
+    setScale(1.0)
+    setRotation(0)
     onClose()
   }
 
