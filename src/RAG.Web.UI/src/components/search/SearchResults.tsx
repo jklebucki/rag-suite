@@ -5,6 +5,7 @@ import { Modal } from '@/components/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from './hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
+import { apiClient } from '@/services/api'
 import type { SearchResult } from '@/types'
 
 interface SearchResultsProps {
@@ -145,6 +146,17 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
     ? `${result.metadata.chunksFound}/${result.metadata.totalChunks} chunks`
     : null
 
+  const handleDownload = async () => {
+    if (result.filePath) {
+      try {
+        await apiClient.downloadFile(result.filePath)
+      } catch (error) {
+        console.error('Download failed:', error)
+        // TODO: Show error toast
+      }
+    }
+  }
+
   return (
     <div className="p-6 hover:bg-gray-50">
       <div className="flex justify-between items-start mb-2">
@@ -186,12 +198,23 @@ function SearchResultItem({ result, onViewDetails, language }: SearchResultItemP
           {/* <span>{result.filePath}</span> */}
           <span>{formatDate(result.updatedAt, language)}</span>
         </div>
-        <button
-          onClick={onViewDetails}
-          className="text-primary-600 hover:text-primary-700 font-medium"
-        >
-          View Details
-        </button>
+        <div className="flex items-center gap-2">
+          {result.filePath && (
+            <button
+              onClick={handleDownload}
+              className="text-primary-600 hover:text-primary-700 p-1 rounded"
+              title="Download file"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            onClick={onViewDetails}
+            className="text-primary-600 hover:text-primary-700 font-medium"
+          >
+            View Details
+          </button>
+        </div>
       </div>
     </div>
   )

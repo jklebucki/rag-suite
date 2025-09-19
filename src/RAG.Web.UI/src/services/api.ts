@@ -34,7 +34,7 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
     })
-    
+
     // Separate client for health endpoints with SHORT timeout
     this.healthClient = axios.create({
       timeout: 5000, // 5 seconds for health checks
@@ -84,7 +84,7 @@ class ApiClient {
       limit: query.maxResults || 10,
       filters: query.filters as any
     }
-    
+
     // Add language headers for future API enhancement
     const headers: Record<string, string> = {}
     if (query.language) {
@@ -93,7 +93,7 @@ class ApiClient {
     if (query.resultLanguage) {
       headers['X-Response-Language'] = query.resultLanguage
     }
-    
+
     const response: AxiosResponse<ApiResponse<SearchResponse>> = await this.client.post('/search', searchQuery, { headers })
     return response.data.data
   }
@@ -115,7 +115,7 @@ class ApiClient {
     try {
       // Uses main client timeout (15 minutes configured in constructor)
       const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(
-        `/user-chat/sessions/${sessionId}/messages/multilingual`, 
+        `/user-chat/sessions/${sessionId}/messages/multilingual`,
         request
       )
       console.log('API response received:', response.data)
@@ -223,7 +223,7 @@ class ApiClient {
   async getDashboardData(includeDetailedStats = false): Promise<DashboardData> {
     const params = new URLSearchParams()
     if (includeDetailedStats) params.append('includeDetailedStats', 'true')
-    
+
     const response: AxiosResponse<ApiResponse<DashboardData>> = await this.client.get(`/analytics/dashboard?${params}`)
     return response.data.data
   }
@@ -242,6 +242,23 @@ class ApiClient {
   async getSystemHealth(): Promise<SystemHealthResponse> {
     const response: AxiosResponse<ApiResponse<SystemHealthResponse>> = await this.healthClient.get('/healthz/system')
     return response.data.data
+  }
+
+  // File Download
+  async downloadFile(filePath: string): Promise<void> {
+    const response = await this.client.get(`/filedownload/${encodeURIComponent(filePath)}`, {
+      responseType: 'blob'
+    })
+
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', filePath.split('/').pop() || 'download')
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
   }
 }
 

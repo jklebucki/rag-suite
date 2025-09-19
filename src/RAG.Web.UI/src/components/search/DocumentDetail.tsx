@@ -1,7 +1,8 @@
 import React from 'react'
-import { Calendar, FileText, Database, Tag, Hash, File, HardDrive, Clock } from 'lucide-react'
+import { Calendar, FileText, Database, Tag, Hash, File, HardDrive, Clock, Download } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
+import { apiClient } from '@/services/api'
 import type { DocumentDetailResponse } from '@/types'
 
 interface DocumentDetailProps {
@@ -11,6 +12,18 @@ interface DocumentDetailProps {
 export function DocumentDetail({ document }: DocumentDetailProps) {
   const formatScore = (score: number) => Math.round(score)
   const { language } = useI18n()
+
+  const handleDownload = async () => {
+    const filePath = document.filePath || document.metadata?.file_path || document.metadata?.source_file
+    if (filePath) {
+      try {
+        await apiClient.downloadFile(filePath)
+      } catch (error) {
+        console.error('Download failed:', error)
+        // TODO: Show error toast
+      }
+    }
+  }
 
   // Extract metadata for the table
   const fileExtension = document.metadata?.category || document.source || ''
@@ -55,6 +68,15 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
           <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
             {filePath || 'Unknown path'}
           </span>
+          {filePath && (
+            <button
+              onClick={handleDownload}
+              className="text-primary-600 hover:text-primary-700 p-1 rounded"
+              title="Download file"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          )}
           {isReconstructed && (
             <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
               Reconstructed Document

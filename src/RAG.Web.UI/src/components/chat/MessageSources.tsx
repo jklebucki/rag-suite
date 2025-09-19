@@ -1,7 +1,8 @@
 import React from 'react'
-import { FileText, ExternalLink, Clock, Star, Folder } from 'lucide-react'
+import { FileText, ExternalLink, Clock, Star, Folder, Download } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
+import { apiClient } from '@/services/api'
 import type { SearchResult } from '@/types/api'
 
 interface MessageSourcesProps {
@@ -12,14 +13,23 @@ interface MessageSourcesProps {
 export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
   const { t, language: currentLanguage } = useI18n()
 
+  const handleDownload = async (filePath: string) => {
+    try {
+      await apiClient.downloadFile(filePath)
+    } catch (error) {
+      console.error('Download failed:', error)
+      // TODO: Show error toast
+    }
+  }
+
   if (!sources || sources.length === 0) {
     return null
   }
 
   return (
     <div className={`mt-3 p-3 rounded-lg border ${
-      messageRole === 'user' 
-        ? 'bg-blue-50 border-blue-200' 
+      messageRole === 'user'
+        ? 'bg-blue-50 border-blue-200'
         : 'bg-gray-50 border-gray-200'
     }`}>
       <div className="flex items-center gap-2 mb-2">
@@ -32,11 +42,11 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           {t('chat.sources.title', sources.length.toString())}
         </span>
       </div>
-      
+
       <div className="space-y-2">
         {sources.map((source, index) => (
-          <div 
-            key={`${source.id}-${index}`} 
+          <div
+            key={`${source.id}-${index}`}
             className={`flex items-start gap-3 p-2 rounded border ${
               messageRole === 'user'
                 ? 'bg-white border-blue-100 hover:border-blue-300'
@@ -45,13 +55,13 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           >
             {/* Source Index */}
             <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-              messageRole === 'user' 
-                ? 'bg-blue-100 text-blue-700' 
+              messageRole === 'user'
+                ? 'bg-blue-100 text-blue-700'
                 : 'bg-gray-100 text-gray-700'
             }`}>
               {index + 1}
             </div>
-            
+
             {/* Source Content */}
             <div className="flex-1 min-w-0">
               {/* Title and Score */}
@@ -63,7 +73,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                       {source.fileName || source.title || `Document ${source.title}`}
                     </h4>
                   </div>
-                  {source.filePath && source.filePath !== source.fileName && ( 
+                  {source.filePath && source.filePath !== source.fileName && (
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <Folder className="h-3 w-3 text-gray-400 flex-shrink-0" />
                       <p className="text-xs text-gray-500 truncate">
@@ -79,22 +89,22 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                   </span>
                 </div>
               </div>
-              
+
               {/* Content Preview */}
               <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                {source.content.length > 120 
-                  ? `${source.content.substring(0, 120)}...` 
+                {source.content.length > 120
+                  ? `${source.content.substring(0, 120)}...`
                   : source.content
                 }
               </p>
-              
+
               {/* Metadata */}
               <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center gap-2 flex-wrap">
                   {source.documentType && (
                     <span className={`px-2 py-1 rounded-full ${
-                      messageRole === 'user' 
-                        ? 'bg-blue-100 text-blue-700' 
+                      messageRole === 'user'
+                        ? 'bg-blue-100 text-blue-700'
                         : 'bg-gray-100 text-gray-700'
                     }`}>
                       {source.documentType}
@@ -107,7 +117,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                     <span>• {source.source}</span>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Clock className="h-3 w-3" />
                   <span title={formatDateTime(source.createdAt, currentLanguage)}>
@@ -116,9 +126,20 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                 </div>
               </div>
             </div>
-            
+
             {/* External Link Icon */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex items-center gap-1">
+              {source.filePath && (
+                <button
+                  onClick={() => handleDownload(source.filePath!)}
+                  className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
+                    messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                  }`}
+                  title="Download file"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+              )}
               <ExternalLink className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity ${
                 messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
               }`} />
@@ -126,7 +147,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           </div>
         ))}
       </div>
-      
+
       {/* Summary */}
       {sources.length > 3 && (
         <div className={`mt-2 text-xs text-center ${
