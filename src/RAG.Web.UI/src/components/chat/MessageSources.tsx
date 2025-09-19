@@ -3,6 +3,9 @@ import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'luci
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
+import { Modal } from '@/components/ui/Modal'
+import { DocumentDetail } from '@/components/search/DocumentDetail'
+import { useDocumentDetail } from '@/components/search/hooks/useDocumentDetail'
 import type { SearchResult } from '@/types/api'
 
 // Lazy load PDFViewerModal
@@ -16,6 +19,17 @@ interface MessageSourcesProps {
 export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
   const { t, language: currentLanguage } = useI18n()
   const [pdfViewerFilePath, setPdfViewerFilePath] = React.useState<string | null>(null)
+  const [selectedDocumentId, setSelectedDocumentId] = React.useState<string | null>(null)
+  const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
+
+  const renderError = (err: unknown) => {
+    if (!err) return null
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg m-6">
+        <p className="text-red-700">{t('search.error')}</p>
+      </div>
+    )
+  }
 
   const handleDownload = async (filePath: string) => {
     try {
@@ -155,9 +169,15 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                   </button>
                 </>
               )}
-              <ExternalLink className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity ${
-                messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
-              }`} />
+              <button
+                onClick={() => setSelectedDocumentId(source.id)}
+                className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-primary-600 ${
+                  messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                }`}
+                title="View Details"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
             </div>
           </div>
         ))}
@@ -171,6 +191,27 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           {t('chat.sources.summary', sources.length.toString())}
         </div>
       )}
+
+      {/* Document Detail Modal */}
+      <Modal
+        isOpen={!!selectedDocumentId}
+        onClose={() => setSelectedDocumentId(null)}
+        title="Document Details"
+        size="xl"
+      >
+        {isLoadingDetail && (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading document details...</p>
+          </div>
+        )}
+
+        {renderError(detailError)}
+
+        {documentDetail && (
+          <DocumentDetail document={documentDetail} />
+        )}
+      </Modal>
 
       {/* PDF Viewer Modal */}
       <React.Suspense fallback={
