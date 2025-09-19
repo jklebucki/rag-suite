@@ -5,7 +5,7 @@ import { Modal } from './Modal'
 import { apiClient } from '@/services/api'
 
 // Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('/pdf.worker.min.js', import.meta.url).toString()
 
 interface PDFViewerModalProps {
   isOpen: boolean
