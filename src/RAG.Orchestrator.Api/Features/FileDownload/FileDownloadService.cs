@@ -49,7 +49,7 @@ public class FileDownloadService : IFileDownloadService
             }
 
             // Replace path prefix
-            var relativePath = GetRelativePath(filePath, matchingConfig.PathToReplace);
+            var relativePath = GetRelativePath(filePath, matchingConfig.PathToReplace, matchingConfig.Path);
             var fullPath = Path.Combine(matchingConfig.Path, relativePath);
 
             // Ensure the resolved path is within the shared folder
@@ -97,13 +97,22 @@ public class FileDownloadService : IFileDownloadService
             filePath.StartsWith(config.PathToReplace, StringComparison.OrdinalIgnoreCase));
     }
 
-    private string GetRelativePath(string fullPath, string prefix)
+    private string GetRelativePath(string fullPath, string prefix, string targetPath)
     {
         if (fullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
         {
             var relativePath = fullPath.Substring(prefix.Length);
             // Remove leading path separators
             relativePath = relativePath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Normalize path separators to match the target system
+            // If target path uses '/', convert all '\' to '/'
+            // If target path uses '\', convert all '/' to '\'
+            var targetSeparator = targetPath.Contains('/') ? '/' : '\\';
+            var sourceSeparator = targetSeparator == '/' ? '\\' : '/';
+
+            relativePath = relativePath.Replace(sourceSeparator, targetSeparator);
+
             return relativePath;
         }
         return fullPath;
