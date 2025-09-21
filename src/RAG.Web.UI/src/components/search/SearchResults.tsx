@@ -50,8 +50,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     )
   }
 
-  // Spinner tylko jeśli isLoading, hasSearched i nie ma nowych searchResults (np. przy ponownym wyszukiwaniu)
-  if (isLoading && hasSearched && !searchResults) {
+  // Spinner jak przy pierwszym wyszukiwaniu - przy każdym wyszukiwaniu gdy isLoading i hasSearched
+  if (isLoading && hasSearched) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
@@ -73,7 +73,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     )
   }
 
-  if (!hasSearched) {
+  if (!hasSearched || (hasSearched && !searchResults && !isLoading)) {
     return (
       <div className="bg-white rounded-lg shadow-sm border p-8">
         <div className="text-center text-gray-500">
@@ -94,8 +94,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 
   return (
     <div className="bg-white rounded-lg shadow-sm border relative">
-      {/* Dodaj overlay z spinnerem jeśli isLoading i są nowe wyniki (np. przy zmianie inputu) */}
-      {isLoading && searchResults && (
+      {/* Dodaj overlay z spinnerem jeśli isLoading, hasSearched i są wyniki (np. przy zmianie inputu po wyszukaniu) */}
+      {isLoading && hasSearched && searchResults && (
         <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
