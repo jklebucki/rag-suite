@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { Download, Search, Eye } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { Modal } from '@/components/ui/Modal'
@@ -29,6 +29,16 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   const [pdfViewerFilePath, setPdfViewerFilePath] = useState<string | null>(null)
   const { data: documentDetail, isLoading: isLoadingDetail, error: detailError } = useDocumentDetail(selectedDocumentId)
 
+  // Dodaj stan lokalny do przechowywania poprzednich wyników wyszukiwania
+  const [previousResults, setPreviousResults] = useState<typeof searchResults | null>(null)
+
+  // Aktualizuj previousResults tylko gdy nowe searchResults są dostępne
+  useEffect(() => {
+    if (searchResults) {
+      setPreviousResults(searchResults)
+    }
+  }, [searchResults])
+
   console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
 
   const renderError = (err: unknown) => {
@@ -40,7 +50,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     )
   }
 
-  if (isLoading && hasSearched) {
+  // Spinner tylko jeśli nie ma poprzednich wyników, isLoading i hasSearched
+  if (isLoading && hasSearched && !previousResults) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
@@ -74,17 +85,26 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     )
   }
 
-  if (!searchResults) {
+  // Użyj previousResults jeśli isLoading, w przeciwnym razie searchResults
+  const resultsToShow = isLoading ? previousResults : searchResults
+
+  if (!resultsToShow) {
     return null
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border">
+    <div className="bg-white rounded-lg shadow-sm border relative">
+      {/* Dodaj overlay z spinnerem jeśli isLoading */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+        </div>
+      )}
       <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{t('search.results')}</h2>
           <p className="text-sm text-gray-600">
-            {t('search.results')} {searchResults.total} {t('search.results')} in {searchResults.took}ms
+            {t('search.results')} {resultsToShow.total} {t('search.results')} in {resultsToShow.took}ms
           </p>
         </div>
         <button onClick={onExport} className="btn-secondary flex items-center gap-2">
@@ -94,7 +114,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       </div>
 
       <div className="divide-y divide-gray-200">
-        {searchResults.results.map((result) => (
+        {resultsToShow.results.map((result) => (
           <SearchResultItem
             key={result.id}
             result={result}
@@ -105,7 +125,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
         ))}
       </div>
 
-      {searchResults.results.length === 0 && (
+      {resultsToShow.results.length === 0 && (
         <div className="p-8 text-center text-gray-500">
           <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <p>{t('search.no_results')}</p>
