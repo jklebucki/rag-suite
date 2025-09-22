@@ -9,12 +9,10 @@ namespace RAG.Orchestrator.Api.Services;
 public class GlobalSettingsService : IGlobalSettingsService
 {
     private readonly ChatDbContext _context;
-    private readonly ILlmService _llmService;
 
-    public GlobalSettingsService(ChatDbContext context, ILlmService llmService)
+    public GlobalSettingsService(ChatDbContext context)
     {
         _context = context;
-        _llmService = llmService;
     }
 
     public async Task<LlmSettings?> GetLlmSettingsAsync()
@@ -60,8 +58,8 @@ public class GlobalSettingsService : IGlobalSettingsService
 
         await _context.SaveChangesAsync();
         
-        // Clear LLM service cache to force reload of new settings
-        _llmService.ClearCache();
+        // Note: LLM service cache will refresh automatically after 5 minutes
+        // No need to clear it immediately as settings changes are not frequent
     }
 
     public async Task InitializeLlmSettingsAsync(IConfiguration configuration)
