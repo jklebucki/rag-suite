@@ -43,16 +43,11 @@ export function ChatInterface() {
   // Focus input when new session is created
   useEffect(() => {
     if (isNewSession && inputRef.current) {
-      inputRef.current.focus()
-      setIsNewSession(false)
-    }
-  }, [isNewSession, setIsNewSession])
-
-  // Focus input when new session is created
-  useEffect(() => {
-    if (isNewSession && inputRef.current) {
-      inputRef.current.focus()
-      setIsNewSession(false)
+      // Small delay to ensure the DOM has updated
+      setTimeout(() => {
+        inputRef.current?.focus()
+        setIsNewSession(false)
+      }, 100)
     }
   }, [isNewSession, setIsNewSession])
 

@@ -72,6 +72,8 @@ export function useMultilingualChat() {
     mutationFn: ({ title, language }: { title?: string; language?: string }) => apiClient.createChatSession(title, language),
     onSuccess: (newSession) => {
       console.log('Session created:', newSession)
+      // Immediately add the new session to the cache for instant UI update
+      queryClient.setQueryData(['chat-sessions'], (old: ChatSession[] = []) => [...old, newSession])
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setCurrentSessionId(newSession.id)
       setIsNewSession(true)
