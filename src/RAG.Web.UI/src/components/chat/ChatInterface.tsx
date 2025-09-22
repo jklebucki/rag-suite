@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Bot, User, Loader2 } from 'lucide-react'
 import { useMultilingualChat } from '@/hooks/useMultilingualChat'
 import { useI18n } from '@/contexts/I18nContext'
@@ -11,6 +11,8 @@ import type { ChatMessage } from '@/types'
 
 export function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const {
     currentSessionId,
     message,
@@ -34,7 +36,25 @@ export function ChatInterface() {
     setMessage,
     setCurrentSessionId,
     setUseDocumentSearch,
+    isNewSession,
+    setIsNewSession,
   } = useMultilingualChat()
+
+  // Focus input when new session is created
+  useEffect(() => {
+    if (isNewSession && inputRef.current) {
+      inputRef.current.focus()
+      setIsNewSession(false)
+    }
+  }, [isNewSession, setIsNewSession])
+
+  // Focus input when new session is created
+  useEffect(() => {
+    if (isNewSession && inputRef.current) {
+      inputRef.current.focus()
+      setIsNewSession(false)
+    }
+  }, [isNewSession, setIsNewSession])
 
   return (
     <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -65,21 +85,21 @@ export function ChatInterface() {
                   </div>
                   <div className={`max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-4`}>
                     <div className="whitespace-pre-wrap">{msg.content}</div>
-                    
+
                     {/* Sources for assistant messages */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                       <MessageSources sources={msg.sources} messageRole={msg.role} />
                     )}
-                    
+
                     {/* Timestamp */}
-                    <div 
+                    <div
                       className={`mt-2 text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'} cursor-help`}
                       title={`Sent at ${formatDateTime(msg.timestamp, currentLanguage)}`}
                     >
                       <span className="font-medium">{formatRelativeTime(msg.timestamp, currentLanguage)}</span>
                       <span className="ml-2 opacity-75">{formatDateTime(msg.timestamp, currentLanguage)}</span>
                     </div>
-                    
+
                     {/* Language detection info */}
                     {lastMessageLanguage && msg.id === currentSession.messages[currentSession.messages.length - 1]?.id && (
                       <div className="mt-1 text-xs opacity-75">
@@ -115,7 +135,7 @@ export function ChatInterface() {
                   </div>
                 </div>
               )}
-              
+
               {/* Documents unavailable notice */}
               {!documentsAvailable && currentSession && currentSession.messages.length > 0 && (
                 <div className="flex items-start gap-3 opacity-90">
@@ -134,12 +154,13 @@ export function ChatInterface() {
                   </div>
                 </div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input */}
             <MessageInput
+              ref={inputRef}
               message={message}
               onMessageChange={setMessage}
               onSendMessage={handleSendMessage}

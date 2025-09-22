@@ -13,6 +13,7 @@ export function useMultilingualChat() {
   const [lastResponse, setLastResponse] = useState<MultilingualChatResponse | null>(null)
   const [documentsAvailable, setDocumentsAvailable] = useState<boolean>(true)
   const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(false)
+  const [isNewSession, setIsNewSession] = useState<boolean>(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
@@ -73,6 +74,7 @@ export function useMultilingualChat() {
       console.log('Session created:', newSession)
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setCurrentSessionId(newSession.id)
+      setIsNewSession(true)
     },
     onError: (error) => {
       console.error('Failed to create session:', error)
@@ -232,6 +234,8 @@ export function useMultilingualChat() {
     lastResponse,
     messagesEndRef,
     sessionToDelete,
+    isNewSession,
+    setIsNewSession,
 
     // Multilingual specific data
     lastMessageLanguage: lastResponse?.detectedLanguage,

@@ -11,16 +11,16 @@ interface MessageInputProps {
   onUseDocumentSearchChange: (value: boolean) => void
 }
 
-export function MessageInput({
+export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps>(({
   message,
   onMessageChange,
   onSendMessage,
   isSending,
   useDocumentSearch,
   onUseDocumentSearchChange,
-}: MessageInputProps) {
+}, ref) => {
   const { t } = useI18n()
-  
+
   return (
     <div className="border-t border-gray-200 p-4">
       {/* Document Search Toggle */}
@@ -37,9 +37,10 @@ export function MessageInput({
           {t('chat.useDocumentSearch')}
         </label>
       </div>
-      
+
       <form onSubmit={onSendMessage} className="flex gap-3">
         <input
+          ref={ref}
           type="text"
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}
@@ -58,4 +59,4 @@ export function MessageInput({
       </form>
     </div>
   )
-}
+})
