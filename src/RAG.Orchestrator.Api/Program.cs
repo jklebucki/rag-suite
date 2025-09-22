@@ -45,28 +45,9 @@ try
     await app.Services.EnsureSecurityDatabaseCreatedAsync();
     app.Logger.LogInformation("Security database initialization completed successfully");
 
-    // Initialize Chat database
-    using var scope = app.Services.CreateScope();
-    var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
-    await chatDbContext.Database.MigrateAsync();
+    // Initialize Chat database and Elasticsearch
+    await app.Services.EnsureChatDatabaseCreatedAsync();
     app.Logger.LogInformation("Chat database initialization completed successfully");
-
-    // Initialize Elasticsearch indices
-    var indexManagement = scope.ServiceProvider.GetRequiredService<IIndexManagementService>();
-    var elasticsearchOptions = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ElasticsearchOptions>>().Value;
-
-    if (elasticsearchOptions.AutoCreateIndices)
-    {
-        var indexCreated = await indexManagement.EnsureIndexExistsAsync(elasticsearchOptions.DefaultIndexName);
-        if (indexCreated)
-        {
-            app.Logger.LogInformation("Elasticsearch index '{IndexName}' initialization completed successfully", elasticsearchOptions.DefaultIndexName);
-        }
-        else
-        {
-            app.Logger.LogWarning("Failed to initialize Elasticsearch index '{IndexName}'. Search functionality may not work properly", elasticsearchOptions.DefaultIndexName);
-        }
-    }
 }
 catch (Exception ex)
 {

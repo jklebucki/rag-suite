@@ -1,5 +1,6 @@
 using Elasticsearch.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using RAG.Orchestrator.Api.Data;
@@ -184,5 +185,44 @@ public static class ServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    public static async Task EnsureChatDatabaseCreatedAsync(this IServiceProvider services)
+    {
+        try
+        {
+            using var scope = services.CreateScope();
+            var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChatDbContext>>();
+
+            logger.LogInformation("Attempting to ensure Chat database is created and migrated...");
+
+            // Run migrations to ensure all tables are created and up-to-date
+            await chatDbContext.Database.MigrateAsync();
+
+            logger.LogInformation("Chat database migration successful");
+
+            // Initialize Elasticsearch indices
+            var indexManagement = scope.ServiceProvider.GetRequiredService<IIndexManagementService>();
+            var elasticsearchOptions = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ElasticsearchOptions>>().Value;
+
+            if (elasticsearchOptions.AutoCreateIndices)
+            {
+                var indexCreated = await indexManagement.EnsureIndexExistsAsync(elasticsearchOptions.DefaultIndexName);
+                if (indexCreated)
+                {
+                    logger.LogInformation("Elasticsearch index '{IndexName}' initialization completed successfully", elasticsearchOptions.DefaultIndexName);
+                }
+                else
+                {
+                    logger.LogWarning("Failed to initialize Elasticsearch index '{IndexName}'. Search functionality may not work properly", elasticsearchOptions.DefaultIndexName);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // General database initialization error
+            throw new InvalidOperationException($"Chat database initialization failed: {ex.Message}", ex);
+        }
     }
 }
