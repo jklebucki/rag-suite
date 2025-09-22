@@ -15,6 +15,7 @@ export function useMultilingualSearch() {
   const [isAdvancedMode, setIsAdvancedMode] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [lastSearchLanguage, setLastSearchLanguage] = useState<string | null>(null)
+  const [isSearching, setIsSearching] = useState(false)
   const { showError, showSuccess } = useToastContext()
   const { language: currentLanguage } = useI18n()
 
@@ -48,16 +49,16 @@ export function useMultilingualSearch() {
 
         const result = await apiClient.searchMultilingual(searchQuery)
         console.log('🌐 Multilingual search results:', result)
-        
+
         // Show language detection info if available
         if (result.detectedLanguage && result.detectedLanguage !== currentLanguage) {
           setLastSearchLanguage(result.detectedLanguage)
           showSuccess(
-            'Language detected', 
+            'Language detected',
             `Query detected as ${result.detectedLanguage}, searching in ${result.resultLanguage || currentLanguage}`
           )
         }
-        
+
         // Ensure we always return a valid SearchResponse object
         return result || {
           results: [],
@@ -81,12 +82,15 @@ export function useMultilingualSearch() {
 
     console.log('🔍 Starting multilingual search for:', query)
     setHasSearched(true)
-    
+    setIsSearching(true)
+
     try {
       await refetch()
     } catch (error) {
       console.error('Search failed:', error)
       showError('Search failed', 'Unable to search at this time. Please try again.')
+    } finally {
+      setIsSearching(false)
     }
   }
 
@@ -121,18 +125,19 @@ export function useMultilingualSearch() {
     hasSearched,
     lastSearchLanguage,
     currentLanguage,
-    
+    isSearching,
+
     // Data
     searchResults,
     isLoading,
     error,
-    
+
     // Actions
     handleSearch,
     handleClearSearch,
     handleFilterChange,
     toggleAdvancedMode,
-    
+
     // Utilities
     hasFilters,
   }

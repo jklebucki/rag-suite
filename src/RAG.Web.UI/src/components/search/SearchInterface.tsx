@@ -16,6 +16,7 @@ export function SearchInterface() {
     searchResults,
     isLoading,
     error,
+    isSearching,
     setQuery,
     toggleAdvancedMode,
     handleSearch,
@@ -53,7 +54,7 @@ export function SearchInterface() {
 
       <SearchResults
         searchResults={searchResults}
-        isLoading={isLoading}
+        isLoading={isSearching}
         error={error}
         hasSearched={hasSearched}
         onExport={() => {
