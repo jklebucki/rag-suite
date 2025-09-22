@@ -30,7 +30,7 @@ public class UserChatService : IUserChatService
     private readonly ILogger<UserChatService> _logger;
     private readonly IConfiguration _configuration;
     private readonly ILlmService _llmService;
-    private readonly LlmEndpointConfig _llmConfig;
+    private readonly IGlobalSettingsService _globalSettingsService;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -40,7 +40,7 @@ public class UserChatService : IUserChatService
         ILogger<UserChatService> logger,
         IConfiguration configuration,
         ILlmService llmService,
-        IOptions<LlmEndpointConfig> llmOptions)
+        IGlobalSettingsService globalSettingsService)
     {
         _chatDbContext = chatDbContext;
         _kernel = kernel;
@@ -49,7 +49,7 @@ public class UserChatService : IUserChatService
         _logger = logger;
         _configuration = configuration;
         _llmService = llmService;
-        _llmConfig = llmOptions.Value;
+        _globalSettingsService = globalSettingsService;
     }
 
     // Helper method to convert UserChatMessage history to LlmChatMessage format
@@ -64,7 +64,8 @@ public class UserChatService : IUserChatService
     /// </summary>
     private async Task InitializeSessionWithSystemMessageAsync(string sessionId, string language, CancellationToken cancellationToken)
     {
-        if (!_llmConfig.IsOllama)
+        var settings = await _globalSettingsService.GetLlmSettingsAsync();
+        if (settings == null || !settings.IsOllama)
             return;
 
         // Get system message from localized JSON to validate it exists
@@ -274,7 +275,8 @@ public class UserChatService : IUserChatService
             string aiResponseContent;
             int[]? newOllamaContext = null;
 
-            if (_llmConfig.IsOllama)
+            var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
+            if (llmSettings != null && llmSettings.IsOllama)
             {
                 // Inject documents into user message if document search is enabled and results found
                 string enhancedUserMessage = request.Message;

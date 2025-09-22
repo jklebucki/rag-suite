@@ -11,6 +11,7 @@ using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
 
@@ -87,6 +88,9 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
 
+        // Add memory cache for LLM settings
+        services.AddMemoryCache();
+
         // Configure LLM endpoint configuration  
         services.AddOptions<LlmEndpointConfig>()
             .Configure<IConfiguration>((options, configuration) =>
@@ -125,13 +129,8 @@ public static class ServiceCollectionExtensions
             return new ElasticLowLevelClient(settings);
         });
 
-        // Add HttpClient for LLM service with configuration from LlmEndpointConfig
-        services.AddHttpClient<ILlmService, LlmService>((serviceProvider, client) =>
-        {
-            var config = serviceProvider.GetRequiredService<IOptions<LlmEndpointConfig>>().Value;
-            client.BaseAddress = new Uri(config.Url);
-            client.Timeout = TimeSpan.FromMinutes(config.TimeoutMinutes);
-        });
+        // Add HttpClient for LLM service
+        services.AddHttpClient<ILlmService, LlmService>();
 
         // Add HttpClient for SearchService with reasonable timeout
         services.AddHttpClient<RAG.Abstractions.Search.ISearchService, SearchService>(client =>
@@ -161,6 +160,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
         services.AddScoped<IGotenbergService, GotenbergService>();
+        services.AddScoped<IGlobalSettingsService, GlobalSettingsService>();
+        services.AddScoped<ISettingsService, SettingsService>();
 
         return services;
     }

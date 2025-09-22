@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
 using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
@@ -8,20 +8,39 @@ using RAG.Orchestrator.Api.Services;
 public class LlmService : ILlmService
 {
     private readonly HttpClient _httpClient;
-    private readonly LlmEndpointConfig _config;
+    private readonly IGlobalSettingsService _globalSettingsService;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<LlmService> _logger;
+    private const string CacheKey = "LlmSettings";
 
-    public LlmService(HttpClient httpClient, IOptions<LlmEndpointConfig> config, ILogger<LlmService> logger)
+    public LlmService(HttpClient httpClient, IGlobalSettingsService globalSettingsService, IMemoryCache cache, ILogger<LlmService> logger)
     {
         _httpClient = httpClient;
-        _config = config.Value;
+        _globalSettingsService = globalSettingsService;
+        _cache = cache;
         _logger = logger;
+    }
 
-        _httpClient.BaseAddress = new Uri(_config.Url);
-        _httpClient.Timeout = TimeSpan.FromMinutes(_config.TimeoutMinutes);
+    private async Task<LlmSettings> GetSettingsAsync()
+    {
+        if (_cache.TryGetValue(CacheKey, out LlmSettings? settings) && settings != null)
+        {
+            return settings;
+        }
 
-        _logger.LogDebug("LlmService configured with URL: {Url}, Model: {Model}, Timeout: {Timeout}min",
-            _config.Url, _config.Model, _config.TimeoutMinutes);
+        settings = await _globalSettingsService.GetLlmSettingsAsync();
+        if (settings == null)
+        {
+            throw new InvalidOperationException("LLM settings not found in database. Please initialize settings first.");
+        }
+
+        _cache.Set(CacheKey, settings, TimeSpan.FromMinutes(5)); // Cache for 5 minutes
+
+        // Update HttpClient settings
+        _httpClient.BaseAddress = new Uri(settings.Url);
+        _httpClient.Timeout = TimeSpan.FromMinutes(settings.TimeoutMinutes);
+
+        return settings;
     }
 
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
@@ -34,10 +53,11 @@ public class LlmService : ILlmService
     {
         try
         {
-            var maxTokens = _config.MaxTokens;
-            var temperature = _config.Temperature;
-            var model = _config.Model;
-            var isOllama = _config.IsOllama;
+            var settings = await GetSettingsAsync();
+            var maxTokens = settings.MaxTokens;
+            var temperature = settings.Temperature;
+            var model = settings.Model;
+            var isOllama = settings.IsOllama;
 
             object request;
             string endpoint;
@@ -172,7 +192,8 @@ public class LlmService : ILlmService
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(3)); // very short timeout for health check
 
-            var isOllama = _config.IsOllama;
+            var settings = await GetSettingsAsync();
+            var isOllama = settings.IsOllama;
             var endpoint = isOllama ? "/api/tags" : "/health";
 
             var response = await _httpClient.GetAsync(endpoint, cts.Token);
@@ -204,7 +225,8 @@ public class LlmService : ILlmService
 
     public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
     {
-        var isOllama = _config.IsOllama;
+        var settings = await GetSettingsAsync();
+        var isOllama = settings.IsOllama;
         try
         {
             if (isOllama)
@@ -237,8 +259,7 @@ public class LlmService : ILlmService
             else
             {
                 // For non-Ollama (e.g. TGI) return configured model only
-                var model = _config.Model;
-                return new[] { model };
+                return new[] { settings.Model };
             }
         }
         catch (Exception ex)
@@ -252,10 +273,11 @@ public class LlmService : ILlmService
     {
         try
         {
-            var maxTokens = _config.MaxTokens;
-            var temperature = _config.Temperature;
-            var model = _config.Model;
-            var isOllama = _config.IsOllama;
+            var settings = await GetSettingsAsync();
+            var maxTokens = settings.MaxTokens;
+            var temperature = settings.Temperature;
+            var model = settings.Model;
+            var isOllama = settings.IsOllama;
 
             if (!isOllama)
             {
@@ -298,7 +320,7 @@ public class LlmService : ILlmService
 
             _logger.LogDebug("Sending chat request to Ollama with {MessageCount} messages", messages.Count);
 
-            var response = await _httpClient.PostAsync(_config.ChatEndpoint, content, cancellationToken);
+            var response = await _httpClient.PostAsync(settings.ChatEndpoint, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

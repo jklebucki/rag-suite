@@ -11,6 +11,7 @@ public class ChatDbContext : DbContext
 
     public DbSet<ChatSession> ChatSessions { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<GlobalSetting> GlobalSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -126,6 +127,28 @@ public class ChatDbContext : DbContext
             // Composite index for session + timestamp (most common query)
             entity.HasIndex(e => new { e.SessionId, e.Timestamp })
                 .HasDatabaseName("ix_chat_messages_session_timestamp");
+        });
+
+        // Global Setting configuration
+        modelBuilder.Entity<GlobalSetting>(entity =>
+        {
+            entity.ToTable("global_settings");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Key)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Value)
+                .IsRequired();
+
+            // Unique index on Key for fast lookup
+            entity.HasIndex(e => e.Key)
+                .IsUnique()
+                .HasDatabaseName("ix_global_settings_key");
         });
     }
 }

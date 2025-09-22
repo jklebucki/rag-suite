@@ -7,6 +7,8 @@ using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Settings;
+using RAG.Orchestrator.Api.Services;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
 
@@ -28,6 +30,14 @@ builder.Services.Configure<SharedFoldersOptions>(builder.Configuration.GetSectio
 builder.Services.AddFeatureServices();
 
 var app = builder.Build();
+
+// Initialize global settings from appsettings if not exist
+using (var scope = app.Services.CreateScope())
+{
+    var globalSettingsService = scope.ServiceProvider.GetRequiredService<IGlobalSettingsService>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await globalSettingsService.InitializeLlmSettingsAsync(configuration);
+}
 
 // Ensure database is created and admin user exists
 try
@@ -85,6 +95,7 @@ app.MapHealthEndpoints();
 app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapFileDownloadEndpoints();
+app.MapSettingsEndpoints();
 
 // Simple health endpoint
 app.MapGet("/health", (HttpContext context) =>
