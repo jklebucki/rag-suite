@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Orchestrator.Api.Features.Settings;
 
@@ -55,6 +56,22 @@ public static class SettingsEndpoints
         .WithName("UpdateLlmSettings")
         .WithSummary("Update LLM settings")
         .WithDescription("Updates the LLM service configuration settings.");
+
+        group.MapGet("/llm/models", async (ILlmService llmService) =>
+        {
+            try
+            {
+                var models = await llmService.GetAvailableModelsAsync();
+                return Results.Ok(new { Models = models });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Failed to retrieve available models: {ex.Message}", statusCode: 500);
+            }
+        })
+        .WithName("GetAvailableLlmModels")
+        .WithSummary("Get available LLM models")
+        .WithDescription("Retrieves the list of available models from the configured LLM service.");
 
         return app;
     }
