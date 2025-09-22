@@ -6,7 +6,7 @@ public static class SettingsEndpoints
 {
     public static IEndpointRouteBuilder MapSettingsEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/settings").WithTags("Settings");
+        var group = app.MapGroup("/api/settings").WithTags("Settings");
 
         group.MapGet("/llm", async (ISettingsService service) =>
         {
