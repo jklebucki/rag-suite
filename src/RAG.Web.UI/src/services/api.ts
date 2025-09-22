@@ -19,7 +19,11 @@ import type {
   NodeStats,
   SearchStatistics,
   SystemHealth,
-  DashboardData
+  DashboardData,
+  LlmSettings,
+  LlmSettingsRequest,
+  LlmSettingsResponse,
+  AvailableModelsResponse
 } from '@/types'
 
 class ApiClient {
@@ -268,6 +272,22 @@ class ApiClient {
     return await this.client.get(`/filedownload/convert/${encodeURIComponent(filePath)}?${params.toString()}`, {
       responseType: 'blob'
     })
+  }
+
+  // Settings API methods
+  async getLlmSettings(): Promise<LlmSettingsResponse> {
+    const response = await this.client.get('/settings/llm')
+    return response.data
+  }
+
+  async updateLlmSettings(settings: LlmSettingsRequest): Promise<{ message: string }> {
+    const response = await this.client.put('/settings/llm', settings)
+    return response.data
+  }
+
+  async getAvailableLlmModels(): Promise<AvailableModelsResponse> {
+    const response = await this.client.get('/settings/llm/models')
+    return response.data
   }
 }
 

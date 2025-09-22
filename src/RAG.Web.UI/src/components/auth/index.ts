@@ -6,3 +6,4 @@ export { ResetPasswordConfirmForm } from './ResetPasswordConfirmForm'
 // Route guards
 export { ProtectedRoute } from './ProtectedRoute';
 export { AuthRoute } from './AuthRoute';
+export { AdminProtectedRoute } from './AdminProtectedRoute';
