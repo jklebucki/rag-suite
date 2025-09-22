@@ -65,7 +65,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
     try {
       setLoadingModels(true)
-      const data: AvailableModelsResponse = await apiClient.getAvailableLlmModels()
+      const data: AvailableModelsResponse = await apiClient.getAvailableLlmModelsFromUrl(settings.url, settings.isOllama)
       setAvailableModels(data.models || [])
     } catch (error) {
       console.error('Failed to load available models:', error)

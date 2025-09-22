@@ -57,11 +57,23 @@ public static class SettingsEndpoints
         .WithSummary("Update LLM settings")
         .WithDescription("Updates the LLM service configuration settings.");
 
-        group.MapGet("/llm/models", async (ILlmService llmService) =>
+        group.MapGet("/llm/models", async (ILlmService llmService, string? url, bool? isOllama) =>
         {
             try
             {
-                var models = await llmService.GetAvailableModelsAsync();
+                string[] models;
+                
+                if (!string.IsNullOrEmpty(url) && isOllama.HasValue)
+                {
+                    // Use the provided URL and type to fetch models
+                    models = await llmService.GetAvailableModelsAsync(url, isOllama.Value);
+                }
+                else
+                {
+                    // Fall back to configured settings
+                    models = await llmService.GetAvailableModelsAsync();
+                }
+                
                 return Results.Ok(new { Models = models });
             }
             catch (Exception ex)
@@ -71,7 +83,7 @@ public static class SettingsEndpoints
         })
         .WithName("GetAvailableLlmModels")
         .WithSummary("Get available LLM models")
-        .WithDescription("Retrieves the list of available models from the configured LLM service.");
+        .WithDescription("Retrieves the list of available models from the configured LLM service or a specified URL.");
 
         return app;
     }

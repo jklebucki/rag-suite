@@ -10,4 +10,6 @@ public interface ILlmService
 
     Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default);
     Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default);
+    Task<string[]> GetAvailableModelsAsync(string url, bool isOllama, CancellationToken cancellationToken = default);
+    void ClearCache();
 }

@@ -289,6 +289,15 @@ class ApiClient {
     const response = await this.client.get('/settings/llm/models')
     return response.data
   }
+
+  async getAvailableLlmModelsFromUrl(url: string, isOllama: boolean): Promise<AvailableModelsResponse> {
+    const params = new URLSearchParams({
+      url: url,
+      isOllama: isOllama.toString()
+    })
+    const response = await this.client.get(`/settings/llm/models?${params}`)
+    return response.data
+  }
 }
 
 export const apiClient = new ApiClient()

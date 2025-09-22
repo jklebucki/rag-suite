@@ -43,6 +43,12 @@ public class LlmService : ILlmService
         return settings;
     }
 
+    public void ClearCache()
+    {
+        _cache.Remove(CacheKey);
+        _logger.LogInformation("LLM settings cache cleared");
+    }
+
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
     {
         var (response, _) = await GenerateResponseWithContextAsync(prompt, null, cancellationToken);
@@ -265,6 +271,55 @@ public class LlmService : ILlmService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving available models from LLM service");
+            return Array.Empty<string>();
+        }
+    }
+
+    public async Task<string[]> GetAvailableModelsAsync(string url, bool isOllama, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(url);
+            httpClient.Timeout = TimeSpan.FromSeconds(5); // Short timeout for model discovery
+
+            if (isOllama)
+            {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(3));
+                var response = await httpClient.GetAsync("/api/tags", cts.Token);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Failed to retrieve Ollama tags from {Url}. Status: {StatusCode}", url, response.StatusCode);
+                    return Array.Empty<string>();
+                }
+                var json = await response.Content.ReadAsStringAsync(cts.Token);
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("models", out var modelsArray))
+                {
+                    var list = new List<string>();
+                    foreach (var m in modelsArray.EnumerateArray())
+                    {
+                        if (m.TryGetProperty("name", out var nameProp))
+                        {
+                            var name = nameProp.GetString();
+                            if (!string.IsNullOrWhiteSpace(name)) list.Add(name!);
+                        }
+                    }
+                    return list.Distinct().OrderBy(n => n).ToArray();
+                }
+                return Array.Empty<string>();
+            }
+            else
+            {
+                // For non-Ollama services, we can't easily discover models without specific API calls
+                // Return empty array to indicate models need to be manually specified
+                return Array.Empty<string>();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving available models from LLM service at {Url}", url);
             return Array.Empty<string>();
         }
     }
