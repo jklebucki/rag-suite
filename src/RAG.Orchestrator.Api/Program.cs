@@ -31,14 +31,6 @@ builder.Services.AddFeatureServices();
 
 var app = builder.Build();
 
-// Initialize global settings from appsettings if not exist
-using (var scope = app.Services.CreateScope())
-{
-    var globalSettingsService = scope.ServiceProvider.GetRequiredService<IGlobalSettingsService>();
-    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    await globalSettingsService.InitializeLlmSettingsAsync(configuration);
-}
-
 // Ensure database is created and admin user exists
 try
 {
@@ -48,6 +40,12 @@ try
     // Initialize Chat database and Elasticsearch
     await app.Services.EnsureChatDatabaseCreatedAsync();
     app.Logger.LogInformation("Chat database initialization completed successfully");
+
+    // Initialize global settings from appsettings if not exist
+    using var scope = app.Services.CreateScope();
+    var globalSettingsService = scope.ServiceProvider.GetRequiredService<IGlobalSettingsService>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await globalSettingsService.InitializeLlmSettingsAsync(configuration);
 }
 catch (Exception ex)
 {
