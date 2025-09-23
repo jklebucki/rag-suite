@@ -4,11 +4,6 @@ using System.Text.Json;
 
 namespace RAG.Orchestrator.Api.Features.Health;
 
-public interface IHealthAggregator
-{
-    Task<SystemHealthResponse> GetSystemHealthAsync(CancellationToken cancellationToken = default);
-}
-
 public class HealthAggregator : IHealthAggregator
 {
     private readonly ILlmService _llmService;

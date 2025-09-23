@@ -11,13 +11,6 @@ public record FileDownloadInfo(
     string FileName
 );
 
-public interface IFileDownloadService
-{
-    Task<IResult> DownloadFileAsync(string filePath, CancellationToken cancellationToken = default);
-    Task<FileDownloadInfo?> GetFileInfoAsync(string filePath, CancellationToken cancellationToken = default);
-    Task<IResult> DownloadFileWithConversionAsync(string filePath, bool forceConvert, CancellationToken cancellationToken = default);
-}
-
 public class FileDownloadService : IFileDownloadService
 {
     private readonly SharedFoldersOptions _options;
