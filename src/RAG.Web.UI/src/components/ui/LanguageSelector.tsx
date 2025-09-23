@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check, Globe } from 'lucide-react';
+import ReactCountryFlag from 'react-country-flag';
 import { useI18n } from '@/contexts/I18nContext';
 import { Language } from '@/types/i18n';
 
@@ -30,20 +31,23 @@ export function LanguageSelector() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-        title={t('language.selector.title')}
-        aria-label={t('language.selector.title')}
-        aria-expanded={isOpen ? true : false}
-        aria-haspopup="true"
-      >
-        <Globe className="h-4 w-4" />
-        <span className="text-sm font-medium">{currentLanguage?.flag}</span>
-        <span className="text-sm text-gray-600">{currentLanguage?.code.toUpperCase()}</span>
-        <ChevronDown className="h-4 w-4 text-gray-500" />
-      </button>
+              <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          {currentLanguage && (
+            <ReactCountryFlag
+              countryCode={currentLanguage.countryCode}
+              svg
+              style={{
+                width: '20px',
+                height: '15px',
+              }}
+            />
+          )}
+          <span>{currentLanguage?.nativeName}</span>
+          <ChevronDown className="w-4 h-4" />
+        </button>
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
@@ -65,7 +69,14 @@ export function LanguageSelector() {
                 className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{lang.flag}</span>
+                  <ReactCountryFlag
+                    countryCode={lang.countryCode}
+                    svg
+                    style={{
+                      width: '20px',
+                      height: '15px',
+                    }}
+                  />
                   <div>
                     <p className="text-sm font-medium text-gray-900">{lang.nativeName}</p>
                     <p className="text-xs text-gray-500">{lang.name}</p>
