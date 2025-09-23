@@ -9,62 +9,27 @@ namespace RAG.Orchestrator.Api.Services;
 public class GlobalSettingsService : IGlobalSettingsService
 {
     private readonly ChatDbContext _context;
+    private readonly IGlobalSettingsCache _cache;
 
-    public GlobalSettingsService(ChatDbContext context)
+    public GlobalSettingsService(ChatDbContext context, IGlobalSettingsCache cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     public async Task<LlmSettings?> GetLlmSettingsAsync()
     {
-        var setting = await _context.GlobalSettings
-            .FirstOrDefaultAsync(s => s.Key == "LlmService");
-
-        if (setting == null || string.IsNullOrEmpty(setting.Value))
-        {
-            return null;
-        }
-
-        try
-        {
-            return JsonSerializer.Deserialize<LlmSettings>(setting.Value);
-        }
-        catch
-        {
-            return null;
-        }
+        return await _cache.GetLlmSettingsAsync();
     }
 
     public async Task SetLlmSettingsAsync(LlmSettings settings)
     {
-        var setting = await _context.GlobalSettings
-            .FirstOrDefaultAsync(s => s.Key == "LlmService");
-
-        var jsonValue = JsonSerializer.Serialize(settings);
-
-        if (setting == null)
-        {
-            setting = new GlobalSetting
-            {
-                Key = "LlmService",
-                Value = jsonValue
-            };
-            _context.GlobalSettings.Add(setting);
-        }
-        else
-        {
-            setting.Value = jsonValue;
-        }
-
-        await _context.SaveChangesAsync();
-        
-        // Note: LLM service cache will refresh automatically after 5 minutes
-        // No need to clear it immediately as settings changes are not frequent
+        await _cache.SetLlmSettingsAsync(settings, _context);
     }
 
     public async Task InitializeLlmSettingsAsync(IConfiguration configuration)
     {
-        var existing = await GetLlmSettingsAsync();
+        var existing = await _cache.GetLlmSettingsAsync();
         if (existing != null)
         {
             return; // Already initialized
@@ -83,6 +48,6 @@ public class GlobalSettingsService : IGlobalSettingsService
             GenerateEndpoint = llmSection["GenerateEndpoint"] ?? "/api/generate"
         };
 
-        await SetLlmSettingsAsync(settings);
+        await _cache.SetLlmSettingsAsync(settings, _context);
     }
 }

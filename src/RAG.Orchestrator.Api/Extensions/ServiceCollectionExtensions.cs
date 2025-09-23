@@ -89,9 +89,6 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
 
-        // Add memory cache for LLM settings
-        services.AddMemoryCache();
-
         // Configure LLM endpoint configuration  
         services.AddOptions<LlmEndpointConfig>()
             .Configure<IConfiguration>((options, configuration) =>
@@ -163,6 +160,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGotenbergService, GotenbergService>();
         services.AddScoped<IGlobalSettingsService, GlobalSettingsService>();
         services.AddScoped<ISettingsService, SettingsService>();
+
+        // Register singleton for global settings cache
+        services.AddSingleton<IGlobalSettingsCache, GlobalSettingsCache>();
 
         return services;
     }

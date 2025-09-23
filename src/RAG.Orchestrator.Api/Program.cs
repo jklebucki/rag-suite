@@ -46,6 +46,12 @@ try
     var globalSettingsService = scope.ServiceProvider.GetRequiredService<IGlobalSettingsService>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     await globalSettingsService.InitializeLlmSettingsAsync(configuration);
+
+    // Initialize global settings cache
+    var globalSettingsCache = scope.ServiceProvider.GetRequiredService<IGlobalSettingsCache>();
+    var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+    await globalSettingsCache.InitializeAsync(chatDbContext);
+    app.Logger.LogInformation("Global settings cache initialization completed successfully");
 }
 catch (Exception ex)
 {

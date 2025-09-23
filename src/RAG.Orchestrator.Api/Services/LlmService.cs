@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
@@ -8,33 +7,23 @@ using RAG.Orchestrator.Api.Services;
 public class LlmService : ILlmService
 {
     private readonly HttpClient _httpClient;
-    private readonly IGlobalSettingsService _globalSettingsService;
-    private readonly IMemoryCache _cache;
+    private readonly IGlobalSettingsCache _globalSettingsCache;
     private readonly ILogger<LlmService> _logger;
-    private const string CacheKey = "LlmSettings";
 
-    public LlmService(HttpClient httpClient, IGlobalSettingsService globalSettingsService, IMemoryCache cache, ILogger<LlmService> logger)
+    public LlmService(HttpClient httpClient, IGlobalSettingsCache globalSettingsCache, ILogger<LlmService> logger)
     {
         _httpClient = httpClient;
-        _globalSettingsService = globalSettingsService;
-        _cache = cache;
+        _globalSettingsCache = globalSettingsCache;
         _logger = logger;
     }
 
     private async Task<LlmSettings> GetSettingsAsync()
     {
-        if (_cache.TryGetValue(CacheKey, out LlmSettings? settings) && settings != null)
-        {
-            return settings;
-        }
-
-        settings = await _globalSettingsService.GetLlmSettingsAsync();
+        var settings = await _globalSettingsCache.GetLlmSettingsAsync();
         if (settings == null)
         {
-            throw new InvalidOperationException("LLM settings not found in database. Please initialize settings first.");
+            throw new InvalidOperationException("LLM settings not found. Please initialize settings first.");
         }
-
-        _cache.Set(CacheKey, settings, TimeSpan.FromMinutes(5)); // Cache for 5 minutes
 
         // Update HttpClient settings
         _httpClient.BaseAddress = new Uri(settings.Url);
@@ -45,8 +34,8 @@ public class LlmService : ILlmService
 
     public void ClearCache()
     {
-        _cache.Remove(CacheKey);
-        _logger.LogInformation("LLM settings cache cleared");
+        // No memory cache to clear - settings are now in singleton cache
+        _logger.LogInformation("LLM settings cache clear requested - no action needed as settings are in singleton cache");
     }
 
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
