@@ -227,44 +227,44 @@ public class FileDownloadService : IFileDownloadService
     {
         try
         {
-            // Sprawdź czy możemy skonwertować plik na PDF
+            // Check if we can convert the file to PDF
             var fileExtension = Path.GetExtension(filePath);
             var canConvert = await _gotenbergService.CanConvertAsync(fileExtension);
 
             if (!canConvert && !forceConvert)
             {
-                // Zwróć oryginalny plik jeśli konwersja nie jest możliwa
+                // Return the original file if conversion is not possible
                 return await DownloadFileAsync(filePath, cancellationToken);
             }
 
-            // Pobierz informacje o pliku
+            // Retrieve file information
             var fileInfo = await GetFileInfoAsync(filePath, cancellationToken);
             if (fileInfo == null)
             {
-                // Jeśli nie możemy pobrać informacji o pliku, zwróć oryginalny wynik
+                // If we cannot retrieve file information, return the original result
                 return await DownloadFileAsync(filePath, cancellationToken);
             }
 
-            // Otwórz plik jako stream
+            // Open the file as a stream
             await using var fileStream = File.OpenRead(fileInfo.FullPath);
 
-            // Spróbuj skonwertować plik na PDF
+            // Try to convert the file to PDF
             var pdfStream = await _gotenbergService.ConvertToPdfAsync(fileStream, fileInfo.FileName);
 
             if (pdfStream == null)
             {
-                // Konwersja się nie udała, zwróć oryginalny plik
+                // Conversion failed, return the original file
                 return await DownloadFileAsync(filePath, cancellationToken);
             }
 
-            // Zwróć skonwertowany plik PDF
+            // Return the converted PDF file
             var pdfFileName = Path.ChangeExtension(fileInfo.FileName, ".pdf");
             return Results.File(pdfStream, "application/pdf", pdfFileName);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during file conversion for path: {FilePath}", filePath);
-            // W przypadku błędu, spróbuj zwrócić oryginalny plik
+            // In case of error, try to return the original file
             return await DownloadFileAsync(filePath, cancellationToken);
         }
     }

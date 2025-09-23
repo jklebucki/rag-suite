@@ -44,3 +44,4 @@ Modular monolith with **Vertical Slice Architecture** on **.NET 8 Minimal APIs**
 - C#: async/await with `CancellationToken`; file-scoped namespaces; records for DTOs; guard clauses.
 - React: function components + hooks; strict TS; API calls in services/hooks; cache/loading/error via React Query.
 - Keep DTOs **local to a feature** unless truly cross-cutting; align FE/BE DTO shapes.
+- **All code comments must be written in English, regardless of the conversation language.**
