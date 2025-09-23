@@ -224,6 +224,11 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
   }
 
+  async getRoles(): Promise<string[]> {
+    const response = await this.client.get<string[]>('/roles')
+    return response.data
+  }
+
   // Token management with proper storage handling
   getToken(): string | null {
     try {

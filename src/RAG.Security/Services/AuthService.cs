@@ -352,4 +352,10 @@ public class AuthService : IAuthService
 
         return userInfos;
     }
+
+    public async Task<List<string>> GetAllRolesAsync()
+    {
+        var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+        return roles.Where(name => name != null).Cast<string>().ToList();
+    }
 }

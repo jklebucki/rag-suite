@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { User, Shield, Key, Plus, Minus } from 'lucide-react'
+import { User, Shield, Key, Plus, Minus, Eye, EyeOff, Lock, CheckCircle, XCircle } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '@/contexts/I18nContext'
 import { authService } from '@/services/auth'
@@ -15,11 +15,20 @@ export function UserSettings() {
   const [isSetPasswordModalOpen, setIsSetPasswordModalOpen] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Fetch users
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: () => authService.getUsers(),
+    enabled: authService.hasRole('Admin')
+  })
+
+  // Fetch roles
+  const { data: availableRoles = [] } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => authService.getRoles(),
     enabled: authService.hasRole('Admin')
   })
 
@@ -93,6 +102,30 @@ export function UserSettings() {
     setSelectedUser(user)
     setIsSetPasswordModalOpen(true)
   }
+
+  // Password strength checker
+  const getPasswordStrength = (password: string) => {
+    let strength = 0
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    }
+
+    strength = Object.values(checks).filter(Boolean).length
+
+    return {
+      score: strength,
+      checks,
+      label: strength <= 2 ? 'Weak' : strength <= 3 ? 'Fair' : strength <= 4 ? 'Good' : 'Strong'
+    }
+  }
+
+  const passwordStrength = getPasswordStrength(newPassword)
+  const passwordsMatch = newPassword && confirmPassword && newPassword === confirmPassword
+  const passwordsMismatch = newPassword && confirmPassword && newPassword !== confirmPassword
 
   if (!authService.hasRole('Admin')) {
     return (
@@ -195,14 +228,19 @@ export function UserSettings() {
                             </button>
                           </span>
                         ))}
-                        <button
-                          onClick={() => handleAssignRole(user.id, 'Admin')}
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
-                          disabled={assignRoleMutation.isLoading || user.roles.includes('Admin')}
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Admin
-                        </button>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {availableRoles.filter(role => !user.roles.includes(role)).map((role) => (
+                            <button
+                              key={role}
+                              onClick={() => handleAssignRole(user.id, role)}
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                              disabled={assignRoleMutation.isLoading}
+                            >
+                              <Plus className="h-3 w-3 mr-1" />
+                              {role}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -233,49 +271,208 @@ export function UserSettings() {
           setNewPassword('')
           setConfirmPassword('')
           setSelectedUser(null)
+          setShowPassword(false)
+          setShowConfirmPassword(false)
         }}
-        title={`Set Password for ${selectedUser?.firstName} ${selectedUser?.lastName}`}
+        title={
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-indigo-100 rounded-full">
+              <Key className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Set New Password</h3>
+              <p className="text-sm text-gray-600">
+                for {selectedUser?.firstName} {selectedUser?.lastName}
+              </p>
+            </div>
+          </div>
+        }
+        size="md"
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">New Password</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter new password"
-            />
+        <div className="p-6">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 min-h-[500px] flex flex-col">
+            <div className="p-6 space-y-6 flex-1">
+              {/* User Info Card */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-100">
+                <div className="flex items-center space-x-3">
+                  <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <User className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {selectedUser?.firstName} {selectedUser?.lastName}
+                    </p>
+                    <p className="text-sm text-indigo-600 font-medium">@{selectedUser?.userName}</p>
+                  </div>
+                </div>
+              </div>
+
+          {/* New Password Field */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              New Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                placeholder="Enter a strong password"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+
+            {/* Password Strength Indicator */}
+            {newPassword && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Password strength:</span>
+                  <span className={`font-medium ${
+                    passwordStrength.score <= 2 ? 'text-red-600' :
+                    passwordStrength.score <= 3 ? 'text-yellow-600' :
+                    passwordStrength.score <= 4 ? 'text-blue-600' : 'text-green-600'
+                  }`}>
+                    {passwordStrength.label}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      passwordStrength.score <= 2 ? 'bg-red-500' :
+                      passwordStrength.score <= 3 ? 'bg-yellow-500' :
+                      passwordStrength.score <= 4 ? 'bg-blue-500' : 'bg-green-500'
+                    }`}
+                    style={{ width: `${Math.min((passwordStrength.score / 5) * 100, 100)}%` }}
+                  ></div>
+                </div>
+
+                {/* Password Requirements */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className={`flex items-center space-x-2 ${passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                    {passwordStrength.checks.length ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    <span>8+ characters</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 ${passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                    {passwordStrength.checks.uppercase ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    <span>Uppercase</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 ${passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                    {passwordStrength.checks.lowercase ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    <span>Lowercase</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 ${passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                    {passwordStrength.checks.number ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    <span>Number</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 ${passwordStrength.checks.special ? 'text-green-600' : 'text-gray-400'}`}>
+                    {passwordStrength.checks.special ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    <span>Special char</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Confirm new password"
-            />
+
+          {/* Confirm Password Field */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={`block w-full pl-10 pr-10 py-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${
+                  passwordsMismatch
+                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                    : passwordsMatch
+                    ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
+                    : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+                }`}
+                placeholder="Confirm your password"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+
+            {/* Password Match Indicator */}
+            {confirmPassword && (
+              <div className="flex items-center space-x-2 text-sm">
+                {passwordsMatch ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600">Passwords match</span>
+                  </>
+                ) : passwordsMismatch ? (
+                  <>
+                    <XCircle className="h-4 w-4 text-red-600" />
+                    <span className="text-red-600">Passwords do not match</span>
+                  </>
+                ) : null}
+              </div>
+            )}
           </div>
-          <div className="flex justify-end space-x-3">
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               onClick={() => {
                 setIsSetPasswordModalOpen(false)
                 setNewPassword('')
                 setConfirmPassword('')
                 setSelectedUser(null)
+                setShowPassword(false)
+                setShowConfirmPassword(false)
               }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSetPassword}
-              disabled={setPasswordMutation.isLoading || !newPassword || !confirmPassword}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+              disabled={setPasswordMutation.isLoading || !newPassword || !confirmPassword || passwordsMismatch || passwordStrength.score < 3}
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {setPasswordMutation.isLoading ? 'Setting...' : 'Set Password'}
+              {setPasswordMutation.isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Setting Password...</span>
+                </div>
+              ) : (
+                'Set Password'
+              )}
             </button>
+          </div>
+            </div>
           </div>
         </div>
       </Modal>
