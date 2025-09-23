@@ -10,10 +10,10 @@ public class GotenbergService : IGotenbergService
     private readonly ILogger<GotenbergService> _logger;
     private readonly GotenbergConfig _config;
 
-    // Lista obsługiwanych rozszerzeń plików przez Gotenberg
+    // List of file extensions supported by Gotenberg
     private static readonly HashSet<string> _supportedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        // LibreOffice (dokumenty biurowe) - pełna lista z dokumentacji
+        // LibreOffice (office documents) - full list from documentation
         ".123", ".602", ".abw", ".bib", ".bmp", ".cdr", ".cgm", ".cmx", ".csv", ".cwk", ".dbf",
         ".dif", ".doc", ".docm", ".docx", ".dot", ".dotm", ".dotx", ".dxf", ".emf", ".eps", ".epub",
         ".fodg", ".fodp", ".fods", ".fodt", ".fopd", ".gif", ".htm", ".html", ".hwp", ".jpeg", ".jpg",
@@ -31,7 +31,7 @@ public class GotenbergService : IGotenbergService
         // Chromium (HTML, Markdown)
         ".html", ".htm", ".md", ".markdown",
 
-        // Obrazy (obsługiwane przez LibreOffice)
+        // Images (supported by LibreOffice)
         ".bmp", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".tiff", ".webp"
     };
 
@@ -41,7 +41,7 @@ public class GotenbergService : IGotenbergService
         _config = config.Value;
         _logger = logger;
 
-        // Konfiguracja HttpClient na podstawie ustawień
+        // HttpClient configuration based on settings
         _httpClient.BaseAddress = new Uri(_config.Url);
         _httpClient.Timeout = TimeSpan.FromMinutes(_config.TimeoutMinutes);
 
@@ -54,7 +54,7 @@ public class GotenbergService : IGotenbergService
         if (string.IsNullOrEmpty(fileExtension))
             return Task.FromResult(false);
 
-        // Usuń kropkę jeśli istnieje
+        // Remove dot if it exists
         if (fileExtension.StartsWith('.'))
             fileExtension = fileExtension[1..];
 
@@ -79,7 +79,7 @@ public class GotenbergService : IGotenbergService
                 return null;
             }
 
-            // Przygotuj multipart form data
+            // Prepare multipart form data
             using var content = new MultipartFormDataContent();
 
             var endpoint = GetConversionEndpoint(fileExtension);
@@ -132,7 +132,7 @@ public class GotenbergService : IGotenbergService
 
             _logger.LogInformation("Converting file {FileName} to PDF using endpoint {Endpoint}", fileName, endpoint);
 
-            // Wyślij request do Gotenberg
+            // Send request to Gotenberg
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -142,7 +142,7 @@ public class GotenbergService : IGotenbergService
                 return null;
             }
 
-            // Zwróć stream z przekonwertowanym PDF
+            // Return stream with converted PDF
             var pdfStream = await response.Content.ReadAsStreamAsync(cancellationToken);
             _logger.LogInformation("Successfully converted file {FileName} to PDF", fileName);
 

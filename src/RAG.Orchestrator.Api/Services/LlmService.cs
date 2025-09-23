@@ -165,7 +165,7 @@ public class LlmService : ILlmService
             }
 
             _logger.LogWarning("Unexpected response format from LLM service. Response: {ResponseJson}", responseJson);
-            return ("Otrzymano niepoprawną odpowiedź z serwisu LLM.", null);
+            return ("Received an incorrect response from the LLM service.", null);
         }
         catch (Exception ex)
         {
@@ -387,7 +387,7 @@ public class LlmService : ILlmService
             }
 
             _logger.LogWarning("Unexpected response format from Ollama chat API. Response: {ResponseJson}", responseJson);
-            return "Otrzymano niepoprawną odpowiedź z serwisu Ollama.";
+            return "Received an incorrect response from the Ollama service.";
         }
         catch (Exception ex)
         {

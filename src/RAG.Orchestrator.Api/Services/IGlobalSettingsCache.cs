@@ -4,29 +4,29 @@ using RAG.Orchestrator.Api.Models;
 namespace RAG.Orchestrator.Api.Services;
 
 /// <summary>
-/// Interfejs dla singletona przechowującego ustawienia globalne w pamięci.
-/// Zapewnia thread-safe dostęp do ustawień, szczególnie dla metod używanych w requestach chat.
-/// Aktualizacja ustawień jest dwufazowa: najpierw w singletonie, potem w bazie danych.
+/// Interface for a singleton storing global settings in memory.
+/// Provides thread-safe access to settings, especially for methods used in chat requests.
+/// Settings update is two-phase: first in the singleton, then in the database.
 /// </summary>
 public interface IGlobalSettingsCache
 {
     /// <summary>
-    /// Inicjalizuje cache ładowaniem wszystkich ustawień z bazy danych.
-    /// Wywoływane podczas startupu aplikacji.
+    /// Initializes the cache by loading all settings from the database.
+    /// Called during application startup.
     /// </summary>
     Task InitializeAsync(ChatDbContext context, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Pobiera ustawienia LLM w sposób thread-safe.
-    /// Używane przez requesty chat dla współbieżnego dostępu.
+    /// Retrieves LLM settings in a thread-safe manner.
+    /// Used by chat requests for concurrent access.
     /// </summary>
     Task<LlmSettings?> GetLlmSettingsAsync();
 
     /// <summary>
-    /// Aktualizuje ustawienia LLM w dwufazowy sposób:
-    /// 1. Najpierw aktualizuje w singletonie (w pamięci).
-    /// 2. Po sukcesie zapisuje do bazy danych.
-    /// W przypadku błędu bazy cofa zmiany w singletonie.
+    /// Updates LLM settings in a two-phase manner:
+    /// 1. First updates in the singleton (in memory).
+    /// 2. On success, saves to the database.
+    /// In case of database error, rolls back changes in the singleton.
     /// </summary>
     Task SetLlmSettingsAsync(LlmSettings settings, ChatDbContext context, CancellationToken cancellationToken = default);
 }

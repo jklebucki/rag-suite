@@ -7,17 +7,17 @@ using RAG.Orchestrator.Api.Models;
 namespace RAG.Orchestrator.Api.Services;
 
 /// <summary>
-/// Singleton przechowujący ustawienia globalne w pamięci.
-/// Ładuje dane z bazy przy uruchomieniu i zapewnia thread-safe dostęp.
-/// Aktualizacja jest dwufazowa: najpierw w pamięci, potem w bazie z obsługą rollback.
+/// Singleton storing global settings in memory.
+/// Loads data from the database on startup and ensures thread-safe access.
+/// Update is two-phase: first in memory, then in database with rollback handling.
 /// </summary>
 public class GlobalSettingsCache : IGlobalSettingsCache
 {
     private readonly ConcurrentDictionary<string, GlobalSetting> _settings = new();
-    private readonly object _lock = new(); // Dla złożonych operacji wymagających synchronizacji
+    private readonly object _lock = new(); // For complex operations requiring synchronization
 
     /// <summary>
-    /// Inicjalizuje cache ładowaniem wszystkich ustawień z bazy danych.
+    /// Initializes the cache by loading all settings from the database.
     /// </summary>
     public async Task InitializeAsync(ChatDbContext context, CancellationToken cancellationToken = default)
     {
@@ -34,7 +34,7 @@ public class GlobalSettingsCache : IGlobalSettingsCache
     }
 
     /// <summary>
-    /// Pobiera ustawienia LLM w sposób thread-safe.
+    /// Retrieves LLM settings in a thread-safe manner.
     /// </summary>
     public Task<LlmSettings?> GetLlmSettingsAsync()
     {
@@ -54,14 +54,14 @@ public class GlobalSettingsCache : IGlobalSettingsCache
     }
 
     /// <summary>
-    /// Aktualizuje ustawienia LLM w dwufazowy sposób.
+    /// Updates LLM settings in a two-phase manner.
     /// </summary>
     public async Task SetLlmSettingsAsync(LlmSettings settings, ChatDbContext context, CancellationToken cancellationToken = default)
     {
         var jsonValue = JsonSerializer.Serialize(settings);
         var key = "LlmService";
 
-        // Faza 1: Aktualizacja w pamięci (z pamięcią poprzedniej wartości dla rollback)
+        // Phase 1: Update in memory (with memory of previous value for rollback)
         GlobalSetting? previousSetting = null;
         lock (_lock)
         {
@@ -77,14 +77,14 @@ public class GlobalSettingsCache : IGlobalSettingsCache
 
             var newSetting = new GlobalSetting
             {
-                Id = previousSetting?.Id ?? 0, // Id zostanie ustawione przez EF przy zapisie
+                Id = previousSetting?.Id ?? 0, // Id will be set by EF on save
                 Key = key,
                 Value = jsonValue
             };
             _settings[key] = newSetting;
         }
 
-        // Faza 2: Zapis do bazy
+        // Phase 2: Save to database
         try
         {
             var dbSetting = await context.GlobalSettings.FirstOrDefaultAsync(s => s.Key == key, cancellationToken);
@@ -102,7 +102,7 @@ public class GlobalSettingsCache : IGlobalSettingsCache
         }
         catch (Exception)
         {
-            // Rollback: Przywróć poprzednią wartość w pamięci
+            // Rollback: Restore the previous value in memory
             lock (_lock)
             {
                 if (previousSetting != null)
@@ -114,7 +114,7 @@ public class GlobalSettingsCache : IGlobalSettingsCache
                     _settings.TryRemove(key, out _);
                 }
             }
-            throw; // Przekaż wyjątek dalej
+            throw; // Rethrow the exception
         }
     }
 }
