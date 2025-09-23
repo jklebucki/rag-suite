@@ -55,16 +55,19 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <button
-        onClick={onToggleSidebar}
-        className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
-        aria-label={t('common.toggle_menu')}
-        title={t('common.toggle_menu')}
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      <div className="flex items-center gap-4">
+        <img src="/logo-citronex.png" alt="Citronex Logo" className="h-8 w-auto" />
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+          aria-label={t('common.toggle_menu')}
+          title={t('common.toggle_menu')}
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
 
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-3">
         <LanguageSelector />
         
         {user && (
