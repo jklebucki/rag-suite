@@ -2,17 +2,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace RAG.Security.Services;
 
-public interface IUserContextService
-{
-    string? GetCurrentUserId();
-    string? GetCurrentUserName();
-    string? GetCurrentUserEmail();
-    string[] GetCurrentUserRoles();
-    bool IsAuthenticated();
-    bool IsInRole(string role);
-    bool HasAnyRole(params string[] roles);
-}
-
 public class UserContextService : IUserContextService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

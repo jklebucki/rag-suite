@@ -9,18 +9,6 @@ using System.Text;
 
 namespace RAG.Security.Services;
 
-public interface IJwtService
-{
-    string GenerateAccessToken(User user, IList<string> roles);
-    string GenerateRefreshToken();
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
-    TokenValidationResponse ValidateToken(string token);
-    Task<bool> ValidateRefreshTokenAsync(string userId, string refreshToken);
-    Task SaveRefreshTokenAsync(string userId, string refreshToken);
-    Task RevokeRefreshTokenAsync(string userId, string refreshToken);
-    Task RevokeAllRefreshTokensAsync(string userId);
-}
-
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;

@@ -7,22 +7,6 @@ using System.Linq;
 
 namespace RAG.Security.Services;
 
-public interface IAuthService
-{
-    Task<LoginResponse?> LoginAsync(LoginRequest request);
-    Task<bool> RegisterAsync(RegisterRequest request);
-    Task<LoginResponse?> RefreshTokenAsync(RefreshTokenRequest request);
-    Task<bool> LogoutAsync(string userId, string refreshToken);
-    Task<bool> LogoutAllDevicesAsync(string userId);
-    Task<bool> ChangePasswordAsync(string userId, ChangePasswordRequest request);
-    Task<UserInfo?> GetUserInfoAsync(string userId);
-    Task<bool> AssignRoleAsync(string userId, string roleName);
-    Task<bool> RemoveRoleAsync(string userId, string roleName);
-    Task<IList<string>> GetUserRolesAsync(string userId);
-    Task<bool> ForgotPasswordAsync(string email, string uiUrl);
-    Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
-}
-
 public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
@@ -329,5 +313,18 @@ public class AuthService : IAuthService
         }
 
         return false;
+    }
+
+    public async Task<bool> SetPasswordAsync(string userId, string newPassword)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null || !user.IsActive)
+        {
+            return false;
+        }
+
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+        return result.Succeeded;
     }
 }

@@ -122,6 +122,24 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password changed successfully" });
     }
 
+    [HttpPost("set-password")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> SetPassword([FromBody] SetPasswordRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var success = await _authService.SetPasswordAsync(request.UserId, request.NewPassword);
+        if (!success)
+        {
+            return BadRequest(new { message = "Failed to set password" });
+        }
+
+        return Ok(new { message = "Password set successfully" });
+    }
+
     [HttpGet("me")]
     [Authorize]
     public async Task<ActionResult<UserInfo>> GetCurrentUser()
@@ -228,4 +246,10 @@ public record AssignRoleRequest
 {
     public string UserId { get; init; } = string.Empty;
     public string RoleName { get; init; } = string.Empty;
+}
+
+public record SetPasswordRequest
+{
+    public string UserId { get; init; } = string.Empty;
+    public string NewPassword { get; init; } = string.Empty;
 }
