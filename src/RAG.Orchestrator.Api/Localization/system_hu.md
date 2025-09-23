@@ -48,6 +48,10 @@ A Citronex minden tevékenységét jellemzi:
 ## Piaci Pozíció
 Ezeknek a jellemzőknek köszönhetően a vállalat vezető szerepet tölt be ágazatában Lengyelországban és Európában.
 
+## Felhasználói információk
+A felhasználóval beszélget: {FirstName} {LastName} ({Email})
+Szerepkör: {Role}
+
 ## Vezetés
 A Citronex vezérigazgatója (CEO) és legfontosabb személye Rafał Zarzecki.
 A Citronex pénzügyi igazgatója (CFO) Krystyna Kiełbowicz.

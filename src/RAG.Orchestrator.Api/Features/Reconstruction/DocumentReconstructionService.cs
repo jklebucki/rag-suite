@@ -25,7 +25,7 @@ public class DocumentReconstructionService : IDocumentReconstructionService
     /// <summary>
     /// Reconstructs a complete document from chunks, removing overlaps between adjacent chunks
     /// </summary>
-    public string ReconstructDocument(IEnumerable<ChunkInfo> chunks, bool removeOverlap = true)
+    public string ReconstructDocument(IEnumerable<ChunkInfo> chunks, bool removeOverlap = true, bool removeDuplicates = false)
     {
         var sortedChunks = chunks.OrderBy(c => c.ChunkIndex).ToList();
 
@@ -74,17 +74,16 @@ public class DocumentReconstructionService : IDocumentReconstructionService
 
                 if (!string.IsNullOrEmpty(contentWithoutOverlap))
                 {
-                    // Add separator between chunks if the content doesn't start with punctuation
-                    if (!string.IsNullOrEmpty(result.ToString()) &&
-                        !contentWithoutOverlap.StartsWith('.') &&
-                        !contentWithoutOverlap.StartsWith(',') &&
-                        !contentWithoutOverlap.StartsWith(';') &&
-                        !contentWithoutOverlap.StartsWith('!') &&
-                        !contentWithoutOverlap.StartsWith('?'))
+                    // Add separator between chunks if needed
+                    if (!string.IsNullOrEmpty(result.ToString()))
                     {
-                        // Check if we need to add space or new line
+                        var firstChar = contentWithoutOverlap.Length > 0 ? contentWithoutOverlap[0] : ' ';
                         var lastChar = result.Length > 0 ? result[result.Length - 1] : ' ';
-                        if (!char.IsWhiteSpace(lastChar))
+                        
+                        // Add space only if neither the result ends with whitespace nor the content starts with whitespace
+                        if (!char.IsWhiteSpace(lastChar) && !char.IsWhiteSpace(firstChar) &&
+                            !firstChar.Equals('.') && !firstChar.Equals(',') && !firstChar.Equals(';') && 
+                            !firstChar.Equals('!') && !firstChar.Equals('?'))
                         {
                             result.Append(' ');
                         }
@@ -98,12 +97,19 @@ public class DocumentReconstructionService : IDocumentReconstructionService
 
         var reconstructed = result.ToString().Trim();
 
+        // Remove duplicates if requested
+        if (removeDuplicates)
+        {
+            reconstructed = RemoveDuplicates(reconstructed);
+        }
+
         _logger.LogDebug("Reconstructed document from {ChunkCount} chunks. Original total length: {OriginalLength}, " +
-                        "Reconstructed length: {ReconstructedLength}, Overlap removed: {OverlapRemoved}",
+                        "Reconstructed length: {ReconstructedLength}, Overlap removed: {OverlapRemoved}, Duplicates removed: {DuplicatesRemoved}",
                         sortedChunks.Count,
                         sortedChunks.Sum(c => c.Content?.Length ?? 0),
                         reconstructed.Length,
-                        removeOverlap);
+                        removeOverlap,
+                        removeDuplicates);
 
         return reconstructed;
     }
@@ -313,5 +319,33 @@ public class DocumentReconstructionService : IDocumentReconstructionService
         }
 
         return (double)matches / maxLength;
+    }
+
+    /// <summary>
+    /// Removes duplicate phrases from the entire document
+    /// </summary>
+    private string RemoveDuplicates(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        // Simple approach: remove exact duplicate sentences
+        var sentences = SentenceBoundaryRegex.Split(text)
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Select(s => s.Trim())
+            .ToList();
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<string>();
+
+        foreach (var sentence in sentences)
+        {
+            if (seen.Add(sentence))
+            {
+                result.Add(sentence);
+            }
+        }
+
+        return string.Join(" ", result);
     }
 }

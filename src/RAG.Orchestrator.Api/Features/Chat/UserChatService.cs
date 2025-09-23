@@ -7,6 +7,7 @@ using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
 using RAG.Orchestrator.Api.Models;
+using RAG.Security.Data;
 using System.IO;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace RAG.Orchestrator.Api.Features.Chat;
 public class UserChatService : IUserChatService
 {
     private readonly ChatDbContext _chatDbContext;
+    private readonly SecurityDbContext _securityDbContext;
     private readonly Kernel _kernel;
     private readonly ISearchService _searchService;
     private readonly ILanguageService _languageService;
@@ -25,6 +27,7 @@ public class UserChatService : IUserChatService
 
     public UserChatService(
         ChatDbContext chatDbContext,
+        SecurityDbContext securityDbContext,
         Kernel kernel,
         ISearchService searchService,
         ILanguageService languageService,
@@ -34,6 +37,7 @@ public class UserChatService : IUserChatService
         IGlobalSettingsService globalSettingsService)
     {
         _chatDbContext = chatDbContext;
+        _securityDbContext = securityDbContext;
         _kernel = kernel;
         _searchService = searchService;
         _languageService = languageService;
@@ -41,6 +45,28 @@ public class UserChatService : IUserChatService
         _configuration = configuration;
         _llmService = llmService;
         _globalSettingsService = globalSettingsService;
+    }
+
+    private async Task<(string? FirstName, string? LastName, string? Email, string? Role)> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var user = await _securityDbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+            if (user == null)
+                return (null, null, null, null);
+
+            var role = user.UserRoles.FirstOrDefault()?.Role?.Name;
+            return (user.FirstName, user.LastName, user.Email, role);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve user info for user {UserId}", userId);
+            return (null, null, null, null);
+        }
     }
 
     // Helper method to convert UserChatMessage history to LlmChatMessage format
@@ -152,6 +178,9 @@ public class UserChatService : IUserChatService
 
     public async Task<MultilingualChatResponse> SendUserMultilingualMessageAsync(string userId, string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
     {
+        // Get user information for system message personalization
+        var (firstName, lastName, email, role) = await GetUserInfoAsync(userId, cancellationToken);
+
         // Check if user has access to this session
         var dbSession = await _chatDbContext.ChatSessions
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, cancellationToken);
@@ -304,6 +333,10 @@ public class UserChatService : IUserChatService
                     messageHistory,
                     enhancedUserMessage,
                     normalizedResponseLanguage, // Let ChatService handle system message
+                    firstName,
+                    lastName,
+                    email,
+                    role,
                     cancellationToken);
 
                 _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages", messageHistory.Count());

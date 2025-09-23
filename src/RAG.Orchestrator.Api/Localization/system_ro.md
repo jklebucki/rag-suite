@@ -48,6 +48,10 @@ Toate activitățile Citronex se caracterizează prin:
 ## Poziția pe Piață
 Datorită acestor caracteristici, compania este lider în domeniul său în Polonia și Europa.
 
+## Informații despre utilizator
+Vorbești cu utilizatorul: {FirstName} {LastName} ({Email})
+Rol: {Role}
+
 ## Conducere
 CEO-ul și cea mai importantă persoană din Citronex este Rafał Zarzecki.
 CFO-ul Citronex este Krystyna Kiełbowicz.

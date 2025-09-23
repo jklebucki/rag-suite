@@ -46,7 +46,7 @@ public class WinSpedDocumentReconstructionTests
         };
 
         // Act
-        var result = _service.ReconstructDocument(chunks);
+        var result = _service.ReconstructDocument(chunks, removeDuplicates: true);
 
         // Assert
         // Sprawdź czy powtarzające się fragmenty zostały usunięte

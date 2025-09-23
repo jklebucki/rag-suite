@@ -48,6 +48,10 @@ Całość działalności Citronex cechuje:
 ## Pozycja na Rynku
 Dzięki tym cechom firma należy do liderów w swojej branży w Polsce i Europie.
 
+## Informacje o użytkowniku
+Rozmawiasz z użytkownikiem: {FirstName} {LastName} ({Email})
+Rola: {Role}
+
 ## Kierownictwo
 Prezesem CEO i najważniejszą osobą w Citronex jest Rafał Zarzecki.
 Dyrektorem Finansowym CFO w firmie Citronex jest Krystyna Kiełbowicz.

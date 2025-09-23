@@ -48,6 +48,10 @@ Alle activiteiten van Citronex worden gekenmerkt door:
 ## Marktpositie
 Dankzij deze kenmerken behoort het bedrijf tot de leiders in zijn branche in Polen en Europa.
 
+## Gebruikersinformatie
+Je praat met gebruiker: {FirstName} {LastName} ({Email})
+Rol: {Role}
+
 ## Management
 De CEO en belangrijkste persoon bij Citronex is Rafał Zarzecki.
 De CFO bij Citronex is Krystyna Kiełbowicz.

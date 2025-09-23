@@ -309,6 +309,11 @@ public class LlmService : ILlmService
 
     public async Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language = "en", CancellationToken cancellationToken = default)
     {
+        return await ChatWithHistoryAsync(messageHistory, userMessage, language, null, null, null, null, cancellationToken);
+    }
+
+    public async Task<string> ChatWithHistoryAsync(IEnumerable<LlmChatMessage> messageHistory, string userMessage, string language, string? firstName, string? lastName, string? email, string? role, CancellationToken cancellationToken = default)
+    {
         try
         {
             var settings = await GetSettingsAsync();
@@ -328,7 +333,7 @@ public class LlmService : ILlmService
 
             // Add system message as first message if needed
 
-            var systemMessage = await GetSystemMessageAsync(language, cancellationToken);
+            var systemMessage = await GetSystemMessageAsync(language, firstName, lastName, email, role, cancellationToken);
             if (!string.IsNullOrEmpty(systemMessage))
             {
                 messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
@@ -398,6 +403,11 @@ public class LlmService : ILlmService
 
     public async Task<string> GetSystemMessageAsync(string language = "en", CancellationToken cancellationToken = default)
     {
+        return await GetSystemMessageAsync(language, null, null, null, null, cancellationToken);
+    }
+
+    public async Task<string> GetSystemMessageAsync(string language, string? firstName, string? lastName, string? email, string? role, CancellationToken cancellationToken = default)
+    {
         try
         {
             // Map language codes to supported languages
@@ -418,6 +428,16 @@ public class LlmService : ILlmService
 
             if (systemMessageModel != null)
             {
+                // Replace user information placeholders if provided
+                if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName) || !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(role))
+                {
+                    systemMessageModel = systemMessageModel
+                        .Replace("{FirstName}", firstName ?? "")
+                        .Replace("{LastName}", lastName ?? "")
+                        .Replace("{Email}", email ?? "")
+                        .Replace("{Role}", role ?? "");
+                }
+
                 _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
                 return systemMessageModel;
             }

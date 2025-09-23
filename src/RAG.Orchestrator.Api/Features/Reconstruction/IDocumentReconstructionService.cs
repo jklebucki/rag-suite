@@ -12,8 +12,9 @@ public interface IDocumentReconstructionService
     /// </summary>
     /// <param name="chunks">List of chunks sorted by index</param>
     /// <param name="removeOverlap">Whether to remove overlap between chunks</param>
+    /// <param name="removeDuplicates">Whether to remove duplicate content within the entire document</param>
     /// <returns>Reconstructed document content without overlaps</returns>
-    string ReconstructDocument(IEnumerable<ChunkInfo> chunks, bool removeOverlap = true);
+    string ReconstructDocument(IEnumerable<ChunkInfo> chunks, bool removeOverlap = true, bool removeDuplicates = false);
 
     /// <summary>
     /// Removes overlap between two adjacent text segments
