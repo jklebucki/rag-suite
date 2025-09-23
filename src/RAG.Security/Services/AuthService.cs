@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RAG.Security.Data;
 using RAG.Security.DTOs;
 using RAG.Security.Models;
+using RAG.Security.Requests;
 using System.Linq;
 
 namespace RAG.Security.Services;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RAG.Security.DTOs;
+using RAG.Security.Requests;
 
 namespace RAG.Security.Services;
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RAG.Security.DTOs;
+using RAG.Security.Requests;
 using RAG.Security.Services;
 using System.Security.Claims;
 
@@ -240,16 +241,4 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Password has been reset successfully" });
     }
-}
-
-public record AssignRoleRequest
-{
-    public string UserId { get; init; } = string.Empty;
-    public string RoleName { get; init; } = string.Empty;
-}
-
-public record SetPasswordRequest
-{
-    public string UserId { get; init; } = string.Empty;
-    public string NewPassword { get; init; } = string.Empty;
 }
