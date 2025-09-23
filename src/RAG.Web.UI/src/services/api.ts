@@ -285,11 +285,6 @@ class ApiClient {
     return response.data
   }
 
-  async clearLlmCache(): Promise<{ message: string }> {
-    const response = await this.client.post('/settings/llm/cache/clear')
-    return response.data
-  }
-
   async getAvailableLlmModels(): Promise<AvailableModelsResponse> {
     const response = await this.client.get('/settings/llm/models')
     return response.data

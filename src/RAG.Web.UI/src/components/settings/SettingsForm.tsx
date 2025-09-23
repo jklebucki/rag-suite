@@ -28,7 +28,6 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [loadingModels, setLoadingModels] = useState(false)
-  const [clearingCache, setClearingCache] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   // Load settings on component mount
@@ -167,27 +166,6 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
   const handleRefreshModels = () => {
     loadAvailableModels()
-  }
-
-  const handleClearCache = async () => {
-    try {
-      setClearingCache(true)
-      await apiClient.clearLlmCache()
-      addToast({
-        type: 'success',
-        title: 'Success',
-        message: 'LLM cache cleared successfully'
-      })
-    } catch (error) {
-      console.error('Failed to clear LLM cache:', error)
-      addToast({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to clear LLM cache'
-      })
-    } finally {
-      setClearingCache(false)
-    }
   }
 
   if (loading) {
@@ -375,20 +353,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       </div>
 
       {/* Submit Button */}
-      <div className="flex justify-end space-x-3">
-        <button
-          type="button"
-          onClick={handleClearCache}
-          disabled={clearingCache}
-          className="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          {clearingCache ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <RefreshCw className="h-4 w-4 mr-2" />
-          )}
-          {clearingCache ? 'Clearing...' : 'Clear Cache'}
-        </button>
+      <div className="flex justify-end">
         <button
           type="submit"
           disabled={saving}
