@@ -62,11 +62,6 @@ Gebouwd met moderne software architectuur principes:
 
 ## Ondersteuning
 
-Voor ondersteuning en documentatie, raadpleeg:
-- [API Documentatie](./api-documentation.md)
-- [Implementatiegids](../DEPLOYMENT_GUIDE.md)
-- [Probleemoplossing](../DOTNET8-TROUBLESHOOTING.md)
-
 ---
 
 **Versie**: 1.0.0

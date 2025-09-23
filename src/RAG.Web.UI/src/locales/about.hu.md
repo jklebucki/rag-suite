@@ -60,13 +60,6 @@ Modern szoftver architektúra elvekkel épült:
 3. **Bevitel**: Töltsd fel és dolgozd fel dokumentumaidat
 4. **Keresés**: Kezdd el felfedezni tudásbázisodat
 
-## Támogatás
-
-Támogatásért és dokumentációért lásd:
-- [API Dokumentáció](./api-documentation.md)
-- [Telepítési Útmutató](../DEPLOYMENT_GUIDE.md)
-- [Hibaelhárítás](../DOTNET8-TROUBLESHOOTING.md)
-
 ---
 
 **Verzió**: 1.0.0
