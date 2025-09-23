@@ -45,11 +45,11 @@ try
     using var scope = app.Services.CreateScope();
     var globalSettingsService = scope.ServiceProvider.GetRequiredService<IGlobalSettingsService>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    await globalSettingsService.InitializeLlmSettingsAsync(configuration);
+    var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+    await globalSettingsService.InitializeLlmSettingsAsync(configuration, chatDbContext);
 
     // Initialize global settings cache
     var globalSettingsCache = scope.ServiceProvider.GetRequiredService<IGlobalSettingsCache>();
-    var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
     await globalSettingsCache.InitializeAsync(chatDbContext);
     app.Logger.LogInformation("Global settings cache initialization completed successfully");
 }

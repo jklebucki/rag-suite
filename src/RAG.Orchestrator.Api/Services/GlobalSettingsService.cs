@@ -27,12 +27,12 @@ public class GlobalSettingsService : IGlobalSettingsService
         await _cache.SetLlmSettingsAsync(settings, _context);
     }
 
-    public async Task InitializeLlmSettingsAsync(IConfiguration configuration)
+    public async Task InitializeLlmSettingsAsync(IConfiguration configuration, ChatDbContext context)
     {
-        var existing = await _cache.GetLlmSettingsAsync();
-        if (existing != null)
+        var existing = await context.GlobalSettings.AnyAsync(s => s.Key == "LlmService");
+        if (existing)
         {
-            return; // Already initialized
+            return; // Already initialized in database
         }
 
         var llmSection = configuration.GetSection("Services:LlmService");
@@ -48,6 +48,9 @@ public class GlobalSettingsService : IGlobalSettingsService
             GenerateEndpoint = llmSection["GenerateEndpoint"] ?? "/api/generate"
         };
 
-        await _cache.SetLlmSettingsAsync(settings, _context);
+        var jsonValue = JsonSerializer.Serialize(settings);
+        var dbSetting = new GlobalSetting { Key = "LlmService", Value = jsonValue };
+        context.GlobalSettings.Add(dbSetting);
+        await context.SaveChangesAsync();
     }
 }
