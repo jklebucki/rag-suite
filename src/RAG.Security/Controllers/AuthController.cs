@@ -241,4 +241,12 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Password has been reset successfully" });
     }
+
+    [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<List<UserInfo>>> GetUsers()
+    {
+        var users = await _authService.GetAllUsersAsync();
+        return Ok(users);
+    }
 }

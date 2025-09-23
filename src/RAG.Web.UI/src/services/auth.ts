@@ -207,6 +207,23 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/change-password', request)
   }
 
+  async getUsers(): Promise<User[]> {
+    const response = await this.client.get<User[]>('/users')
+    return response.data
+  }
+
+  async assignRole(userId: string, roleName: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/assign-role', { userId, roleName })
+  }
+
+  async removeRole(userId: string, roleName: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/remove-role', { userId, roleName })
+  }
+
+  async setPassword(userId: string, newPassword: string): Promise<void> {
+    await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
+  }
+
   // Token management with proper storage handling
   getToken(): string | null {
     try {

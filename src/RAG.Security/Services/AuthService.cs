@@ -328,4 +328,28 @@ public class AuthService : IAuthService
         var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
         return result.Succeeded;
     }
+
+    public async Task<List<UserInfo>> GetAllUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var userInfos = new List<UserInfo>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            userInfos.Add(new UserInfo
+            {
+                Id = user.Id,
+                Email = user.Email ?? string.Empty,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName ?? string.Empty,
+                Roles = roles.ToArray(),
+                CreatedAt = user.CreatedAt,
+                LastLoginAt = user.LastLoginAt
+            });
+        }
+
+        return userInfos;
+    }
 }
