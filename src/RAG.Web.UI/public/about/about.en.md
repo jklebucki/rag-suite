@@ -64,13 +64,6 @@ Built with modern software architecture principles:
 3. **Ingest**: Upload and process your documents
 4. **Search**: Start exploring your knowledge base
 
-## Support
-
-For support and documentation, please refer to:
-- [API Documentation](./api-documentation.md)
-- [Deployment Guide](../DEPLOYMENT_GUIDE.md)
-- [Troubleshooting](../DOTNET8-TROUBLESHOOTING.md)
-
 ---
 
 **Version**: 1.0.0

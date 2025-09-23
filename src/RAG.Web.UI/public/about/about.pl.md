@@ -64,13 +64,6 @@ Zbudowane z nowoczesnymi zasadami architektury oprogramowania:
 3. **Pozyskiwanie**: Prześlij i przetwórz swoje dokumenty
 4. **Wyszukiwanie**: Zacznij eksplorować swoją bazę wiedzy
 
-## Wsparcie
-
-Aby uzyskać wsparcie i dokumentację, skorzystaj z:
-- [Dokumentacja API](./api-documentation.md)
-- [Przewodnik Wdrażania](../DEPLOYMENT_GUIDE.md)
-- [Rozwiązywanie Problemów](../DOTNET8-TROUBLESHOOTING.md)
-
 ---
 
 **Wersja**: 1.0.0

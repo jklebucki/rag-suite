@@ -64,13 +64,6 @@ Construit cu principii moderne de arhitectură software:
 3. **Ingestie**: Încărcați și procesați documentele dumneavoastră
 4. **Căutare**: Începeți să explorați baza dumneavoastră de cunoștințe
 
-## Suport
-
-Pentru suport și documentație, consultați:
-- [Documentație API](./api-documentation.md)
-- [Ghid Implementare](../DEPLOYMENT_GUIDE.md)
-- [Depanare](../DOTNET8-TROUBLESHOOTING.md)
-
 ---
 
 **Versiune**: 1.0.0
