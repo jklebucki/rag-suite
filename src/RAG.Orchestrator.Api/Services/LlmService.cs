@@ -32,12 +32,6 @@ public class LlmService : ILlmService
         return settings;
     }
 
-    public void ClearCache()
-    {
-        // No memory cache to clear - settings are now in singleton cache
-        _logger.LogInformation("LLM settings cache clear requested - no action needed as settings are in singleton cache");
-    }
-
     public async Task<string> GenerateResponseAsync(string prompt, CancellationToken cancellationToken = default)
     {
         var (response, _) = await GenerateResponseWithContextAsync(prompt, null, cancellationToken);

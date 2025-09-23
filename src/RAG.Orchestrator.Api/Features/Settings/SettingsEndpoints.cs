@@ -57,22 +57,21 @@ public static class SettingsEndpoints
         .WithSummary("Update LLM settings")
         .WithDescription("Updates the LLM service configuration settings.");
 
-        group.MapPost("/llm/cache/clear", async (ILlmService llmService) =>
+        group.MapGet("/llm/models", async (string url, bool isOllama, ILlmService llmService) =>
         {
             try
             {
-                llmService.ClearCache();
-                await Task.CompletedTask; // Ensure async method
-                return Results.Ok(new { Message = "LLM cache cleared successfully" });
+                var models = await llmService.GetAvailableModelsAsync(url, isOllama);
+                return Results.Ok(new { Models = models });
             }
             catch (Exception ex)
             {
-                return Results.Problem($"Failed to clear LLM cache: {ex.Message}", statusCode: 500);
+                return Results.Problem($"Failed to retrieve available models: {ex.Message}", statusCode: 500);
             }
         })
-        .WithName("ClearLlmCache")
-        .WithSummary("Clear LLM service cache")
-        .WithDescription("Clears the cached LLM settings to force reload from database on next request.");
+        .WithName("GetAvailableLlmModels")
+        .WithSummary("Get available LLM models")
+        .WithDescription("Retrieves the list of available models from the specified LLM service URL.");
 
         return app;
     }
