@@ -9,6 +9,7 @@ export const pl: TranslationKeys = {
   'nav.ingestion': 'Ingestion',
   'nav.analytics': 'Analityka',
   'nav.settings': 'Ustawienia',
+  'nav.app_info': 'O Aplikacji',
 
   // Dashboard
   'dashboard.title': 'Panel RAG Suite',

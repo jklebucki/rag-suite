@@ -9,6 +9,7 @@ export const nl: TranslationKeys = {
   'nav.ingestion': 'Inname',
   'nav.analytics': 'Analytics',
   'nav.settings': 'Instellingen',
+  'nav.app_info': 'App Info',
 
   // Common
   'common.loading': 'Laden...',

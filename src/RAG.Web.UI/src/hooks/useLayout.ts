@@ -5,6 +5,7 @@ import {
   MessageSquare,
   BarChart3,
   Settings,
+  Info,
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -27,7 +28,13 @@ export function useLayout() {
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
-  const navigation = isAdmin ? [...baseNavigation, ...adminNavigation] : baseNavigation
+  const footerNavigation = [
+    { name: t('nav.app_info'), href: '/about', icon: Info },
+  ]
+
+  const mainNavigation = isAdmin ? [...baseNavigation, ...adminNavigation] : baseNavigation
+
+  const navigation = [...mainNavigation, ...footerNavigation]
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
@@ -47,6 +54,8 @@ export function useLayout() {
 
     // Data
     navigation,
+    mainNavigation,
+    footerNavigation,
     currentPath: location.pathname,
 
     // Actions

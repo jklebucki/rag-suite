@@ -1,45 +1,50 @@
-import React from 'react'
-import { Settings as SettingsIcon, Shield } from 'lucide-react'
+import React, { useState } from 'react'
+import { Settings as SettingsIcon, User } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { SettingsForm } from './SettingsForm'
+import { UserSettings } from './UserSettings'
+
+type Tab = 'llm' | 'user'
 
 export function Settings() {
   const { t } = useI18n()
+  const [activeTab, setActiveTab] = useState<Tab>('llm')
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <SettingsIcon className="h-6 w-6 text-blue-600" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">LLM Settings</h1>
-          <p className="text-gray-600">Configure your Large Language Model settings</p>
-        </div>
+    <div className="flex h-full">
+      {/* Sidebar */}
+      <div className="w-64 bg-gray-50 border-r border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
+        <nav className="space-y-2">
+          <button
+            onClick={() => setActiveTab('llm')}
+            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors ${
+              activeTab === 'llm'
+                ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <SettingsIcon className="h-5 w-5" />
+            <span>LLM Settings</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('user')}
+            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors ${
+              activeTab === 'user'
+                ? 'bg-green-100 text-green-700 border border-green-200'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <User className="h-5 w-5" />
+            <span>User Settings</span>
+          </button>
+        </nav>
       </div>
 
-      {/* Admin Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <div className="flex items-center space-x-2">
-          <Shield className="h-5 w-5 text-amber-600" />
-          <span className="text-sm font-medium text-amber-800">Admin Access Required</span>
-        </div>
-        <p className="mt-1 text-sm text-amber-700">
-          These settings control the behavior of the LLM service. Changes may affect system performance and functionality.
-        </p>
-      </div>
-
-      {/* Settings Form */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Model Configuration</h2>
-          <p className="text-gray-600">
-            Configure the connection to your LLM service and set generation parameters.
-          </p>
-        </div>
-
-        <SettingsForm />
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        {activeTab === 'llm' && <SettingsForm />}
+        {activeTab === 'user' && <UserSettings />}
       </div>
     </div>
   )

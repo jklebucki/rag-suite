@@ -9,6 +9,7 @@ export const hu: TranslationKeys = {
   'nav.ingestion': 'Adatbevitel',
   'nav.analytics': 'Analitika',
   'nav.settings': 'Beállítások',
+  'nav.app_info': 'Alkalmazás Info',
 
   // Common
   'common.loading': 'Betöltés...',

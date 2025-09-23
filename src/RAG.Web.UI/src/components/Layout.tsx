@@ -10,7 +10,8 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const {
     isSidebarOpen,
-    navigation,
+    mainNavigation,
+    footerNavigation,
     toggleSidebar,
     closeSidebar,
     isActiveRoute,
@@ -19,7 +20,8 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar
-        navigation={navigation}
+        mainNavigation={mainNavigation}
+        footerNavigation={footerNavigation}
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
         isActiveRoute={isActiveRoute}

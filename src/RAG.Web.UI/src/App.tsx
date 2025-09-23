@@ -4,6 +4,7 @@ import { Dashboard } from '@/components/dashboard/Dashboard'
 import { ChatInterface } from '@/components/chat/ChatInterface'
 import { SearchInterface } from '@/components/search/SearchInterface'
 import { Settings } from '@/components/settings/Settings'
+import { About } from '@/components/About'
 import { LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm, ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/components/auth'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
@@ -39,6 +40,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SearchInterface />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <ProtectedRoute>
+                    <About />
                   </ProtectedRoute>
                 }
               />

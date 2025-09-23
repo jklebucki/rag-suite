@@ -8,6 +8,7 @@ export * from './auth';
 export * from './chat';
 export * from './dashboard';
 export * from './search';
+export { About } from './About';
 
 // Layout components - explicit imports to avoid naming conflicts
 export { Sidebar, TopBar } from './layout/';

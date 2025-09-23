@@ -9,6 +9,7 @@ export const ro: TranslationKeys = {
   'nav.ingestion': 'Ingestion',
   'nav.analytics': 'Analiză',
   'nav.settings': 'Setări',
+  'nav.app_info': 'Despre Aplicație',
 
   // Common
   'common.loading': 'Se încarcă...',
