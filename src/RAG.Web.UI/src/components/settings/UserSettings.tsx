@@ -7,6 +7,22 @@ import { Modal } from '@/components/ui/Modal'
 import { useToast } from '@/hooks/useToast'
 import type { User as UserType } from '@/types/auth'
 
+// Filter interfaces
+interface UserFilters {
+  searchText: string
+  selectedRoles: string[]
+  activeStatus: 'all' | 'active' | 'inactive'
+  createdDateFrom: string
+  createdDateTo: string
+  lastLoginFrom: string
+  lastLoginTo: string
+}
+
+interface DatePreset {
+  label: string
+  days: number
+}
+
 export function UserSettings() {
   const { t } = useI18n()
   const { showSuccess, showError } = useToast()
@@ -17,6 +33,155 @@ export function UserSettings() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Filter states
+  const [filters, setFilters] = useState<UserFilters>({
+    searchText: '',
+    selectedRoles: [],
+    activeStatus: 'all',
+    createdDateFrom: '',
+    createdDateTo: '',
+    lastLoginFrom: '',
+    lastLoginTo: ''
+  })
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false)
+  const [debouncedSearchText, setDebouncedSearchText] = useState('')
+
+  // Filter users based on current filters
+  const filterUsers = (users: UserType[]): UserType[] => {
+    return users.filter(user => {
+      // Text search filter
+      if (debouncedSearchText) {
+        const searchLower = debouncedSearchText.toLowerCase()
+        const matchesSearch =
+          user.firstName.toLowerCase().includes(searchLower) ||
+          user.lastName.toLowerCase().includes(searchLower) ||
+          user.fullName.toLowerCase().includes(searchLower) ||
+          user.userName.toLowerCase().includes(searchLower) ||
+          user.email.toLowerCase().includes(searchLower)
+
+        if (!matchesSearch) return false
+      }
+
+      // Role filter
+      if (filters.selectedRoles.length > 0) {
+        const hasAllSelectedRoles = filters.selectedRoles.every(role =>
+          user.roles.includes(role)
+        )
+        if (!hasAllSelectedRoles) return false
+      }
+
+      // Active status filter
+      if (filters.activeStatus !== 'all') {
+        if (filters.activeStatus === 'active' && !user.isActive) return false
+        if (filters.activeStatus === 'inactive' && user.isActive) return false
+      }
+
+      // Created date filter
+      if (filters.createdDateFrom) {
+        const createdDate = new Date(user.createdAt)
+        const fromDate = new Date(filters.createdDateFrom)
+        if (createdDate < fromDate) return false
+      }
+      if (filters.createdDateTo) {
+        const createdDate = new Date(user.createdAt)
+        const toDate = new Date(filters.createdDateTo)
+        toDate.setHours(23, 59, 59, 999) // End of day
+        if (createdDate > toDate) return false
+      }
+
+      // Last login filter
+      if (filters.lastLoginFrom) {
+        if (!user.lastLoginAt) return false
+        const lastLoginDate = new Date(user.lastLoginAt)
+        const fromDate = new Date(filters.lastLoginFrom)
+        if (lastLoginDate < fromDate) return false
+      }
+      if (filters.lastLoginTo) {
+        if (!user.lastLoginAt) return false
+        const lastLoginDate = new Date(user.lastLoginAt)
+        const toDate = new Date(filters.lastLoginTo)
+        toDate.setHours(23, 59, 59, 999) // End of day
+        if (lastLoginDate > toDate) return false
+      }
+
+      return true
+    })
+  }
+
+  // Debounce search text
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchText(filters.searchText)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [filters.searchText])
+
+  // URL persistence for filters
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+
+    // Read filters from URL on mount
+    const searchText = urlParams.get('search') || ''
+    const selectedRoles = urlParams.get('roles')?.split(',').filter(Boolean) || []
+    const activeStatus = (urlParams.get('status') as 'all' | 'active' | 'inactive') || 'all'
+    const createdDateFrom = urlParams.get('createdFrom') || ''
+    const createdDateTo = urlParams.get('createdTo') || ''
+    const lastLoginFrom = urlParams.get('loginFrom') || ''
+    const lastLoginTo = urlParams.get('loginTo') || ''
+
+    setFilters({
+      searchText,
+      selectedRoles,
+      activeStatus,
+      createdDateFrom,
+      createdDateTo,
+      lastLoginFrom,
+      lastLoginTo
+    })
+  }, [])
+
+  // Update URL when filters change
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams()
+
+    if (filters.searchText) urlParams.set('search', filters.searchText)
+    if (filters.selectedRoles.length > 0) urlParams.set('roles', filters.selectedRoles.join(','))
+    if (filters.activeStatus !== 'all') urlParams.set('status', filters.activeStatus)
+    if (filters.createdDateFrom) urlParams.set('createdFrom', filters.createdDateFrom)
+    if (filters.createdDateTo) urlParams.set('createdTo', filters.createdDateTo)
+    if (filters.lastLoginFrom) urlParams.set('loginFrom', filters.lastLoginFrom)
+    if (filters.lastLoginTo) urlParams.set('loginTo', filters.lastLoginTo)
+
+    const newUrl = urlParams.toString()
+    const currentUrl = window.location.search.substring(1)
+
+    if (newUrl !== currentUrl) {
+      window.history.replaceState(null, '', newUrl ? `?${newUrl}` : window.location.pathname)
+    }
+  }, [filters])
+
+  // Date preset helper
+  const applyDatePreset = (field: 'created' | 'lastLogin', days: number) => {
+    const today = new Date()
+    const fromDate = new Date(today)
+    fromDate.setDate(today.getDate() - days)
+
+    if (field === 'created') {
+      setFilters(prev => ({
+        ...prev,
+        createdDateFrom: fromDate.toISOString().split('T')[0],
+        createdDateTo: today.toISOString().split('T')[0]
+      }))
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        lastLoginFrom: fromDate.toISOString().split('T')[0],
+        lastLoginTo: today.toISOString().split('T')[0]
+      }))
+    }
+  }
 
   // Fetch users
   const { data: users = [], isLoading, error } = useQuery({
@@ -158,6 +323,232 @@ export function UserSettings() {
 
       {/* Users Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
+        {/* Search Bar */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 max-w-lg">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={filters.searchText}
+                  onChange={(e) => setFilters(prev => ({ ...prev, searchText: e.target.value }))}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Search users by name, username, or email..."
+                />
+              </div>
+            </div>
+            <button
+              onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+              className="ml-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              {isFiltersExpanded ? 'Hide Filters' : 'More Filters'}
+            </button>
+          </div>
+        </div>
+
+        {/* Filters Panel */}
+        {isFiltersExpanded && (
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Role Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Roles
+                </label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {availableRoles.map((role) => (
+                    <label key={role} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={filters.selectedRoles.includes(role)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFilters(prev => ({
+                              ...prev,
+                              selectedRoles: [...prev.selectedRoles, role]
+                            }))
+                          } else {
+                            setFilters(prev => ({
+                              ...prev,
+                              selectedRoles: prev.selectedRoles.filter(r => r !== role)
+                            }))
+                          }
+                        }}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{role}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'all', label: 'All Users' },
+                    { value: 'active', label: 'Active Only' },
+                    { value: 'inactive', label: 'Inactive Only' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="activeStatus"
+                        value={option.value}
+                        checked={filters.activeStatus === option.value}
+                        onChange={(e) => setFilters(prev => ({
+                          ...prev,
+                          activeStatus: e.target.value as 'all' | 'active' | 'inactive'
+                        }))}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Created Date Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Created Date
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="date"
+                    value={filters.createdDateFrom}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      createdDateFrom: e.target.value
+                    }))}
+                    className="block w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="From"
+                  />
+                  <input
+                    type="date"
+                    value={filters.createdDateTo}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      createdDateTo: e.target.value
+                    }))}
+                    className="block w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="To"
+                  />
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => applyDatePreset('created', 7)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      7 days
+                    </button>
+                    <button
+                      onClick={() => applyDatePreset('created', 30)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      30 days
+                    </button>
+                    <button
+                      onClick={() => applyDatePreset('created', 90)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      90 days
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Last Login Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Login
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="date"
+                    value={filters.lastLoginFrom}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      lastLoginFrom: e.target.value
+                    }))}
+                    className="block w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="From"
+                  />
+                  <input
+                    type="date"
+                    value={filters.lastLoginTo}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      lastLoginTo: e.target.value
+                    }))}
+                    className="block w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="To"
+                  />
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => applyDatePreset('lastLogin', 7)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      7 days
+                    </button>
+                    <button
+                      onClick={() => applyDatePreset('lastLogin', 30)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      30 days
+                    </button>
+                    <button
+                      onClick={() => applyDatePreset('lastLogin', 90)}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    >
+                      90 days
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Actions */}
+            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setFilters({
+                    searchText: '',
+                    selectedRoles: [],
+                    activeStatus: 'all',
+                    createdDateFrom: '',
+                    createdDateTo: '',
+                    lastLoginFrom: '',
+                    lastLoginTo: ''
+                  })
+                  setDebouncedSearchText('')
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Clear Filters
+              </button>
+              <button
+                onClick={() => setIsFiltersExpanded(false)}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Results Summary */}
+        <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+          <p className="text-sm text-gray-700">
+            Showing {filterUsers(users).length} of {users.length} users
+          </p>
+        </div>
         {isLoading ? (
           <div className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
@@ -190,7 +581,7 @@ export function UserSettings() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
+                {filterUsers(users).map((user) => (
                   <tr key={user.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
