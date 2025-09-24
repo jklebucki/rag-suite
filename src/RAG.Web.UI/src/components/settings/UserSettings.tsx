@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { User, Shield, Key, Plus, Minus, Eye, EyeOff, Lock, CheckCircle, XCircle } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '@/contexts/I18nContext'
@@ -49,24 +49,28 @@ export function UserSettings() {
 
   // Filter users based on current filters
   const filterUsers = (users: UserType[]): UserType[] => {
+    if (!users || !Array.isArray(users)) return []
+
     return users.filter(user => {
+      if (!user) return false
       // Text search filter
-      if (debouncedSearchText) {
-        const searchLower = debouncedSearchText.toLowerCase()
+      if (filters.searchText) {
+        const searchLower = filters.searchText.toLowerCase()
         const matchesSearch =
-          user.firstName.toLowerCase().includes(searchLower) ||
-          user.lastName.toLowerCase().includes(searchLower) ||
-          user.fullName.toLowerCase().includes(searchLower) ||
-          user.userName.toLowerCase().includes(searchLower) ||
-          user.email.toLowerCase().includes(searchLower)
+          user.firstName?.toLowerCase().includes(searchLower) ||
+          user.lastName?.toLowerCase().includes(searchLower) ||
+          user.fullName?.toLowerCase().includes(searchLower) ||
+          user.userName?.toLowerCase().includes(searchLower) ||
+          user.email?.toLowerCase().includes(searchLower)
 
         if (!matchesSearch) return false
       }
 
       // Role filter
       if (filters.selectedRoles.length > 0) {
+        const userRoles = user.roles || []
         const hasAllSelectedRoles = filters.selectedRoles.every(role =>
-          user.roles.includes(role)
+          userRoles.includes(role)
         )
         if (!hasAllSelectedRoles) return false
       }
@@ -109,8 +113,8 @@ export function UserSettings() {
     })
   }
 
-  // Debounce search text
-  React.useEffect(() => {
+    // Debounce search text
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchText(filters.searchText)
     }, 300)
@@ -119,7 +123,7 @@ export function UserSettings() {
   }, [filters.searchText])
 
   // URL persistence for filters
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
 
     // Read filters from URL on mount
@@ -143,7 +147,7 @@ export function UserSettings() {
   }, [])
 
   // Update URL when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams()
 
     if (filters.searchText) urlParams.set('search', filters.searchText)
@@ -546,7 +550,7 @@ export function UserSettings() {
         {/* Results Summary */}
         <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
           <p className="text-sm text-gray-700">
-            Showing {filterUsers(users).length} of {users.length} users
+            Showing {users ? filterUsers(users).length : 0} of {users?.length || 0} users
           </p>
         </div>
         {isLoading ? (
@@ -581,8 +585,8 @@ export function UserSettings() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filterUsers(users).map((user) => (
-                  <tr key={user.id}>
+                {users && filterUsers(users).map((user) => (
+                  <tr key={user.id || user.email || Math.random()}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -592,18 +596,18 @@ export function UserSettings() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {user.firstName} {user.lastName}
+                            {user.firstName || ''} {user.lastName || ''}
                           </div>
-                          <div className="text-sm text-gray-500">@{user.userName}</div>
+                          <div className="text-sm text-gray-500">@{user.userName || ''}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.email}</div>
+                      <div className="text-sm text-gray-900">{user.email || ''}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
-                        {user.roles.map((role) => (
+                        {(user.roles || []).map((role) => (
                           <span
                             key={role}
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -620,7 +624,7 @@ export function UserSettings() {
                           </span>
                         ))}
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {availableRoles.filter(role => !user.roles.includes(role)).map((role) => (
+                          {(availableRoles || []).filter(role => !(user.roles || []).includes(role)).map((role) => (
                             <button
                               key={role}
                               onClick={() => handleAssignRole(user.id, role)}
@@ -635,7 +639,7 @@ export function UserSettings() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
