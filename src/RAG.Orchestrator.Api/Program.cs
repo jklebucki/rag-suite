@@ -11,6 +11,8 @@ using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Services;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
+using RAG.CyberPanel.Extensions;
+using RAG.CyberPanel.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,8 @@ builder.Services.Configure<SharedFoldersOptions>(builder.Configuration.GetSectio
 
 // Add feature services
 builder.Services.AddFeatureServices();
+// Register CyberPanel feature (scaffold)
+builder.Services.AddCyberPanel(builder.Configuration);
 
 var app = builder.Build();
 
@@ -81,6 +85,8 @@ app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapFileDownloadEndpoints();
 app.MapSettingsEndpoints();
+// Map CyberPanel endpoints
+app.MapCyberPanelEndpoints();
 
 // Simple health endpoint
 app.MapGet("/health", (HttpContext context) =>
