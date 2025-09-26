@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAG.Orchestrator.Api", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAG.Ingestion.Worker", "src\RAG.Ingestion.Worker\RAG.Ingestion.Worker.csproj", "{E331902B-413A-477B-B655-490593F04FF3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAG.CyberPanel.Tests", "src\RAG.CyberPanel.Tests\RAG.CyberPanel.Tests.csproj", "{C8F1E2F9-9F1C-4A8E-9F3A-6B1F9D2C1234}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAG.Shared", "src\RAG.Shared\RAG.Shared.csproj", "{0C85D12E-36DE-4E98-A3C4-240025F527F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAG.VectorStores", "src\RAG.VectorStores\RAG.VectorStores.csproj", "{A596DD26-A92C-4177-BFCD-3C0534A7FE85}"
