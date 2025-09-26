@@ -10,6 +10,7 @@ export const nl: TranslationKeys = {
   'nav.analytics': 'Analytics',
   'nav.settings': 'Instellingen',
   'nav.app_info': 'App Info',
+  'nav.cyberpanel': 'Cyber Panel',
 
   // Common
   'common.loading': 'Laden...',
@@ -138,6 +139,10 @@ export const nl: TranslationKeys = {
   'auth.reset.back_to_login': 'Terug naar inloggen',
   'auth.reset.success_title': 'Instructies verstuurd!',
   'auth.reset.success_message': 'Wachtwoord reset instructies zijn naar je e-mail verstuurd.',
+  // Cyber Panel
+  'cyberpanel.quizzes': 'Quizzen',
+  'cyberpanel.builder': 'Quiz Bouwer',
+  'cyberpanel.results': 'Quiz Resultaten',
 
   'auth.reset_confirm.title': 'Nieuw Wachtwoord Instellen',
   'auth.reset_confirm.subtitle': 'Voer je nieuwe wachtwoord hieronder in.',

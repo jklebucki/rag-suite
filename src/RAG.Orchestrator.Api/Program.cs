@@ -38,12 +38,26 @@ var app = builder.Build();
 // Ensure database is created and admin user exists
 try
 {
-    await app.Services.EnsureSecurityDatabaseCreatedAsync();
-    app.Logger.LogInformation("Security database initialization completed successfully");
+    // Migration auto-apply gating (default: true)
+    var autoApply = builder.Configuration.GetValue<bool>("Migrations:AutoApply", true);
 
-    // Initialize Chat database and Elasticsearch
-    await app.Services.EnsureChatDatabaseCreatedAsync();
-    app.Logger.LogInformation("Chat database initialization completed successfully");
+    if (autoApply)
+    {
+        await app.Services.EnsureSecurityDatabaseCreatedAsync();
+        app.Logger.LogInformation("Security database initialization completed successfully");
+
+        // Initialize Chat database and Elasticsearch
+        await app.Services.EnsureChatDatabaseCreatedAsync();
+        app.Logger.LogInformation("Chat database initialization completed successfully");
+
+        // Ensure CyberPanel database migrations are applied
+        await app.Services.EnsureCyberPanelDatabaseCreatedAsync();
+        app.Logger.LogInformation("CyberPanel database initialization completed successfully");
+    }
+    else
+    {
+        app.Logger.LogInformation("Automatic DB migrations disabled by configuration (Migrations:AutoApply=false). Skipping migrations and seeding.");
+    }
 
     // Initialize global settings from appsettings if not exist
     using var scope = app.Services.CreateScope();

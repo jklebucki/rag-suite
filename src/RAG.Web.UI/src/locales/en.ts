@@ -10,6 +10,7 @@ export const en: TranslationKeys = {
   'nav.analytics': 'Analytics',
   'nav.settings': 'Settings',
   'nav.app_info': 'App Info',
+  'nav.cyberpanel': 'Cyber Panel',
 
   // Common
   'common.loading': 'Loading...',
@@ -220,4 +221,8 @@ export const en: TranslationKeys = {
   'account.logout_all_devices': 'Logout from all devices',
   'account.logout_all_devices_description': 'This will log you out from all devices where you are currently signed in.',
   'account.logout_all_devices_confirm': 'Are you sure you want to logout from all devices?',
+  // Cyber Panel
+  'cyberpanel.quizzes': 'Quizzes',
+  'cyberpanel.builder': 'Quiz Builder',
+  'cyberpanel.results': 'Quiz Results',
 };

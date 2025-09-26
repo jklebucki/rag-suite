@@ -14,9 +14,10 @@ export function useLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const location = useLocation()
   const { t } = useI18n()
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
 
   const isAdmin = user?.roles?.includes('Admin') ?? false
+  const isPowerUser = user?.roles?.includes('PowerUser') ?? false
 
   const baseNavigation = [
     { name: t('nav.dashboard'), href: '/', icon: BarChart3 },
@@ -28,11 +29,18 @@ export function useLayout() {
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
+  // Cyber Panel navigation entry - visible to any authenticated user and placed before admin items
+  const cyberNavigation = isAuthenticated
+    ? [{ name: t('nav.cyberpanel'), href: '/cyberpanel', icon: BarChart3 }]
+    : []
+
   const footerNavigation = [
     { name: t('nav.app_info'), href: '/about', icon: Info },
   ]
 
-  const mainNavigation = isAdmin ? [...baseNavigation, ...adminNavigation] : baseNavigation
+  const mainNavigation = isAdmin
+    ? [...baseNavigation, ...cyberNavigation, ...adminNavigation]
+    : [...baseNavigation, ...cyberNavigation]
 
   const navigation = [...mainNavigation, ...footerNavigation]
 

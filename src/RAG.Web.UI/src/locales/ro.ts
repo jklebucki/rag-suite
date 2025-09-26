@@ -10,6 +10,12 @@ export const ro: TranslationKeys = {
   'nav.analytics': 'Analiză',
   'nav.settings': 'Setări',
   'nav.app_info': 'Despre Aplicație',
+  'nav.cyberpanel': 'Cyber Panel',
+
+  // Cyber Panel
+  'cyberpanel.quizzes': 'Chestionare',
+  'cyberpanel.builder': 'Constructor chestionar',
+  'cyberpanel.results': 'Rezultate',
 
   // Common
   'common.loading': 'Se încarcă...',

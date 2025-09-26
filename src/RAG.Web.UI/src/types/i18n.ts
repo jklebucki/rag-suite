@@ -28,6 +28,7 @@ export interface TranslationKeys {
   'nav.analytics': string;
   'nav.settings': string;
   'nav.app_info': string;
+  'nav.cyberpanel': string;
 
   // Common keys
   'common.loading': string;
@@ -238,6 +239,11 @@ export interface TranslationKeys {
   'account.logout_all_devices': string;
   'account.logout_all_devices_description': string;
   'account.logout_all_devices_confirm': string;
+
+  // Cyber Panel
+  'cyberpanel.quizzes': string;
+  'cyberpanel.builder': string;
+  'cyberpanel.results': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;

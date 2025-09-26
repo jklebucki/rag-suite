@@ -10,6 +10,7 @@ export const pl: TranslationKeys = {
   'nav.analytics': 'Analityka',
   'nav.settings': 'Ustawienia',
   'nav.app_info': 'O Aplikacji',
+  'nav.cyberpanel': 'Cyber Panel',
 
   // Dashboard
   'dashboard.title': 'Panel RAG Suite',
@@ -220,4 +221,8 @@ export const pl: TranslationKeys = {
   'account.logout_all_devices': 'Wyloguj ze wszystkich urządzeń',
   'account.logout_all_devices_description': 'Spowoduje to wylogowanie z wszystkich urządzeń, na których jesteś obecnie zalogowany.',
   'account.logout_all_devices_confirm': 'Czy na pewno chcesz się wylogować ze wszystkich urządzeń?',
+  // Cyber Panel
+  'cyberpanel.quizzes': 'Quizy',
+  'cyberpanel.builder': 'Twórca quizów',
+  'cyberpanel.results': 'Wyniki quizów',
 };

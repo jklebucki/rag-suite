@@ -10,6 +10,7 @@ export const hu: TranslationKeys = {
   'nav.analytics': 'Analitika',
   'nav.settings': 'Beállítások',
   'nav.app_info': 'Alkalmazás Info',
+  'nav.cyberpanel': 'Cyber Panel',
 
   // Common
   'common.loading': 'Betöltés...',
@@ -138,6 +139,10 @@ export const hu: TranslationKeys = {
   'auth.reset.back_to_login': 'Vissza a bejelentkezéshez',
   'auth.reset.success_title': 'Utasítások elküldve!',
   'auth.reset.success_message': 'A jelszó visszaállítási utasítások el lettek küldve.',
+  // Cyber Panel
+  'cyberpanel.quizzes': 'Kvízek',
+  'cyberpanel.builder': 'Kvíz Szerkesztő',
+  'cyberpanel.results': 'Kvíz Eredmények',
 
   'auth.reset_confirm.title': 'Új Jelszó Beállítása',
   'auth.reset_confirm.subtitle': 'Add meg az új jelszavad alább.',

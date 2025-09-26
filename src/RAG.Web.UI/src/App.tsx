@@ -6,6 +6,12 @@ import { SearchInterface } from '@/components/search/SearchInterface'
 import { Settings } from '@/components/settings/Settings'
 import { About } from '@/components/About'
 import { LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm, ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/components/auth'
+import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute'
+import { CyberPanelLayout } from '@/components/cyberpanel/CyberPanelLayout'
+import Quizzes from '@/components/cyberpanel/Quizzes'
+import QuizBuilder from '@/components/cyberpanel/QuizBuilder'
+import QuizResults from '@/components/cyberpanel/QuizResults'
+import QuizDetail from '@/components/cyberpanel/QuizDetail'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -59,6 +65,22 @@ function App() {
                   </AdminProtectedRoute>
                 }
               />
+
+                {/* Cyber Panel parent with nested routes */}
+                <Route
+                  path="/cyberpanel/*"
+                  element={
+                    <ProtectedRoute>
+                      <CyberPanelLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Quizzes />} />
+                  <Route path="quizzes" element={<Quizzes />} />
+                  <Route path="quizzes/:id" element={<QuizDetail />} />
+                  <Route path="builder" element={<AdminProtectedRoute><QuizBuilder /></AdminProtectedRoute>} />
+                  <Route path="results" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser"]}><QuizResults /></RoleProtectedRoute>} />
+                </Route>
               <Route
                 path="/login"
                 element={

@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface NavigationItem {
   name: string
@@ -18,6 +19,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isActiveRoute }: SidebarProps) {
+  const { user } = useAuth()
+  const roles = user?.roles || []
+  const canSeeCyberPanel = roles.includes('Admin') || roles.includes('PowerUser')
   return (
     <>
       {/* Mobile overlay */}
@@ -68,6 +72,8 @@ export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isA
                 </li>
               )
             })}
+
+            {/* Cyber Panel is now part of mainNavigation from useLayout; inner CyberPanelSidebar is implemented as nested routes/layout */}
           </ul>
 
           {/* Footer Navigation */}
