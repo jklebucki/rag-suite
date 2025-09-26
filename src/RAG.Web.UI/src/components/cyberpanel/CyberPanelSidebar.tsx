@@ -17,14 +17,17 @@ export default function CyberPanelSidebar({ onClose, isActiveRoute }: Props) {
   const isPowerUser = roles.includes('PowerUser')
   const { t } = useI18n()
 
-  const itemBase = 'w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors text-gray-700'
+  const itemBase = 'w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors'
+
+  const activeClasses = 'bg-blue-100 text-blue-700 border border-blue-200'
+  const inactiveClasses = 'text-gray-700 hover:bg-gray-100'
 
   return (
     <nav className="space-y-2">
       <Link
         to="/cyberpanel/quizzes"
         onClick={onClose}
-        className={`${itemBase} hover:bg-gray-100`}
+        className={`${itemBase} ${isActiveRoute('/cyberpanel/quizzes') ? activeClasses : inactiveClasses}`}
         aria-current={isActiveRoute('/cyberpanel/quizzes') ? 'true' : undefined}
       >
         <List className="h-5 w-5" />
@@ -35,7 +38,7 @@ export default function CyberPanelSidebar({ onClose, isActiveRoute }: Props) {
         <Link
           to="/cyberpanel/builder"
           onClick={onClose}
-          className={`${itemBase} hover:bg-gray-100`}
+          className={`${itemBase} ${isActiveRoute('/cyberpanel/builder') ? activeClasses : inactiveClasses}`}
           aria-current={isActiveRoute('/cyberpanel/builder') ? 'true' : undefined}
         >
           <Hammer className="h-5 w-5" />
@@ -47,7 +50,7 @@ export default function CyberPanelSidebar({ onClose, isActiveRoute }: Props) {
         <Link
           to="/cyberpanel/results"
           onClick={onClose}
-          className={`${itemBase} hover:bg-gray-100`}
+          className={`${itemBase} ${isActiveRoute('/cyberpanel/results') ? activeClasses : inactiveClasses}`}
           aria-current={isActiveRoute('/cyberpanel/results') ? 'true' : undefined}
         >
           <BookOpen className="h-5 w-5" />
