@@ -91,7 +91,7 @@ app.MapGet("/health", (HttpContext context) =>
         {
             Status = "Healthy",
             Timestamp = DateTime.UtcNow,
-            Version = "2.0.0-semantic-kernel"
+            Version = "1.0.0-rag-suite"
         });
     }
     catch
@@ -100,7 +100,7 @@ app.MapGet("/health", (HttpContext context) =>
         {
             Status = "Error",
             Timestamp = DateTime.UtcNow,
-            Version = "2.0.0-semantic-kernel"
+            Version = "1.0.0-rag-suite"
         }, statusCode: 503);
     }
 });
