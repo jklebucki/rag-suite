@@ -14,7 +14,7 @@ public static class CyberPanelEndpoints
 {
     public static RouteGroupBuilder MapCyberPanelEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/v1/cyberpanel").WithOpenApi();
+        var group = app.MapGroup("/api/cyberpanel").WithTags("CyberPanel").WithOpenApi();
 
         group.MapGet("/quizzes", async ([FromServices] CyberPanelDbContext db, HttpContext ctx) =>
         {
@@ -53,7 +53,7 @@ public static class CyberPanelEndpoints
             if (await db.Quizzes.AnyAsync(q => q.Id == id, ctx.RequestAborted) == false)
                 return Results.NotFound();
 
-            return Results.Created($"/api/v1/cyberpanel/quizzes/{id}/attempts/00000000-0000-0000-0000-000000000000", new { Message = "Attempt scaffolded - implement logic" });
+            return Results.Created($"/api/cyberpanel/quizzes/{id}/attempts/00000000-0000-0000-0000-000000000000", new { Message = "Attempt scaffolded - implement logic" });
         }).RequireAuthorization();
 
         return group;

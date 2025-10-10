@@ -99,30 +99,7 @@ app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapFileDownloadEndpoints();
 app.MapSettingsEndpoints();
-// Map CyberPanel endpoints
-app.MapCyberPanelEndpoints();
 
-// Simple health endpoint
-app.MapGet("/health", (HttpContext context) =>
-{
-    try
-    {
-        return Results.Ok(new
-        {
-            Status = "Healthy",
-            Timestamp = DateTime.UtcNow,
-            Version = "1.0.0-rag-suite"
-        });
-    }
-    catch
-    {
-        return Results.Json(new
-        {
-            Status = "Error",
-            Timestamp = DateTime.UtcNow,
-            Version = "1.0.0-rag-suite"
-        }, statusCode: 503);
-    }
-});
+app.MapCyberPanelEndpoints();
 
 app.Run();
