@@ -45,16 +45,19 @@ export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}
           placeholder={t('chat.input.placeholder')}
-          className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 sm:px-4 sm:py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           disabled={isSending}
         />
         <button
           type="submit"
           disabled={!message.trim() || isSending}
-          className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 px-2 py-2 sm:px-3 sm:py-2"
+          aria-label={t('chat.send')}
+          title={t('chat.send')}
         >
           <Send className="h-4 w-4" />
-          {t('chat.send')}
+          {/* Hide text on small screens to show icon-only; keep visible on md+ */}
+          <span className="hidden md:inline">{t('chat.send')}</span>
         </button>
       </form>
     </div>

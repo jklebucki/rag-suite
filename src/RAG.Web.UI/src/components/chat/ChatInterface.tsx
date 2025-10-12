@@ -52,7 +52,8 @@ export function ChatInterface() {
   }, [isNewSession, setIsNewSession])
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
+    // Use column layout on small screens so the mobile sidebar topbar sits above the chat
+    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
       {/* Sidebar - Chat Sessions */}
       <ChatSidebar
         sessions={sessions}
@@ -63,12 +64,14 @@ export function ChatInterface() {
         isCreatingSession={createSessionMutation.isPending}
       />
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+  {/* Main Chat Area */}
+  {/* min-h-0 ensures flex children can shrink and inner overflow (messages) works correctly */}
+  <div className="flex-1 flex flex-col min-h-0">
         {currentSession ? (
           <>
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Add top padding on small screens so sticky mobile topbar doesn't overlap content */}
+            <div className="flex-1 overflow-y-auto p-6 pt-12 md:pt-6 space-y-6">
               {currentSession.messages.map((msg: ChatMessage) => (
                 <div key={msg.id} className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                   <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-100' : 'bg-primary-100'}`}>
