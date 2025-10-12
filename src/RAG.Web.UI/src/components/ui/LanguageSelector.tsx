@@ -32,8 +32,9 @@ export function LanguageSelector() {
   return (
     <div className="relative" ref={dropdownRef}>
               <button
+          data-language-selector-toggle
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="hidden md:inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           {currentLanguage && (
             <ReactCountryFlag
@@ -50,7 +51,7 @@ export function LanguageSelector() {
         </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+        <div className="fixed right-0 top-16 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 md:absolute md:right-0 md:top-auto md:mt-2">
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-900">{t('language.selector.title')}</p>
             {isAutoDetected && (
