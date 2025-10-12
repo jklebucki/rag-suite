@@ -52,7 +52,6 @@ export function ChatInterface() {
   }, [isNewSession, setIsNewSession])
 
   return (
-    // Use column layout on small screens so the mobile sidebar topbar sits above the chat
     <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
       {/* Sidebar - Chat Sessions */}
       <ChatSidebar
@@ -64,25 +63,23 @@ export function ChatInterface() {
         isCreatingSession={createSessionMutation.isPending}
       />
 
-  {/* Main Chat Area */}
-  {/* min-h-0 ensures flex children can shrink and inner overflow (messages) works correctly */}
-  <div className="flex-1 flex flex-col min-h-0">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-h-0">
         {currentSession ? (
           <>
             {/* Messages */}
-            {/* Add top padding on small screens so sticky mobile topbar doesn't overlap content */}
-            <div className="flex-1 overflow-y-auto p-6 pt-12 md:pt-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
               {currentSession.messages.map((msg: ChatMessage) => (
-                <div key={msg.id} className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-100' : 'bg-primary-100'}`}>
+                <div key={msg.id} className={`flex items-start gap-2 md:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1.5 md:p-2 rounded-full shrink-0 ${msg.role === 'user' ? 'bg-blue-100' : 'bg-primary-100'}`}>
                     {msg.role === 'user' ? (
-                      <User className="h-5 w-5 text-blue-600" />
+                      <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                     ) : (
-                      <Bot className="h-5 w-5 text-primary-600" />
+                      <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600" />
                     )}
                   </div>
-                  <div className={`max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-4`}>
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div className={`max-w-[85%] md:max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-3 md:p-4`}>
+                    <div className="whitespace-pre-wrap text-sm md:text-base break-words">{msg.content}</div>
 
                     {/* Sources for assistant messages */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
@@ -117,18 +114,18 @@ export function ChatInterface() {
                 </div>
               ))}
               {isTyping && (
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-primary-100">
-                    <Bot className="h-5 w-5 text-primary-600" />
+                <div className="flex items-start gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-full bg-primary-100 shrink-0">
+                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600" />
                   </div>
-                  <div className="bg-gray-100 rounded-lg p-4 min-w-[100px]">
+                  <div className="bg-gray-100 rounded-lg p-3 md:p-4 min-w-[100px]">
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin text-primary-600" />
-                      <span className="text-sm text-gray-600">Assistant is typing...</span>
+                      <span className="text-xs md:text-sm text-gray-600">Assistant is typing...</span>
                     </div>
                     <div className="mt-1 text-xs text-gray-500">
                       <span className="font-medium">now</span>
-                      <span className="ml-2 opacity-75">{formatDateTime(new Date(), currentLanguage)}</span>
+                      <span className="ml-1 md:ml-2 opacity-75 text-[10px] md:text-xs">{formatDateTime(new Date(), currentLanguage)}</span>
                     </div>
                   </div>
                 </div>
@@ -136,17 +133,17 @@ export function ChatInterface() {
 
               {/* Documents unavailable notice */}
               {!documentsAvailable && currentSession && currentSession.messages.length > 0 && (
-                <div className="flex items-start gap-3 opacity-90">
-                  <div className="p-2 rounded-full bg-orange-100">
-                    <Bot className="h-5 w-5 text-orange-600" />
+                <div className="flex items-start gap-2 md:gap-3 opacity-90">
+                  <div className="p-1.5 md:p-2 rounded-full bg-orange-100 shrink-0">
+                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
                   </div>
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-3xl">
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 md:p-4 max-w-[85%] md:max-w-3xl">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-medium text-orange-800">
+                      <span className="text-xs md:text-sm font-medium text-orange-800">
                         {t('chat.documents_unavailable')}
                       </span>
                     </div>
-                    <p className="text-sm text-orange-700">
+                    <p className="text-xs md:text-sm text-orange-700">
                       {t('chat.documents_unavailable_message')}
                     </p>
                   </div>
@@ -168,18 +165,18 @@ export function ChatInterface() {
             />
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <Bot className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center max-w-md">
+              <Bot className="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-3 md:mb-4" />
+              <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
                 {t('chat.title')}
               </h3>
-              <p className="text-gray-600 mb-6 max-w-md">
+              <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6 px-2">
                 {t('chat.subtitle')}
               </p>
               <button
                 onClick={handleNewSession}
-                className="btn-primary"
+                className="btn-primary text-sm md:text-base"
               >
                 {t('chat.new_session')}
               </button>

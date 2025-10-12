@@ -21,4 +21,14 @@
   .search-highlights em {
     @apply bg-yellow-200 text-yellow-900 font-semibold px-1 rounded;
   }
+
+  /* Hide scrollbar but keep scrolling functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

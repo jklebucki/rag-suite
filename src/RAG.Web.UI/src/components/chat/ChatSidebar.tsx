@@ -39,6 +39,47 @@ export function ChatSidebar({
   
   return (
     <>
+      {/* Mobile topbar: hamburger menu with sessions list */}
+      <div className="md:hidden bg-white border-b border-gray-200">
+        <div className="flex items-center gap-2 p-3">
+          <button
+            onClick={onNewSession}
+            disabled={isCreatingSession}
+            className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors shrink-0"
+            aria-label={t('chat.new_session')}
+            title={t('chat.new_session')}
+          >
+            <Plus className="h-5 w-5 text-gray-700" />
+          </button>
+
+          <div className="flex-1 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2">
+              {sessions.length > 0 ? (
+                sessions.map((session) => (
+                  <button
+                    key={session.id}
+                    onClick={() => onSelectSession(session.id)}
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors shrink-0 ${
+                      currentSessionId === session.id
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                    }`}
+                  >
+                    {isDefaultTitle(session.title)
+                      ? t('chat.new_conversation')
+                      : session.title}
+                  </button>
+                ))
+              ) : (
+                <span className="text-sm text-gray-500 px-2 py-1.5">
+                  {t('chat.no_sessions')}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Desktop / tablet vertical sidebar */}
       <div className="hidden md:flex w-80 border-r border-gray-200 flex-col">
         <div className="p-4 border-b border-gray-200">
@@ -87,43 +128,6 @@ export function ChatSidebar({
                 </button>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-  {/* Mobile topbar: displayed under the main TopBar so chat content can take full width */}
-  {/* sticky so it remains under TopBar (TopBar has h-16) */}
-  <div className="md:hidden sticky top-16 z-40 border-b border-gray-200 px-3 py-2 bg-white">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onNewSession}
-            disabled={isCreatingSession}
-            className="p-2 rounded-md hover:bg-gray-100"
-            aria-label={t('chat.new_session')}
-            title={t('chat.new_session')}
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-
-          <div className="flex-1 overflow-x-auto">
-            <div className="flex gap-2 items-center">
-              {sessions.map((session) => (
-                <button
-                  key={session.id}
-                  onClick={() => onSelectSession(session.id)}
-                  className={`whitespace-nowrap px-3 py-1 rounded-full text-sm truncate focus:outline-none ${
-                    currentSessionId === session.id
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                  title={session.title ?? ''}
-                >
-                  {isDefaultTitle(session.title)
-                    ? t('chat.new_conversation')
-                    : session.title}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
