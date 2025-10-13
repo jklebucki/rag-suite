@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
-import { useToast } from '@/contexts/ToastContext'
-import { useI18n } from '@/contexts/I18nContext'
+import { useToast, useI18n } from '@/contexts'
 import apiClient from '@/services/api'
 import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/types'
 import { validateLlmSettings } from './llmValidation'
