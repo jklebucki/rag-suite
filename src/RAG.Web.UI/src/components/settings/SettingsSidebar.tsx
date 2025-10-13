@@ -1,15 +1,16 @@
+// All code comments must be written in English, regardless of the conversation language.
+
 import React, { useEffect, useRef, useState } from 'react'
 import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
-
-type Tab = 'llm' | 'user'
+import type { SettingsTab } from '../../types/settings'
 
 export function SettingsSidebar({
   activeTab,
   setActiveTab,
 }: {
-  activeTab: Tab
-  setActiveTab: (t: Tab) => void
+  activeTab: SettingsTab
+  setActiveTab: (t: SettingsTab) => void
 }) {
   const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -42,7 +43,7 @@ export function SettingsSidebar({
     else menuRef.current?.querySelector<HTMLElement>('button, [tabindex]')?.focus()
   }, [isMenuOpen])
 
-  const navButton = (tab: Tab, label: string, icon: React.ReactNode) => (
+  const navButton = (tab: SettingsTab, label: string, icon: React.ReactNode) => (
     <button
       onClick={() => {
         setActiveTab(tab)

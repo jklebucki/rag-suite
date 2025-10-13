@@ -1,15 +1,15 @@
+// All code comments must be written in English, regardless of the conversation language.
+
 import React, { useState } from 'react'
-import { Settings as SettingsIcon, User } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { SettingsForm } from './SettingsForm'
 import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
-
-type Tab = 'llm' | 'user'
+import type { SettingsTab } from '../../types/settings'
 
 export function Settings() {
   const { t } = useI18n()
-  const [activeTab, setActiveTab] = useState<Tab>('llm')
+  const [activeTab, setActiveTab] = useState<SettingsTab>('llm')
 
   return (
     // On mobile we want the sidebar topbar above content (column). On md+ use row with sidebar left.
