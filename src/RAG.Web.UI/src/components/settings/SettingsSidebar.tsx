@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
-import type { SettingsTab } from '../../types/settings'
+import type { SettingsTab } from '@/types'
 
 export function SettingsSidebar({
   activeTab,

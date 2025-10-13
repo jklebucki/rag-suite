@@ -1,6 +1,6 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import type { PasswordStrength } from '../types'
+import type { PasswordStrength } from '@/types'
 
 /**
  * Calculate password strength based on various criteria

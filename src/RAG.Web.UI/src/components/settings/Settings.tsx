@@ -5,7 +5,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { SettingsForm } from './SettingsForm'
 import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
-import type { SettingsTab } from '../../types/settings'
+import type { SettingsTab } from '@/types'
 
 export function Settings() {
   const { t } = useI18n()

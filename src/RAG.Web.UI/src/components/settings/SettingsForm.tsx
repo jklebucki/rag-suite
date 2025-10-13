@@ -8,7 +8,7 @@ import apiClient from '@/services/api'
 import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/types'
 import { validateLlmSettings } from './llmValidation'
 import { LlmFormField, ModelSelectField } from './LlmFormFields'
-import type { LlmFormErrors } from '../../types/settings'
+import type { LlmFormErrors } from '@/types'
 
 interface SettingsFormProps {
   onSettingsChange?: (settings: LlmSettings) => void
