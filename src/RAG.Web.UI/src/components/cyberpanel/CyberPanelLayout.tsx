@@ -13,20 +13,14 @@ export function CyberPanelLayout() {
   const { t } = useI18n()
 
   return (
-    <div className="flex h-full">
-      {/* Sidebar (match Settings layout) */}
-      <div className="w-64 bg-gray-50 border-r border-gray-200 p-6">
-        <div className="sticky top-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('nav.cyberpanel')}</h2>
-          <CyberPanelSidebar
-            onClose={() => {}}
-            isActiveRoute={(href) => location.pathname.startsWith(href)}
-          />
-        </div>
-      </div>
+    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
+      {/* Sidebar - responsive (mobile topbar + desktop sidebar) */}
+      <CyberPanelSidebar
+        isActiveRoute={(href) => location.pathname.startsWith(href)}
+      />
 
-      {/* Main Content (match Settings layout padding) */}
-      <div className="flex-1 p-6">
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <Outlet />
       </div>
     </div>

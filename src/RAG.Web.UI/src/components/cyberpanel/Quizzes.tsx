@@ -1,10 +1,13 @@
 import React from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function Quizzes() {
+  const { t } = useI18n()
+  
   return (
-    <div>
-      <h3 className="text-2xl font-bold mb-4">Quizzes</h3>
-      <p className="text-sm text-gray-600">Lista dostępnych quizów pojawi się tutaj.</p>
+    <div className="max-w-4xl">
+      <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">{t('cyberpanel.quizzes')}</h3>
+      <p className="text-sm md:text-base text-gray-600">Lista dostępnych quizów pojawi się tutaj.</p>
     </div>
   )
 }
