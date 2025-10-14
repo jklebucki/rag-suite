@@ -5,7 +5,7 @@ import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
 import { Modal } from '@/components/ui/Modal'
 import { DocumentDetail } from '@/components/search/DocumentDetail'
-import { useDocumentDetail } from '@/components/search/hooks/useDocumentDetail'
+import { useDocumentDetail } from '@/hooks/useDocumentDetail'
 import type { SearchResult } from '@/types/api'
 
 // Lazy load PDFViewerModal
