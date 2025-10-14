@@ -63,37 +63,41 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
     <div className="flex flex-col h-full max-h-[80vh]">
       {/* Header with file path */}
       <div className="flex-shrink-0 border-b border-gray-200 pb-4 mb-4">
-        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-          <File className="h-4 w-4" />
-          <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-            {filePath || 'Unknown path'}
-          </span>
-          {filePath && (
-            <button
-              onClick={handleDownload}
-              className="text-primary-600 hover:text-primary-700 p-1 rounded"
-              title="Download file"
-            >
-              <Download className="h-4 w-4" />
-            </button>
-          )}
-          {isReconstructed && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
-              Reconstructed Document
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600 mb-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <File className="h-4 w-4 flex-shrink-0" />
+            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded break-all">
+              {filePath || 'Unknown path'}
             </span>
-          )}
-          {chunksFound && totalChunks && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
-              {chunksFound}/{totalChunks} chunks
-            </span>
-          )}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {filePath && (
+              <button
+                onClick={handleDownload}
+                className="text-primary-600 hover:text-primary-700 p-1 rounded"
+                title="Download file"
+              >
+                <Download className="h-4 w-4" />
+              </button>
+            )}
+            {isReconstructed && (
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded whitespace-nowrap">
+                Reconstructed Document
+              </span>
+            )}
+            {chunksFound && totalChunks && (
+              <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded whitespace-nowrap">
+                {chunksFound}/{totalChunks} chunks
+              </span>
+            )}
+          </div>
         </div>
-        <h1 className="text-xl font-bold text-gray-900">{document.title || document.fileName}</h1>
-        <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900 break-words">{document.title || document.fileName}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
           {elasticsearchIndex && (
             <span className="flex items-center">
-              <Database className="h-4 w-4 mr-1" />
-              Index: {elasticsearchIndex}
+              <Database className="h-4 w-4 mr-1 flex-shrink-0" />
+              <span className="truncate">Index: {elasticsearchIndex}</span>
             </span>
           )}
         </div>
@@ -101,35 +105,35 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
 
       {/* Scrollable content area */}
       <div className="flex-grow overflow-y-auto mb-4">
-        <div className="bg-gray-50 rounded-lg p-4 h-full">
-          <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
+        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 h-full">
+          <div className="text-xs sm:text-sm text-gray-700 leading-relaxed whitespace-pre-wrap font-mono break-words">
             {document.fullContent || document.content}
           </div>
         </div>
       </div>
 
       {/* Metadata table at the bottom */}
-      <div className="flex-shrink-0 bg-gray-50 rounded-lg p-4">
+      <div className="flex-shrink-0 bg-gray-50 rounded-lg p-3 sm:p-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
           <Tag className="h-4 w-4 mr-2" />
           File Information
         </h3>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">File Extension:</span>
-            <span className="text-gray-600">{fileExtension}</span>
+            <span className="text-gray-600 break-all">{fileExtension}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">File Size:</span>
             <span className="text-gray-600">{formatBytes(fileSize)}</span>
           </div>
           {chunksFound && totalChunks && (
             <>
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                 <span className="font-medium text-gray-700">Chunks Found:</span>
                 <span className="text-gray-600">{chunksFound} of {totalChunks}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                 <span className="font-medium text-gray-700">Document Status:</span>
                 <span className={`text-gray-600 ${isReconstructed ? 'text-blue-600' : ''}`}>
                   {isReconstructed ? 'Reconstructed' : 'Complete'}
@@ -137,21 +141,21 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
               </div>
             </>
           )}
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">Last Modified:</span>
-            <span className="text-gray-600">{formatMetadataDate(lastModified)}</span>
+            <span className="text-gray-600 break-all">{formatMetadataDate(lastModified)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">Indexed At:</span>
-            <span className="text-gray-600">{formatMetadataDate(indexedAt)}</span>
+            <span className="text-gray-600 break-all">{formatMetadataDate(indexedAt)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">Created:</span>
-            <span className="text-gray-600">{formatDateTime(document.createdAt, language)}</span>
+            <span className="text-gray-600 break-all">{formatDateTime(document.createdAt, language)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="font-medium text-gray-700">Last Updated:</span>
-            <span className="text-gray-600">{formatDateTime(document.updatedAt, language)}</span>
+            <span className="text-gray-600 break-all">{formatDateTime(document.updatedAt, language)}</span>
           </div>
         </div>
       </div>

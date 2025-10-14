@@ -30,31 +30,34 @@ export function SearchForm({
   const { t } = useI18n()
   
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
       <form onSubmit={onSearch} className="space-y-4">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder={t('search.input.placeholder')}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
+        {/* Search input - full width on mobile */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder={t('search.input.placeholder')}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+        
+        {/* Buttons - stacked on mobile, row on desktop */}
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             type="button"
             onClick={onToggleAdvanced}
-            className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2"
           >
             <Filter className="h-5 w-5" />
-            {t('search.filters.title')}
+            <span className="sm:inline">{t('search.filters.title')}</span>
           </button>
           <button
             type="submit"
             disabled={!query.trim()}
-            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('search.button')}
           </button>
@@ -62,7 +65,7 @@ export function SearchForm({
             <button
               type="button"
               onClick={onClear}
-              className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+              className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
             >
               Clear
             </button>

@@ -25,13 +25,13 @@ export function SearchInterface() {
   } = useMultilingualSearch()
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t('search.title')}</h1>
-        <p className="text-gray-600 mt-1">
+    <div className="max-w-6xl mx-auto space-y-6 px-4 sm:px-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('search.title')}</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">
           {t('search.subtitle')}
           {lastSearchLanguage && lastSearchLanguage !== currentLanguage && (
-            <span className="ml-2 text-blue-600 text-sm">
+            <span className="block sm:inline sm:ml-2 text-blue-600 text-sm mt-1 sm:mt-0">
               (Query detected in {lastSearchLanguage})
             </span>
           )}

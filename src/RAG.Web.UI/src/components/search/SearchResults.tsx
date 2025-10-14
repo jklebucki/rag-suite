@@ -53,9 +53,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   // Spinner jak przy pierwszym wyszukiwaniu - przy każdym wyszukiwaniu gdy isLoading i hasSearched
   if (isLoading && hasSearched) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-8 px-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600">{t('search.loading')}</p>
+        <p className="mt-4 text-gray-600 text-sm sm:text-base">{t('search.loading')}</p>
       </div>
     )
   }
@@ -63,11 +63,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   if (error && hasSearched) {
     console.error('🔍 Search error in component:', error)
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700">{t('search.error')}</p>
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mx-4 sm:mx-0">
+        <p className="text-red-700 text-sm sm:text-base">{t('search.error')}</p>
         <details className="mt-2">
           <summary className="cursor-pointer text-sm">Error details</summary>
-          <pre className="text-xs mt-1 text-red-600">{JSON.stringify(error, null, 2)}</pre>
+          <pre className="text-xs mt-1 text-red-600 overflow-x-auto">{JSON.stringify(error, null, 2)}</pre>
         </details>
       </div>
     )
@@ -75,11 +75,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 
   if (!hasSearched || (hasSearched && !searchResults && !isLoading)) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-8">
+      <div className="bg-white rounded-lg shadow-sm border p-6 sm:p-8">
         <div className="text-center text-gray-500">
-          <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('search.title')}</h3>
-          <p>{t('search.subtitle')}</p>
+          <Search className="h-12 sm:h-16 w-12 sm:w-16 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">{t('search.title')}</h3>
+          <p className="text-sm sm:text-base">{t('search.subtitle')}</p>
         </div>
       </div>
     )
@@ -100,14 +100,14 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
       )}
-      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+      <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{t('search.results')}</h2>
           <p className="text-sm text-gray-600">
             {t('search.results')} {resultsToShow.total} {t('search.results')} in {resultsToShow.took}ms
           </p>
         </div>
-        <button onClick={onExport} className="btn-secondary flex items-center gap-2">
+        <button onClick={onExport} className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
           <Download className="h-4 w-4" />
           Export
         </button>
@@ -126,9 +126,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       </div>
 
       {resultsToShow.results.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <p>{t('search.no_results')}</p>
+        <div className="p-6 sm:p-8 text-center text-gray-500">
+          <Search className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-sm sm:text-base">{t('search.no_results')}</p>
         </div>
       )}
 
@@ -140,9 +140,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
         size="xl"
       >
         {isLoadingDetail && (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading document details...</p>
+          <div className="p-6 sm:p-8 text-center">
+            <div className="animate-spin rounded-full h-10 sm:h-12 w-10 sm:w-12 border-b-2 border-primary-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading document details...</p>
           </div>
         )}
 
@@ -205,25 +205,25 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
   }
 
   return (
-    <div className="p-6 hover:bg-gray-50">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
+    <div className="p-4 sm:p-6 hover:bg-gray-50">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 line-clamp-2 flex-1">
           {result.title}
         </h3>
-        <div className="ml-4 flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {isReconstructed && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full whitespace-nowrap">
               Reconstructed
             </span>
           )}
-          <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
+          <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full whitespace-nowrap">
             {formatScore(result.score)}% match
           </span>
         </div>
       </div>
 
       {/* Show highlights if available, otherwise show content */}
-      <div className="text-gray-600 mb-3 line-clamp-3 search-highlights">
+      <div className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-3 search-highlights">
         {result.metadata?.highlights ? (
           <div dangerouslySetInnerHTML={{ __html: result.metadata.highlights }} />
         ) : (
@@ -231,21 +231,21 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
         )}
       </div>
 
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center space-x-4">
-          <span className="px-2 py-1 bg-gray-100 rounded text-xs">
+      {/* Metadata and actions - stack on mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="px-2 py-1 bg-gray-100 rounded text-xs whitespace-nowrap">
             {result.documentType}
           </span>
-          <span>{result.source}</span>
+          <span className="text-xs sm:text-sm truncate">{result.source}</span>
           {chunksInfo && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded whitespace-nowrap">
               {chunksInfo}
             </span>
           )}
-          {/* <span>{result.filePath}</span> */}
-          <span>{formatDate(result.updatedAt, language)}</span>
+          <span className="text-xs sm:text-sm">{formatDate(result.updatedAt, language)}</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
           {result.filePath && (
             <>
               <button
@@ -266,7 +266,7 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
           )}
           <button
             onClick={onViewDetails}
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="text-primary-600 hover:text-primary-700 font-medium text-sm whitespace-nowrap"
           >
             View Details
           </button>
