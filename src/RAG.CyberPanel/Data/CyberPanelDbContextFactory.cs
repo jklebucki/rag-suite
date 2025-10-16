@@ -11,7 +11,7 @@ public class CyberPanelDbContextFactory : IDesignTimeDbContextFactory<CyberPanel
     public CyberPanelDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<CyberPanelDbContext>();
-        
+
         // Use a default connection string for design-time operations
         var connectionString = "Host=localhost;Database=rag-suite;Username=postgres;Password=postgres";
         optionsBuilder.UseNpgsql(connectionString);

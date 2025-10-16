@@ -1,14 +1,14 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RAG.CyberPanel.Data;
-using RAG.CyberPanel.Services;
-using FluentValidation;
 using RAG.CyberPanel.Features.CreateQuiz;
-using RAG.CyberPanel.Features.SubmitAttempt;
 using RAG.CyberPanel.Features.GetQuiz;
 using RAG.CyberPanel.Features.ListQuizzes;
+using RAG.CyberPanel.Features.SubmitAttempt;
+using RAG.CyberPanel.Services;
 
 namespace RAG.CyberPanel.Extensions;
 

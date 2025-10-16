@@ -16,10 +16,10 @@ public static class GetQuizEndpoint
         ) =>
         {
             var result = await service.GetQuizAsync(id, ct);
-            
+
             if (result == null)
                 return Results.NotFound(new { Message = "Quiz not found" });
-            
+
             return Results.Ok(result);
         })
         .WithName("GetQuiz")

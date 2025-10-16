@@ -1,8 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using FluentValidation;
 
 namespace RAG.CyberPanel.Features.SubmitAttempt;
 
@@ -25,7 +25,7 @@ public static class SubmitAttemptEndpoint
             }
 
             var validationResult = await validator.ValidateAsync(request, ct);
-            
+
             if (!validationResult.IsValid)
             {
                 return Results.ValidationProblem(validationResult.ToDictionary());

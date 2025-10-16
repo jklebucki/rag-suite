@@ -1,11 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
-using RAG.CyberPanel.Data;
-using RAG.CyberPanel.Services;
 using RAG.CyberPanel.Features.CreateQuiz;
 using RAG.CyberPanel.Features.GetQuiz;
 using RAG.CyberPanel.Features.ListQuizzes;
