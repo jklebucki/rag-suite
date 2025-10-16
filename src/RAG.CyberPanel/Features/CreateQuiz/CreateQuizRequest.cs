@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RAG.CyberPanel.Features.CreateQuiz;
 
 public record OptionDto(Guid? Id, string Text, bool IsCorrect);

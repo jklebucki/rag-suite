@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Orchestrator.Api.Features.FileDownload;

@@ -1,6 +1,4 @@
 using RAG.Orchestrator.Api.Models;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
 

@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+using RAG.CyberPanel.Endpoints;
+using RAG.CyberPanel.Extensions;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Extensions;
 using RAG.Orchestrator.Api.Features.Analytics;
@@ -11,8 +12,6 @@ using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Services;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
-using RAG.CyberPanel.Extensions;
-using RAG.CyberPanel.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 

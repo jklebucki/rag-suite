@@ -1,8 +1,6 @@
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System;
 
 namespace RAG.Security.Services;
 

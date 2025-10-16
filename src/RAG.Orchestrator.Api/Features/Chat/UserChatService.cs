@@ -1,14 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Localization;
-using RAG.Orchestrator.Api.Models.Configuration;
-using RAG.Orchestrator.Api.Services;
 using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Services;
 using RAG.Security.Data;
-using System.IO;
 using System.Text;
 
 namespace RAG.Orchestrator.Api.Features.Chat;
@@ -320,7 +317,7 @@ public class UserChatService : IUserChatService
                 {
                     var sourcesContext = BuildConversationSourcesContext(conversationSources);
                     enhancedUserMessage = $"{sourcesContext}\n\n{enhancedUserMessage}";
-                    
+
                     _logger.LogDebug("Added {SourceCount} conversation sources to prompt", conversationSources.Length);
                 }
 
@@ -791,19 +788,19 @@ public class UserChatService : IUserChatService
     private string[] ExtractConversationSources(List<UserChatMessage> conversationHistory)
     {
         var sources = new HashSet<string>();
-        
+
         foreach (var message in conversationHistory)
         {
             if (message.Sources != null)
             {
                 foreach (var result in message.Sources)
                 {
-                    var sourceName = !string.IsNullOrEmpty(result.FileName) 
-                        ? result.FileName 
+                    var sourceName = !string.IsNullOrEmpty(result.FileName)
+                        ? result.FileName
                         : !string.IsNullOrEmpty(result.FilePath)
                             ? Path.GetFileName(result.FilePath)
                             : result.Source ?? "Unknown";
-                    
+
                     if (!string.IsNullOrEmpty(sourceName))
                     {
                         sources.Add(sourceName);
@@ -811,7 +808,7 @@ public class UserChatService : IUserChatService
                 }
             }
         }
-        
+
         return sources.ToArray();
     }
 
@@ -826,16 +823,16 @@ public class UserChatService : IUserChatService
         var contextBuilder = new StringBuilder();
         contextBuilder.AppendLine("sources used in this conversation");
         contextBuilder.AppendLine();
-        
+
         foreach (var source in sources)
         {
             contextBuilder.AppendLine($"- {source}");
         }
-        
+
         contextBuilder.AppendLine();
         contextBuilder.AppendLine("end of sources used in this conversation");
         contextBuilder.AppendLine();
-        
+
         return contextBuilder.ToString();
     }
 }

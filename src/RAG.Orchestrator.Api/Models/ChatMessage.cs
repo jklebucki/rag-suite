@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 namespace RAG.Orchestrator.Api.Models;
+
 public class ChatMessage
 {
     [Key]

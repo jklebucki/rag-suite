@@ -1,8 +1,7 @@
+using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Services;
 using System.Text;
 using System.Text.Json;
-using RAG.Orchestrator.Api.Models;
-using RAG.Orchestrator.Api.Models.Configuration;
-using RAG.Orchestrator.Api.Services;
 
 public class LlmService : ILlmService
 {
@@ -424,7 +423,7 @@ public class LlmService : ILlmService
             }
 
             var systemMessageModel = await File.ReadAllTextAsync(filePath, cancellationToken);
-            
+
 
             if (systemMessageModel != null)
             {

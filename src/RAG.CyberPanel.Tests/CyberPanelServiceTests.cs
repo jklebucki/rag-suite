@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using RAG.CyberPanel.Domain;
 using RAG.CyberPanel.Services;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace RAG.CyberPanel.Tests;

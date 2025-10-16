@@ -4,7 +4,6 @@ using RAG.Security.Data;
 using RAG.Security.DTOs;
 using RAG.Security.Models;
 using RAG.Security.Requests;
-using System.Linq;
 
 namespace RAG.Security.Services;
 
@@ -255,7 +254,7 @@ public class AuthService : IAuthService
         return await _userManager.GetRolesAsync(user);
     }
 
-    public async Task<bool> ForgotPasswordAsync(string email, string uiUrl) 
+    public async Task<bool> ForgotPasswordAsync(string email, string uiUrl)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null || !user.IsActive)

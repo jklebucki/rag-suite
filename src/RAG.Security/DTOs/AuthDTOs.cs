@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RAG.Security.DTOs;
 
 public record LoginResponse

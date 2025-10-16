@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 namespace RAG.Orchestrator.Api.Models;
+
 public class ChatSession
 {
     [Key]

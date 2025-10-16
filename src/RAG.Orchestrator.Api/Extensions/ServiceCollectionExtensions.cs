@@ -1,6 +1,5 @@
 using Elasticsearch.Net;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using RAG.Orchestrator.Api.Data;

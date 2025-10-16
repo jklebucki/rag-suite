@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace RAG.Security.Services;
 
 public interface IEmailService

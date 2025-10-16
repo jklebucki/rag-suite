@@ -79,10 +79,10 @@ public class DocumentReconstructionService : IDocumentReconstructionService
                     {
                         var firstChar = contentWithoutOverlap.Length > 0 ? contentWithoutOverlap[0] : ' ';
                         var lastChar = result.Length > 0 ? result[result.Length - 1] : ' ';
-                        
+
                         // Add space only if neither the result ends with whitespace nor the content starts with whitespace
                         if (!char.IsWhiteSpace(lastChar) && !char.IsWhiteSpace(firstChar) &&
-                            !firstChar.Equals('.') && !firstChar.Equals(',') && !firstChar.Equals(';') && 
+                            !firstChar.Equals('.') && !firstChar.Equals(',') && !firstChar.Equals(';') &&
                             !firstChar.Equals('!') && !firstChar.Equals('?'))
                         {
                             result.Append(' ');
