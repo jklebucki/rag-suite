@@ -4,6 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Services;
+using FluentValidation;
+using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.CyberPanel.Features.SubmitAttempt;
+using RAG.CyberPanel.Features.GetQuiz;
+using RAG.CyberPanel.Features.ListQuizzes;
 
 namespace RAG.CyberPanel.Extensions;
 
