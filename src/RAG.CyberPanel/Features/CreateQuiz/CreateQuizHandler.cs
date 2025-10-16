@@ -33,6 +33,7 @@ public class CreateQuizHandler
             var question = new Question
             {
                 Text = q.Text,
+                ImageUrl = q.ImageUrl,
                 Points = q.Points
             };
 
@@ -41,6 +42,7 @@ public class CreateQuizHandler
                 question.Options.Add(new Option
                 {
                     Text = o.Text,
+                    ImageUrl = o.ImageUrl,
                     IsCorrect = o.IsCorrect
                 });
             }

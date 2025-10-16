@@ -4,6 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Services;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
+using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.CyberPanel.Features.SubmitAttempt;
+using RAG.CyberPanel.Features.GetQuiz;
+using RAG.CyberPanel.Features.ListQuizzes;
 
 using System;
 using System.Threading.Tasks;
@@ -22,8 +27,18 @@ public static class ServiceCollectionExtensions
             options.UseNpgsql(connectionString);
         });
 
-        // Register services and handlers here (scaffold)
+        // Register core services
         services.AddScoped<ICyberPanelService, CyberPanelService>();
+
+        // Register feature handlers and services
+        services.AddScoped<CreateQuizHandler>();
+        services.AddScoped<SubmitAttemptHandler>();
+        services.AddScoped<GetQuizService>();
+        services.AddScoped<ListQuizzesService>();
+
+        // Register validators
+        services.AddScoped<IValidator<CreateQuizRequest>, CreateQuizValidator>();
+        services.AddScoped<IValidator<SubmitAttemptRequest>, SubmitAttemptValidator>();
 
         return services;
     }
