@@ -1,0 +1,219 @@
+### CyberPanel API Tests
+### Base URL
+@baseUrl = http://localhost:5000
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. List all quizzes
+GET {{baseUrl}}/api/cyberpanel/quizzes
+Authorization: Bearer {{token}}
+
+### 2. Create a new cybersecurity quiz with images
+POST {{baseUrl}}/api/cyberpanel/quizzes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Phishing Detection Training",
+  "description": "Learn to identify common phishing attacks through visual examples",
+  "isPublished": true,
+  "questions": [
+    {
+      "text": "Examine this email screenshot. Is this a phishing attempt?",
+      "imageUrl": "https://example.com/images/suspicious-email.png",
+      "points": 3,
+      "options": [
+        {
+          "text": "Yes - suspicious sender domain",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Yes - contains urgency tactics",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "No - looks legitimate",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which of these URL patterns indicates a potential phishing site?",
+      "imageUrl": null,
+      "points": 2,
+      "options": [
+        {
+          "text": "paypa1.com (with number 1)",
+          "imageUrl": "https://example.com/images/fake-url1.png",
+          "isCorrect": true
+        },
+        {
+          "text": "paypal.com (official)",
+          "imageUrl": "https://example.com/images/real-url.png",
+          "isCorrect": false
+        },
+        {
+          "text": "secure-paypal-login.tk",
+          "imageUrl": "https://example.com/images/fake-url2.png",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "text": "What type of attack is shown in this network diagram?",
+      "imageUrl": "https://example.com/images/network-attack-diagram.png",
+      "points": 5,
+      "options": [
+        {
+          "text": "Man-in-the-Middle (MITM)",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "DDoS Attack",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "SQL Injection",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Brute Force",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}
+
+### 3. Get quiz by ID (replace with actual quiz ID from step 2)
+@quizId = 00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/api/cyberpanel/quizzes/{{quizId}}
+Authorization: Bearer {{token}}
+
+### 4. Submit quiz attempt
+POST {{baseUrl}}/api/cyberpanel/quizzes/{{quizId}}/attempts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quizId": "{{quizId}}",
+  "answers": [
+    {
+      "questionId": "question-guid-1",
+      "selectedOptionIds": ["option-guid-1", "option-guid-2"]
+    },
+    {
+      "questionId": "question-guid-2",
+      "selectedOptionIds": ["option-guid-1", "option-guid-3"]
+    },
+    {
+      "questionId": "question-guid-3",
+      "selectedOptionIds": ["option-guid-1"]
+    }
+  ]
+}
+
+### 5. Create a quiz with only text (no images)
+POST {{baseUrl}}/api/cyberpanel/quizzes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Basic Security Concepts",
+  "description": "Test your understanding of fundamental cybersecurity principles",
+  "isPublished": true,
+  "questions": [
+    {
+      "text": "What is the principle of least privilege?",
+      "imageUrl": null,
+      "points": 1,
+      "options": [
+        {
+          "text": "Users should only have access to what they need",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Users should have full system access",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which of the following are good password practices? (Select all)",
+      "imageUrl": null,
+      "points": 2,
+      "options": [
+        {
+          "text": "Use multi-factor authentication",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Use unique passwords for each account",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Write passwords on sticky notes",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Share passwords with coworkers",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}
+
+### 6. Test validation - Quiz without questions (should fail)
+POST {{baseUrl}}/api/cyberpanel/quizzes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Invalid Quiz",
+  "description": "This should fail validation",
+  "isPublished": true,
+  "questions": []
+}
+
+### 7. Test validation - Question with invalid image URL (should fail)
+POST {{baseUrl}}/api/cyberpanel/quizzes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Invalid Image URL Test",
+  "description": "Testing invalid image URL validation",
+  "isPublished": true,
+  "questions": [
+    {
+      "text": "Test question",
+      "imageUrl": "not-a-valid-url",
+      "points": 1,
+      "options": [
+        {
+          "text": "Option 1",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Option 2",
+          "imageUrl": "also-invalid",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

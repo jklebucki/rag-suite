@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RAG.CyberPanel.Data;
@@ -11,9 +12,11 @@ using RAG.CyberPanel.Data;
 namespace RAG.CyberPanel.Migrations
 {
     [DbContext(typeof(CyberPanelDbContext))]
-    partial class CyberPanelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016125517_AddImageUrlSupport")]
+    partial class AddImageUrlSupport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

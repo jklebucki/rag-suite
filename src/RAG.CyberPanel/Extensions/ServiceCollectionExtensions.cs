@@ -19,8 +19,18 @@ public static class ServiceCollectionExtensions
             options.UseNpgsql(connectionString);
         });
 
-        // Register services and handlers here (scaffold)
+        // Register core services
         services.AddScoped<ICyberPanelService, CyberPanelService>();
+
+        // Register feature handlers and services
+        services.AddScoped<CreateQuizHandler>();
+        services.AddScoped<SubmitAttemptHandler>();
+        services.AddScoped<GetQuizService>();
+        services.AddScoped<ListQuizzesService>();
+
+        // Register validators
+        services.AddScoped<IValidator<CreateQuizRequest>, CreateQuizValidator>();
+        services.AddScoped<IValidator<SubmitAttemptRequest>, SubmitAttemptValidator>();
 
         return services;
     }
