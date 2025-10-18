@@ -6,7 +6,7 @@ import { getSavedLanguage, saveLanguage, isLanguageAutoDetected } from '@/utils/
 interface I18nContextType {
   language: LanguageCode;
   setLanguage: (language: LanguageCode) => void;
-  t: (key: keyof TranslationKeys, ...args: string[]) => string;
+  t: (key: keyof TranslationKeys, params?: Record<string, string> | string[]) => string;
   languages: typeof SUPPORTED_LANGUAGES;
   isAutoDetected: boolean;
 }
@@ -27,11 +27,22 @@ export function I18nProvider({ children }: I18nProviderProps) {
     setIsAutoDetected(false);
   };
 
-  const t = (key: keyof TranslationKeys, ...args: string[]): string => {
+  const t = (key: keyof TranslationKeys, params?: Record<string, string> | string[]): string => {
     const translation = translations[language]?.[key] || translations.en[key] || key;
     
-    // Simple string interpolation for placeholders like {0}, {1}, etc.
-    return args.reduce((str, arg, index) => {
+    if (!params) {
+      return translation;
+    }
+
+    // Handle named parameters (object with key-value pairs)
+    if (!Array.isArray(params)) {
+      return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
+        return str.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
+      }, translation);
+    }
+
+    // Handle indexed parameters (array with positional values)
+    return params.reduce((str, arg, index) => {
       return str.replace(new RegExp(`\\{${index}\\}`, 'g'), arg);
     }, translation);
   };

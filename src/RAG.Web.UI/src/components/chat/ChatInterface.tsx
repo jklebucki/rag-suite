@@ -41,6 +41,10 @@ export function ChatInterface() {
     setIsNewSession,
   } = useMultilingualChat()
 
+  // Get the session to delete for displaying in modal
+  const sessionToDeleteData = sessions.find(s => s.id === sessionToDelete)
+  const sessionToDeleteTitle = sessionToDeleteData?.title || t('chat.new_conversation')
+
   // Focus input when new session is created
   useEffect(() => {
     if (isNewSession && inputRef.current) {
@@ -191,8 +195,8 @@ export function ChatInterface() {
         isOpen={!!sessionToDelete}
         onClose={cancelDeleteSession}
         onConfirm={confirmDeleteSession}
-        title={t('chat.sessions')}
-        message={t('chat.no_sessions')}
+        title={t('chat.delete_session_title') || 'Delete Session'}
+        message={t('chat.delete_session_confirm', { title: sessionToDeleteTitle }) || `Are you sure you want to delete the session "${sessionToDeleteTitle}"? This action cannot be undone.`}
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         variant="danger"

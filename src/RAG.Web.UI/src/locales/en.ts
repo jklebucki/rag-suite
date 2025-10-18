@@ -67,6 +67,8 @@ export const en: TranslationKeys = {
   'chat.new_session': 'New Chat',
   'chat.sessions': 'Chat Sessions',
   'chat.no_sessions': 'No chat sessions',
+  'chat.delete_session_title': 'Delete Session',
+  'chat.delete_session_confirm': 'Are you sure you want to delete the session "{title}"? This action cannot be undone.',
   'chat.loading': 'Generating response...',
   'chat.error': 'Failed to send message',
   'chat.language_detected': 'Language detected',

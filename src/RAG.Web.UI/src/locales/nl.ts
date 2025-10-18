@@ -67,6 +67,8 @@ export const nl: TranslationKeys = {
   'chat.new_session': 'Nieuwe Chat',
   'chat.sessions': 'Chat Sessies',
   'chat.no_sessions': 'Nog geen chat sessies',
+  'chat.delete_session_title': 'Sessie Verwijderen',
+  'chat.delete_session_confirm': 'Weet je zeker dat je de sessie "{title}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
   'chat.loading': 'Antwoord genereren...',
   'chat.error': 'Kon bericht niet verzenden',
   'chat.language_detected': 'Taal gedetecteerd',

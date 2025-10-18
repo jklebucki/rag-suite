@@ -47,6 +47,8 @@ export const pl: TranslationKeys = {
   'chat.new_session': 'Nowy Czat',
   'chat.sessions': 'Sesje Czatu',
   'chat.no_sessions': 'Brak sesji czatu',
+  'chat.delete_session_title': 'Usuń Sesję',
+  'chat.delete_session_confirm': 'Czy na pewno chcesz usunąć sesję "{title}"? Ta operacja jest nieodwracalna.',
   'chat.loading': 'Generowanie odpowiedzi...',
   'chat.error': 'Nie udało się wysłać wiadomości',
   'chat.language_detected': 'Wykryty język',

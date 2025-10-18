@@ -67,6 +67,8 @@ export const hu: TranslationKeys = {
   'chat.new_session': 'Új Chat',
   'chat.sessions': 'Chat Munkamenetek',
   'chat.no_sessions': 'Még nincsenek chat munkamenetek',
+  'chat.delete_session_title': 'Munkamenet Törlése',
+  'chat.delete_session_confirm': 'Biztosan törölni szeretnéd a(z) "{title}" munkamenetet? Ez a művelet nem vonható vissza.',
   'chat.loading': 'Válasz generálása...',
   'chat.error': 'Nem sikerült elküldeni az üzenetet',
   'chat.language_detected': 'Észlelt nyelv',

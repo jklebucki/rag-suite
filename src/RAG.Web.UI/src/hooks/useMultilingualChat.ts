@@ -48,8 +48,12 @@ export function useMultilingualChat() {
         setDocumentsAvailable(response.metadata.documentsAvailable as boolean)
       }
 
-      // Refresh the entire session to get the real messages from server
+      // Refresh the current session to get the real messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
+      
+      // Refresh the sessions list to update the title if it changed
+      queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
+      
       setIsTyping(false)
 
       // Show language detection info if available

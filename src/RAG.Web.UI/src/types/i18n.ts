@@ -85,6 +85,8 @@ export interface TranslationKeys {
   'chat.new_session': string;
   'chat.sessions': string;
   'chat.no_sessions': string;
+  'chat.delete_session_title': string;
+  'chat.delete_session_confirm': string;
   'chat.loading': string;
   'chat.error': string;
   'chat.language_detected': string;

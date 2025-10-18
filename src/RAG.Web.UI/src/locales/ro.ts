@@ -72,6 +72,8 @@ export const ro: TranslationKeys = {
   'chat.new_session': 'Chat Nou',
   'chat.sessions': 'Sesiuni Chat',
   'chat.no_sessions': 'Încă nu există sesiuni de chat',
+  'chat.delete_session_title': 'Șterge Sesiunea',
+  'chat.delete_session_confirm': 'Ești sigur că vrei să ștergi sesiunea "{title}"? Această acțiune nu poate fi anulată.',
   'chat.loading': 'Generez răspuns...',
   'chat.error': 'Nu s-a putut trimite mesajul',
   'chat.language_detected': 'Limbă detectată',
