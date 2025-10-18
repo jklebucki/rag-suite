@@ -49,9 +49,11 @@ export function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div 
+      <button 
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={onClose}
+        aria-label="Close modal"
+        tabIndex={-1}
       />
       
       {/* Modal */}

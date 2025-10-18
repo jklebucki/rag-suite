@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
@@ -11,7 +11,6 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
-  const navigate = useNavigate()
   const { login, loading, error, clearError } = useAuth()
   const { t } = useI18n()
   const { addToast } = useToast()

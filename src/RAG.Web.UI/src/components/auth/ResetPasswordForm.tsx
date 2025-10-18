@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Mail, ArrowLeft } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -14,7 +14,6 @@ interface ValidationErrors {
 }
 
 export function ResetPasswordForm() {
-  const navigate = useNavigate()
   const { t } = useI18n()
   const { resetPassword } = useAuth()
   const { addToast } = useToast()
@@ -73,19 +72,16 @@ export function ResetPasswordForm() {
         title: t('auth.reset.success_title'),
         message: t('auth.reset.success_message')
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send reset instructions. Please try again.'
       addToast({
         type: 'error',
         title: 'Reset Password Error',
-        message: error.message || 'Failed to send reset instructions. Please try again.'
+        message: errorMessage
       })
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleBackToLogin = () => {
-    navigate('/login')
   }
 
   if (isSuccess) {

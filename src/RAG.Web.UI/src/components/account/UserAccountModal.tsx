@@ -3,7 +3,6 @@ import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-re
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
-import type { User as UserType } from '@/types/auth'
 
 interface UserAccountModalProps {
   isOpen: boolean

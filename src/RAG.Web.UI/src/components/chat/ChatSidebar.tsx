@@ -86,9 +86,9 @@ export function ChatSidebar({
                 <div className="p-2">
                   {sessions.length > 0 ? (
                     sessions.map((session) => (
-                      <div
+                      <button
                         key={session.id}
-                        className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                        className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                           currentSessionId === session.id
                             ? 'bg-primary-50 border border-primary-200'
                             : 'hover:bg-gray-50'
@@ -119,7 +119,7 @@ export function ChatSidebar({
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                      </div>
+                      </button>
                     ))
                   ) : (
                     <div className="p-3 text-center">
@@ -151,9 +151,9 @@ export function ChatSidebar({
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 space-y-2">
             {sessions.map((session) => (
-              <div
+              <button
                 key={session.id}
-                className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                   currentSessionId === session.id
                     ? 'bg-primary-50 border border-primary-200'
                     : 'hover:bg-gray-50'
@@ -181,7 +181,7 @@ export function ChatSidebar({
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-              </div>
+              </button>
             ))}
           </div>
         </div>

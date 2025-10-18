@@ -2,7 +2,7 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { Components } from 'react-markdown'
 
 interface MarkdownMessageProps {
@@ -13,23 +13,29 @@ interface MarkdownMessageProps {
 export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMessageProps) {
   const components: Components = {
     // Headings
-    h1: ({ node, ...props }) => <h1 className="text-xl md:text-2xl font-bold mt-4 mb-2" {...props} />,
-    h2: ({ node, ...props }) => <h2 className="text-lg md:text-xl font-bold mt-3 mb-2" {...props} />,
-    h3: ({ node, ...props }) => <h3 className="text-base md:text-lg font-semibold mt-3 mb-1" {...props} />,
-    h4: ({ node, ...props }) => <h4 className="text-sm md:text-base font-semibold mt-2 mb-1" {...props} />,
-    h5: ({ node, ...props }) => <h5 className="text-sm font-semibold mt-2 mb-1" {...props} />,
-    h6: ({ node, ...props }) => <h6 className="text-xs md:text-sm font-semibold mt-2 mb-1" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h1: ({ node: _node, ...props }) => <h1 className="text-xl md:text-2xl font-bold mt-4 mb-2" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h2: ({ node: _node, ...props }) => <h2 className="text-lg md:text-xl font-bold mt-3 mb-2" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h3: ({ node: _node, ...props }) => <h3 className="text-base md:text-lg font-semibold mt-3 mb-1" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h4: ({ node: _node, ...props}) => <h4 className="text-sm md:text-base font-semibold mt-2 mb-1" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h5: ({ node: _node, ...props }) => <h5 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+    // eslint-disable-next-line jsx-a11y/heading-has-content
+    h6: ({ node: _node, ...props }) => <h6 className="text-xs md:text-sm font-semibold mt-2 mb-1" {...props} />,
 
     // Paragraphs
-    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
+    p: ({ node: _node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
 
     // Lists
-    ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
-    ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
-    li: ({ node, ...props }) => <li className="ml-2" {...props} />,
+    ul: ({ node: _node, ...props }) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+    ol: ({ node: _node, ...props }) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+    li: ({ node: _node, ...props }) => <li className="ml-2" {...props} />,
 
     // Code blocks with syntax highlighting
-    code: ({ node, className, children, ...props }) => {
+    code: ({ node: _node, className, children, ...props }) => {
       const match = /language-(\w+)/.exec(className || '')
       const language = match ? match[1] : ''
       const isInline = !className
@@ -68,7 +74,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
           )}
           <SyntaxHighlighter
             language={language || 'text'}
-            style={vscDarkPlus as any}
+            style={vscDarkPlus}
             customStyle={{
               margin: 0,
               borderRadius: language ? '0 0 0.375rem 0.375rem' : '0.375rem',
@@ -92,7 +98,8 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     },
 
     // Links
-    a: ({ node, ...props }) => (
+    // eslint-disable-next-line jsx-a11y/anchor-has-content
+    a: ({ node: _node, ...props }) => (
       <a
         className={`underline hover:no-underline ${isUserMessage ? 'text-blue-100' : 'text-blue-600'}`}
         target="_blank"
@@ -102,7 +109,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     ),
 
     // Blockquotes
-    blockquote: ({ node, ...props }) => (
+    blockquote: ({ node: _node, ...props }) => (
       <blockquote
         className={`border-l-4 pl-4 py-1 my-2 italic ${
           isUserMessage ? 'border-blue-300 text-blue-100' : 'border-gray-300 text-gray-600'
@@ -112,12 +119,12 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     ),
 
     // Tables
-    table: ({ node, ...props }) => (
+    table: ({ node: _node, ...props }) => (
       <div className="overflow-x-auto my-3">
         <table className="min-w-full border-collapse border border-gray-300" {...props} />
       </div>
     ),
-    th: ({ node, ...props }) => (
+    th: ({ node: _node, ...props }) => (
       <th
         className={`border border-gray-300 px-3 py-2 text-left font-semibold ${
           isUserMessage ? 'bg-blue-600/20' : 'bg-gray-100'
@@ -125,18 +132,18 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
         {...props}
       />
     ),
-    td: ({ node, ...props }) => <td className="border border-gray-300 px-3 py-2" {...props} />,
+    td: ({ node: _node, ...props }) => <td className="border border-gray-300 px-3 py-2" {...props} />,
 
     // Horizontal rule
-    hr: ({ node, ...props }) => (
+    hr: ({ node: _node, ...props }) => (
       <hr className={`my-4 ${isUserMessage ? 'border-blue-300' : 'border-gray-300'}`} {...props} />
     ),
 
     // Strong/Bold
-    strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+    strong: ({ node: _node, ...props }) => <strong className="font-bold" {...props} />,
 
     // Emphasis/Italic
-    em: ({ node, ...props }) => <em className="italic" {...props} />,
+    em: ({ node: _node, ...props }) => <em className="italic" {...props} />,
   }
 
   return (

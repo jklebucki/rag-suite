@@ -41,9 +41,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
       {/* Backdrop */}
-      <div 
+      <button 
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={onClose}
+        aria-label="Close modal"
+        tabIndex={-1}
       />
       
       {/* Modal */}

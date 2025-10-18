@@ -4,7 +4,7 @@ import ReactCountryFlag from 'react-country-flag';
 import { useI18n } from '@/contexts/I18nContext';
 import { Language } from '@/types/i18n';
 
-/* eslint-disable jsx-a11y/aria-proptypes */
+ 
 
 export function LanguageSelector() {
   const { language, setLanguage, languages, isAutoDetected, t } = useI18n();

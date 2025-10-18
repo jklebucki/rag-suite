@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Eye, EyeOff, User, Mail, Lock, Check } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -27,7 +27,6 @@ interface ValidationErrors {
 }
 
 export function RegisterForm() {
-  const navigate = useNavigate()
   const { t } = useI18n()
   const { register } = useAuth()
   const { addToast } = useToast()
@@ -186,11 +185,12 @@ export function RegisterForm() {
         confirmPassword: '',
         acceptTerms: false
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.'
       addToast({
         type: 'error',
         title: 'Registration Error',
-        message: error.message || 'Registration failed. Please try again.'
+        message: errorMessage
       })
     } finally {
       setLoading(false)

@@ -108,11 +108,12 @@ export function ResetPasswordConfirmForm() {
       setTimeout(() => {
         navigate('/login')
       }, 3000)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reset password. The link may be expired.'
       addToast({
         type: 'error',
         title: 'Password Reset Failed',
-        message: error.message || 'Failed to reset password. The link may be expired.'
+        message: errorMessage
       })
     } finally {
       setLoading(false)

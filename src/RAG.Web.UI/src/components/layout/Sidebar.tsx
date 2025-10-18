@@ -21,14 +21,16 @@ interface SidebarProps {
 export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isActiveRoute }: SidebarProps) {
   const { user } = useAuth()
   const roles = user?.roles || []
-  const canSeeCyberPanel = roles.includes('Admin') || roles.includes('PowerUser')
+  
   return (
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div
+        <button
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={onClose}
+          aria-label="Close sidebar"
+          tabIndex={-1}
         />
       )}
 

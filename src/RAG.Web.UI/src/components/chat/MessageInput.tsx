@@ -62,3 +62,5 @@ export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps
     </div>
   )
 })
+
+MessageInput.displayName = 'MessageInput'
