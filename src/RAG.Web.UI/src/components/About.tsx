@@ -16,10 +16,10 @@ export default function About() {
         setLoading(true)
         setError(null)
 
-        const response = await fetch(`/about/about.${language}.md`)
+        const response = await fetch(`/assets/about/about.${language}.md`)
         if (!response.ok) {
           // Fallback to English if the language file doesn't exist
-          const fallbackResponse = await fetch('/about/about.en.md')
+          const fallbackResponse = await fetch('/assets/about/about.en.md')
           if (!fallbackResponse.ok) {
             throw new Error('Failed to load about content')
           }
