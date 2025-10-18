@@ -57,7 +57,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
         <span className={`text-sm font-medium ${
           messageRole === 'user' ? 'text-blue-800' : 'text-gray-700'
         }`}>
-          {t('chat.sources.title', sources.length.toString())}
+          {t('chat.sources.title', [sources.length.toString()])}
         </span>
       </div>
 
@@ -188,7 +188,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
         <div className={`mt-2 text-xs text-center ${
           messageRole === 'user' ? 'text-blue-600' : 'text-gray-500'
         }`}>
-          {t('chat.sources.summary', sources.length.toString())}
+          {t('chat.sources.summary', [sources.length.toString()])}
         </div>
       )}
 
