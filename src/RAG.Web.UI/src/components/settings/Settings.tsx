@@ -7,7 +7,7 @@ import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
 import type { SettingsTab } from '@/types'
 
-export function Settings() {
+export default function Settings() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<SettingsTab>('llm')
 

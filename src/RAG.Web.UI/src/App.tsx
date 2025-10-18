@@ -1,17 +1,22 @@
 import { Routes, Route } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { Layout } from '@/components/Layout'
-import { Dashboard } from '@/components/dashboard/Dashboard'
-import { ChatInterface } from '@/components/chat/ChatInterface'
-import { SearchInterface } from '@/components/search/SearchInterface'
-import { Settings } from '@/components/settings/Settings'
-import { About } from '@/components/About'
-import { LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm, ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/components/auth'
+const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'))
+const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'))
+const SearchInterface = lazy(() => import('@/components/search/SearchInterface'))
+const Settings = lazy(() => import('@/components/settings/Settings'))
+const About = lazy(() => import('@/components/About'))
+const LoginForm = lazy(() => import('@/components/auth/LoginForm'))
+const RegisterForm = lazy(() => import('@/components/auth/RegisterForm'))
+const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm'))
+const ResetPasswordConfirmForm = lazy(() => import('@/components/auth/ResetPasswordConfirmForm'))
+const CyberPanelLayout = lazy(() => import('@/components/cyberpanel/CyberPanelLayout'))
+const Quizzes = lazy(() => import('@/components/cyberpanel/Quizzes'))
+const QuizBuilder = lazy(() => import('@/components/cyberpanel/QuizBuilder'))
+const QuizResults = lazy(() => import('@/components/cyberpanel/QuizResults'))
+const QuizDetail = lazy(() => import('@/components/cyberpanel/QuizDetail'))
+import { ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/components/auth'
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute'
-import { CyberPanelLayout } from '@/components/cyberpanel/CyberPanelLayout'
-import Quizzes from '@/components/cyberpanel/Quizzes'
-import QuizBuilder from '@/components/cyberpanel/QuizBuilder'
-import QuizResults from '@/components/cyberpanel/QuizResults'
-import QuizDetail from '@/components/cyberpanel/QuizDetail'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { I18nProvider } from '@/contexts/I18nContext'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -24,6 +29,7 @@ function App() {
         <ConfigurationProvider>
           <AuthProvider>
           <Layout>
+            <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route
                 path="/"
@@ -114,6 +120,7 @@ function App() {
                 }
               />
             </Routes>
+            </Suspense>
           </Layout>
         </AuthProvider>
         </ConfigurationProvider>

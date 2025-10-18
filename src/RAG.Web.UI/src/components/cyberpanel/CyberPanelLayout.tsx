@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import CyberPanelSidebar from '@/components/cyberpanel/CyberPanelSidebar'
 import { useI18n } from '@/contexts/I18nContext'
 
-export function CyberPanelLayout() {
+export default function CyberPanelLayout() {
   const { user } = useAuth()
   const roles = user?.roles || []
   const isAdmin = roles.includes('Admin')

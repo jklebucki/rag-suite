@@ -12,7 +12,7 @@ import { TopQueries } from './TopQueries'
 import { PluginsStatus } from './PluginsStatus'
 import { SystemHealth } from './SystemHealth'
 
-export function Dashboard() {
+export default function Dashboard() {
   const { t } = useI18n()
   const {
     stats,

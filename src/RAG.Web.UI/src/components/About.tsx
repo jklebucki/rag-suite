@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { Info } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 
-export function About() {
+export default function About() {
   const { language } = useI18n()
   const [content, setContent] = useState<string>('')
   const [loading, setLoading] = useState(true)
