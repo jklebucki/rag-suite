@@ -64,6 +64,8 @@ Added export for the new `MarkdownMessage` component to make it available for im
 ### Dependencies Used
 - `react-markdown` (v10.1.0) - Core Markdown rendering
 - `remark-gfm` (v4.0.1) - GitHub Flavored Markdown support
+- `react-syntax-highlighter` - Syntax highlighting for code blocks
+- `@types/react-syntax-highlighter` - TypeScript types
 
 ### Styling Approach
 - Uses Tailwind CSS utility classes
@@ -73,10 +75,20 @@ Added export for the new `MarkdownMessage` component to make it available for im
   - Assistant messages: Gray theme (`bg-gray-100`, `text-gray-700`, etc.)
 
 ### Code Block Rendering
-- Inline code: Small pills with background color
-- Block code: Full code blocks with optional language label
-- Detects language from className (e.g., `language-typescript`)
-- Syntax highlighting friendly (ready for future enhancement)
+- **Inline code**: Small pills with background color
+- **Block code**: Full code blocks with syntax highlighting
+- **Language detection**: Automatically detects language from className (e.g., `language-typescript`)
+- **Syntax highlighting**: Uses Prism.js through `react-syntax-highlighter`
+- **Theme**: VS Code Dark+ theme for consistent, familiar appearance
+- **Line numbers**: Automatically shown for code blocks with more than 5 lines
+- **Copy button**: One-click copy to clipboard functionality
+- **Language label**: Shows language name in uppercase with copy button
+- **Supported languages**: All languages supported by Prism.js including:
+  - JavaScript, TypeScript, Python, Java, C#, C++, Go, Rust
+  - HTML, CSS, SCSS, JSON, YAML, XML
+  - SQL, Bash, Shell, PowerShell
+  - PHP, Ruby, Swift, Kotlin
+  - And many more...
 
 ### Accessibility Features
 - Proper semantic HTML structure
@@ -126,14 +138,23 @@ Visit [GitHub](https://github.com) for more info.
 - No lint errors
 - Component properly exported and imported
 
+## Implemented Features
+
+### ✅ Completed
+1. **Syntax highlighting** - ✅ Implemented with `react-syntax-highlighter`
+2. **Copy button** - ✅ One-click copy to clipboard for code blocks
+3. **Line numbers** - ✅ Automatic for code blocks > 5 lines
+4. **Language labels** - ✅ Shows detected language name
+
 ## Future Enhancements
 Potential improvements for future iterations:
-1. **Syntax highlighting** - Add `react-syntax-highlighter` for colored code
-2. **Math equations** - Add `remark-math` and `rehype-katex` for LaTeX support
-3. **Mermaid diagrams** - Add support for diagram rendering
-4. **Copy button** - Add copy-to-clipboard for code blocks
-5. **Image optimization** - Handle image rendering and lazy loading
-6. **Custom components** - Add custom renderers for specific use cases
+1. **Math equations** - Add `remark-math` and `rehype-katex` for LaTeX support
+2. **Mermaid diagrams** - Add support for diagram rendering
+3. **Image optimization** - Handle image rendering and lazy loading
+4. **Custom components** - Add custom renderers for specific use cases
+5. **Theme switcher** - Allow users to choose between light/dark syntax themes
+6. **Copy notification** - Show toast/feedback when code is copied
+7. **Download code** - Option to download code blocks as files
 
 ## Notes
 - All code comments are in English (per project guidelines)

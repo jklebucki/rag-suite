@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { Components } from 'react-markdown'
 
 interface MarkdownMessageProps {
@@ -26,11 +28,12 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
     li: ({ node, ...props }) => <li className="ml-2" {...props} />,
 
-    // Code blocks
+    // Code blocks with syntax highlighting
     code: ({ node, className, children, ...props }) => {
       const match = /language-(\w+)/.exec(className || '')
       const language = match ? match[1] : ''
       const isInline = !className
+      const codeString = String(children).replace(/\n$/, '')
 
       return isInline ? (
         <code
@@ -44,25 +47,46 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
           {children}
         </code>
       ) : (
-        <div className="my-3">
+        <div className="my-3 rounded-md overflow-hidden">
           {language && (
             <div
-              className={`text-xs px-3 py-1 rounded-t-md ${
+              className={`text-xs px-3 py-1.5 font-medium flex items-center justify-between ${
                 isUserMessage ? 'bg-blue-600/40 text-blue-100' : 'bg-gray-700 text-gray-300'
               }`}
             >
-              {language}
+              <span>{language.toUpperCase()}</span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(codeString)
+                }}
+                className="hover:bg-white/10 px-2 py-0.5 rounded text-[10px] transition-colors"
+                title="Copy code"
+              >
+                Copy
+              </button>
             </div>
           )}
-          <pre
-            className={`overflow-x-auto p-3 rounded-md ${language ? 'rounded-t-none' : ''} ${
-              isUserMessage ? 'bg-blue-600/20 text-white' : 'bg-gray-800 text-gray-100'
-            }`}
+          <SyntaxHighlighter
+            language={language || 'text'}
+            style={vscDarkPlus as any}
+            customStyle={{
+              margin: 0,
+              borderRadius: language ? '0 0 0.375rem 0.375rem' : '0.375rem',
+              fontSize: '0.75rem',
+              lineHeight: '1.5',
+            }}
+            codeTagProps={{
+              style: {
+                fontSize: '0.75rem',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              },
+            }}
+            showLineNumbers={codeString.split('\n').length > 5}
+            wrapLines={true}
+            wrapLongLines={false}
           >
-            <code className="text-xs md:text-sm font-mono" {...props}>
-              {children}
-            </code>
-          </pre>
+            {codeString}
+          </SyntaxHighlighter>
         </div>
       )
     },

@@ -356,6 +356,19 @@ public class UserChatService : IUserChatService
                     _languageService.GetLocalizedErrorMessage("generation_failed", normalizedResponseLanguage);
             }
 
+            // Extract summary from the LLM response and update session title if present
+            var (cleanedResponse, extractedSummary) = ExtractSummaryFromResponse(aiResponseContent);
+            
+            // Use cleaned response (without summary line) for saving
+            aiResponseContent = cleanedResponse;
+
+            // Update session title if summary was found
+            if (!string.IsNullOrWhiteSpace(extractedSummary))
+            {
+                dbSession.Title = extractedSummary;
+                _logger.LogInformation("Updated session {SessionId} title from LLM summary: {Title}", sessionId, extractedSummary);
+            }
+
             // Save AI response to database
             var aiDbMessage = new ChatMessage
             {
@@ -834,5 +847,40 @@ public class UserChatService : IUserChatService
         contextBuilder.AppendLine();
 
         return contextBuilder.ToString();
+    }
+
+    /// <summary>
+    /// Extracts summary from the last line of LLM response if it's enclosed in {} brackets.
+    /// Returns the cleaned response and the extracted summary.
+    /// </summary>
+    /// <param name="response">The LLM response text</param>
+    /// <returns>Tuple containing cleaned response and extracted summary (null if no summary found)</returns>
+    private (string cleanedResponse, string? extractedSummary) ExtractSummaryFromResponse(string response)
+    {
+        if (string.IsNullOrWhiteSpace(response))
+            return (response, null);
+
+        var lines = response.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        if (lines.Length == 0)
+            return (response, null);
+
+        var lastLine = lines[^1].Trim();
+
+        // Check if the last line contains a summary enclosed in {}
+        var match = System.Text.RegularExpressions.Regex.Match(lastLine, @"^\{(.+)\}$");
+        if (match.Success)
+        {
+            var summary = match.Groups[1].Value.Trim();
+            
+            // Remove the last line from the response
+            var cleanedLines = lines.Take(lines.Length - 1).ToArray();
+            var cleanedResponse = string.Join(Environment.NewLine, cleanedLines).TrimEnd();
+
+            _logger.LogInformation("Extracted summary from LLM response: {Summary}", summary);
+            
+            return (cleanedResponse, summary);
+        }
+
+        return (response, null);
     }
 }
