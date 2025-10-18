@@ -5,6 +5,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { MessageSources } from './MessageSources'
+import { MarkdownMessage } from './MarkdownMessage'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import type { ChatMessage } from '@/types'
@@ -79,7 +80,7 @@ export function ChatInterface() {
                     )}
                   </div>
                   <div className={`max-w-[85%] md:max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-3 md:p-4`}>
-                    <div className="whitespace-pre-wrap text-sm md:text-base break-words">{msg.content}</div>
+                    <MarkdownMessage content={msg.content} isUserMessage={msg.role === 'user'} />
 
                     {/* Sources for assistant messages */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
