@@ -83,7 +83,7 @@ export default function ChatInterface() {
                       <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600" />
                     )}
                   </div>
-                  <div className={`max-w-[85%] md:max-w-3xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-3 md:p-4`}>
+                  <div className={`max-w-[85%] md:max-w-5xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-3 md:p-4`}>
                     <MarkdownMessage content={msg.content} isUserMessage={msg.role === 'user'} />
 
                     {/* Sources for assistant messages */}

@@ -24,7 +24,7 @@ export function ChatSidebar({
   const { t, language } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,30 +32,30 @@ export function ChatSidebar({
         setIsMenuOpen(false)
       }
     }
-    
+
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isMenuOpen])
-  
+
   // Helper function to check if title is a default conversation title
   const isDefaultTitle = (title: string | null | undefined): boolean => {
     if (!title) return true
     // Check for common default titles that should be localized
     const defaultTitles = [
       'New Conversation',
-      'Nowa rozmowa', 
+      'Nowa rozmowa',
       'Conversație nouă',
       'Új beszélgetés',
       'Nieuw gesprek'
     ]
     return defaultTitles.includes(title)
   }
-  
+
   return (
     <>
       {/* Mobile topbar: hamburger menu with sessions list */}
@@ -86,7 +86,7 @@ export function ChatSidebar({
                 <div className="p-2">
                   {sessions.length > 0 ? (
                     sessions.map((session) => (
-                      <button
+                      <div
                         key={session.id}
                         className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                           currentSessionId === session.id
@@ -99,8 +99,13 @@ export function ChatSidebar({
                         }}
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {isDefaultTitle(session.title) 
+                          <p className="text-sm font-medium text-gray-900 truncate"
+                            title={isDefaultTitle(session.title)
+                              ? t('chat.new_conversation')
+                              : session.title
+                            }
+                          >
+                            {isDefaultTitle(session.title)
                               ? t('chat.new_conversation')
                               : session.title
                             }
@@ -119,7 +124,7 @@ export function ChatSidebar({
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                      </button>
+                      </div>
                     ))
                   ) : (
                     <div className="p-3 text-center">
@@ -151,7 +156,7 @@ export function ChatSidebar({
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 space-y-2">
             {sessions.map((session) => (
-              <button
+              <div
                 key={session.id}
                 className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                   currentSessionId === session.id
@@ -162,7 +167,7 @@ export function ChatSidebar({
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {isDefaultTitle(session.title) 
+                    {isDefaultTitle(session.title)
                       ? t('chat.new_conversation')
                       : session.title
                     }
@@ -181,7 +186,7 @@ export function ChatSidebar({
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         </div>
