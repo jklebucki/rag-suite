@@ -57,7 +57,7 @@ export default function ChatInterface() {
   }, [isNewSession, setIsNewSession])
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] max-w-7xl mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] w-[95%] mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
       {/* Sidebar - Chat Sessions */}
       <ChatSidebar
         sessions={sessions}
