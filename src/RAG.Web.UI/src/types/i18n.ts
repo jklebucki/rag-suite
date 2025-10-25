@@ -335,6 +335,11 @@ export interface TranslationKeys {
   'cyberpanel.loadingQuiz': string;
   'cyberpanel.quizNotFound': string;
   'cyberpanel.retakeQuiz': string;
+  'cyberpanel.noResultsYet': string;
+  'cyberpanel.takeFirstQuiz': string;
+  'cyberpanel.browseQuizzes': string;
+  'cyberpanel.viewQuiz': string;
+  'cyberpanel.score': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;

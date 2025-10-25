@@ -33,7 +33,8 @@ import type {
   ImportQuizRequest,
   ImportQuizResponse,
   SubmitAttemptRequest,
-  SubmitAttemptResponse
+  SubmitAttemptResponse,
+  ListAttemptsResponse
 } from '@/types'
 
 class ApiClient {
@@ -371,6 +372,14 @@ class ApiClient {
    */
   async updateQuiz(quizId: string, request: CreateQuizRequest): Promise<CreateQuizResponse> {
     const response = await this.client.put(`/cyberpanel/quizzes/${quizId}`, request)
+    return response.data
+  }
+
+  /**
+   * List all quiz attempts/results for current user
+   */
+  async listQuizAttempts(): Promise<ListAttemptsResponse> {
+    const response = await this.client.get('/cyberpanel/quizzes/attempts')
     return response.data
   }
 }

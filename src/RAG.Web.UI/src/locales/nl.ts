@@ -233,7 +233,12 @@ export const nl: TranslationKeys = {
   'cyberpanel.submitting': 'Submitting...',
   'cyberpanel.loadingQuiz': 'Loading quiz...',
   'cyberpanel.quizNotFound': 'Quiz not found',
-  'cyberpanel.retakeQuiz': 'Retake Quiz',
+  'cyberpanel.retakeQuiz': 'Quiz Opnieuw Doen',
+  'cyberpanel.noResultsYet': 'Nog geen resultaten',
+  'cyberpanel.takeFirstQuiz': 'Maak je eerste quiz om resultaten te zien',
+  'cyberpanel.browseQuizzes': 'Bekijk Quizzen',
+  'cyberpanel.viewQuiz': 'Bekijk Quiz',
+  'cyberpanel.score': 'Score',
 
   'auth.reset_confirm.title': 'Nieuw Wachtwoord Instellen',
   'auth.reset_confirm.subtitle': 'Voer je nieuwe wachtwoord hieronder in.',

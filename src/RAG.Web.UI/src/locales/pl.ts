@@ -315,5 +315,10 @@ export const pl: TranslationKeys = {
   'cyberpanel.submitting': 'Wysyłanie...',
   'cyberpanel.loadingQuiz': 'Ładowanie quizu...',
   'cyberpanel.quizNotFound': 'Quiz nie został znaleziony',
-  'cyberpanel.retakeQuiz': 'Rozwiąż ponownie',
+  'cyberpanel.retakeQuiz': 'Powtórz Quiz',
+  'cyberpanel.noResultsYet': 'Brak wyników',
+  'cyberpanel.takeFirstQuiz': 'Rozwiąż pierwszy quiz, aby zobaczyć wyniki',
+  'cyberpanel.browseQuizzes': 'Przeglądaj Quizy',
+  'cyberpanel.viewQuiz': 'Zobacz Quiz',
+  'cyberpanel.score': 'Wynik',
 };

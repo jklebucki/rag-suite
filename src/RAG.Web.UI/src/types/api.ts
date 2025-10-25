@@ -474,3 +474,20 @@ export interface SubmitAttemptResponse {
     maxPoints: number
   }[]
 }
+
+// List Quiz Attempts (Results)
+export interface QuizAttemptDto {
+  id: string
+  quizId: string
+  quizTitle: string
+  score: number
+  maxScore: number
+  percentageScore: number
+  submittedAt: string | Date
+  questionCount: number
+  correctAnswers: number
+}
+
+export interface ListAttemptsResponse {
+  attempts: QuizAttemptDto[]
+}

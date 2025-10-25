@@ -8,6 +8,7 @@ using RAG.CyberPanel.Features.CreateQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetQuiz;
 using RAG.CyberPanel.Features.ImportQuiz;
+using RAG.CyberPanel.Features.ListAttempts;
 using RAG.CyberPanel.Features.ListQuizzes;
 using RAG.CyberPanel.Features.SubmitAttempt;
 using RAG.CyberPanel.Services;
@@ -34,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SubmitAttemptHandler>();
         services.AddScoped<GetQuizService>();
         services.AddScoped<ListQuizzesService>();
+        services.AddScoped<ListAttemptsHandler>();
         services.AddScoped<ExportQuizService>();
         services.AddScoped<ImportQuizHandler>();
 

@@ -316,4 +316,9 @@ export const en: TranslationKeys = {
   'cyberpanel.loadingQuiz': 'Loading quiz...',
   'cyberpanel.quizNotFound': 'Quiz not found',
   'cyberpanel.retakeQuiz': 'Retake Quiz',
+  'cyberpanel.noResultsYet': 'No results yet',
+  'cyberpanel.takeFirstQuiz': 'Take your first quiz to see results',
+  'cyberpanel.browseQuizzes': 'Browse Quizzes',
+  'cyberpanel.viewQuiz': 'View Quiz',
+  'cyberpanel.score': 'Score',
 };

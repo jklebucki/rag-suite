@@ -104,7 +104,12 @@ export const ro: TranslationKeys = {
   'cyberpanel.submitting': 'Submitting...',
   'cyberpanel.loadingQuiz': 'Loading quiz...',
   'cyberpanel.quizNotFound': 'Quiz not found',
-  'cyberpanel.retakeQuiz': 'Retake Quiz',
+  'cyberpanel.retakeQuiz': 'Reia Quiz-ul',
+  'cyberpanel.noResultsYet': 'Încă nu sunt rezultate',
+  'cyberpanel.takeFirstQuiz': 'Rezolvă primul quiz pentru a vedea rezultatele',
+  'cyberpanel.browseQuizzes': 'Răsfoiește Quiz-urile',
+  'cyberpanel.viewQuiz': 'Vezi Quiz-ul',
+  'cyberpanel.score': 'Scor',
 
   // Common
   'common.loading': 'Se încarcă...',
