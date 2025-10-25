@@ -355,7 +355,7 @@ class ApiClient {
    * Submit quiz attempt and get results
    */
   async submitQuizAttempt(request: SubmitAttemptRequest): Promise<SubmitAttemptResponse> {
-    const response = await this.client.post('/cyberpanel/quizzes/submit', request)
+    const response = await this.client.post(`/cyberpanel/quizzes/${request.quizId}/attempts`, request)
     return response.data
   }
 
