@@ -23,7 +23,17 @@ import type {
   LlmSettings,
   LlmSettingsRequest,
   LlmSettingsResponse,
-  AvailableModelsResponse
+  AvailableModelsResponse,
+  // CyberPanel types
+  ListQuizzesResponse,
+  GetQuizResponse,
+  CreateQuizRequest,
+  CreateQuizResponse,
+  ExportQuizResponse,
+  ImportQuizRequest,
+  ImportQuizResponse,
+  SubmitAttemptRequest,
+  SubmitAttemptResponse
 } from '@/types'
 
 class ApiClient {
@@ -296,6 +306,71 @@ class ApiClient {
       isOllama: isOllama.toString()
     })
     const response = await this.client.get(`/settings/llm/models?${params}`)
+    return response.data
+  }
+
+  // CyberPanel Quiz API methods
+  
+  /**
+   * List all quizzes
+   */
+  async listQuizzes(): Promise<ListQuizzesResponse> {
+    const response = await this.client.get('/cyberpanel/quizzes')
+    return response.data
+  }
+
+  /**
+   * Get a specific quiz by ID (for quiz takers - without correct answers)
+   */
+  async getQuiz(quizId: string): Promise<GetQuizResponse> {
+    const response = await this.client.get(`/cyberpanel/quizzes/${quizId}`)
+    return response.data
+  }
+
+  /**
+   * Create a new quiz
+   */
+  async createQuiz(request: CreateQuizRequest): Promise<CreateQuizResponse> {
+    const response = await this.client.post('/cyberpanel/quizzes', request)
+    return response.data
+  }
+
+  /**
+   * Export quiz to JSON format (includes correct answers and metadata)
+   */
+  async exportQuiz(quizId: string): Promise<ExportQuizResponse> {
+    const response = await this.client.get(`/cyberpanel/quizzes/${quizId}/export`)
+    return response.data
+  }
+
+  /**
+   * Import quiz from JSON (create new or overwrite existing)
+   */
+  async importQuiz(request: ImportQuizRequest): Promise<ImportQuizResponse> {
+    const response = await this.client.post('/cyberpanel/quizzes/import', request)
+    return response.data
+  }
+
+  /**
+   * Submit quiz attempt and get results
+   */
+  async submitQuizAttempt(request: SubmitAttemptRequest): Promise<SubmitAttemptResponse> {
+    const response = await this.client.post('/cyberpanel/quizzes/submit', request)
+    return response.data
+  }
+
+  /**
+   * Delete a quiz by ID
+   */
+  async deleteQuiz(quizId: string): Promise<void> {
+    await this.client.delete(`/cyberpanel/quizzes/${quizId}`)
+  }
+
+  /**
+   * Update/Edit an existing quiz
+   */
+  async updateQuiz(quizId: string, request: CreateQuizRequest): Promise<CreateQuizResponse> {
+    const response = await this.client.put(`/cyberpanel/quizzes/${quizId}`, request)
     return response.data
   }
 }
