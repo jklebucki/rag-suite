@@ -133,8 +133,9 @@ export default function QuizDetail() {
 
   // Results view
   if (result) {
-    const correctCount = result.answers.filter((a) => a.isCorrect).length
-    const incorrectCount = result.answers.filter((a) => !a.isCorrect).length
+    const correctCount = result.perQuestionResults.filter((a) => a.correct).length
+    const incorrectCount = result.perQuestionResults.filter((a) => !a.correct).length
+    const percentageScore = (result.score / result.maxScore) * 100
 
     return (
       <div className="max-w-4xl">
@@ -152,7 +153,7 @@ export default function QuizDetail() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">{result.percentageScore.toFixed(1)}%</p>
+                <p className="text-2xl font-bold text-blue-600">{percentageScore.toFixed(1)}%</p>
                 <p className="text-sm text-gray-600">{t('cyberpanel.percentage')}</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -185,14 +186,15 @@ export default function QuizDetail() {
         {/* Answer details */}
         <div className="space-y-4">
           {quiz.questions.map((question, qIdx) => {
-            const answerResult = result.answers.find((a) => a.questionId === question.id)
+            const answerResult = result.perQuestionResults.find((a) => a.questionId === question.id)
+            const userAnswers = answers[question.id] || []
             if (!answerResult) return null
 
             return (
               <Card key={question.id}>
                 <CardHeader>
                   <div className="flex items-start gap-3">
-                    {answerResult.isCorrect ? (
+                    {answerResult.correct ? (
                       <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
                     ) : (
                       <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
@@ -210,11 +212,11 @@ export default function QuizDetail() {
                         />
                       )}
                       <div className="flex items-center gap-4 text-sm">
-                        <span className={answerResult.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                          {answerResult.isCorrect ? t('cyberpanel.correct') : t('cyberpanel.incorrect')}
+                        <span className={answerResult.correct ? 'text-green-600' : 'text-red-600'}>
+                          {answerResult.correct ? t('cyberpanel.correct') : t('cyberpanel.incorrect')}
                         </span>
                         <span className="text-gray-600">
-                          {answerResult.pointsEarned}/{answerResult.maxPoints} {t('cyberpanel.points')}
+                          {answerResult.pointsAwarded}/{answerResult.maxPoints} {t('cyberpanel.points')}
                         </span>
                       </div>
                     </div>
@@ -223,14 +225,14 @@ export default function QuizDetail() {
                 <CardContent>
                   <div className="space-y-2">
                     {question.options.map((option) => {
-                      const wasSelected = answerResult.selectedOptionIds.includes(option.id)
+                      const wasSelected = userAnswers.includes(option.id)
                       
                       return (
                         <div
                           key={option.id}
                           className={`p-3 rounded-lg border-2 ${
                             wasSelected
-                              ? answerResult.isCorrect
+                              ? answerResult.correct
                                 ? 'border-green-500 bg-green-50'
                                 : 'border-red-500 bg-red-50'
                               : 'border-gray-200 bg-gray-50'

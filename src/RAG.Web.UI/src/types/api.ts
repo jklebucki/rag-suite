@@ -465,13 +465,12 @@ export interface SubmitAttemptResponse {
   quizId: string
   score: number
   maxScore: number
-  percentageScore: number
-  submittedAt: string | Date
-  answers: {
+  percentageScore?: number
+  submittedAt?: string | Date
+  perQuestionResults: {
     questionId: string
-    selectedOptionIds: string[]
-    isCorrect: boolean
-    pointsEarned: number
+    correct: boolean
+    pointsAwarded: number
     maxPoints: number
   }[]
 }
