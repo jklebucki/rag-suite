@@ -311,6 +311,7 @@ export interface TranslationKeys {
   'cyberpanel.actions': string;
   'cyberpanel.noQuizzesYet': string;
   'cyberpanel.createFirstQuiz': string;
+  'cyberpanel.takeQuiz': string;
   'cyberpanel.startQuiz': string;
   'cyberpanel.submitAnswers': string;
   'cyberpanel.backToQuizzes': string;

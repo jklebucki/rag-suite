@@ -292,6 +292,7 @@ export const pl: TranslationKeys = {
   'cyberpanel.actions': 'Akcje',
   'cyberpanel.noQuizzesYet': 'Brak quizów',
   'cyberpanel.createFirstQuiz': 'Utwórz pierwszy quiz, aby rozpocząć',
+  'cyberpanel.takeQuiz': 'Rozwiąż quiz',
   'cyberpanel.startQuiz': 'Rozpocznij quiz',
   'cyberpanel.submitAnswers': 'Wyślij odpowiedzi',
   'cyberpanel.backToQuizzes': 'Powrót do quizów',

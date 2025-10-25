@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@/contexts/I18nContext'
 import { useToast } from '@/contexts'
 import { useQuizzes } from '@/hooks/useQuizzes'
@@ -6,26 +7,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmModal } from '@/components/ui'
 import QuizBuilder from './QuizBuilder'
-import { Download, Upload, Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Play } from 'lucide-react'
 import type { QuizListItem } from '@/types'
 
 export default function Quizzes() {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const { showSuccess, showError } = useToast()
   const {
     quizzes,
     loading,
     error,
     fetchQuizzes,
-    deleteQuiz,
-    exportQuiz,
-    importFromFile
+    deleteQuiz
   } = useQuizzes()
 
   const [showBuilder, setShowBuilder] = useState(false)
   const [editQuizId, setEditQuizId] = useState<string | null>(null)
   const [deleteConfirmQuiz, setDeleteConfirmQuiz] = useState<QuizListItem | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchQuizzes()
@@ -41,6 +40,10 @@ export default function Quizzes() {
     setShowBuilder(true)
   }
 
+  const handleRunQuiz = (quizId: string) => {
+    navigate(`/cyberpanel/quizzes/${quizId}`)
+  }
+
   const handleDeleteQuiz = async () => {
     if (!deleteConfirmQuiz) return
 
@@ -51,50 +54,6 @@ export default function Quizzes() {
       showError(t('cyberpanel.deleteError'))
     }
     setDeleteConfirmQuiz(null)
-  }
-
-  const handleExportQuiz = async (quizId: string, title: string) => {
-    const result = await exportQuiz(quizId)
-    if (result) {
-      // Trigger download
-      const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      showSuccess(t('cyberpanel.exportSuccess'))
-    } else {
-      showError(t('cyberpanel.importError'))
-    }
-  }
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      const result = await importFromFile(file)
-      if (result) {
-        showSuccess(t('cyberpanel.importSuccess'))
-      } else {
-        showError(t('cyberpanel.importError'))
-      }
-    } catch (err) {
-      showError(t('cyberpanel.importError'))
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
   }
 
   const handleBuilderClose = () => {
@@ -121,24 +80,11 @@ export default function Quizzes() {
         <h3 className="text-xl md:text-2xl font-bold">{t('cyberpanel.quizzes')}</h3>
         
         <div className="flex gap-2 flex-wrap">
-          <Button onClick={handleImportClick} variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            {t('cyberpanel.importQuiz')}
-          </Button>
           <Button onClick={handleNewQuiz} variant="primary" size="sm">
             <Plus className="w-4 h-4 mr-2" />
             {t('cyberpanel.newQuiz')}
           </Button>
         </div>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json,application/json"
-          onChange={handleFileSelected}
-          className="hidden"
-          aria-label={t('cyberpanel.selectJsonFile')}
-        />
       </div>
 
       {loading && !quizzes && (
@@ -190,12 +136,12 @@ export default function Quizzes() {
 
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => handleExportQuiz(quiz.id, quiz.title)}
-                      variant="outline"
+                      onClick={() => handleRunQuiz(quiz.id)}
+                      variant="primary"
                       size="sm"
-                      title={t('cyberpanel.exportQuiz')}
+                      title={t('cyberpanel.takeQuiz')}
                     >
-                      <Download className="w-4 h-4" />
+                      <Play className="w-4 h-4" />
                     </Button>
                     <Button
                       onClick={() => handleEditQuiz(quiz.id)}

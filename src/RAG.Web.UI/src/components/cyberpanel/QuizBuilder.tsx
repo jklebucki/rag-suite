@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useQuizzes } from '@/hooks'
 import { useToast } from '@/contexts/ToastContext'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui'
 import { Input } from '@/components/ui'
 import { Textarea } from '@/components/ui'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { Trash2, Plus, Image as ImageIcon, X, Save, Eye, ChevronUp, ChevronDown } from 'lucide-react'
+import { Trash2, Plus, Image as ImageIcon, X, Save, Eye, ChevronUp, ChevronDown, Download, Upload } from 'lucide-react'
 
 interface QuizBuilderProps {
   editQuizId?: string | null
@@ -19,7 +19,7 @@ interface QuizBuilderProps {
 
 export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) {
   const { t } = useI18n()
-  const { createQuiz, updateQuiz, loading } = useQuizzes()
+  const { createQuiz, updateQuiz, loading, exportQuiz, importFromFile } = useQuizzes()
   const { showSuccess, showError } = useToast()
 
   const [title, setTitle] = useState('')
@@ -28,6 +28,7 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
   const [questions, setQuestions] = useState<CreateQuizQuestionDto[]>([])
   const [preview, setPreview] = useState(false)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load quiz for editing
   useEffect(() => {
@@ -212,6 +213,59 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
     setPreview(false)
   }
 
+  const handleExportQuiz = async () => {
+    if (!editQuizId) {
+      showError('Please save the quiz first before exporting')
+      return
+    }
+
+    const result = await exportQuiz(editQuizId)
+    if (result) {
+      // Trigger download
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      showSuccess(t('cyberpanel.exportSuccess'))
+    } else {
+      showError(t('cyberpanel.importError'))
+    }
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const result = await importFromFile(file)
+      if (result) {
+        showSuccess(t('cyberpanel.importSuccess'))
+        // Load the imported quiz for editing
+        if (result.quizId) {
+          loadQuizForEdit(result.quizId)
+        }
+      } else {
+        showError(t('cyberpanel.importError'))
+      }
+    } catch (err) {
+      showError(t('cyberpanel.importError'))
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   if (preview) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -293,6 +347,16 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
               {t('common.cancel')}
             </Button>
           )}
+          {editQuizId && (
+            <Button onClick={handleExportQuiz} variant="outline" size="sm">
+              <Download className="w-4 h-4 mr-2" />
+              {t('cyberpanel.exportQuiz')}
+            </Button>
+          )}
+          <Button onClick={handleImportClick} variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" />
+            {t('cyberpanel.importQuiz')}
+          </Button>
           <Button onClick={() => setPreview(true)} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
             {t('cyberpanel.preview')}
@@ -303,6 +367,15 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
           </Button>
         </div>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        onChange={handleFileSelected}
+        className="hidden"
+        aria-label={t('cyberpanel.selectJsonFile')}
+      />
 
       {validationErrors.length > 0 && (
         <Card className="mb-6 border-red-500">

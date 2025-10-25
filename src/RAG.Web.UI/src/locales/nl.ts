@@ -210,6 +210,7 @@ export const nl: TranslationKeys = {
   'cyberpanel.actions': 'Actions',
   'cyberpanel.noQuizzesYet': 'No quizzes yet',
   'cyberpanel.createFirstQuiz': 'Create your first quiz to get started',
+  'cyberpanel.takeQuiz': 'Take Quiz',
   'cyberpanel.startQuiz': 'Start Quiz',
   'cyberpanel.submitAnswers': 'Submit Answers',
   'cyberpanel.backToQuizzes': 'Back to Quizzes',
