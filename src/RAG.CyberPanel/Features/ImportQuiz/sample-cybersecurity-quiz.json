@@ -1,0 +1,294 @@
+{
+  "title": "Cybersecurity Fundamentals Quiz",
+  "description": "Test your knowledge of basic cybersecurity concepts, threats, and best practices. This quiz covers essential topics including phishing, password security, malware, encryption, and network security.",
+  "isPublished": true,
+  "createNew": true,
+  "overwriteQuizId": null,
+  "questions": [
+    {
+      "text": "What is phishing?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "A type of malware that encrypts your files",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A social engineering attack that tricks users into revealing sensitive information",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "A hardware device used to protect networks",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A method of encrypting network traffic",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which of the following is the STRONGEST password?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Password123",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "qwerty2024",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "T$9mK#pL@2xR!vN8",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "MyBirthday1990",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "What does HTTPS stand for?",
+      "imageUrl": null,
+      "points": 5,
+      "options": [
+        {
+          "text": "HyperText Transfer Protocol Secure",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "High Transfer Protocol System",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "HyperText Transmission Protection Service",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Hosting Transfer Protocol Standard",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which of the following are common types of malware? (Select all that apply)",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        {
+          "text": "Trojan Horse",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Ransomware",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Firewall",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Spyware",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "VPN",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "What is two-factor authentication (2FA)?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Using two different passwords for the same account",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A security process requiring two different authentication methods to verify identity",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Logging in from two different devices simultaneously",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Having two user accounts on the same system",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "What is the primary purpose of a firewall?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "To encrypt data stored on hard drives",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "To create backup copies of important files",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "To monitor and control incoming and outgoing network traffic",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "To scan for viruses in email attachments",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which protocol is used to securely transfer files over a network?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "HTTP",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "FTP",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "SFTP",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "SMTP",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "What is SQL injection?",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        {
+          "text": "A method to optimize database queries",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "An attack that inserts malicious SQL code into application queries",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "A technique for backing up databases",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A way to encrypt database connections",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "What does VPN stand for and what is its main purpose?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Virtual Private Network - creates a secure encrypted connection over the internet",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Verified Protection Network - verifies user identities before network access",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Virtual Public Network - provides public access to private resources",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Variable Port Network - changes network ports dynamically for security",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Which of these practices help prevent security breaches? (Select all that apply)",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        {
+          "text": "Regular software updates and patches",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Using the same password for all accounts",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Employee security awareness training",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Disabling antivirus to improve performance",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Regular security audits and penetration testing",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Storing passwords in plain text files",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

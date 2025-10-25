@@ -7,6 +7,7 @@ using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Features.CreateQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetQuiz;
+using RAG.CyberPanel.Features.ImportQuiz;
 using RAG.CyberPanel.Features.ListQuizzes;
 using RAG.CyberPanel.Features.SubmitAttempt;
 using RAG.CyberPanel.Services;
@@ -34,10 +35,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetQuizService>();
         services.AddScoped<ListQuizzesService>();
         services.AddScoped<ExportQuizService>();
+        services.AddScoped<ImportQuizHandler>();
 
         // Register validators
         services.AddScoped<IValidator<CreateQuizRequest>, CreateQuizValidator>();
         services.AddScoped<IValidator<SubmitAttemptRequest>, SubmitAttemptValidator>();
+        services.AddScoped<IValidator<ImportQuizRequest>, ImportQuizValidator>();
 
         return services;
     }

@@ -1,0 +1,88 @@
+### Import Quiz - Sample Request
+
+POST {{baseUrl}}/api/cyberpanel/quizzes/import
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cybersecurity Fundamentals Quiz",
+  "description": "Test your knowledge of basic cybersecurity concepts, threats, and best practices. This quiz covers essential topics including phishing, password security, malware, encryption, and network security.",
+  "isPublished": true,
+  "createNew": true,
+  "overwriteQuizId": null,
+  "questions": [
+    {
+      "text": "What is phishing?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "A type of malware that encrypts your files",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A social engineering attack that tricks users into revealing sensitive information",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "A hardware device used to protect networks",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "A method of encrypting network traffic",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}
+
+### Import Full Sample Quiz from File
+
+# Using curl with the sample file
+# curl -X POST http://localhost:5000/api/cyberpanel/quizzes/import \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -d @sample-cybersecurity-quiz.json
+
+### Export Quiz
+
+GET {{baseUrl}}/api/cyberpanel/quizzes/{{quizId}}/export
+Authorization: Bearer {{token}}
+
+### Overwrite Existing Quiz
+
+POST {{baseUrl}}/api/cyberpanel/quizzes/import
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Updated Quiz Title",
+  "description": "Updated description",
+  "isPublished": true,
+  "createNew": false,
+  "overwriteQuizId": "550e8400-e29b-41d4-a716-446655440000",
+  "questions": [
+    {
+      "text": "Updated question?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Option A",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Option B",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using RAG.CyberPanel.Features.CreateQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetQuiz;
+using RAG.CyberPanel.Features.ImportQuiz;
 using RAG.CyberPanel.Features.ListQuizzes;
 using RAG.CyberPanel.Features.SubmitAttempt;
 
@@ -27,6 +28,7 @@ public static class CyberPanelEndpoints
         group.MapCreateQuiz();
         group.MapSubmitAttempt();
         group.MapExportQuiz();
+        group.MapImportQuiz();
 
         return group;
     }
