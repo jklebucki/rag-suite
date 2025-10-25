@@ -296,3 +296,182 @@ export interface LlmSettingsResponse {
 export interface AvailableModelsResponse {
   models: string[]
 }
+
+// CyberPanel Quiz Types
+export interface QuizOption {
+  id?: string
+  text: string
+  imageUrl?: string | null
+  isCorrect?: boolean // Only present in CreateQuiz/ExportQuiz, not in GetQuiz for quiz takers
+}
+
+export interface QuizQuestion {
+  id?: string
+  text: string
+  imageUrl?: string | null
+  points: number
+  order?: number
+  options: QuizOption[]
+}
+
+export interface Quiz {
+  id: string
+  title: string
+  description?: string | null
+  createdByUserId: string
+  createdAt: string | Date
+  isPublished: boolean
+  questions: QuizQuestion[]
+}
+
+// List Quizzes
+export interface QuizListItem {
+  id: string
+  title: string
+  description?: string | null
+  isPublished: boolean
+  createdAt: string | Date
+  questionCount: number
+}
+
+export interface ListQuizzesResponse {
+  quizzes: QuizListItem[]
+  total: number
+}
+
+// Get Quiz (for quiz takers - without correct answers)
+export interface QuizOptionDto {
+  id: string
+  text: string
+  imageUrl?: string | null
+}
+
+export interface QuizQuestionDto {
+  id: string
+  text: string
+  imageUrl?: string | null
+  points: number
+  options: QuizOptionDto[]
+}
+
+export interface GetQuizResponse {
+  id: string
+  title: string
+  description?: string | null
+  isPublished: boolean
+  questions: QuizQuestionDto[]
+}
+
+// Create Quiz
+export interface CreateQuizOptionDto {
+  id?: string | null
+  text: string
+  imageUrl?: string | null
+  isCorrect: boolean
+}
+
+export interface CreateQuizQuestionDto {
+  id?: string | null
+  text: string
+  imageUrl?: string | null
+  points: number
+  options: CreateQuizOptionDto[]
+}
+
+export interface CreateQuizRequest {
+  title: string
+  description?: string | null
+  isPublished: boolean
+  questions: CreateQuizQuestionDto[]
+}
+
+export interface CreateQuizResponse {
+  id: string
+  title: string
+}
+
+// Export Quiz
+export interface ExportedOptionDto {
+  id: string
+  text: string
+  imageUrl?: string | null
+  isCorrect: boolean
+}
+
+export interface ExportedQuestionDto {
+  id: string
+  text: string
+  imageUrl?: string | null
+  order: number
+  points: number
+  options: ExportedOptionDto[]
+}
+
+export interface ExportQuizResponse {
+  id: string
+  title: string
+  description?: string | null
+  createdByUserId: string
+  createdAt: string | Date
+  isPublished: boolean
+  questions: ExportedQuestionDto[]
+  exportVersion: string
+  exportedAt: string | Date
+}
+
+// Import Quiz
+export interface ImportedOptionDto {
+  text: string
+  imageUrl?: string | null
+  isCorrect: boolean
+}
+
+export interface ImportedQuestionDto {
+  text: string
+  imageUrl?: string | null
+  points: number
+  options: ImportedOptionDto[]
+}
+
+export interface ImportQuizRequest {
+  title: string
+  description?: string | null
+  isPublished: boolean
+  questions: ImportedQuestionDto[]
+  createNew?: boolean
+  overwriteQuizId?: string | null
+}
+
+export interface ImportQuizResponse {
+  quizId: string
+  title: string
+  questionsImported: number
+  optionsImported: number
+  wasOverwritten: boolean
+  importedAt: string | Date
+}
+
+// Submit Quiz Attempt
+export interface SubmitAttemptRequest {
+  quizId: string
+  answers: {
+    questionId: string
+    selectedOptionIds: string[]
+  }[]
+}
+
+export interface SubmitAttemptResponse {
+  attemptId: string
+  quizId: string
+  score: number
+  maxScore: number
+  percentageScore: number
+  submittedAt: string | Date
+  answers: {
+    questionId: string
+    selectedOptionIds: string[]
+    isCorrect: boolean
+    pointsEarned: number
+    maxPoints: number
+  }[]
+}
