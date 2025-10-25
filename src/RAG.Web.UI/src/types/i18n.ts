@@ -311,6 +311,29 @@ export interface TranslationKeys {
   'cyberpanel.actions': string;
   'cyberpanel.noQuizzesYet': string;
   'cyberpanel.createFirstQuiz': string;
+  'cyberpanel.startQuiz': string;
+  'cyberpanel.submitAnswers': string;
+  'cyberpanel.backToQuizzes': string;
+  'cyberpanel.quizResults': string;
+  'cyberpanel.yourScore': string;
+  'cyberpanel.correctAnswers': string;
+  'cyberpanel.incorrectAnswers': string;
+  'cyberpanel.totalPoints': string;
+  'cyberpanel.earnedPoints': string;
+  'cyberpanel.percentage': string;
+  'cyberpanel.questionNumber': string;
+  'cyberpanel.selectAnswers': string;
+  'cyberpanel.correct': string;
+  'cyberpanel.incorrect': string;
+  'cyberpanel.notAnswered': string;
+  'cyberpanel.answerDetails': string;
+  'cyberpanel.yourAnswers': string;
+  'cyberpanel.correctAnswerWas': string;
+  'cyberpanel.pleaseSelectAnswer': string;
+  'cyberpanel.submitting': string;
+  'cyberpanel.loadingQuiz': string;
+  'cyberpanel.quizNotFound': string;
+  'cyberpanel.retakeQuiz': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;
