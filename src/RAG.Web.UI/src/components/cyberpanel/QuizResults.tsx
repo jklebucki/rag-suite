@@ -31,8 +31,8 @@ export default function QuizResults() {
     }
   }
 
-  const handleViewQuiz = (quizId: string) => {
-    navigate(`/cyberpanel/quizzes/${quizId}`)
+  const handleViewQuiz = (attemptId: string) => {
+    navigate(`/cyberpanel/attempts/${attemptId}`)
   }
 
   const getScoreColor = (percentage: number) => {
@@ -110,15 +110,17 @@ export default function QuizResults() {
                           </span>
                         </div>
                         <span>•</span>
+                        <span>{attempt.userName}</span>
+                        <span>•</span>
                         <span>{attempt.questionCount} {t('cyberpanel.questions')}</span>
                       </div>
                     </div>
 
                     <Button
-                      onClick={() => handleViewQuiz(attempt.quizId)}
+                      onClick={() => handleViewQuiz(attempt.id)}
                       variant="outline"
                       size="sm"
-                      title={t('cyberpanel.viewQuiz')}
+                      title={t('cyberpanel.viewDetails')}
                     >
                       <ArrowRight className="w-4 h-4" />
                     </Button>

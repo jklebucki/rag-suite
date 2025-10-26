@@ -239,6 +239,12 @@ export const nl: TranslationKeys = {
   'cyberpanel.browseQuizzes': 'Bekijk Quizzen',
   'cyberpanel.viewQuiz': 'Bekijk Quiz',
   'cyberpanel.score': 'Score',
+  'cyberpanel.userName': 'Gebruiker',
+  'cyberpanel.submittedAt': 'Ingediend op',
+  'cyberpanel.backToResults': 'Terug naar Resultaten',
+  'cyberpanel.yourAnswer': 'Jouw antwoord (onjuist)',
+  'cyberpanel.yourCorrectAnswer': 'Jouw antwoord (correct)',
+  'cyberpanel.viewDetails': 'Bekijk Details',
 
   'auth.reset_confirm.title': 'Nieuw Wachtwoord Instellen',
   'auth.reset_confirm.subtitle': 'Voer je nieuwe wachtwoord hieronder in.',

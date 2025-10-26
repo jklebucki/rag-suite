@@ -15,6 +15,7 @@ const Quizzes = lazy(() => import('@/components/cyberpanel/Quizzes'))
 const QuizBuilder = lazy(() => import('@/components/cyberpanel/QuizBuilder'))
 const QuizResults = lazy(() => import('@/components/cyberpanel/QuizResults'))
 const QuizDetail = lazy(() => import('@/components/cyberpanel/QuizDetail'))
+const AttemptDetail = lazy(() => import('@/components/cyberpanel/AttemptDetail'))
 import { ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/components/auth'
 import { RoleProtectedRoute } from '@/components/auth/RoleProtectedRoute'
 import { ToastProvider } from '@/contexts/ToastContext'
@@ -83,7 +84,8 @@ function App() {
                   <Route path="quizzes" element={<Quizzes />} />
                   <Route path="quizzes/:id" element={<QuizDetail />} />
                   <Route path="builder" element={<AdminProtectedRoute><QuizBuilder /></AdminProtectedRoute>} />
-                  <Route path="results" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser"]}><QuizResults /></RoleProtectedRoute>} />
+                  <Route path="results" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser","User"]}><QuizResults /></RoleProtectedRoute>} />
+                  <Route path="attempts/:id" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser","User"]}><AttemptDetail /></RoleProtectedRoute>} />
                 </Route>
               <Route
                 path="/login"

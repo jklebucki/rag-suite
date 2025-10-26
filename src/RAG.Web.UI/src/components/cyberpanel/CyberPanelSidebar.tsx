@@ -14,6 +14,7 @@ export default function CyberPanelSidebar({ isActiveRoute }: Props) {
   const roles = user?.roles || []
   const isAdmin = roles.includes('Admin')
   const isPowerUser = roles.includes('PowerUser')
+  const isUser = roles.includes('User')
   const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -56,7 +57,7 @@ export default function CyberPanelSidebar({ isActiveRoute }: Props) {
       to: '/cyberpanel/results',
       icon: BookOpen,
       label: t('cyberpanel.results'),
-      visible: isAdmin || isPowerUser,
+      visible: isAdmin || isPowerUser || isUser,
     },
   ].filter(item => item.visible)
 

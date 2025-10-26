@@ -480,6 +480,9 @@ export interface QuizAttemptDto {
   id: string
   quizId: string
   quizTitle: string
+  userId: string
+  userName: string
+  userEmail?: string
   score: number
   maxScore: number
   percentageScore: number
@@ -490,4 +493,44 @@ export interface QuizAttemptDto {
 
 export interface ListAttemptsResponse {
   attempts: QuizAttemptDto[]
+}
+
+// Get Attempt Detail
+export interface AttemptDetailDto {
+  id: string
+  quizId: string
+  quizTitle: string
+  userId: string
+  userName: string
+  userEmail?: string
+  score: number
+  maxScore: number
+  percentageScore: number
+  submittedAt: string | Date
+  questionCount: number
+  correctAnswers: number
+  questions: QuestionResultDto[]
+}
+
+export interface QuestionResultDto {
+  questionId: string
+  questionText: string
+  questionImageUrl?: string
+  points: number
+  isCorrect: boolean
+  pointsAwarded: number
+  options: OptionResultDto[]
+  selectedOptionIds: string[]
+  correctOptionIds: string[]
+}
+
+export interface OptionResultDto {
+  id: string
+  text: string
+  imageUrl?: string
+  isCorrect: boolean
+}
+
+export interface GetAttemptByIdResponse {
+  attempt: AttemptDetailDto
 }

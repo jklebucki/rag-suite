@@ -321,4 +321,10 @@ export const en: TranslationKeys = {
   'cyberpanel.browseQuizzes': 'Browse Quizzes',
   'cyberpanel.viewQuiz': 'View Quiz',
   'cyberpanel.score': 'Score',
+  'cyberpanel.userName': 'User',
+  'cyberpanel.submittedAt': 'Submitted',
+  'cyberpanel.backToResults': 'Back to Results',
+  'cyberpanel.yourAnswer': 'Your answer (incorrect)',
+  'cyberpanel.yourCorrectAnswer': 'Your answer (correct)',
+  'cyberpanel.viewDetails': 'View Details',
 };

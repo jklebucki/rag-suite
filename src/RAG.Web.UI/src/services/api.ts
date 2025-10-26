@@ -34,7 +34,8 @@ import type {
   ImportQuizResponse,
   SubmitAttemptRequest,
   SubmitAttemptResponse,
-  ListAttemptsResponse
+  ListAttemptsResponse,
+  GetAttemptByIdResponse
 } from '@/types'
 
 class ApiClient {
@@ -376,10 +377,18 @@ class ApiClient {
   }
 
   /**
-   * List all quiz attempts/results for current user
+   * List all quiz attempts/results for current user (or all if Admin/PowerUser)
    */
   async listQuizAttempts(): Promise<ListAttemptsResponse> {
     const response = await this.client.get('/cyberpanel/quizzes/attempts')
+    return response.data
+  }
+
+  /**
+   * Get detailed results for a specific quiz attempt
+   */
+  async getAttemptById(attemptId: string): Promise<GetAttemptByIdResponse> {
+    const response = await this.client.get(`/cyberpanel/quizzes/attempts/${attemptId}`)
     return response.data
   }
 }

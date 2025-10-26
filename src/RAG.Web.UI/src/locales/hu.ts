@@ -239,6 +239,12 @@ export const hu: TranslationKeys = {
   'cyberpanel.browseQuizzes': 'Kvízek Böngészése',
   'cyberpanel.viewQuiz': 'Kvíz Megtekintése',
   'cyberpanel.score': 'Pontszám',
+  'cyberpanel.userName': 'Felhasználó',
+  'cyberpanel.submittedAt': 'Beküldve',
+  'cyberpanel.backToResults': 'Vissza az Eredményekhez',
+  'cyberpanel.yourAnswer': 'A te válaszod (hibás)',
+  'cyberpanel.yourCorrectAnswer': 'A te válaszod (helyes)',
+  'cyberpanel.viewDetails': 'Részletek Megtekintése',
 
   'auth.reset_confirm.title': 'Új Jelszó Beállítása',
   'auth.reset_confirm.subtitle': 'Add meg az új jelszavad alább.',

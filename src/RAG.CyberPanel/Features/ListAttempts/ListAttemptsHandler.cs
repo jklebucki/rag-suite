@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RAG.CyberPanel.Data;
+using RAG.Security.Data;
 using RAG.Security.Services;
 
 namespace RAG.CyberPanel.Features.ListAttempts;
@@ -7,27 +8,44 @@ namespace RAG.CyberPanel.Features.ListAttempts;
 public class ListAttemptsHandler
 {
     private readonly CyberPanelDbContext _db;
+    private readonly SecurityDbContext _securityDb;
     private readonly IUserContextService _userContext;
 
-    public ListAttemptsHandler(CyberPanelDbContext db, IUserContextService userContext)
+    public ListAttemptsHandler(
+        CyberPanelDbContext db, 
+        SecurityDbContext securityDb,
+        IUserContextService userContext)
     {
         _db = db;
+        _securityDb = securityDb;
         _userContext = userContext;
     }
 
     public async Task<ListAttemptsResponse> Handle(CancellationToken cancellationToken)
     {
-        var userId = _userContext.GetCurrentUserId() ?? "anonymous";
+        var currentUserId = _userContext.GetCurrentUserId() ?? "anonymous";
+        var userRoles = _userContext.GetCurrentUserRoles();
+        var isAdminOrPowerUser = userRoles.Contains("Admin") || userRoles.Contains("PowerUser");
 
-        var attempts = await _db.QuizAttempts
+        // Build query based on role
+        var attemptsQuery = _db.QuizAttempts
             .Include(a => a.Answers)
             .ThenInclude(ans => ans.SelectedOptions)
-            .Where(a => a.UserId == userId)
+            .AsQueryable();
+
+        // Filter by user if not Admin/PowerUser
+        if (!isAdminOrPowerUser)
+        {
+            attemptsQuery = attemptsQuery.Where(a => a.UserId == currentUserId);
+        }
+
+        var attempts = await attemptsQuery
             .OrderByDescending(a => a.FinishedAt ?? a.StartedAt)
             .Select(a => new
             {
                 a.Id,
                 a.QuizId,
+                a.UserId,
                 a.Score,
                 a.FinishedAt,
                 a.StartedAt,
@@ -55,6 +73,15 @@ public class ListAttemptsHandler
             })
             .ToListAsync(cancellationToken);
 
+        // Get user details for all attempts
+        var userIds = attempts.Select(a => a.UserId).Distinct().ToList();
+        var users = await _securityDb.Users
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new { u.Id, u.UserName, u.Email })
+            .ToListAsync(cancellationToken);
+
+        var userDict = users.ToDictionary(u => u.Id, u => u);
+
         var dtos = attempts.Select(a =>
         {
             var maxScore = a.Quiz?.MaxScore ?? 0;
@@ -68,10 +95,15 @@ public class ListAttemptsHandler
                 return correctIds.OrderBy(x => x).SequenceEqual(selectedIds.OrderBy(x => x));
             });
 
+            var user = userDict.GetValueOrDefault(a.UserId);
+
             return new AttemptDto(
                 a.Id,
                 a.QuizId,
                 a.Quiz?.Title ?? "Unknown Quiz",
+                a.UserId,
+                user?.UserName ?? "Unknown User",
+                user?.Email,
                 a.Score,
                 maxScore,
                 percentageScore,

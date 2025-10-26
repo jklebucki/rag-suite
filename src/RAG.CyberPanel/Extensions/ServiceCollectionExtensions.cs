@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Features.CreateQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
+using RAG.CyberPanel.Features.GetAttemptById;
 using RAG.CyberPanel.Features.GetQuiz;
 using RAG.CyberPanel.Features.ImportQuiz;
 using RAG.CyberPanel.Features.ListAttempts;
@@ -36,6 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetQuizService>();
         services.AddScoped<ListQuizzesService>();
         services.AddScoped<ListAttemptsHandler>();
+        services.AddScoped<GetAttemptByIdHandler>();
         services.AddScoped<ExportQuizService>();
         services.AddScoped<ImportQuizHandler>();
 

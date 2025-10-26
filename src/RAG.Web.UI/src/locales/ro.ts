@@ -110,6 +110,12 @@ export const ro: TranslationKeys = {
   'cyberpanel.browseQuizzes': 'Răsfoiește Quiz-urile',
   'cyberpanel.viewQuiz': 'Vezi Quiz-ul',
   'cyberpanel.score': 'Scor',
+  'cyberpanel.userName': 'Utilizator',
+  'cyberpanel.submittedAt': 'Data depunerii',
+  'cyberpanel.backToResults': 'Înapoi la Rezultate',
+  'cyberpanel.yourAnswer': 'Răspunsul tău (incorect)',
+  'cyberpanel.yourCorrectAnswer': 'Răspunsul tău (corect)',
+  'cyberpanel.viewDetails': 'Vezi Detalii',
 
   // Common
   'common.loading': 'Se încarcă...',

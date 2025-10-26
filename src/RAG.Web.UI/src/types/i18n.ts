@@ -340,6 +340,12 @@ export interface TranslationKeys {
   'cyberpanel.browseQuizzes': string;
   'cyberpanel.viewQuiz': string;
   'cyberpanel.score': string;
+  'cyberpanel.userName': string;
+  'cyberpanel.submittedAt': string;
+  'cyberpanel.backToResults': string;
+  'cyberpanel.yourAnswer': string;
+  'cyberpanel.yourCorrectAnswer': string;
+  'cyberpanel.viewDetails': string;
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;
