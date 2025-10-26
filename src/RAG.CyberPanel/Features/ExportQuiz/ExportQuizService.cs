@@ -60,6 +60,7 @@ public class ExportQuizService
             CreatedAt: quiz.CreatedAt,
             IsPublished: quiz.IsPublished,
             Questions: exportedQuestions,
+            Language: quiz.Language,
             ExportVersion: "1.0"
         );
     }

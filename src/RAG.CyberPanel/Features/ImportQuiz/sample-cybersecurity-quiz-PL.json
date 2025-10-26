@@ -1,0 +1,243 @@
+{
+  "title": "Quiz z podstaw Cyberbezpieczeństwa",
+  "description": "Sprawdź swoją wiedzę z zakresu podstawowych pojęć, zagrożeń i dobrych praktyk cyberbezpieczeństwa. Ten quiz obejmuje kluczowe tematy, takie jak phishing, bezpieczeństwo haseł, malware, szyfrowanie i bezpieczeństwo sieci.",
+  "isPublished": true,
+  "createNew": true,
+  "overwriteQuizId": null,
+  "language": "pl",
+  "questions": [
+    {
+      "text": "Czym jest phishing?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Rodzaj malware’u, który szyfruje Twoje pliki",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Atak typu social engineering mający na celu wyłudzenie poufnych informacji od użytkownika",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Urządzenie sprzętowe służące do ochrony sieci",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Metoda szyfrowania ruchu sieciowego",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Które z poniższych haseł jest NAJTRUDNIEJSZE do złamania?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        { "text": "Password123", "imageUrl": null, "isCorrect": false },
+        { "text": "qwerty2024", "imageUrl": null, "isCorrect": false },
+        { "text": "T$9mK#pL@2xR!vN8", "imageUrl": null, "isCorrect": true },
+        { "text": "MyBirthday1990", "imageUrl": null, "isCorrect": false }
+      ]
+    },
+    {
+      "text": "Co oznacza skrót HTTPS?",
+      "imageUrl": null,
+      "points": 5,
+      "options": [
+        {
+          "text": "HyperText Transfer Protocol Secure",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "High Transfer Protocol System",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "HyperText Transmission Protection Service",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Hosting Transfer Protocol Standard",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Które z poniższych są popularnymi rodzajami malware’u? (Wybierz wszystkie poprawne odpowiedzi)",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        { "text": "Koń trojański (Trojan Horse)", "imageUrl": null, "isCorrect": true },
+        { "text": "Ransomware", "imageUrl": null, "isCorrect": true },
+        { "text": "Firewall", "imageUrl": null, "isCorrect": false },
+        { "text": "Spyware", "imageUrl": null, "isCorrect": true },
+        { "text": "VPN", "imageUrl": null, "isCorrect": false }
+      ]
+    },
+    {
+      "text": "Czym jest uwierzytelnianie dwuskładnikowe (2FA)?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Używanie dwóch różnych haseł do tego samego konta",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Proces bezpieczeństwa wymagający dwóch różnych metod uwierzytelnienia w celu potwierdzenia tożsamości",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Logowanie z dwóch urządzeń jednocześnie",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Posiadanie dwóch kont użytkownika w tym samym systemie",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Jaki jest główny cel działania firewalla?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Szyfrowanie danych przechowywanych na dysku twardym",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Tworzenie kopii zapasowych ważnych plików",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Monitorowanie i kontrolowanie ruchu sieciowego przychodzącego i wychodzącego",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Skanowanie załączników e-mail w poszukiwaniu wirusów",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Który protokół służy do bezpiecznego przesyłania plików w sieci?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        { "text": "HTTP", "imageUrl": null, "isCorrect": false },
+        { "text": "FTP", "imageUrl": null, "isCorrect": false },
+        { "text": "SFTP", "imageUrl": null, "isCorrect": true },
+        { "text": "SMTP", "imageUrl": null, "isCorrect": false }
+      ]
+    },
+    {
+      "text": "Czym jest SQL injection?",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        {
+          "text": "Metoda optymalizacji zapytań bazodanowych",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Atak polegający na wstrzyknięciu złośliwego kodu SQL do zapytań aplikacji",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Technika wykonywania kopii zapasowych bazy danych",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Sposób szyfrowania połączeń z bazą danych",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Co oznacza skrót VPN i jaki jest jego główny cel?",
+      "imageUrl": null,
+      "points": 10,
+      "options": [
+        {
+          "text": "Virtual Private Network – tworzy bezpieczne, szyfrowane połączenie przez Internet",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Verified Protection Network – weryfikuje tożsamość użytkownika przed dostępem do sieci",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Virtual Public Network – zapewnia publiczny dostęp do zasobów prywatnych",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Variable Port Network – dynamicznie zmienia porty sieciowe dla bezpieczeństwa",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "text": "Które z poniższych praktyk pomagają zapobiegać naruszeniom bezpieczeństwa? (Wybierz wszystkie poprawne odpowiedzi)",
+      "imageUrl": null,
+      "points": 15,
+      "options": [
+        {
+          "text": "Regularne aktualizacje oprogramowania i instalacja poprawek (patchy)",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Używanie tego samego hasła do wszystkich kont",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Szkolenia z zakresu świadomości bezpieczeństwa dla pracowników",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Wyłączanie programu antywirusowego w celu poprawy wydajności",
+          "imageUrl": null,
+          "isCorrect": false
+        },
+        {
+          "text": "Regularne audyty bezpieczeństwa i testy penetracyjne",
+          "imageUrl": null,
+          "isCorrect": true
+        },
+        {
+          "text": "Przechowywanie haseł w plikach tekstowych bez szyfrowania",
+          "imageUrl": null,
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

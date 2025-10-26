@@ -16,7 +16,7 @@ interface UseQuizzesReturn {
   quizzes: ListQuizzesResponse | null
   loading: boolean
   error: string | null
-  fetchQuizzes: () => Promise<void>
+  fetchQuizzes: (language?: string) => Promise<void>
   createQuiz: (quiz: CreateQuizRequest) => Promise<CreateQuizResponse | null>
   updateQuiz: (quizId: string, quiz: CreateQuizRequest) => Promise<CreateQuizResponse | null>
   deleteQuiz: (quizId: string) => Promise<boolean>
@@ -34,11 +34,11 @@ export function useQuizzes(): UseQuizzesReturn {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchQuizzes = useCallback(async () => {
+  const fetchQuizzes = useCallback(async (language?: string) => {
     setLoading(true)
     setError(null)
     try {
-      const data = await cyberPanelService.listQuizzes()
+      const data = await cyberPanelService.listQuizzes(language)
       setQuizzes(data)
     } catch (err: any) {
       setError(err.message || 'Failed to fetch quizzes')

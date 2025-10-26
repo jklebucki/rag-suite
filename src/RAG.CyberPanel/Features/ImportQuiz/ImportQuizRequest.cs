@@ -29,7 +29,8 @@ public record ImportQuizRequest(
     bool IsPublished,
     ImportedQuestionDto[] Questions,
     bool CreateNew = true,
-    Guid? OverwriteQuizId = null
+    Guid? OverwriteQuizId = null,
+    string? Language = null
 );
 
 /// <summary>

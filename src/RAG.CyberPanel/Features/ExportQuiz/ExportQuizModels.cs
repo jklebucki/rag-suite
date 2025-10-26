@@ -33,6 +33,7 @@ public record ExportQuizResponse(
     DateTime CreatedAt,
     bool IsPublished,
     ExportedQuestionDto[] Questions,
+    string? Language,
     string ExportVersion = "1.0"
 )
 {

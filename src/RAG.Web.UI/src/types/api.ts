@@ -332,6 +332,7 @@ export interface QuizListItem {
   isPublished: boolean
   createdAt: string | Date
   questionCount: number
+  language?: string | null
 }
 
 export interface ListQuizzesResponse {
@@ -383,6 +384,7 @@ export interface CreateQuizRequest {
   description?: string | null
   isPublished: boolean
   questions: CreateQuizQuestionDto[]
+  language?: string | null
 }
 
 export interface CreateQuizResponse {
@@ -415,6 +417,7 @@ export interface ExportQuizResponse {
   createdAt: string | Date
   isPublished: boolean
   questions: ExportedQuestionDto[]
+  language?: string | null
   exportVersion: string
   exportedAt: string | Date
 }
@@ -440,6 +443,7 @@ export interface ImportQuizRequest {
   questions: ImportedQuestionDto[]
   createNew?: boolean
   overwriteQuizId?: string | null
+  language?: string | null
 }
 
 export interface ImportQuizResponse {

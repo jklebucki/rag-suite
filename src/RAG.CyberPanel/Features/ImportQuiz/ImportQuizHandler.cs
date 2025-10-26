@@ -55,6 +55,7 @@ public class ImportQuizHandler
             quiz.Title = request.Title;
             quiz.Description = request.Description;
             quiz.IsPublished = request.IsPublished;
+            quiz.Language = request.Language;
             quiz.Questions.Clear();
             
             wasOverwritten = true;
@@ -67,6 +68,7 @@ public class ImportQuizHandler
                 Title = request.Title,
                 Description = request.Description,
                 IsPublished = request.IsPublished,
+                Language = request.Language,
                 CreatedByUserId = userId,
                 CreatedAt = DateTime.UtcNow
             };

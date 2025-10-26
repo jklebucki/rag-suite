@@ -4,6 +4,7 @@
   "isPublished": true,
   "createNew": true,
   "overwriteQuizId": null,
+  "language": "en",
   "questions": [
     {
       "text": "What is phishing?",

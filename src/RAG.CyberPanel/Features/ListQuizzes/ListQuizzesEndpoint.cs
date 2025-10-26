@@ -11,10 +11,11 @@ public static class ListQuizzesEndpoint
     {
         group.MapGet("/", async (
             [FromServices] ListQuizzesService service,
+            [FromQuery] string? language,
             CancellationToken ct
         ) =>
         {
-            var result = await service.GetQuizzesAsync(ct);
+            var result = await service.GetQuizzesAsync(language, ct);
             return Results.Ok(result);
         })
         .WithName("ListQuizzes")

@@ -7,7 +7,8 @@ public record UpdateQuizRequest(
     string? Description,
     string? ImageUrl,
     bool IsPublished,
-    QuestionRequest[] Questions
+    QuestionRequest[] Questions,
+    string? Language = null
 );
 
 public record QuestionRequest(

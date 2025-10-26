@@ -18,5 +18,6 @@ public record CreateQuizRequest
     string Title,
     string? Description,
     bool IsPublished,
-    QuestionDto[] Questions
+    QuestionDto[] Questions,
+    string? Language = null
 );

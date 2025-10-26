@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useQuizzes } from '@/hooks'
 import { useToast } from '@/contexts/ToastContext'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui'
 import { Input } from '@/components/ui'
 import { Textarea } from '@/components/ui'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { Trash2, Plus, Image as ImageIcon, X, Save, Eye, ChevronUp, ChevronDown, Download, Upload } from 'lucide-react'
+import { Trash2, Plus, Image as ImageIcon, X, Save, Eye, ChevronUp, ChevronDown, Download } from 'lucide-react'
 
 interface QuizBuilderProps {
   editQuizId?: string | null
@@ -18,17 +18,17 @@ interface QuizBuilderProps {
 }
 
 export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) {
-  const { t } = useI18n()
-  const { createQuiz, updateQuiz, loading, exportQuiz, importFromFile } = useQuizzes()
+  const { t, language } = useI18n()
+  const { createQuiz, updateQuiz, loading, exportQuiz } = useQuizzes()
   const { showSuccess, showError } = useToast()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [isPublished, setIsPublished] = useState(false)
+  const [quizLanguage, setQuizLanguage] = useState<string>(language)
   const [questions, setQuestions] = useState<CreateQuizQuestionDto[]>([])
   const [preview, setPreview] = useState(false)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load quiz for editing
   useEffect(() => {
@@ -44,6 +44,7 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
         setTitle(exportedQuiz.title)
         setDescription(exportedQuiz.description || '')
         setIsPublished(exportedQuiz.isPublished)
+        setQuizLanguage(exportedQuiz.language || language)
         setQuestions(
           exportedQuiz.questions.map(q => ({
             id: q.id,
@@ -160,7 +161,8 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
       title,
       description: description || null,
       isPublished,
-      questions
+      questions,
+      language: quizLanguage
     }
 
     const validation = cyberPanelService.validateQuizData(quizData)
@@ -181,7 +183,8 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
       title,
       description: description || null,
       isPublished,
-      questions
+      questions,
+      language: quizLanguage
     }
 
     try {
@@ -208,6 +211,7 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
     setTitle('')
     setDescription('')
     setIsPublished(false)
+    setQuizLanguage(language)
     setQuestions([])
     setValidationErrors([])
     setPreview(false)
@@ -234,35 +238,6 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
       showSuccess(t('cyberpanel.exportSuccess'))
     } else {
       showError(t('cyberpanel.importError'))
-    }
-  }
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      const result = await importFromFile(file)
-      if (result) {
-        showSuccess(t('cyberpanel.importSuccess'))
-        // Load the imported quiz for editing
-        if (result.quizId) {
-          loadQuizForEdit(result.quizId)
-        }
-      } else {
-        showError(t('cyberpanel.importError'))
-      }
-    } catch (err) {
-      showError(t('cyberpanel.importError'))
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
     }
   }
 
@@ -353,10 +328,6 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
               {t('cyberpanel.exportQuiz')}
             </Button>
           )}
-          <Button onClick={handleImportClick} variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            {t('cyberpanel.importQuiz')}
-          </Button>
           <Button onClick={() => setPreview(true)} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
             {t('cyberpanel.preview')}
@@ -367,15 +338,6 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
           </Button>
         </div>
       </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json,application/json"
-        onChange={handleFileSelected}
-        className="hidden"
-        aria-label={t('cyberpanel.selectJsonFile')}
-      />
 
       {validationErrors.length > 0 && (
         <Card className="mb-6 border-red-500">
@@ -416,6 +378,23 @@ export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilde
               rows={3}
             />
             <p className="text-xs text-gray-500 mt-1">{description.length}/1000</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Language</label>
+            <select
+              value={quizLanguage}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setQuizLanguage(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title="Language"
+            >
+              <option value="en">English</option>
+              <option value="pl">Polski</option>
+              <option value="ro">Română</option>
+              <option value="hu">Magyar</option>
+              <option value="nl">Nederlands</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Select the language for this quiz</p>
           </div>
 
           <div className="flex items-center">

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Hammer, List, Menu } from 'lucide-react'
+import { BookOpen, Hammer, List, Menu, Settings } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
@@ -48,10 +48,10 @@ export default function CyberPanelSidebar({ isActiveRoute }: Props) {
       visible: true,
     },
     {
-      to: '/cyberpanel/builder',
-      icon: Hammer,
-      label: t('cyberpanel.builder'),
-      visible: isAdmin,
+      to: '/cyberpanel/manager',
+      icon: Settings,
+      label: 'Quiz Manager',
+      visible: isAdmin || isPowerUser,
     },
     {
       to: '/cyberpanel/results',

@@ -19,9 +19,10 @@ import { downloadQuizJson, readQuizJsonFile } from '@/types/cyberpanel'
 class CyberPanelService {
   /**
    * List all quizzes
+   * @param language Optional language filter for published quizzes
    */
-  async listQuizzes(): Promise<ListQuizzesResponse> {
-    return apiClient.listQuizzes()
+  async listQuizzes(language?: string): Promise<ListQuizzesResponse> {
+    return apiClient.listQuizzes(language)
   }
 
   /**
@@ -49,7 +50,7 @@ class CyberPanelService {
    * Delete quiz
    */
   async deleteQuiz(quizId: string): Promise<void> {
-    return apiClient.deleteQuiz(quizId)
+    await apiClient.deleteQuiz(quizId)
   }
 
   /**

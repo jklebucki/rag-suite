@@ -54,6 +54,7 @@ public class UpdateQuizHandler
         quiz.Title = request.Title;
         quiz.Description = request.Description;
         quiz.IsPublished = request.IsPublished;
+        quiz.Language = request.Language;
 
         // Add new questions from request
         var questionOrder = 0;

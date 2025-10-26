@@ -316,9 +316,11 @@ class ApiClient {
   
   /**
    * List all quizzes
+   * @param language Optional language filter for published quizzes
    */
-  async listQuizzes(): Promise<ListQuizzesResponse> {
-    const response = await this.client.get('/cyberpanel/quizzes')
+  async listQuizzes(language?: string): Promise<ListQuizzesResponse> {
+    const params = language ? { language } : {}
+    const response = await this.client.get('/cyberpanel/quizzes', { params })
     return response.data
   }
 

@@ -9,7 +9,8 @@ public record QuizListItemDto(
     string? Description,
     bool IsPublished,
     DateTime CreatedAt,
-    int QuestionCount
+    int QuestionCount,
+    string? Language
 );
 
 /// <summary>

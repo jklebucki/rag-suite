@@ -24,6 +24,7 @@ public class CreateQuizHandler
             Title = request.Title,
             Description = request.Description,
             IsPublished = request.IsPublished,
+            Language = request.Language,
             CreatedByUserId = userId,
             CreatedAt = DateTime.UtcNow
         };

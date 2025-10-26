@@ -12,6 +12,7 @@ const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm
 const ResetPasswordConfirmForm = lazy(() => import('@/components/auth/ResetPasswordConfirmForm'))
 const CyberPanelLayout = lazy(() => import('@/components/cyberpanel/CyberPanelLayout'))
 const Quizzes = lazy(() => import('@/components/cyberpanel/Quizzes'))
+const QuizManager = lazy(() => import('@/components/cyberpanel/QuizManager'))
 const QuizBuilder = lazy(() => import('@/components/cyberpanel/QuizBuilder'))
 const QuizResults = lazy(() => import('@/components/cyberpanel/QuizResults'))
 const QuizDetail = lazy(() => import('@/components/cyberpanel/QuizDetail'))
@@ -83,6 +84,7 @@ function App() {
                   <Route index element={<Quizzes />} />
                   <Route path="quizzes" element={<Quizzes />} />
                   <Route path="quizzes/:id" element={<QuizDetail />} />
+                  <Route path="manager" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser"]}><QuizManager /></RoleProtectedRoute>} />
                   <Route path="builder" element={<AdminProtectedRoute><QuizBuilder /></AdminProtectedRoute>} />
                   <Route path="results" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser","User"]}><QuizResults /></RoleProtectedRoute>} />
                   <Route path="attempts/:id" element={<RoleProtectedRoute allowedRoles={["Admin","PowerUser","User"]}><AttemptDetail /></RoleProtectedRoute>} />
