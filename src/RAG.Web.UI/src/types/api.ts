@@ -534,3 +534,13 @@ export interface OptionResultDto {
 export interface GetAttemptByIdResponse {
   attempt: AttemptDetailDto
 }
+
+export interface DeleteQuizResponse {
+  quizId: string
+  quizTitle: string
+  questionCount: number
+  attemptCount: number
+  ownerUserName: string
+  deletedByUserName: string
+  deletedAt: string
+}

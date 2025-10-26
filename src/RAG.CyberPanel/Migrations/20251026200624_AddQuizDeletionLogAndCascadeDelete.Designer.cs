@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RAG.CyberPanel.Data;
@@ -11,9 +12,11 @@ using RAG.CyberPanel.Data;
 namespace RAG.CyberPanel.Migrations
 {
     [DbContext(typeof(CyberPanelDbContext))]
-    partial class CyberPanelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251026200624_AddQuizDeletionLogAndCascadeDelete")]
+    partial class AddQuizDeletionLogAndCascadeDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,61 +24,6 @@ namespace RAG.CyberPanel.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("RAG.CyberPanel.Domain.AttemptDeletionLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AttemptId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AttemptUserEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AttemptUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("AttemptUserName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DeletedByUserEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DeletedByUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DeletedByUserName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("FinishedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("QuizTitle")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AttemptDeletionLogs");
-                });
 
             modelBuilder.Entity("RAG.CyberPanel.Domain.Option", b =>
                 {

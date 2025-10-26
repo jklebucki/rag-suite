@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@/contexts/I18nContext'
+import { useAuth } from '@/contexts/AuthContext'
 import apiClient from '@/services/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Trophy, Calendar, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
+import { Trophy, Calendar, CheckCircle, XCircle, ArrowRight, Trash2 } from 'lucide-react'
+import { DeleteConfirmationModal } from '@/components/common/DeleteConfirmationModal'
 import type { QuizAttemptDto } from '@/types'
 
 export default function QuizResults() {
   const { t } = useI18n()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [attempts, setAttempts] = useState<QuizAttemptDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    attemptId: string | null
+    quizTitle: string
+    userName: string
+  }>({
+    isOpen: false,
+    attemptId: null,
+    quizTitle: '',
+    userName: '',
+  })
+  const [deleting, setDeleting] = useState(false)
+
+  const isAdminOrPowerUser = user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')
 
   useEffect(() => {
     fetchAttempts()
@@ -33,6 +50,34 @@ export default function QuizResults() {
 
   const handleViewQuiz = (attemptId: string) => {
     navigate(`/cyberpanel/attempts/${attemptId}`)
+  }
+
+  const handleDeleteClick = (attempt: QuizAttemptDto) => {
+    setDeleteModal({
+      isOpen: true,
+      attemptId: attempt.id,
+      quizTitle: attempt.quizTitle,
+      userName: attempt.userName,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.attemptId) return
+
+    setDeleting(true)
+    try {
+      await apiClient.deleteAttempt(deleteModal.attemptId)
+      setAttempts(attempts.filter((a) => a.id !== deleteModal.attemptId))
+      setDeleteModal({ isOpen: false, attemptId: null, quizTitle: '', userName: '' })
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete attempt')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({ isOpen: false, attemptId: null, quizTitle: '', userName: '' })
   }
 
   const getScoreColor = (percentage: number) => {
@@ -116,14 +161,27 @@ export default function QuizResults() {
                       </div>
                     </div>
 
-                    <Button
-                      onClick={() => handleViewQuiz(attempt.id)}
-                      variant="outline"
-                      size="sm"
-                      title={t('cyberpanel.viewDetails')}
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleViewQuiz(attempt.id)}
+                        variant="outline"
+                        size="sm"
+                        title={t('cyberpanel.viewDetails')}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                      {isAdminOrPowerUser && (
+                        <Button
+                          onClick={() => handleDeleteClick(attempt)}
+                          variant="outline"
+                          size="sm"
+                          title="Delete attempt"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -166,7 +224,24 @@ export default function QuizResults() {
           })}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Quiz Attempt"
+        message="Are you sure you want to delete this quiz attempt? This will permanently remove the result."
+        itemName={deleteModal.quizTitle}
+        details={[
+          { label: 'User', value: deleteModal.userName },
+          { label: 'Quiz', value: deleteModal.quizTitle },
+        ]}
+        isLoading={deleting}
+        confirmText="Delete"
+        cancelText="Cancel"
+        deletingText="Deleting..."
+        warningText="This action cannot be undone"
+      />
     </div>
   )
 }
-

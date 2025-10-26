@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.CyberPanel.Features.DeleteAttempt;
 using RAG.CyberPanel.Features.DeleteQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetAttemptById;
@@ -37,6 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<CreateQuizHandler>();
         services.AddScoped<UpdateQuizHandler>();
         services.AddScoped<DeleteQuizHandler>();
+        services.AddScoped<DeleteAttemptHandler>();
         services.AddScoped<SubmitAttemptHandler>();
         services.AddScoped<GetQuizService>();
         services.AddScoped<ListQuizzesService>();

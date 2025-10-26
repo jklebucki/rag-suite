@@ -15,6 +15,8 @@ public class CyberPanelDbContext : DbContext
     public DbSet<QuizAttempt> QuizAttempts { get; set; } = null!;
     public DbSet<QuizAnswer> QuizAnswers { get; set; } = null!;
     public DbSet<QuizAnswerOption> QuizAnswerOptions { get; set; } = null!;
+    public DbSet<QuizDeletionLog> QuizDeletionLogs { get; set; } = null!;
+    public DbSet<AttemptDeletionLog> AttemptDeletionLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,9 +36,11 @@ public class CyberPanelDbContext : DbContext
 
         modelBuilder.Entity<Option>(b => { b.HasKey(o => o.Id); });
 
+        // Add Quiz -> QuizAttempt cascade delete relationship
         modelBuilder.Entity<QuizAttempt>(b =>
         {
             b.HasKey(a => a.Id);
+            b.HasOne<Quiz>().WithMany().HasForeignKey(a => a.QuizId).OnDelete(DeleteBehavior.Cascade);
             b.HasMany(a => a.Answers).WithOne(ans => ans.QuizAttempt!).HasForeignKey(ans => ans.QuizAttemptId).OnDelete(DeleteBehavior.Cascade);
         });
 

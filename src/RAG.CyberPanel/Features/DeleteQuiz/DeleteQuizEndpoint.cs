@@ -13,23 +13,23 @@ public static class DeleteQuizEndpoint
         app.MapDelete("/{quizId:guid}", DeleteQuiz)
             .WithName("DeleteQuiz")
             .WithOpenApi()
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<DeleteQuizResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status401Unauthorized);
     }
 
-    private static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> DeleteQuiz(
+    private static async Task<Results<Ok<DeleteQuizResponse>, NotFound, UnauthorizedHttpResult>> DeleteQuiz(
         [FromRoute] Guid quizId,
         DeleteQuizHandler handler,
         CancellationToken ct)
     {
         var result = await handler.Handle(quizId, ct);
 
-        if (!result)
+        if (result == null)
         {
             return TypedResults.NotFound();
         }
 
-        return TypedResults.NoContent();
+        return TypedResults.Ok(result);
     }
 }

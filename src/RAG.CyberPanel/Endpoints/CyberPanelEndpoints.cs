@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.CyberPanel.Features.DeleteAttempt;
 using RAG.CyberPanel.Features.DeleteQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetAttemptById;
@@ -35,6 +36,7 @@ public static class CyberPanelEndpoints
         group.MapSubmitAttempt();
         group.MapListAttempts();
         group.MapGetAttemptById();
+        group.MapDeleteAttempt();
         group.MapExportQuiz();
         group.MapImportQuiz();
 

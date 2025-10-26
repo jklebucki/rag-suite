@@ -35,7 +35,8 @@ import type {
   SubmitAttemptRequest,
   SubmitAttemptResponse,
   ListAttemptsResponse,
-  GetAttemptByIdResponse
+  GetAttemptByIdResponse,
+  DeleteQuizResponse
 } from '@/types'
 
 class ApiClient {
@@ -362,10 +363,18 @@ class ApiClient {
   }
 
   /**
-   * Delete a quiz by ID
+   * Delete a quiz by ID (returns deletion summary)
    */
-  async deleteQuiz(quizId: string): Promise<void> {
-    await this.client.delete(`/cyberpanel/quizzes/${quizId}`)
+  async deleteQuiz(quizId: string): Promise<DeleteQuizResponse> {
+    const response = await this.client.delete(`/cyberpanel/quizzes/${quizId}`)
+    return response.data
+  }
+
+  /**
+   * Delete a quiz attempt by ID (Admin/PowerUser only)
+   */
+  async deleteAttempt(attemptId: string): Promise<void> {
+    await this.client.delete(`/cyberpanel/quizzes/attempts/${attemptId}`)
   }
 
   /**
