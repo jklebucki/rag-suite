@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.CyberPanel.Features.DeleteQuiz;
 using RAG.CyberPanel.Features.ExportQuiz;
 using RAG.CyberPanel.Features.GetAttemptById;
 using RAG.CyberPanel.Features.GetQuiz;
@@ -12,6 +13,7 @@ using RAG.CyberPanel.Features.ImportQuiz;
 using RAG.CyberPanel.Features.ListAttempts;
 using RAG.CyberPanel.Features.ListQuizzes;
 using RAG.CyberPanel.Features.SubmitAttempt;
+using RAG.CyberPanel.Features.UpdateQuiz;
 using RAG.CyberPanel.Services;
 
 namespace RAG.CyberPanel.Extensions;
@@ -33,6 +35,8 @@ public static class ServiceCollectionExtensions
 
         // Register feature handlers and services
         services.AddScoped<CreateQuizHandler>();
+        services.AddScoped<UpdateQuizHandler>();
+        services.AddScoped<DeleteQuizHandler>();
         services.AddScoped<SubmitAttemptHandler>();
         services.AddScoped<GetQuizService>();
         services.AddScoped<ListQuizzesService>();
@@ -43,6 +47,7 @@ public static class ServiceCollectionExtensions
 
         // Register validators
         services.AddScoped<IValidator<CreateQuizRequest>, CreateQuizValidator>();
+        services.AddScoped<IValidator<UpdateQuizRequest>, UpdateQuizValidator>();
         services.AddScoped<IValidator<SubmitAttemptRequest>, SubmitAttemptValidator>();
         services.AddScoped<IValidator<ImportQuizRequest>, ImportQuizValidator>();
 
