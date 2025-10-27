@@ -228,6 +228,20 @@ export function useMultilingualChat() {
     }
   }, [sessions, currentSessionId, queryClient])
 
+  // Cleanup on unmount - reset state
+  useEffect(() => {
+    return () => {
+      console.log('useMultilingualChat cleanup: resetting state')
+      setCurrentSessionId(null)
+      setMessage('')
+      setIsTyping(false)
+      setSessionToDelete(null)
+      setLastResponse(null)
+      setUseDocumentSearch(false)
+      setIsNewSession(false)
+    }
+  }, [])
+
   return {
     // State
     currentSessionId,
