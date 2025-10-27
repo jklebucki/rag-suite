@@ -40,12 +40,17 @@ public class SubmitAttemptHandler
         {
             var qa = new QuizAnswer
             {
-                QuestionId = ans.QuestionId
+                QuestionId = ans.QuestionId,
+                QuizAttempt = attempt
             };
 
             foreach (var optId in ans.SelectedOptionIds.Distinct())
             {
-                qa.SelectedOptions.Add(new QuizAnswerOption { OptionId = optId });
+                qa.SelectedOptions.Add(new QuizAnswerOption 
+                { 
+                    OptionId = optId,
+                    QuizAnswer = qa
+                });
             }
 
             attempt.Answers.Add(qa);

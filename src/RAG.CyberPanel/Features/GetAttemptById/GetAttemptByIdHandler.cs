@@ -27,9 +27,9 @@ public class GetAttemptByIdHandler
         var userRoles = _userContext.GetCurrentUserRoles();
         var isAdminOrPowerUser = userRoles.Contains("Admin") || userRoles.Contains("PowerUser");
 
+        // Load attempt with all related data using separate queries to ensure proper loading
         var attempt = await _db.QuizAttempts
-            .Include(a => a.Answers)
-            .ThenInclude(ans => ans.SelectedOptions)
+            .AsNoTracking()
             .Where(a => a.Id == attemptId)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -44,8 +44,19 @@ public class GetAttemptByIdHandler
             return null;
         }
 
+        // Load answers with selected options explicitly
+        var answers = await _db.QuizAnswers
+            .AsNoTracking()
+            .Include(a => a.SelectedOptions)
+            .Where(a => a.QuizAttemptId == attemptId)
+            .ToListAsync(cancellationToken);
+
+        // Assign the loaded answers to the attempt
+        attempt.Answers = answers;
+
         // Get quiz with questions and options
         var quiz = await _db.Quizzes
+            .AsNoTracking()
             .Include(q => q.Questions)
             .ThenInclude(qn => qn.Options)
             .FirstOrDefaultAsync(q => q.Id == attempt.QuizId, cancellationToken);

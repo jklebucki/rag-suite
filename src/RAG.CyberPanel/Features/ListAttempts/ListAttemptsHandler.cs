@@ -27,11 +27,8 @@ public class ListAttemptsHandler
         var userRoles = _userContext.GetCurrentUserRoles();
         var isAdminOrPowerUser = userRoles.Contains("Admin") || userRoles.Contains("PowerUser");
 
-        // Build query and load attempts with all related data
-        var attemptsQuery = _db.QuizAttempts
-            .Include(a => a.Answers)
-                .ThenInclude(ans => ans.SelectedOptions)
-            .AsQueryable();
+        // Build query for attempts
+        var attemptsQuery = _db.QuizAttempts.AsNoTracking().AsQueryable();
 
         // Filter by user if not Admin/PowerUser
         if (!isAdminOrPowerUser)
@@ -39,14 +36,33 @@ public class ListAttemptsHandler
             attemptsQuery = attemptsQuery.Where(a => a.UserId == currentUserId);
         }
 
-        // Load attempts first with all navigation properties
+        // Load attempts first (without related data to keep query simple)
         var attemptsList = await attemptsQuery
             .OrderByDescending(a => a.FinishedAt ?? a.StartedAt)
             .ToListAsync(cancellationToken);
 
-        // Load quizzes separately to avoid complex projections
+        // Load all answers with selected options for all attempts in one query
+        var attemptIds = attemptsList.Select(a => a.Id).ToList();
+        var allAnswers = await _db.QuizAnswers
+            .AsNoTracking()
+            .Include(a => a.SelectedOptions)
+            .Where(a => attemptIds.Contains(a.QuizAttemptId))
+            .ToListAsync(cancellationToken);
+
+        // Group answers by attempt ID
+        var answersDict = allAnswers.GroupBy(a => a.QuizAttemptId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // Assign answers to attempts
+        foreach (var attempt in attemptsList)
+        {
+            attempt.Answers = answersDict.GetValueOrDefault(attempt.Id) ?? new List<Domain.QuizAnswer>();
+        }
+
+        // Load quizzes separately
         var quizIds = attemptsList.Select(a => a.QuizId).Distinct().ToList();
         var quizzes = await _db.Quizzes
+            .AsNoTracking()
             .Include(q => q.Questions)
                 .ThenInclude(qn => qn.Options)
             .Where(q => quizIds.Contains(q.Id))
