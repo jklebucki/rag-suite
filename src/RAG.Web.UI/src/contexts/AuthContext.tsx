@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useReducer, ReactNode, use
 import { authService } from '@/services/auth'
 import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 import { useAuthStorage } from '@/hooks/useAuthStorage'
+import { queryClient } from '@/main'
 import type { AuthState, User, LoginRequest, RegisterRequest } from '@/types/auth'
 
 interface AuthContextType extends AuthState {
@@ -88,6 +89,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [])
 
   const handleStorageLogout = useCallback(() => {
+    console.debug('🔐 Storage logout - clearing React Query cache')
+    queryClient.clear()
     dispatch({ type: 'LOGOUT' })
   }, [])
 
@@ -98,6 +101,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [])
 
   const handleLogout = useCallback(() => {
+    console.debug('🔐 Token refresh logout - clearing React Query cache')
+    queryClient.clear()
     dispatch({ type: 'LOGOUT' })
   }, [])
 
@@ -167,13 +172,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           dispatch({ type: 'SET_USER', payload: user })
         } else {
           console.warn('🔐 Background verification failed - server rejected token')
-          // Clear auth data and logout instead of trying to refresh in background
+          // Clear React Query cache and auth data
+          queryClient.clear()
           clearAuthData()
           dispatch({ type: 'LOGOUT' })
         }
       } catch (error) {
         console.warn('🔐 Background verification error:', error)
-        // Clear auth data and logout instead of trying to refresh in background
+        // Clear React Query cache and auth data
+        queryClient.clear()
         clearAuthData()
         dispatch({ type: 'LOGOUT' })
       } finally {
@@ -204,6 +211,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null })
 
     try {
+      // Clear React Query cache before login to ensure fresh state for new user
+      console.debug('🔐 Clearing React Query cache before login')
+      queryClient.clear()
+
       const loginData = await authService.login(credentials)
 
       // Store auth data using our secure storage method
@@ -277,6 +288,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
+      // Clear React Query cache to remove all user-specific data
+      console.debug('🔐 Clearing React Query cache on logout')
+      queryClient.clear()
+      
       // Clear storage and update state
       clearAuthData()
       dispatch({ type: 'LOGOUT' })
@@ -308,6 +323,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout from all devices error:', error)
     } finally {
+      // Clear React Query cache to remove all user-specific data
+      console.debug('🔐 Clearing React Query cache on logout from all devices')
+      queryClient.clear()
+      
       // Clear storage and update state
       clearAuthData()
       dispatch({ type: 'LOGOUT' })

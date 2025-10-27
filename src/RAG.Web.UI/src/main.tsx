@@ -6,7 +6,7 @@ import App from './App'
 import './index.css'
 import './utils/debug' // Import debug utilities
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
@@ -26,3 +26,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </QueryClientProvider>,
 )
+
