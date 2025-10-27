@@ -27,8 +27,8 @@ export default function AttemptDetail() {
     try {
       const response = await apiClient.getAttemptById(attemptId)
       setAttempt(response.attempt)
-    } catch (err: any) {
-      setError(err.message || 'Failed to load attempt details')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load attempt details')
     } finally {
       setLoading(false)
     }
@@ -189,49 +189,52 @@ export default function AttemptDetail() {
               <div className="space-y-2">
                 {question.options.map((option) => {
                   const isSelected = question.selectedOptionIds.includes(option.id)
-                  const isCorrectOption = question.correctOptionIds.includes(option.id)
-                  const shouldBeShown = isSelected || isCorrectOption
-
-                  if (!shouldBeShown) return null
+                  const isCorrectOption = option.isCorrect
 
                   let borderColor = 'border-gray-200'
                   let bgColor = 'bg-white'
                   let icon = null
+                  let label = null
 
                   if (isSelected && isCorrectOption) {
+                    // User selected correct answer
                     borderColor = 'border-green-300'
                     bgColor = 'bg-green-50'
                     icon = <CheckCircle className="w-5 h-5 text-green-600" />
+                    label = <p className="text-xs text-green-600 mt-1 font-medium">{t('cyberpanel.yourCorrectAnswer')}</p>
                   } else if (isSelected && !isCorrectOption) {
+                    // User selected wrong answer
                     borderColor = 'border-red-300'
                     bgColor = 'bg-red-50'
                     icon = <XCircle className="w-5 h-5 text-red-600" />
+                    label = <p className="text-xs text-red-600 mt-1 font-medium">{t('cyberpanel.yourAnswer')}</p>
                   } else if (!isSelected && isCorrectOption) {
+                    // Correct answer not selected by user
                     borderColor = 'border-green-200'
-                    bgColor = 'bg-green-50'
-                    icon = <CheckCircle className="w-5 h-5 text-green-600" />
+                    bgColor = 'bg-green-50/50'
+                    icon = <CheckCircle className="w-5 h-5 text-green-500" />
+                    label = <p className="text-xs text-green-600 mt-1">{t('cyberpanel.correctAnswerWas')}</p>
+                  } else {
+                    // Neutral option (not selected, not correct)
+                    borderColor = 'border-gray-200'
+                    bgColor = 'bg-gray-50'
+                    icon = null
                   }
 
                   return (
                     <div
                       key={option.id}
-                      className={`flex items-start gap-3 p-3 rounded border-2 ${borderColor} ${bgColor}`}
+                      className={`flex items-start gap-3 p-3 rounded border ${borderColor} ${bgColor}`}
                     >
-                      {icon}
+                      <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                        {icon}
+                      </div>
                       <div className="flex-1">
                         <p className="text-sm">{option.text}</p>
                         {option.imageUrl && (
                           <img src={option.imageUrl} alt="Option" className="mt-2 max-w-xs rounded" />
                         )}
-                        {isSelected && !isCorrectOption && (
-                          <p className="text-xs text-red-600 mt-1">{t('cyberpanel.yourAnswer')}</p>
-                        )}
-                        {!isSelected && isCorrectOption && (
-                          <p className="text-xs text-green-600 mt-1">{t('cyberpanel.correctAnswerWas')}</p>
-                        )}
-                        {isSelected && isCorrectOption && (
-                          <p className="text-xs text-green-600 mt-1">{t('cyberpanel.yourCorrectAnswer')}</p>
-                        )}
+                        {label}
                       </div>
                     </div>
                   )
