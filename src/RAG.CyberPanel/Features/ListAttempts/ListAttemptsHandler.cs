@@ -27,10 +27,10 @@ public class ListAttemptsHandler
         var userRoles = _userContext.GetCurrentUserRoles();
         var isAdminOrPowerUser = userRoles.Contains("Admin") || userRoles.Contains("PowerUser");
 
-        // Build query based on role
+        // Build query and load attempts with all related data
         var attemptsQuery = _db.QuizAttempts
             .Include(a => a.Answers)
-            .ThenInclude(ans => ans.SelectedOptions)
+                .ThenInclude(ans => ans.SelectedOptions)
             .AsQueryable();
 
         // Filter by user if not Admin/PowerUser
@@ -39,41 +39,23 @@ public class ListAttemptsHandler
             attemptsQuery = attemptsQuery.Where(a => a.UserId == currentUserId);
         }
 
-        var attempts = await attemptsQuery
+        // Load attempts first with all navigation properties
+        var attemptsList = await attemptsQuery
             .OrderByDescending(a => a.FinishedAt ?? a.StartedAt)
-            .Select(a => new
-            {
-                a.Id,
-                a.QuizId,
-                a.UserId,
-                a.Score,
-                a.FinishedAt,
-                a.StartedAt,
-                Quiz = _db.Quizzes
-                    .Where(q => q.Id == a.QuizId)
-                    .Select(q => new
-                    {
-                        q.Title,
-                        MaxScore = q.Questions.Sum(qn => qn.Points),
-                        QuestionCount = q.Questions.Count,
-                        Questions = q.Questions.Select(qn => new
-                        {
-                            qn.Id,
-                            qn.Points,
-                            CorrectOptionIds = qn.Options.Where(o => o.IsCorrect).Select(o => o.Id).ToList()
-                        }).ToList()
-                    })
-                    .FirstOrDefault(),
-                Answers = a.Answers.Select(ans => new
-                {
-                    ans.QuestionId,
-                    SelectedOptionIds = ans.SelectedOptions.Select(so => so.OptionId).ToList()
-                }).ToList()
-            })
             .ToListAsync(cancellationToken);
 
+        // Load quizzes separately to avoid complex projections
+        var quizIds = attemptsList.Select(a => a.QuizId).Distinct().ToList();
+        var quizzes = await _db.Quizzes
+            .Include(q => q.Questions)
+                .ThenInclude(qn => qn.Options)
+            .Where(q => quizIds.Contains(q.Id))
+            .ToListAsync(cancellationToken);
+
+        var quizDict = quizzes.ToDictionary(q => q.Id, q => q);
+
         // Get user details for all attempts
-        var userIds = attempts.Select(a => a.UserId).Distinct().ToList();
+        var userIds = attemptsList.Select(a => a.UserId).Distinct().ToList();
         var users = await _securityDb.Users
             .Where(u => userIds.Contains(u.Id))
             .Select(u => new { u.Id, u.UserName, u.Email })
@@ -81,51 +63,75 @@ public class ListAttemptsHandler
 
         var userDict = users.ToDictionary(u => u.Id, u => u);
 
-        var dtos = attempts.Select(a =>
+        // Build DTOs with score recalculation
+        var dtos = attemptsList.Select(a =>
         {
-            var maxScore = a.Quiz?.MaxScore ?? 0;
-            var questions = a.Quiz?.Questions;
-            
-            // Count correct answers and calculate actual score
+            var quiz = quizDict.GetValueOrDefault(a.QuizId);
+            if (quiz == null)
+            {
+                // Quiz not found, return basic info
+                var user = userDict.GetValueOrDefault(a.UserId);
+                return new AttemptDto(
+                    a.Id,
+                    a.QuizId,
+                    "Unknown Quiz",
+                    a.UserId,
+                    user?.UserName ?? "Unknown User",
+                    user?.Email,
+                    0,
+                    0,
+                    0,
+                    a.FinishedAt ?? a.StartedAt,
+                    0,
+                    0
+                );
+            }
+
+            var maxScore = quiz.Questions.Sum(q => q.Points);
             var correctCount = 0;
             var actualScore = 0;
-            
-            if (questions != null)
+
+            // Calculate score based on answers
+            foreach (var answer in a.Answers)
             {
-                foreach (var ans in a.Answers)
+                var question = quiz.Questions.FirstOrDefault(q => q.Id == answer.QuestionId);
+                if (question == null) continue;
+
+                var correctIds = question.Options
+                    .Where(o => o.IsCorrect)
+                    .Select(o => o.Id)
+                    .OrderBy(x => x)
+                    .ToArray();
+
+                var selectedIds = answer.SelectedOptions
+                    .Select(so => so.OptionId)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToArray();
+
+                var isCorrect = correctIds.SequenceEqual(selectedIds);
+                if (isCorrect)
                 {
-                    var question = questions.FirstOrDefault(q => q.Id == ans.QuestionId);
-                    if (question != null)
-                    {
-                        var correctIds = question.CorrectOptionIds;
-                        var selectedIds = ans.SelectedOptionIds;
-                        var isCorrect = correctIds.OrderBy(x => x).SequenceEqual(selectedIds.OrderBy(x => x));
-                        
-                        if (isCorrect)
-                        {
-                            correctCount++;
-                            actualScore += question.Points;
-                        }
-                    }
+                    correctCount++;
+                    actualScore += question.Points;
                 }
             }
-            
-            var percentageScore = maxScore > 0 ? (double)actualScore / maxScore * 100 : 0;
 
-            var user = userDict.GetValueOrDefault(a.UserId);
+            var percentageScore = maxScore > 0 ? (double)actualScore / maxScore * 100 : 0;
+            var userInfo = userDict.GetValueOrDefault(a.UserId);
 
             return new AttemptDto(
                 a.Id,
                 a.QuizId,
-                a.Quiz?.Title ?? "Unknown Quiz",
+                quiz.Title,
                 a.UserId,
-                user?.UserName ?? "Unknown User",
-                user?.Email,
+                userInfo?.UserName ?? "Unknown User",
+                userInfo?.Email,
                 actualScore,
                 maxScore,
                 percentageScore,
                 a.FinishedAt ?? a.StartedAt,
-                a.Quiz?.QuestionCount ?? 0,
+                quiz.Questions.Count,
                 correctCount
             );
         }).ToArray();
