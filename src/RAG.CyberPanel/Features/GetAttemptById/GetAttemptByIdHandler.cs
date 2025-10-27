@@ -63,11 +63,11 @@ public class GetAttemptByIdHandler
 
         // Calculate scores
         var maxScore = quiz.Questions.Sum(q => q.Points);
-        var percentageScore = maxScore > 0 ? (double)attempt.Score / maxScore * 100 : 0;
 
         // Build question results
         var questionResults = new List<QuestionResultDto>();
         var correctCount = 0;
+        var actualScore = 0; // Calculate actual score based on current answers
 
         foreach (var question in quiz.Questions.OrderBy(q => q.Order))
         {
@@ -83,6 +83,7 @@ public class GetAttemptByIdHandler
             }
 
             var pointsAwarded = isCorrect ? question.Points : 0;
+            actualScore += pointsAwarded;
 
             var options = question.Options.Select(o => new OptionDto(
                 o.Id,
@@ -104,6 +105,9 @@ public class GetAttemptByIdHandler
             ));
         }
 
+        // Use the recalculated score instead of the stored one
+        var percentageScore = maxScore > 0 ? (double)actualScore / maxScore * 100 : 0;
+
         var attemptDetail = new AttemptDetailDto(
             attempt.Id,
             quiz.Id,
@@ -111,7 +115,7 @@ public class GetAttemptByIdHandler
             attempt.UserId,
             user?.UserName ?? "Unknown User",
             user?.Email,
-            attempt.Score,
+            actualScore,
             maxScore,
             percentageScore,
             attempt.FinishedAt ?? attempt.StartedAt,

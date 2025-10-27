@@ -55,19 +55,18 @@ public class ListAttemptsHandler
                     {
                         q.Title,
                         MaxScore = q.Questions.Sum(qn => qn.Points),
-                        QuestionCount = q.Questions.Count
+                        QuestionCount = q.Questions.Count,
+                        Questions = q.Questions.Select(qn => new
+                        {
+                            qn.Id,
+                            qn.Points,
+                            CorrectOptionIds = qn.Options.Where(o => o.IsCorrect).Select(o => o.Id).ToList()
+                        }).ToList()
                     })
                     .FirstOrDefault(),
                 Answers = a.Answers.Select(ans => new
                 {
                     ans.QuestionId,
-                    Question = _db.Questions
-                        .Where(q => q.Id == ans.QuestionId)
-                        .Select(q => new
-                        {
-                            CorrectOptionIds = q.Options.Where(o => o.IsCorrect).Select(o => o.Id).ToList()
-                        })
-                        .FirstOrDefault(),
                     SelectedOptionIds = ans.SelectedOptions.Select(so => so.OptionId).ToList()
                 }).ToList()
             })
@@ -85,15 +84,33 @@ public class ListAttemptsHandler
         var dtos = attempts.Select(a =>
         {
             var maxScore = a.Quiz?.MaxScore ?? 0;
-            var percentageScore = maxScore > 0 ? (double)a.Score / maxScore * 100 : 0;
+            var questions = a.Quiz?.Questions;
             
-            // Count correct answers
-            var correctCount = a.Answers.Count(ans =>
+            // Count correct answers and calculate actual score
+            var correctCount = 0;
+            var actualScore = 0;
+            
+            if (questions != null)
             {
-                var correctIds = ans.Question?.CorrectOptionIds ?? new List<Guid>();
-                var selectedIds = ans.SelectedOptionIds;
-                return correctIds.OrderBy(x => x).SequenceEqual(selectedIds.OrderBy(x => x));
-            });
+                foreach (var ans in a.Answers)
+                {
+                    var question = questions.FirstOrDefault(q => q.Id == ans.QuestionId);
+                    if (question != null)
+                    {
+                        var correctIds = question.CorrectOptionIds;
+                        var selectedIds = ans.SelectedOptionIds;
+                        var isCorrect = correctIds.OrderBy(x => x).SequenceEqual(selectedIds.OrderBy(x => x));
+                        
+                        if (isCorrect)
+                        {
+                            correctCount++;
+                            actualScore += question.Points;
+                        }
+                    }
+                }
+            }
+            
+            var percentageScore = maxScore > 0 ? (double)actualScore / maxScore * 100 : 0;
 
             var user = userDict.GetValueOrDefault(a.UserId);
 
@@ -104,7 +121,7 @@ public class ListAttemptsHandler
                 a.UserId,
                 user?.UserName ?? "Unknown User",
                 user?.Email,
-                a.Score,
+                actualScore,
                 maxScore,
                 percentageScore,
                 a.FinishedAt ?? a.StartedAt,
