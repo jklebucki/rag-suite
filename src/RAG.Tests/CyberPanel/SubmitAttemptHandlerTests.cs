@@ -48,7 +48,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(5);
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
@@ -89,7 +89,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns((string?)null);
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(0);
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
@@ -143,7 +143,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q2Options = q2.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(10); // Full score
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
@@ -180,7 +180,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(5); // Partial score
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
@@ -216,7 +216,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(5);
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
@@ -259,7 +259,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q2Options = q2.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<QuizAnswer[]>()))
+        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
             .Returns(5);
 
         var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);

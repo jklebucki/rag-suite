@@ -85,9 +85,13 @@ public class DeleteQuizHandler
         await _db.SaveChangesAsync(cancellationToken);
 
         // Delete quiz (cascade will handle QuizAttempt -> QuizAnswer -> QuizAnswerOption)
-        await _db.Quizzes
-            .Where(q => q.Id == quizId)
-            .ExecuteDeleteAsync(cancellationToken);
+        // Load quiz for deletion (it was loaded with AsNoTracking earlier)
+        var quizToDelete = await _db.Quizzes.FindAsync(new object[] { quizId }, cancellationToken);
+        if (quizToDelete != null)
+        {
+            _db.Quizzes.Remove(quizToDelete);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
 
         return new DeleteQuizResponse(
             quiz.Id,
