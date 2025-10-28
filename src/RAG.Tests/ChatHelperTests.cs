@@ -96,10 +96,14 @@ public class ChatHelperTests
             .Returns("Knowledge base context:");
         mockLanguageService.Setup(ls => ls.GetLocalizedString("system_prompts", "sources_summary", "en"))
             .Returns("Sources:");
+        mockLanguageService.Setup(ls => ls.GetLocalizedString("system_prompts", "current_question", "en"))
+            .Returns("Current question:");
+        mockLanguageService.Setup(ls => ls.GetLocalizedString("ui_labels", "user", "en"))
+            .Returns("User:");
 
         var searchResults = new[]
         {
-            new SearchResult("content1", "source1", "", 1.0, "pdf", "title1", null, null, new Dictionary<string, object>(), DateTime.UtcNow, DateTime.UtcNow)
+            new SearchResult("id1", "title1", "content1", 1.0, "source1", "pdf", null, "", new Dictionary<string, object>(), DateTime.UtcNow, DateTime.UtcNow)
         };
         var conversationHistory = new List<ChatMessage>();
         var userMessage = "Hello";

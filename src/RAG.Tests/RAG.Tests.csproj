@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RAG.CyberPanel\RAG.CyberPanel.csproj" />
     <ProjectReference Include="..\RAG.Orchestrator.Api\RAG.Orchestrator.Api.csproj" />
   </ItemGroup>
 
