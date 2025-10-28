@@ -12,7 +12,7 @@ import type { ChatMessage } from '@/types'
 
 export default function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const {
     currentSessionId,
