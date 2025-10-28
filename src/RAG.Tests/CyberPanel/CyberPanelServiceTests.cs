@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace RAG.Tests;
+namespace RAG.Tests.CyberPanel;
 
 public class CyberPanelServiceTests
 {

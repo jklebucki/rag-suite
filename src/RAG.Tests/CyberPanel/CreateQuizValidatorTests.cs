@@ -1,7 +1,7 @@
 using Xunit;
 using RAG.CyberPanel.Features.CreateQuiz;
 
-namespace RAG.Tests;
+namespace RAG.Tests.CyberPanel;
 
 public class CreateQuizValidatorTests
 {

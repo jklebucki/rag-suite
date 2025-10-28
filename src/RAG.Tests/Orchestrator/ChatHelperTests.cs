@@ -6,7 +6,7 @@ using Moq;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Abstractions.Search;
 
-namespace RAG.Tests;
+namespace RAG.Tests.Orchestrator;
 
 public class ChatHelperTests
 {

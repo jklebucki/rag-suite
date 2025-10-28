@@ -8,7 +8,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RAG.Tests;
+namespace RAG.Tests.CyberPanel;
 
 public class CreateQuizHandlerTests : IDisposable
 {

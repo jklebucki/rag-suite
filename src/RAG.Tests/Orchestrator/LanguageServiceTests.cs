@@ -3,7 +3,7 @@ using RAG.Orchestrator.Api.Localization;
 using Moq;
 using Microsoft.Extensions.Logging;
 
-namespace RAG.Tests;
+namespace RAG.Tests.Orchestrator;
 
 public class LanguageServiceTests
 {

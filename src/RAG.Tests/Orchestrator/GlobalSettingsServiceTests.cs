@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using RAG.Orchestrator.Api.Models;
 using Microsoft.Extensions.Configuration;
 
-namespace RAG.Tests;
+namespace RAG.Tests.Orchestrator;
 
 public class GlobalSettingsServiceTests : IDisposable
 {
