@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace RAG.Orchestrator.Api.Tests.Features.Reconstruction;
+namespace RAG.Tests.Orchestrator.Reconstruction;
 
 /// <summary>
 /// Integration tests showing the main goal achieved: reducing overlap in reconstructed documents

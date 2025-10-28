@@ -5,7 +5,7 @@ using Moq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace RAG.Orchestrator.Api.Tests.Features.Reconstruction;
+namespace RAG.Tests.Orchestrator.Reconstruction;
 
 public class DebugDocumentReconstructionTests
 {
