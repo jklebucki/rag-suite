@@ -48,15 +48,22 @@ public class ImportQuizHandler
 
             quiz = existingQuiz;
 
-            // Remove existing questions and options (cascade delete will handle options)
-            _db.Questions.RemoveRange(quiz.Questions);
-            
-            // Update quiz properties
+            // Update quiz properties first
             quiz.Title = request.Title;
             quiz.Description = request.Description;
             quiz.IsPublished = request.IsPublished;
             quiz.Language = request.Language;
+
+            // Remove existing questions and options (cascade delete will handle options)
+            var questionsToRemove = quiz.Questions.ToList();
             quiz.Questions.Clear();
+            _db.Questions.RemoveRange(questionsToRemove);
+            
+            // Save changes to persist question deletion before adding new ones
+            await _db.SaveChangesAsync(cancellationToken);
+            
+            // After SaveChanges, quiz.Questions should be empty and ready for new questions
+            // No need to reload quiz as it's still tracked and properties are already updated
             
             wasOverwritten = true;
         }
@@ -83,6 +90,7 @@ public class ImportQuizHandler
         {
             var question = new Question
             {
+                QuizId = quiz.Id,
                 Text = q.Text,
                 ImageUrl = q.ImageUrl,
                 Points = q.Points,
@@ -100,7 +108,7 @@ public class ImportQuizHandler
                 totalOptions++;
             }
 
-            quiz.Questions.Add(question);
+            _db.Questions.Add(question);
         }
 
         await _db.SaveChangesAsync(cancellationToken);

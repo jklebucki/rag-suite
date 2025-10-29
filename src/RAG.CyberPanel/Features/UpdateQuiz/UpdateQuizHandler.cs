@@ -39,11 +39,14 @@ public class UpdateQuizHandler
         }
 
         // Delete all existing questions and options (cascade delete)
-        await _db.Questions
+        // ExecuteDeleteAsync is not supported by InMemoryDatabase, use traditional approach
+        var questionsToDelete = await _db.Questions
             .Where(q => q.QuizId == quizId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
+        _db.Questions.RemoveRange(questionsToDelete);
+        await _db.SaveChangesAsync(cancellationToken);
 
-        // Now load the quiz again for tracking and update
+        // Reload quiz with tracking to update properties
         quiz = await _db.Quizzes.FindAsync(new object[] { quizId }, cancellationToken);
         if (quiz == null)
         {

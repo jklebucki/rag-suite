@@ -11,7 +11,7 @@ interface MessageInputProps {
   onUseDocumentSearchChange: (value: boolean) => void
 }
 
-export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps>(({
+export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputProps>(({
   message,
   onMessageChange,
   onSendMessage,
@@ -20,6 +20,27 @@ export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps
   onUseDocumentSearchChange,
 }, ref) => {
   const { t } = useI18n()
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  const actualRef = (ref as React.RefObject<HTMLTextAreaElement>) || textareaRef
+
+  // Auto-resize textarea
+  React.useEffect(() => {
+    const textarea = actualRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      const scrollHeight = textarea.scrollHeight
+      const lineHeight = 24 // approximate line height in pixels
+      const maxHeight = lineHeight * 8 // 4 lines max
+      textarea.style.height = Math.min(scrollHeight, maxHeight) + 'px'
+    }
+  }, [message, actualRef])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      onSendMessage(e)
+    }
+  }
 
   return (
     <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
@@ -39,14 +60,15 @@ export const MessageInput = React.forwardRef<HTMLInputElement, MessageInputProps
       </div>
 
       <form onSubmit={onSendMessage} className="flex gap-2 md:gap-3">
-        <input
-          ref={ref}
-          type="text"
+        <textarea
+          ref={actualRef}
           value={message}
           onChange={(e) => onMessageChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={t('chat.input.placeholder')}
-          className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
+          className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow resize-none overflow-y-auto"
           disabled={isSending}
+          rows={1}
         />
         <button
           type="submit"

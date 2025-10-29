@@ -361,8 +361,8 @@ fi
 echo -e "${BLUE}[TEST] Sprawdzanie połączenia...${NC}"
 
 # Test API
-echo -n -e "${YELLOW}Test API (http://localhost:5000/health)... ${NC}"
-if curl -f -s http://localhost:5000/health > /dev/null; then
+echo -n -e "${YELLOW}Test API (http://localhost:5000/healthz/system)... ${NC}"
+if curl -f -s http://localhost:5000/healthz/system > /dev/null; then
     echo -e "${GREEN}✓ OK${NC}"
 else
     echo -e "${RED}✗ FAIL${NC}"
