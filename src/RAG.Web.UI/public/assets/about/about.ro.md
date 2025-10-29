@@ -1,73 +1,86 @@
 # RAG Suite
 
-**Platformă Inteligentă de Procesare și Căutare Documente**
+### Platformă de cunoștințe și operațiuni pentru companii, alimentată de inteligență artificială {#subtitle-hero}
 
-## Despre
+### Asistentul tău inteligent AI Jan {#subtitle-hero-badge}
 
-RAG Suite este o platformă cuprinzătoare concepută pentru a ajuta organizațiile să proceseze, să caute și să interacționeze eficient cu colecțiile lor de documente folosind tehnologii avansate de AI și învățare automată.
+RAG Suite este o platformă pentru căutare sigură și lucru cu documente/tichete. Combină LLM-urile cu o bază de cunoștințe dedicată (RAG), oferind răspunsuri rapide și verificabile, împreună cu sursele.
 
-## Despre Proiect
+## DESPRE APLICAȚIE {#about-app}
 
-Acest proiect a fost dezvoltat la **Citronex**, unde **Jarosław Kłębucki** servește ca dezvoltator principal, cu sprijinul lui **Kacper Kozłowski**. Toate elementele infrastructurii tehnice și datele sunt găzduite exclusiv în resursele interne ale Citronex, asigurând securitatea maximă și conformitatea cu politicile companiei.
+### Platformă modernă AI care integrează toate cunoștințele organizaționale într-un singur loc {#subtitle-about-app}
 
-## Funcții Principale
+RAG Suite este o platformă modernă bazată pe inteligență artificială, care integrează întreaga cunoaștere organizațională într-un singur loc. Reunește instrucțiuni, proceduri, documentație tehnică, chestionare de securitate și date operaționale, permițând căutare instantanee, analiză și automatizare a proceselor.
 
-### 🤖 Chat Inteligent
-- Conversații în limbaj natural cu baza dumneavoastră de cunoștințe
-- Răspunsuri conștiente de context alimentate de modele lingvistice avansate
-- Suport multilingv pentru echipe globale
+## DESPRE PROIECT {#about-project}
 
-### 🔍 Căutare Inteligentă
-- Căutare semantică puternică în toate documentele
-- Căutare hibridă care combină abordări lexicale și vectoriale
-- Clasare relevanță cu RRF (Reciprocal Rank Fusion)
+### Dezvoltat iterativ la Citronex cu accent pe calitate, conformitate și ușurință în utilizare {#subtitle-about-project}
 
-### 📊 Analize și Perspective
-- Metrici cuprinzătoare de utilizare și monitorizare performanță
-- Urmărire ingestie documente și raportare status
-- Monitorizare sănătate sistem în timp real
+Proiect dezvoltat și menținut în resursele interne Citronex. Dezvoltarea este iterativă, cu accent pe calitatea răspunsurilor, conformitate (ISO/NIS2) și ușurința de utilizare pentru departamentele de business.
 
-### 🔧 Configurație Avansată
-- Integrare flexibilă LLM (Ollama, OpenAI, și mai multe)
-- Modele embedding configurabile (suport BGE-M3)
-- Parametri ajustați fin pentru performanță optimă
+Datorită mecanismelor RAG (Retrieval-Augmented Generation) și motorului de căutare semantică, RAG Suite permite angajaților să găsească informațiile potrivite în câteva secunde, să genereze răspunsuri contextuale și să eficientizeze munca zilnică în întreaga companie.
 
-## Stivă Tehnologică
+Este un asistent digital al cunoașterii — mereu actualizat, sigur și disponibil pentru întreaga companie.
 
-- **Backend**: .NET 8 Minimal APIs cu Arhitectură Vertical Slice
-- **Frontend**: React 18 cu TypeScript
-- **Bază de date**: PostgreSQL cu EF Core
-- **Căutare**: Elasticsearch cu capabilități căutare hibridă
-- **AI/ML**: Integrare cu diverși furnizori LLM
+## CARACTERISTICI PRINCIPALE {#key-features}
 
-## Arhitectură
+### Funcții care simplifică munca, automatizează procesele și centralizează cunoștințele într-un singur loc {#subtitle-key-features}
 
-Construit cu principii moderne de arhitectură software:
+### CHAT INTELIGENT {#chat}
+- Conversații naturale în poloneză, română, engleză și maghiară
+- Mai multe modele lingvistice adaptate sarcinilor specifice
+- Asistent pentru securitate cibernetică și igienă digitală
+- Răspunsuri cu context și linkuri către surse
 
-- **Arhitectură Vertical Slice** pentru limite clare de funcționalități
-- **Principiile Domain-Driven Design**
-- **Model CQRS** pentru separare optimă citire/scriere
-- **Arhitectură bazată pe evenimente** cu model outbox
-- **Design pregătit pentru microservicii** pentru scalabilitate
+### CĂUTARE INTELIGENTĂ {#search}
+- Căutare semantică avansată în documente
+- Combinarea căutării lexicale și semantice
+- Potrivire dinamică a răspunsurilor cu întrebările utilizatorului
+- Căutarea fragmentelor din instrucțiuni, politici sau proceduri de securitate
 
-## Securitate și Conformitate
+### ANALIZE ȘI CONCLUZII {#analytics}
+- Rapoarte automate privind adoptarea cunoștințelor și nivelul de implicare
+- Analiza surselor de cunoștințe și a calității documentației
+- Alerte și politici pentru conformitatea cu standardele (ISO/NIS2)
+- Concluzii și recomandări care susțin procesele companiei
 
-- Autentificare bazată pe JWT cu control acces bazat pe roluri
-- Puncte finale API sigure cu validare corespunzătoare
-- Management configurație bazat pe mediu
-- Logging și monitorizare cuprinzătoare
+## ROADMAP {#roadmap}
 
-## Noțiuni de Bază
+### Cale strategică de dezvoltare pentru funcții AI, securitate și analiză cunoștințe în organizație {#subtitle-roadmap}
 
-1. **Configurare**: Urmați ghidul de implementare pentru a configura platforma
-2. **Configurare**: Configurați serviciile dumneavoastră LLM și embedding
-3. **Ingestie**: Încărcați și procesați documentele dumneavoastră
-4. **Căutare**: Începeți să explorați baza dumneavoastră de cunoștințe
+### REALIZAT {#done}
+- Prototip RAG: arhitectură stabilă și interfață utilizator pregătită.
+- Chestionare CyberSec: teste interactive de cunoștințe pentru angajați.
+- Integrare cu IFS Cloud — automatizarea instrucțiunilor de proces cu modelul GPT-OSS.
+- Multilingual: suport pentru mai multe limbi în chat, documente și interfață.
 
----
+### ÎN CURS {#inprogress}
+- Extinderea CyberPanel
+- Instruirea modelului lingvistic în domeniul securității cibernetice
+- Îmbunătățiri de UX
+- Creșterea relevanței răspunsurilor modelelor lingvistice
 
-**Versiune**: 1.0.0
-**Licență**: MIT
-**Repository**: [GitHub](https://github.com/jklebucki/rag-suite)
-**Dezvoltat de**: Citronex (Dezvoltator principal: Jarosław Kłębucki, Suport: Kacper Kozłowski)
-**Infrastructură**: Toate componentele tehnice și datele găzduite exclusiv în resursele interne Citronex
+### PLAN {#plan}
+- Integrări cu agenda/adresarul
+- Crearea unui dashboard al angajatului și integrare cu IFS CLOUD
+- Instruirea modelelor lingvistice pe procesele de business pentru onboarding-ul noilor angajați
+- Construirea procedurilor de securitate la nivel de companie
+
+## BENEFICII PENTRU COMPANIE {#benefits}
+
+### AI care organizează cunoștințele, simplifică procesele și îmbunătățește eficiența întregii organizații {#subtitle-benefits}
+
+- **PROCESE MAI RAPIDE**: Până la 80–90% mai puțin timp pentru a ajunge la informații, datorită chat-ului central și căutării inteligente în documente.
+- **RĂSPUNSURI CONSISTENTE**: Standardizare completă a cunoștințelor și eliminarea erorilor cauzate de interpretări diferite ale instrucțiunilor.
+- **AUTOMATIZAREA CUNOȘTINȚELOR**: Documentele, instrucțiunile și politicile companiei sunt procesate automat și disponibile prin dialog interactiv.
+- **INTEGRAREA ANGAJAȚILOR NOI**: Onboarding rapid cu răspunsuri contextuale și chestionare despre regulile de securitate și procedurile IFS.
+- **IMAGINE MODERNĂ A ORGANIZAȚIEI**: Utilizarea AI în managementul zilnic al cunoștințelor crește inovația și competitivitatea.
+- **FĂRĂ FRAGMENTARE**: Toate datele, procedurile și instrucțiunile cheie sunt centralizate într-un singur loc, accesibile dintr-o singură platformă.
+
+## AUTORI PROIECT {#authors}
+
+### Persoane responsabile pentru dezvoltarea și menținerea RAG Suite {#subtitle-authors}
+
+- **Jarosław Kłębucki** — Dezvoltator Fullstack Principal
+- **Kacper Kozłowski** — Dezvoltator Junior
+- **Citronex IT** — Infrastructură & Securitate

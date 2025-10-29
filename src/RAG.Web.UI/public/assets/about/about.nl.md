@@ -1,75 +1,86 @@
 # RAG Suite
 
-**Intelligente Documentverwerking en Zoekplatform**
+### Kennis- en operatieplatform voor bedrijven, aangedreven door kunstmatige intelligentie {#subtitle-hero}
 
-## Over
+### Je intelligente AI-assistent Jan {#subtitle-hero-badge}
 
-RAG Suite is een uitgebreid platform ontworpen om organisaties te helpen hun documentcollecties efficiënt te verwerken, doorzoeken en ermee te interageren met behulp van geavanceerde AI- en machine learning-technologieën.
+RAG Suite is een platform voor veilig zoeken en werken met documenten/tickets. Het combineert LLM's met een dedicated kennisbank (RAG) en levert snelle, verifieerbare antwoorden met bronverwijzingen.
 
-## Over het Project
+## OVER DE APP {#about-app}
 
-Dit project is ontwikkeld bij **Citronex**, waar **Jarosław Kłębucki** dient als hoofdontwikkelaar, met ondersteuning van **Kacper Kozłowski**. Alle technische infrastructuurelementen en gegevens worden uitsluitend gehost binnen de interne bronnen van Citronex, waardoor maximale veiligheid en naleving van het bedrijfsbeleid worden gegarandeerd.
+### Modern AI-platform dat alle organisatiekennis op één plek integreert {#subtitle-about-app}
 
-## Belangrijkste Functies
+RAG Suite is een modern, AI-gedreven platform dat alle organisatiekennis op één plek integreert. Het brengt instructies, procedures, technische documentatie, security-quizzen en operationele data samen, waardoor razendsnel zoeken, analyseren en procesautomatisering mogelijk is.
 
-### 🤖 Intelligente Chat
-- Natuurlijke taal gesprekken met uw kennisbank
-- Contextbewuste antwoorden powered by geavanceerde taalmodellen
-- Meertalige ondersteuning voor wereldwijde teams
+## OVER HET PROJECT {#about-project}
 
-### 🔍 Slim Zoeken
-- Krachtige semantische zoekopdrachten in alle documenten
-- Hybride zoekopdrachten die lexicale en vectorbenaderingen combineren
-- Relevantie ranking met RRF (Reciprocal Rank Fusion)
+### Iteratief ontwikkeld bij Citronex met focus op kwaliteit, compliance en gebruiksgemak {#subtitle-about-project}
 
-### 📊 Analytics & Inzichten
-- Uitgebreide gebruiksstatistieken en prestatiemonitoring
-- Documentopname tracking en statusrapportage
-- Real-time systeemgezondheidsmonitoring
+Het project wordt ontwikkeld en beheerd binnen de interne resources van Citronex. Ontwikkeling gebeurt iteratief, met focus op antwoordkwaliteit, compliance (ISO/NIS2) en gebruiksgemak voor businessafdelingen.
 
-### 🔧 Geavanceerde Configuratie
-- Flexibele LLM-integratie (Ollama, OpenAI, en meer)
-- Aanpasbare embedding modellen (BGE-M3 ondersteuning)
-- Fijn afgestemde parameters voor optimale prestaties
+Dankzij Retrieval-Augmented Generation (RAG) en een semantische zoekmachine kunnen medewerkers in seconden de juiste informatie vinden, contextuele antwoorden genereren en het dagelijkse werk in de hele organisatie stroomlijnen.
 
-## Technologie Stack
+Het is een digitale kennisassistent — altijd actueel, veilig en beschikbaar voor de hele organisatie.
 
-- **Backend**: .NET 8 Minimal APIs met Vertical Slice Architecture
-- **Frontend**: React 18 met TypeScript
-- **Database**: PostgreSQL met EF Core
-- **Zoeken**: Elasticsearch met hybride zoekmogelijkheden
-- **AI/ML**: Integratie met verschillende LLM-providers
+## BELANGRIJKSTE FUNCTIES {#key-features}
 
-## Architectuur
+### Functies die werk stroomlijnen, processen automatiseren en kennis centraliseren op één plek {#subtitle-key-features}
 
-Gebouwd met moderne software architectuur principes:
+### INTELLIGENTE CHAT {#chat}
+- Natuurlijke gesprekken in het Pools, Roemeens, Engels en Hongaars
+- Meerdere taalmodellen afgestemd op specifieke taken
+- Assistent voor cyberbeveiliging en digitale hygiëne
+- Antwoorden met context en links naar bronnen
 
-- **Vertical Slice Architecture** voor duidelijke functiegrenzen
-- **Domain-Driven Design** principes
-- **CQRS patroon** voor optimale read/write scheiding
-- **Event-gedreven architectuur** met outbox patroon
-- **Microservices-ready** ontwerp voor schaalbaarheid
+### SLIM ZOEKEN {#search}
+- Geavanceerd semantisch zoeken in documenten
+- Hybride aanpak die lexicale en semantische methoden combineert
+- Dynamische afstemming van antwoorden op gebruikersvragen
+- Zoeken in fragmenten van instructies, beleid of beveiligingsprocedures
 
-## Beveiliging & Compliance
+### ANALYSES EN INZICHTEN {#analytics}
+- Automatische rapporten over kennisadoptie en betrokkenheid
+- Analyse van kennisbronnen en documentatiekwaliteit
+- Alerts en beleidsregels voor naleving van standaarden (ISO/NIS2)
+- Inzichten en aanbevelingen ter ondersteuning van bedrijfsprocessen
 
-- JWT-gebaseerde authenticatie met rolgebaseerde toegangscontrole
-- Veilige API-eindpunten met juiste validatie
-- Omgevingsgebaseerd configuratiebeheer
-- Uitgebreide logging en monitoring
+## ROADMAP {#roadmap}
 
-## Aan de Slag
+### Strategisch ontwikkelingspad voor AI-functies, beveiliging en kennisanalyse in de organisatie {#subtitle-roadmap}
 
-1. **Setup**: Volg de implementatiegids om het platform op te zetten
-2. **Configureer**: Stel uw LLM- en embedding-services in
-3. **Opname**: Upload en verwerk uw documenten
-4. **Zoeken**: Begin met het verkennen van uw kennisbank
+### GEREALISEERD {#done}
+- RAG-prototype: stabiele architectuur en gebruiksklare gebruikersinterface.
+- CyberSec-quizzen: interactieve kennistests voor medewerkers.
+- Integratie met IFS Cloud — automatisering van procesinstructies met een GPT-OSS-model.
+- Meertalig: ondersteuning voor meerdere talen in chat, documenten en interface.
 
-## Ondersteuning
+### IN UITVOERING {#inprogress}
+- Uitbreiding van CyberPanel
+- Training van het taalmodel op cyberbeveiliging
+- UX-verbeteringen
+- Hogere relevantie van modelantwoorden
 
----
+### PLAN {#plan}
+- Integraties met het adresboek
+- Medewerkerdashboard en integratie met IFS CLOUD
+- Taalmodellen trainen in bedrijfsprocessen ter ondersteuning van onboarding van nieuwe medewerkers
+- Opbouw van bedrijfsbrede beveiligingsprocedures
 
-**Versie**: 1.0.0
-**Licentie**: MIT
-**Repository**: [GitHub](https://github.com/jklebucki/rag-suite)
-**Ontwikkeld door**: Citronex (Hoofdontwikkelaar: Jarosław Kłębucki, Ondersteuning: Kacper Kozłowski)
-**Infrastructuur**: Alle technische componenten en gegevens uitsluitend gehost binnen Citronex interne bronnen
+## VOORDELEN VOOR HET BEDRIJF {#benefits}
+
+### AI die kennis organiseert, processen stroomlijnt en de efficiëntie van de hele organisatie verhoogt {#subtitle-benefits}
+
+- **SNELLERE PROCESSEN**: Tot 80–90% kortere tijd tot informatie dankzij centrale chat en slimme documentzoekfunctie.
+- **CONSISTENTE ANTWOORDEN**: Volledige standaardisatie van kennis en eliminatie van fouten door verschillende interpretaties van instructies.
+- **KENNISAUTOMATISERING**: Documenten, instructies en bedrijfsbeleid worden automatisch verwerkt en via interactieve dialoog beschikbaar gemaakt.
+- **ONBOARDING VAN NIEUWE MEDEWERKERS**: Razendsnelle onboarding met contextuele antwoorden en quizzen over beveiligingsregels en IFS-procedures.
+- **MODERN BEDRIJFSIMAGO**: Het gebruik van AI in dagelijks kennismanagement verhoogt innovatie en concurrentievermogen.
+- **GEEN VERSNIPPERING**: Alle kerngegevens, procedures en instructies zijn gecentraliseerd op één plek, toegankelijk via één platform.
+
+## AUTEURS VAN HET PROJECT {#authors}
+
+### Mensen verantwoordelijk voor de ontwikkeling en het onderhoud van RAG Suite {#subtitle-authors}
+
+- **Jarosław Kłębucki** — Lead Fullstack Developer
+- **Kacper Kozłowski** — Junior Developer
+- **Citronex IT** — Infrastructuur & Beveiliging
