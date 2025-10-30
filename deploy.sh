@@ -260,8 +260,8 @@ if [ ! -f "build/api/appsettings.Production.json" ]; then
     "LlmService": {
       "Url": "http://192.168.21.14:11434",
       "MaxTokens": 300,
-      "Temperature": 0.7,
-      "Model": "llama3.1:8b",
+      "Temperature": 0.2,
+      "Model": "gpt-oss:20b",
       "IsOllama": true,
       "TimeoutMinutes": 10
     }
