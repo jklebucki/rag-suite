@@ -5,7 +5,8 @@ const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'))
 const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'))
 const SearchInterface = lazy(() => import('@/components/search/SearchInterface'))
 const Settings = lazy(() => import('@/components/settings/Settings'))
-const About = lazy(() => import('@/components/About'))
+const About = lazy(() => import('@/components/about/About'))
+const AddressBook = lazy(() => import('@/components/addressbook/AddressBook'))
 const LoginForm = lazy(() => import('@/components/auth/LoginForm'))
 const RegisterForm = lazy(() => import('@/components/auth/RegisterForm'))
 const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm'))
@@ -59,6 +60,12 @@ function AppRoutes() {
           <ProtectedRoute>
             <SearchInterface />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/address-book"
+        element={
+          <AddressBook />
         }
       />
       <Route

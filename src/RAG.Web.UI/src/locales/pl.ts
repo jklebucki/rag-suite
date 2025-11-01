@@ -9,6 +9,7 @@ export const pl: TranslationKeys = {
   'nav.ingestion': 'Ingestion',
   'nav.analytics': 'Analityka',
   'nav.settings': 'Ustawienia',
+  'nav.addressBook': 'Książka adresowa',
   'nav.app_info': 'O Aplikacji',
   'nav.cyberpanel': 'Cyber Panel',
 

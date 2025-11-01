@@ -6,6 +6,7 @@ import {
   BarChart3,
   Settings,
   Info,
+  Users,
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -25,6 +26,10 @@ export function useLayout() {
     { name: t('nav.search'), href: '/search', icon: Search },
   ]
 
+  const addressBookNavigation = [
+    { name: t('nav.addressBook'), href: '/address-book', icon: Users },
+  ]
+
   const adminNavigation = [
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
@@ -39,8 +44,8 @@ export function useLayout() {
   ]
 
   const mainNavigation = isAdmin
-    ? [...baseNavigation, ...cyberNavigation, ...adminNavigation]
-    : [...baseNavigation, ...cyberNavigation]
+    ? [...baseNavigation, ...addressBookNavigation, ...cyberNavigation, ...adminNavigation]
+    : [...baseNavigation, ...addressBookNavigation, ...cyberNavigation]
 
   const navigation = [...mainNavigation, ...footerNavigation]
 

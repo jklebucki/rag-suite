@@ -27,6 +27,7 @@ export interface TranslationKeys {
   'nav.ingestion': string;
   'nav.analytics': string;
   'nav.settings': string;
+  'nav.addressBook': string;
   'nav.app_info': string;
   'nav.cyberpanel': string;
 
