@@ -268,8 +268,8 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 h-[95%] flex flex-col">
+      <div className="flex items-center gap-4 flex-shrink-0">
         <input
           type="text"
           value={globalFilter ?? ''}
@@ -313,8 +313,8 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow address-book-table">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto bg-white rounded-lg shadow address-book-table flex-1">
+        <table className="min-w-full divide-y divide-gray-200 h-full">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <React.Fragment key={headerGroup.id}>
@@ -416,7 +416,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         </table>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 flex-shrink-0">
         <div className="flex items-center gap-2 text-sm text-gray-700">
           <span>{t('addressBook.table.rowsPerPage')}:</span>
           <select
