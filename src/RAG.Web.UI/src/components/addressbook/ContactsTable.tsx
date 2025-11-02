@@ -268,7 +268,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
   }
 
   return (
-    <div className="space-y-4 max-w-[95%] flex flex-col">
+    <div className="space-y-4 flex flex-col">
       <div className="flex items-center gap-4 flex-shrink-0">
         <input
           type="text"

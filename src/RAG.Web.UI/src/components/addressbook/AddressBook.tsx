@@ -176,7 +176,7 @@ export default function AddressBook() {
   const pendingProposalsCount = proposals.filter((p) => p.status === ProposalStatus.Pending).length
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl max-w-[95%]">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Address Book</h1>
         <p className="text-gray-600 mt-1">

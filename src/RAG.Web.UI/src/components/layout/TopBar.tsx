@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Menu, User, LogOut, ChevronDown, Settings, Globe } from 'lucide-react'
+import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
 import { UserAccountModal } from '@/components/account/UserAccountModal'
 import { SessionExpiredModal } from '@/components/ui/SessionExpiredModal'
@@ -96,6 +97,18 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
           <Globe className="h-5 w-5" />
           <span className="text-sm font-medium text-gray-700 uppercase">{language}</span>
         </button>
+        
+        {!user && (
+          <Link
+            to="/login"
+            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
+            title={t('auth.login.sign_in')}
+            aria-label={t('auth.login.sign_in')}
+          >
+            <LogIn className="h-5 w-5" />
+            <span className="text-sm font-medium text-gray-700 hidden sm:inline">{t('auth.login.sign_in')}</span>
+          </Link>
+        )}
         
         {user && (
           <div className="relative" ref={menuRef}>
