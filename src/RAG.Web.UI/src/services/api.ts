@@ -402,6 +402,111 @@ class ApiClient {
     const response = await this.client.get(`/cyberpanel/quizzes/attempts/${attemptId}`)
     return response.data
   }
+
+  // AddressBook Contact API methods
+  
+  /**
+   * List all contacts with pagination and filtering
+   */
+  async listContacts(params?: { includeInactive?: boolean; department?: string | null; location?: string | null }): Promise<any> {
+    const queryParams = new URLSearchParams()
+    // includeInactive is required by backend, default to false
+    queryParams.append('includeInactive', params?.includeInactive ? 'true' : 'false')
+    if (params?.department) queryParams.append('department', params.department)
+    if (params?.location) queryParams.append('location', params.location)
+    
+    const response = await this.client.get(`/addressbook?${queryParams}`)
+    return response.data
+  }
+
+  /**
+   * Get a specific contact by ID
+   */
+  async getContact(contactId: string): Promise<any> {
+    const response = await this.client.get(`/addressbook/${contactId}`)
+    return response.data
+  }
+
+  /**
+   * Search contacts by query
+   */
+  async searchContacts(query?: string, includeInactive?: boolean): Promise<any> {
+    const queryParams = new URLSearchParams()
+    if (query) queryParams.append('query', query)
+    if (includeInactive) queryParams.append('includeInactive', 'true')
+    
+    const response = await this.client.get(`/addressbook/search?${queryParams}`)
+    return response.data
+  }
+
+  /**
+   * Create a new contact
+   */
+  async createContact(request: any): Promise<any> {
+    const response = await this.client.post('/addressbook', request)
+    return response.data
+  }
+
+  /**
+   * Update an existing contact
+   */
+  async updateContact(contactId: string, request: any): Promise<any> {
+    const response = await this.client.put(`/addressbook/${contactId}`, request)
+    return response.data
+  }
+
+  /**
+   * Delete a contact
+   */
+  async deleteContact(contactId: string): Promise<void> {
+    await this.client.delete(`/addressbook/${contactId}`)
+  }
+
+  /**
+   * Propose a change to a contact
+   */
+  async proposeChange(request: any): Promise<any> {
+    const response = await this.client.post('/addressbook/proposals', request)
+    return response.data
+  }
+
+  /**
+   * List all proposals with filtering
+   */
+  async listProposals(params?: { status?: number | null; proposalType?: number | null; proposedByUserId?: string | null }): Promise<any> {
+    const queryParams = new URLSearchParams()
+    if (params?.status !== undefined && params.status !== null) queryParams.append('status', params.status.toString())
+    if (params?.proposalType !== undefined && params.proposalType !== null) queryParams.append('proposalType', params.proposalType.toString())
+    if (params?.proposedByUserId) queryParams.append('proposedByUserId', params.proposedByUserId)
+    
+    const url = queryParams.toString() ? `/addressbook/proposals?${queryParams}` : '/addressbook/proposals'
+    const response = await this.client.get(url)
+    return response.data
+  }
+
+  /**
+   * Get a specific proposal by ID
+   */
+  async getProposal(proposalId: string): Promise<any> {
+    const response = await this.client.get(`/addressbook/proposals/${proposalId}`)
+    return response.data
+  }
+
+  /**
+   * Review (approve/reject) a proposal
+   */
+  async reviewProposal(proposalId: string, request: any): Promise<any> {
+    const response = await this.client.post(`/addressbook/proposals/${proposalId}/review`, request)
+    return response.data
+  }
+
+  /**
+   * Import contacts from data
+   */
+  async importContacts(request: any): Promise<any> {
+    const response = await this.client.post('/addressbook/import', request)
+    return response.data
+  }
 }
 
 export const apiClient = new ApiClient()

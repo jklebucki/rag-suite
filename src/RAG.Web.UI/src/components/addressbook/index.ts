@@ -1,1 +1,6 @@
-export { default as AddressBook } from './AddressBook';
+export { default as AddressBook } from './AddressBook'
+export { ContactsTable } from './ContactsTable'
+export { ContactForm } from './ContactForm'
+export { ContactImport } from './ContactImport'
+export { ProposalsList } from './ProposalsList'
+;

@@ -13,7 +13,7 @@ public static class ListContactsEndpoint
             .WithName("ListContacts")
             .WithTags("AddressBook")
             .WithOpenApi()
-            .RequireAuthorization();
+            .AllowAnonymous();
     }
 
     private static async Task<IResult> ListContactsAsync(
