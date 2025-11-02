@@ -1,3 +1,5 @@
+using RAG.AddressBook.Endpoints;
+using RAG.AddressBook.Extensions;
 using RAG.CyberPanel.Endpoints;
 using RAG.CyberPanel.Extensions;
 using RAG.Orchestrator.Api.Data;
@@ -31,6 +33,8 @@ builder.Services.Configure<SharedFoldersOptions>(builder.Configuration.GetSectio
 builder.Services.AddFeatureServices();
 // Register CyberPanel feature (scaffold)
 builder.Services.AddCyberPanel(builder.Configuration);
+// Register AddressBook feature
+builder.Services.AddAddressBook(builder.Configuration);
 
 var app = builder.Build();
 
@@ -52,6 +56,10 @@ try
         // Ensure CyberPanel database migrations are applied
         await app.Services.EnsureCyberPanelDatabaseCreatedAsync();
         app.Logger.LogInformation("CyberPanel database initialization completed successfully");
+
+        // Ensure AddressBook database migrations are applied
+        await app.Services.EnsureAddressBookDatabaseCreatedAsync();
+        app.Logger.LogInformation("AddressBook database initialization completed successfully");
     }
     else
     {
@@ -100,5 +108,7 @@ app.MapFileDownloadEndpoints();
 app.MapSettingsEndpoints();
 
 app.MapCyberPanelEndpoints();
+
+app.MapAddressBookEndpoints();
 
 app.Run();

@@ -1,0 +1,172 @@
+### RAG.AddressBook API Endpoints
+@baseUrl = https://localhost:5001
+@token = YOUR_JWT_TOKEN_HERE
+
+### Create Contact
+POST {{baseUrl}}/api/addressbook
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "displayName": "John Doe - ACME Corp",
+  "department": "IT",
+  "position": "Software Engineer",
+  "location": "Warsaw",
+  "company": "ACME Corporation",
+  "workPhone": "+48221234567",
+  "mobilePhone": "+48600123456",
+  "email": "john.doe@acme.com",
+  "notes": "Senior developer with 5 years experience",
+  "tags": ["Engineering", "Backend"]
+}
+
+### Get Contact by ID
+GET {{baseUrl}}/api/addressbook/{{contactId}}
+Authorization: Bearer {{token}}
+
+### List All Contacts
+GET {{baseUrl}}/api/addressbook
+Authorization: Bearer {{token}}
+
+### List Contacts with Filters
+GET {{baseUrl}}/api/addressbook?department=IT&location=Warsaw
+Authorization: Bearer {{token}}
+
+### List Contacts Including Inactive
+GET {{baseUrl}}/api/addressbook?includeInactive=true
+Authorization: Bearer {{token}}
+
+### Search Contacts
+GET {{baseUrl}}/api/addressbook/search?searchTerm=john
+Authorization: Bearer {{token}}
+
+### Update Contact
+PUT {{baseUrl}}/api/addressbook/{{contactId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "displayName": "John Doe - ACME Corp",
+  "department": "IT",
+  "position": "Senior Software Engineer",
+  "location": "Warsaw",
+  "company": "ACME Corporation",
+  "workPhone": "+48221234567",
+  "mobilePhone": "+48600123456",
+  "email": "john.doe@acme.com",
+  "notes": "Promoted to senior position",
+  "isActive": true
+}
+
+### Delete Contact
+DELETE {{baseUrl}}/api/addressbook/{{contactId}}
+Authorization: Bearer {{token}}
+
+### Import Contacts from CSV
+POST {{baseUrl}}/api/addressbook/import
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "csvContent": "\"Imię\";\"Nazwisko\";\"Dział\";\"Telefon służbowy\";\"Telefon komórkowy\";\"Adres e-mail\";\"Nazwa wyświetlana\";\"Stanowisko\";\"Lokalizacja\"\n\"Jan\";\"Kowalski\";\"IT\";\"\";\"+ 48600123456\";\"jan.kowalski@example.com\";\"Jan Kowalski - ACME Corp\";\"Software Developer\";\"Warsaw\"",
+  "skipDuplicates": true
+}
+
+### ============================================
+### CHANGE PROPOSALS (All authenticated users)
+### ============================================
+
+### Propose New Contact
+POST {{baseUrl}}/api/addressbook/proposals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proposalType": 1,
+  "proposedData": {
+    "firstName": "Anna",
+    "lastName": "Nowak",
+    "department": "HR",
+    "position": "HR Manager",
+    "email": "anna.nowak@example.com",
+    "mobilePhone": "+48600987654",
+    "location": "Krakow"
+  },
+  "reason": "New employee joined the HR department"
+}
+
+### Propose Contact Update
+POST {{baseUrl}}/api/addressbook/proposals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contactId": "{{contactId}}",
+  "proposalType": 2,
+  "proposedData": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "department": "IT",
+    "position": "Lead Software Engineer",
+    "email": "john.doe@acme.com",
+    "mobilePhone": "+48600123456",
+    "location": "Warsaw",
+    "notes": "Promoted to lead position"
+  },
+  "reason": "Employee promotion - title change required"
+}
+
+### Propose Contact Deletion
+POST {{baseUrl}}/api/addressbook/proposals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contactId": "{{contactId}}",
+  "proposalType": 3,
+  "proposedData": {
+    "firstName": "Deleted",
+    "lastName": "Contact"
+  },
+  "reason": "Employee left the company"
+}
+
+### List My Proposals
+GET {{baseUrl}}/api/addressbook/proposals
+Authorization: Bearer {{token}}
+
+### List Pending Proposals (Admin)
+GET {{baseUrl}}/api/addressbook/proposals?status=1
+Authorization: Bearer {{token}}
+
+### Get Proposal Details
+GET {{baseUrl}}/api/addressbook/proposals/{{proposalId}}
+Authorization: Bearer {{token}}
+
+### ============================================
+### PROPOSAL REVIEW (Admin/PowerUser only)
+### ============================================
+
+### Approve Proposal
+POST {{baseUrl}}/api/addressbook/proposals/{{proposalId}}/review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "decision": 2,
+  "reviewComment": "Approved - information verified and accurate"
+}
+
+### Reject Proposal
+POST {{baseUrl}}/api/addressbook/proposals/{{proposalId}}/review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "decision": 3,
+  "reviewComment": "Rejected - insufficient information provided"
+}
