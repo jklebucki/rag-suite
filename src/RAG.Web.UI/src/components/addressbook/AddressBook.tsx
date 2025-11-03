@@ -1,6 +1,7 @@
 // AddressBook - Main component for managing contacts
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useI18n } from '@/contexts/I18nContext'
 import addressBookService from '@/services/addressBookService'
 import { ContactsTable } from './ContactsTable'
 import { ContactForm } from './ContactForm'
@@ -18,6 +19,7 @@ type TabType = 'contacts' | 'import' | 'proposals'
 
 export default function AddressBook() {
   const { user, isAuthenticated } = useAuth()
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<TabType>('contacts')
   const [contacts, setContacts] = useState<ContactListItem[]>([])
   const [proposals, setProposals] = useState<ProposalListItem[]>([])
@@ -28,7 +30,6 @@ export default function AddressBook() {
   // Form/Modal states
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<ContactListItem | null>(null)
-  const [isImportOpen, setIsImportOpen] = useState(false)
   const [proposingContact, setProposingContact] = useState<ContactListItem | null>(null)
 
   // Check if user can modify directly (Admin/PowerUser)
@@ -178,9 +179,9 @@ export default function AddressBook() {
   return (
     <div className="max-w-7xl max-w-[95%]">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Address Book</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('addressBook.title')}</h1>
         <p className="text-gray-600 mt-1">
-          Manage your contacts and proposals
+          {t('addressBook.subtitle')}
         </p>
       </div>
 
