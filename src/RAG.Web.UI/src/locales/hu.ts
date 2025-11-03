@@ -328,7 +328,7 @@ export const hu: TranslationKeys = {
   'account.logout_all_devices': 'Kijelentkezés minden eszközről',
   'account.logout_all_devices_description': 'Ez kijelentkezteti Önt az összes eszközről, ahol jelenleg be van jelentkezve.',
   'account.logout_all_devices_confirm': 'Biztosan ki szeretne jelentkezni minden eszközről?',
-  
+
   // Address Book
   'addressBook.title': 'Címjegyzék',
   'addressBook.subtitle': 'Kezelheti a névjegyeket és kapcsolattartási adatokat',
@@ -339,6 +339,9 @@ export const hu: TranslationKeys = {
   'addressBook.search': 'Kapcsolatok keresése...',
   'addressBook.noContacts': 'Nem találhatók kapcsolatok',
   'addressBook.loading': 'Kapcsolatok betöltése...',
+  'addressBook.permissions.admin': 'közvetlenül hozhat létre, szerkeszthet és törölhet kapcsolatokat',
+  'addressBook.permissions.user': 'változásokat javasolhat, amelyeket az adminisztrátorok felülvizsgálnak',
+  'addressBook.permissions.guest': 'Böngészhet a kapcsolatokban (jelentkezzen be a változások javaslásához)',
   'addressBook.table.details': 'Részletek',
   'addressBook.table.firstName': 'Keresztnév',
   'addressBook.table.lastName': 'Vezetéknév',
@@ -422,7 +425,7 @@ export const hu: TranslationKeys = {
   'addressBook.proposals.reject': 'Elutasítás',
   'addressBook.proposals.comment': 'Felülvizsgálati megjegyzés',
   'addressBook.proposals.commentPlaceholder': 'Opcionális megjegyzés a döntésről...',
-  
+
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Nem sikerült betölteni a kapcsolatokat',
   'addressBook.messages.failedToLoadProposals': 'Nem sikerült betölteni a javaslatokat',

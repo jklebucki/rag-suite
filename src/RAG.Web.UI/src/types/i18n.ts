@@ -358,6 +358,9 @@ export interface TranslationKeys {
   'addressBook.search': string;
   'addressBook.noContacts': string;
   'addressBook.loading': string;
+  'addressBook.permissions.admin': string;
+  'addressBook.permissions.user': string;
+  'addressBook.permissions.guest': string;
   'addressBook.table.details': string;
   'addressBook.table.firstName': string;
   'addressBook.table.lastName': string;
@@ -441,7 +444,7 @@ export interface TranslationKeys {
   'addressBook.proposals.reject': string;
   'addressBook.proposals.comment': string;
   'addressBook.proposals.commentPlaceholder': string;
-  
+
   // Messages and alerts
   'addressBook.messages.failedToLoad': string;
   'addressBook.messages.failedToLoadProposals': string;

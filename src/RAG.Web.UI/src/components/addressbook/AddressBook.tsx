@@ -244,9 +244,9 @@ export default function AddressBook() {
             <div className="text-sm text-gray-600">
               {isAuthenticated
                 ? canModify
-                  ? 'You can create, edit, and delete contacts directly'
-                  : 'You can propose changes that will be reviewed by administrators'
-                : 'Browse contacts (login to propose changes)'}
+                  ? t('addressBook.permissions.admin')
+                  : t('addressBook.permissions.user')
+                : t('addressBook.permissions.guest')}
             </div>
             {isAuthenticated && (
               <button

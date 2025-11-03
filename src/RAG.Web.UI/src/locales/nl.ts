@@ -339,7 +339,10 @@ export const nl: TranslationKeys = {
   'addressBook.search': 'Search contacts...',
   'addressBook.noContacts': 'No contacts found',
   'addressBook.loading': 'Loading contacts...',
-  
+  'addressBook.permissions.admin': 'You can create, edit, and delete contacts directly',
+  'addressBook.permissions.user': 'You can propose changes that will be reviewed by administrators',
+  'addressBook.permissions.guest': 'Browse contacts (login to propose changes)',
+
   // Contact Table
   'addressBook.table.details': 'Details',
   'addressBook.table.firstName': 'First Name',
@@ -364,14 +367,14 @@ export const nl: TranslationKeys = {
   'addressBook.table.active': 'Active',
   'addressBook.table.inactive': 'Inactive',
   'addressBook.table.totalContacts': 'contacts',
-  
+
   // Contact Actions
   'addressBook.actions.edit': 'Edit contact',
   'addressBook.actions.delete': 'Delete contact',
   'addressBook.actions.propose': 'Propose change',
   'addressBook.actions.view': 'View details',
   'addressBook.deleteConfirm': 'Are you sure you want to delete this contact?',
-  
+
   // Contact Form
   'addressBook.form.title.create': 'Create Contact',
   'addressBook.form.title.edit': 'Edit Contact',
@@ -394,7 +397,7 @@ export const nl: TranslationKeys = {
   'addressBook.form.submit': 'Save',
   'addressBook.form.reason': 'Reason for change',
   'addressBook.form.reasonPlaceholder': 'Explain why this change is needed...',
-  
+
   // Import
   'addressBook.import.title': 'Import Contacts',
   'addressBook.import.format': 'CSV Import Format',
@@ -415,7 +418,7 @@ export const nl: TranslationKeys = {
   'addressBook.import.imported': 'Imported',
   'addressBook.import.skipped': 'Skipped',
   'addressBook.import.errors': 'Errors',
-  
+
   // Proposals
   'addressBook.proposals.title': 'Change Proposals',
   'addressBook.proposals.noProposals': 'No pending proposals',
@@ -432,7 +435,7 @@ export const nl: TranslationKeys = {
   'addressBook.proposals.reject': 'Reject',
   'addressBook.proposals.comment': 'Review comment',
   'addressBook.proposals.commentPlaceholder': 'Optional comment about your decision...',
-  
+
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Failed to load contacts',
   'addressBook.messages.failedToLoadProposals': 'Failed to load proposals',
