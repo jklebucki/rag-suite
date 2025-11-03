@@ -1,7 +1,8 @@
 // ProposalsList - Display and manage contact change proposals
 import React, { useState } from 'react'
-import type { ProposalListItem, ContactData } from '@/types/addressbook'
+import type { ProposalListItem } from '@/types/addressbook'
 import { ChangeProposalType, ProposalStatus } from '@/types/addressbook'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface ProposalsListProps {
   proposals: ProposalListItem[]
@@ -16,6 +17,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   canReview,
   loading = false
 }) => {
+  const { t } = useI18n()
   const [reviewingId, setReviewingId] = useState<string | null>(null)
   const [reviewComment, setReviewComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -23,11 +25,11 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   const getProposalTypeLabel = (type: ChangeProposalType): string => {
     switch (type) {
       case ChangeProposalType.Create:
-        return 'Create'
+        return t('addressBook.proposals.type.create')
       case ChangeProposalType.Update:
-        return 'Update'
+        return t('addressBook.proposals.type.update')
       case ChangeProposalType.Delete:
-        return 'Delete'
+        return t('addressBook.proposals.type.delete')
       default:
         return 'Unknown'
     }
@@ -49,13 +51,13 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   const getStatusLabel = (status: ProposalStatus): string => {
     switch (status) {
       case ProposalStatus.Pending:
-        return 'Pending'
+        return t('addressBook.proposals.status.pending')
       case ProposalStatus.Approved:
-        return 'Approved'
+        return t('addressBook.proposals.status.approved')
       case ProposalStatus.Rejected:
-        return 'Rejected'
+        return t('addressBook.proposals.status.rejected')
       case ProposalStatus.Applied:
-        return 'Applied'
+        return t('addressBook.proposals.status.applied')
       default:
         return 'Unknown'
     }
@@ -86,7 +88,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       setReviewComment('')
     } catch (err) {
       console.error('Review failed:', err)
-      alert('Failed to review proposal: ' + (err instanceof Error ? err.message : 'Unknown error'))
+      alert(t('addressBook.proposals.failedToReview') + ': ' + (err instanceof Error ? err.message : 'Unknown error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -95,7 +97,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading proposals...</div>
+        <div className="text-gray-500">{t('addressBook.proposals.loading')}</div>
       </div>
     )
   }
@@ -103,7 +105,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   if (proposals.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-600">No proposals found</p>
+        <p className="text-gray-600">{t('addressBook.proposals.noProposalsFound')}</p>
       </div>
     )
   }
@@ -134,21 +136,21 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                 </span>
               </div>
               <h3 className="font-medium text-gray-900">
-                {proposal.contactName || 'New Contact'}
+                {proposal.contactName || t('addressBook.proposals.newContact')}
               </h3>
               <p className="text-sm text-gray-600 mt-1">
-                Proposed by <span className="font-medium">{proposal.proposedByUserName || proposal.proposedByUserId}</span>
+                {t('addressBook.proposals.proposedBy')} <span className="font-medium">{proposal.proposedByUserName || proposal.proposedByUserId}</span>
                 {' • '}
                 {new Date(proposal.proposedAt).toLocaleString()}
               </p>
               {proposal.reason && (
                 <p className="text-sm text-gray-700 mt-2 italic">
-                  Reason: {proposal.reason}
+                  {t('addressBook.proposals.reason')}: {proposal.reason}
                 </p>
               )}
               {proposal.reviewedByUserName && proposal.reviewedAt && (
                 <p className="text-sm text-gray-600 mt-2">
-                  Reviewed by <span className="font-medium">{proposal.reviewedByUserName}</span>
+                  {t('addressBook.proposals.reviewedBy')} <span className="font-medium">{proposal.reviewedByUserName}</span>
                   {' • '}
                   {new Date(proposal.reviewedAt).toLocaleString()}
                 </p>
@@ -162,14 +164,15 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
               {reviewingId === proposal.id ? (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Review Comment (optional)
+                    <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('addressBook.proposals.comment')}
                     </label>
                     <textarea
+                      id="review-comment"
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
                       rows={2}
-                      placeholder="Add a comment about your decision..."
+                      placeholder={t('addressBook.proposals.commentPlaceholder')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     />
                   </div>
@@ -179,14 +182,14 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                       disabled={isSubmitting}
                       className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium"
                     >
-                      {isSubmitting ? 'Processing...' : 'Approve & Apply'}
+                      {isSubmitting ? t('addressBook.proposals.processing') : t('addressBook.proposals.approveAndApply')}
                     </button>
                     <button
                       onClick={() => handleReview(proposal.id, false)}
                       disabled={isSubmitting}
                       className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium"
                     >
-                      {isSubmitting ? 'Processing...' : 'Reject'}
+                      {isSubmitting ? t('addressBook.proposals.processing') : t('addressBook.proposals.reject')}
                     </button>
                     <button
                       onClick={() => {
@@ -196,7 +199,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                       disabled={isSubmitting}
                       className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 text-sm"
                     >
-                      Cancel
+                      {t('addressBook.proposals.cancel')}
                     </button>
                   </div>
                 </div>
@@ -205,7 +208,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                   onClick={() => setReviewingId(proposal.id)}
                   className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                 >
-                  Review Proposal
+                  {t('addressBook.proposals.reviewProposal')}
                 </button>
               )}
             </div>

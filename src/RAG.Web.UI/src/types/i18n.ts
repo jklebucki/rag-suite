@@ -437,13 +437,23 @@ export interface TranslationKeys {
   'addressBook.proposals.status.pending': string;
   'addressBook.proposals.status.approved': string;
   'addressBook.proposals.status.rejected': string;
+  'addressBook.proposals.status.applied': string;
   'addressBook.proposals.proposedBy': string;
   'addressBook.proposals.proposedAt': string;
   'addressBook.proposals.reason': string;
+  'addressBook.proposals.reviewedBy': string;
   'addressBook.proposals.approve': string;
+  'addressBook.proposals.approveAndApply': string;
   'addressBook.proposals.reject': string;
   'addressBook.proposals.comment': string;
   'addressBook.proposals.commentPlaceholder': string;
+  'addressBook.proposals.cancel': string;
+  'addressBook.proposals.reviewProposal': string;
+  'addressBook.proposals.processing': string;
+  'addressBook.proposals.loading': string;
+  'addressBook.proposals.noProposalsFound': string;
+  'addressBook.proposals.newContact': string;
+  'addressBook.proposals.failedToReview': string;
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': string;

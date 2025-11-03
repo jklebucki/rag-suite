@@ -399,7 +399,7 @@ export const nl: TranslationKeys = {
   'addressBook.form.reasonPlaceholder': 'Explain why this change is needed...',
 
   // Import
-  'addressBook.import.title': 'Import Contacts',
+  'addressBook.import.title': 'Import Contacts from CSV',
   'addressBook.import.format': 'CSV Import Format',
   'addressBook.import.formatDesc': 'Your CSV file should have these columns (in order):',
   'addressBook.import.required': 'Required',
@@ -420,7 +420,7 @@ export const nl: TranslationKeys = {
   'addressBook.import.errors': 'Errors',
 
   // Proposals
-  'addressBook.proposals.title': 'Change Proposals',
+  'addressBook.proposals.title': 'Pending Proposals',
   'addressBook.proposals.noProposals': 'No pending proposals',
   'addressBook.proposals.type.create': 'Create',
   'addressBook.proposals.type.update': 'Update',
@@ -428,13 +428,23 @@ export const nl: TranslationKeys = {
   'addressBook.proposals.status.pending': 'Pending',
   'addressBook.proposals.status.approved': 'Approved',
   'addressBook.proposals.status.rejected': 'Rejected',
+  'addressBook.proposals.status.applied': 'Applied',
   'addressBook.proposals.proposedBy': 'Proposed by',
   'addressBook.proposals.proposedAt': 'Proposed at',
   'addressBook.proposals.reason': 'Reason',
+  'addressBook.proposals.reviewedBy': 'Reviewed by',
   'addressBook.proposals.approve': 'Approve',
+  'addressBook.proposals.approveAndApply': 'Approve & Apply',
   'addressBook.proposals.reject': 'Reject',
   'addressBook.proposals.comment': 'Review comment',
   'addressBook.proposals.commentPlaceholder': 'Optional comment about your decision...',
+  'addressBook.proposals.cancel': 'Cancel',
+  'addressBook.proposals.reviewProposal': 'Review Proposal',
+  'addressBook.proposals.processing': 'Processing...',
+  'addressBook.proposals.loading': 'Loading proposals...',
+  'addressBook.proposals.noProposalsFound': 'No proposals found',
+  'addressBook.proposals.newContact': 'New Contact',
+  'addressBook.proposals.failedToReview': 'Failed to review proposal',
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Failed to load contacts',

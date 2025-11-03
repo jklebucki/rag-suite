@@ -196,7 +196,7 @@ export default function AddressBook() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Contacts ({contacts.length})
+            {t('addressBook.tabs.contacts')} ({contacts.length})
           </button>
           {canModify && (
             <>
@@ -208,7 +208,7 @@ export default function AddressBook() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Import
+                {t('addressBook.tabs.import')}
               </button>
               <button
                 onClick={() => setActiveTab('proposals')}
@@ -218,7 +218,7 @@ export default function AddressBook() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Proposals
+                {t('addressBook.tabs.proposals')}
                 {pendingProposalsCount > 0 && (
                   <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
                     {pendingProposalsCount}
@@ -253,7 +253,7 @@ export default function AddressBook() {
                 onClick={openCreateForm}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
               >
-                + Add Contact
+                + {t('addressBook.addContact')}
               </button>
             )}
           </div>
@@ -272,7 +272,7 @@ export default function AddressBook() {
 
       {activeTab === 'import' && canModify && (
         <div className="max-w-3xl">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Import Contacts from CSV</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('addressBook.import.title')}</h2>
           <ContactImport onImport={handleImport} onClose={() => setActiveTab('contacts')} />
         </div>
       )}
@@ -280,7 +280,7 @@ export default function AddressBook() {
       {activeTab === 'proposals' && canModify && (
         <div>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Pending Proposals ({pendingProposalsCount})
+            {t('addressBook.proposals.title')} ({pendingProposalsCount})
           </h2>
           <ProposalsList
             proposals={proposals}
