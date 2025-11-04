@@ -44,9 +44,7 @@ function AppRoutes() {
         path="/"
         element={
           <Layout>
-            <ProtectedRoute>
-              <LandingPage />
-            </ProtectedRoute>
+            <LandingPage />
           </Layout>
         }
       />
@@ -139,33 +137,41 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          <AuthRoute>
-            <LoginForm />
-          </AuthRoute>
+          <Layout>
+            <AuthRoute>
+              <LoginForm />
+            </AuthRoute>
+          </Layout>
         }
       />
       <Route
         path="/register"
         element={
-          <AuthRoute>
-            <RegisterForm />
-          </AuthRoute>
+          <Layout>
+            <AuthRoute>
+              <RegisterForm />
+            </AuthRoute>
+          </Layout>
         }
       />
       <Route
         path="/forgot-password"
         element={
-          <AuthRoute>
-            <ResetPasswordForm />
-          </AuthRoute>
+          <Layout>
+            <AuthRoute>
+              <ResetPasswordForm />
+            </AuthRoute>
+          </Layout>
         }
       />
       <Route
         path="/reset-password"
         element={
-          <AuthRoute>
-            <ResetPasswordConfirmForm />
-          </AuthRoute>
+          <Layout>
+            <AuthRoute>
+              <ResetPasswordConfirmForm />
+            </AuthRoute>
+          </Layout>
         }
       />
     </Routes>
