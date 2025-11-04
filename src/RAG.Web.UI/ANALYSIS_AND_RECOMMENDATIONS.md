@@ -49,7 +49,7 @@
 
 ### 1.3 Brak centralizacji obsługi błędów
 
-**Status**: ✅ **UKOŃCZONE** - ErrorBoundary utworzony i zintegrowany
+**Status**: ✅ **UKOŃCZONE** - ErrorBoundary i useErrorHandler zaimplementowane
 
 **Wykonane zmiany:**
 - ✅ Utworzono komponent `ErrorBoundary` (`components/common/ErrorBoundary.tsx`)
@@ -57,9 +57,29 @@
 - ✅ Dodano fallback UI z opcjami "Try Again" i "Go Home"
 - ✅ Integracja z logger utility dla logowania błędów
 - ✅ Wyświetlanie szczegółów błędu w trybie development
-- ✅ Eksport w `components/common/index.ts`
+- ✅ Utworzono hook `useErrorHandler` (`hooks/useErrorHandler.ts`)
+  - Centralna obsługa błędów z integracją toast notifications
+  - Funkcje pomocnicze: `getErrorMessage`, `isHttpError`, `isValidationError`
+  - Metoda `handleAsyncError` dla operacji asynchronicznych
+  - Pełna integracja z logger utility
 
-**Następny krok**: Utworzenie hooka `useErrorHandler` dla obsługi błędów w komponentach
+**Użycie:**
+```typescript
+const { handleError, handleAsyncError } = useErrorHandler()
+
+// Bezpośrednia obsługa błędu
+try {
+  await operation()
+} catch (error) {
+  handleError(error, { title: 'Operation Failed' })
+}
+
+// Obsługa async operacji
+const result = await handleAsyncError(
+  apiCall(),
+  { title: 'API Error' }
+)
+```
 
 ### 1.4 Brak abstrakcji dla operacji API
 
@@ -83,24 +103,14 @@
 
 ### 2.2 Priorytet ŚREDNI
 
-#### B. useErrorHandler hook
-```typescript
-// hooks/useErrorHandler.ts
-export function useErrorHandler() {
-  // Centralna logika obsługi błędów
-  // Integracja z toast notifications
-  // Logging przez logger utility
-}
-```
-
-#### C. Type safety improvements
+#### B. Type safety improvements
 - Dodać strict mode dla TypeScript
 - Użyć branded types dla ID
 - Dodać runtime validation (zod/joi)
 
 ### 2.3 Priorytet NISKI
 
-#### D. Testy
+#### C. Testy
 - Dodać unit testy dla utilities
 - Dodać integration testy dla hooks
 - Dodać component testy (React Testing Library)
@@ -117,7 +127,7 @@ export function useErrorHandler() {
 ### Faza 3: Optymalizacja (2-3 dni) - 🔄 W TRAKCIE
 
 1. ✅ Error Boundary - utworzony i zintegrowany
-2. ⏳ Centralizacja obsługi błędów - hook `useErrorHandler`
+2. ✅ Centralizacja obsługi błędów - hook `useErrorHandler` utworzony
 3. ⏳ Usunięcie nieużywanych plików - sprawdzić `useChat.ts` vs `useMultilingualChat.ts`
 4. ⏳ Optymalizacja bundle size - analiza i optymalizacja chunków
 
@@ -135,16 +145,17 @@ export function useErrorHandler() {
 ### Stan obecny:
 - ✅ Console.log: 0 w całym projekcie (komponenty) - kilka debug w contexts (niski priorytet)
 - ✅ Największy komponent: 629 linii (do refaktoryzacji)
-- ✅ Centralizacja: HTTP clients ✅, validation utils ✅, constants ✅, logger ✅, ErrorBoundary ✅
+- ✅ Centralizacja: HTTP clients ✅, validation utils ✅, constants ✅, logger ✅, ErrorBoundary ✅, useErrorHandler ✅
 - ✅ Named exports: 100% komponentów
 - ✅ Layout: Przeniesiony do właściwej lokalizacji
-- ✅ Error handling: ErrorBoundary zintegrowany na poziomie aplikacji
+- ✅ Error handling: ErrorBoundary + useErrorHandler hook zaimplementowane
 
 ### Cel końcowy:
 - ✅ Console.log: 0 (osiągnięte w komponentach!)
 - ✅ ErrorBoundary: Zaimplementowany i zintegrowany (osiągnięte!)
+- ✅ useErrorHandler: Hook utworzony z pełną funkcjonalnością (osiągnięte!)
 - Największy komponent: <300 linii (w trakcie)
-- Centralizacja: ✅ Wszystkie wspólne funkcje w utils/services
+- Centralizacja: ✅ Wszystkie wspólne funkcje w utils/services/hooks
 - Centralizacja: ✅ Wszystkie wspólne funkcje w utils/services
 - ErrorBoundary: ✅ Obsługa błędów na poziomie aplikacji
 
