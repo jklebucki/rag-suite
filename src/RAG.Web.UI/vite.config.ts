@@ -35,18 +35,70 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Separate vendor chunks
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-icons': ['lucide-react'],
-          'vendor-utils': ['clsx', 'tailwind-merge', 'axios'],
-          // PDF viewer in separate chunk
-          'pdf-viewer': ['react-pdf', 'pdfjs-dist'],
+        manualChunks: (id) => {
+          // Core React libraries
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react'
+          }
+          
+          // React Router
+          if (id.includes('node_modules/react-router-dom')) {
+            return 'vendor-router'
+          }
+          
+          // React Query
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'vendor-query'
+          }
+          
+          // React Table (large dependency)
+          if (id.includes('node_modules/@tanstack/react-table')) {
+            return 'vendor-table'
+          }
+          
+          // Icons
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/@heroicons')) {
+            return 'vendor-icons'
+          }
+          
+          // Markdown rendering (heavy)
+          if (id.includes('node_modules/react-markdown') || 
+              id.includes('node_modules/remark-') || 
+              id.includes('node_modules/react-syntax-highlighter') ||
+              id.includes('node_modules/prismjs')) {
+            return 'vendor-markdown'
+          }
+          
+          // PDF viewer (very large)
+          if (id.includes('node_modules/react-pdf') || id.includes('node_modules/pdfjs-dist')) {
+            return 'vendor-pdf'
+          }
+          
+          // Utility libraries
+          if (id.includes('node_modules/clsx') || 
+              id.includes('node_modules/tailwind-merge') ||
+              id.includes('node_modules/remove-accents')) {
+            return 'vendor-utils'
+          }
+          
+          // Axios (HTTP client)
+          if (id.includes('node_modules/axios')) {
+            return 'vendor-http'
+          }
+          
+          // Other node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor-misc'
+          }
         },
+        // Better cache busting with content hashes
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     chunkSizeWarningLimit: 1000, // Increase warning limit to 1000kB
+    // Minification
+    minify: 'terser',
   },
 })
