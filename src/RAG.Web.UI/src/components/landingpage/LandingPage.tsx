@@ -6,7 +6,7 @@ export function LandingPage() {
   const { t } = useI18n()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-start justify-center">
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         {/* Logo */}
         <div className="mb-8">
