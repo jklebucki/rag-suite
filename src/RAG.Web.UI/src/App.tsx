@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Layout } from '@/components/Layout'
+import { Layout } from '@/components/layout'
 import { LandingPage } from '@/components/landingpage/LandingPage'
 const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'))
 const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'))

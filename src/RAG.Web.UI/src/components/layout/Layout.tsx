@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { useLayout } from '@/hooks/useLayout'
-import { Sidebar } from './layout/Sidebar'
-import { TopBar } from './layout/TopBar'
+import { Sidebar } from './Sidebar'
+import { TopBar } from './TopBar'
 
 interface LayoutProps {
   children: ReactNode
@@ -39,3 +39,4 @@ export function Layout({ children }: LayoutProps) {
     </div>
   )
 }
+

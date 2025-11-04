@@ -5,16 +5,17 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import './utils/debug' // Import debug utilities
+import { CACHE_TIMES, QUERY_RETRY } from './constants/config'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 10, // 10 minutes
-      retry: 3, // Number of retries
+      staleTime: CACHE_TIMES.STALE_TIME,
+      cacheTime: CACHE_TIMES.CACHE_TIME,
+      retry: QUERY_RETRY.QUERIES,
     },
     mutations: {
-      retry: 0, // 🆕 No retry for mutations to prevent double sending
+      retry: QUERY_RETRY.MUTATIONS, // No retry for mutations to prevent double sending
     },
   },
 })

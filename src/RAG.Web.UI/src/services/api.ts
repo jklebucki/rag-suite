@@ -1,4 +1,7 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import { AxiosInstance, AxiosResponse } from 'axios'
+import { createHttpClient, createPublicHttpClient } from '@/utils/httpClient'
+import { logger } from '@/utils/logger'
+import { API_TIMEOUTS, API_ENDPOINTS } from '@/constants/config'
 import type {
   ApiResponse,
   SearchQuery,
@@ -44,43 +47,15 @@ class ApiClient {
   private healthClient: AxiosInstance
 
   constructor() {
-    this.client = axios.create({
-      baseURL: '/api',
-      timeout: 900000, // 15 minutes for chat operations (matches backend Chat:RequestTimeoutMinutes)
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    // Main API client with chat timeout
+    this.client = createHttpClient({
+      baseURL: API_ENDPOINTS.BASE,
+      timeout: API_TIMEOUTS.CHAT,
+      requireAuth: true,
     })
 
-    // Separate client for health endpoints with SHORT timeout
-    this.healthClient = axios.create({
-      timeout: 5000, // 5 seconds for health checks
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    // Request interceptor for auth token
-    this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem('auth_token')
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-      return config
-    })
-
-  // Response interceptor for error handling
-    this.client.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          localStorage.removeItem('auth_token')
-          // TODO: Implement proper authentication when auth endpoints are added to API
-          // window.location.href = '/login'
-        }
-        return Promise.reject(error)
-      }
-    )
+    // Separate client for health endpoints with SHORT timeout (no auth required)
+    this.healthClient = createPublicHttpClient('', API_TIMEOUTS.HEALTH)
   }
 
   // TODO: Authentication endpoints - to be implemented when added to .NET API
@@ -128,17 +103,17 @@ class ApiClient {
 
   // Multilingual Chat
   async sendMultilingualMessage(sessionId: string, request: MultilingualChatRequest): Promise<MultilingualChatResponse> {
-    console.log(`Calling API: POST /api/user-chat/sessions/${sessionId}/messages/multilingual`, request)
+    logger.debug(`Calling API: POST /api/user-chat/sessions/${sessionId}/messages/multilingual`, request)
     try {
       // Uses main client timeout (15 minutes configured in constructor)
       const response: AxiosResponse<ApiResponse<MultilingualChatResponse>> = await this.client.post(
         `/user-chat/sessions/${sessionId}/messages/multilingual`,
         request
       )
-      console.log('API response received:', response.data)
+      logger.debug('API response received:', response.data)
       return response.data.data
     } catch (error) {
-      console.error('API call failed:', error)
+      logger.error('API call failed:', error)
       throw error
     }
   }
