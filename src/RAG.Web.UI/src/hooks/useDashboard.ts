@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
+import { REFETCH_INTERVALS } from '@/constants/config'
 import type { DashboardData, SystemHealth, ElasticsearchStats, UsageStats, PluginInfo } from '@/types'
 
 export function useDashboard() {
@@ -15,7 +16,7 @@ export function useDashboard() {
   } = useQuery<DashboardData>({
     queryKey: ['dashboard'],
     queryFn: () => apiClient.getDashboardData(true), // Include detailed stats
-    refetchInterval: 30000, // 30 seconds
+    refetchInterval: REFETCH_INTERVALS.DASHBOARD,
   })
 
   // Analytics Health - more detailed health information
@@ -26,7 +27,7 @@ export function useDashboard() {
   } = useQuery<SystemHealth>({
     queryKey: ['analytics-health'],
     queryFn: () => apiClient.getAnalyticsHealth(),
-    refetchInterval: 15000, // 15 seconds
+    refetchInterval: REFETCH_INTERVALS.ANALYTICS_HEALTH,
   })
 
   // Elasticsearch Cluster Stats
@@ -37,7 +38,7 @@ export function useDashboard() {
   } = useQuery<ElasticsearchStats>({
     queryKey: ['elasticsearch-cluster'],
     queryFn: () => apiClient.getElasticsearchClusterStats(),
-    refetchInterval: 60000, // 1 minute
+    refetchInterval: REFETCH_INTERVALS.CLUSTER_STATS,
   })
 
   // Usage Statistics (keeping for compatibility and fallback)
@@ -48,7 +49,7 @@ export function useDashboard() {
   } = useQuery<UsageStats>({
     queryKey: ['usage-stats'],
     queryFn: () => apiClient.getUsageStats(),
-    refetchInterval: 30000,
+    refetchInterval: REFETCH_INTERVALS.USAGE_STATS,
     enabled: !dashboardData, // Only fetch if dashboard data is not available
   })
 
@@ -60,7 +61,7 @@ export function useDashboard() {
   } = useQuery<PluginInfo[]>({
     queryKey: ['plugins'],
     queryFn: () => apiClient.getPlugins(),
-    refetchInterval: 30000,
+    refetchInterval: REFETCH_INTERVALS.PLUGINS,
   })
 
   // Legacy system health (keeping for compatibility)
@@ -71,7 +72,7 @@ export function useDashboard() {
   } = useQuery({
     queryKey: ['system-health'],
     queryFn: () => apiClient.getSystemHealth(),
-    refetchInterval: 15000,
+    refetchInterval: REFETCH_INTERVALS.SYSTEM_HEALTH,
     enabled: !analyticsHealth, // Only fetch if analytics health is not available
   })
 

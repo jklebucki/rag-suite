@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
+import { CACHE_CONFIG } from '@/constants/config'
 import type { DocumentDetailResponse } from '@/types'
 
 export function useDocumentDetail(documentId: string | null) {
@@ -10,7 +11,7 @@ export function useDocumentDetail(documentId: string | null) {
       return apiClient.getDocumentDetails(documentId)
     },
     enabled: !!documentId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 30 // 30 minutes
+    staleTime: CACHE_CONFIG.DOCUMENT_DETAIL.STALE_TIME,
+    cacheTime: CACHE_CONFIG.DOCUMENT_DETAIL.CACHE_TIME,
   })
 }

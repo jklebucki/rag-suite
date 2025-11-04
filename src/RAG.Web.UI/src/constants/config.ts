@@ -76,3 +76,25 @@ export const API_ENDPOINTS = {
   HEALTH: '/healthz',
 } as const
 
+/**
+ * React Query refetch intervals (in milliseconds)
+ */
+export const REFETCH_INTERVALS = {
+  DASHBOARD: 30000,        // 30 seconds
+  ANALYTICS_HEALTH: 15000, // 15 seconds
+  CLUSTER_STATS: 60000,    // 1 minute
+  PLUGINS: 30000,          // 30 seconds
+  SYSTEM_HEALTH: 15000,    // 15 seconds
+  USAGE_STATS: 30000,      // 30 seconds
+} as const
+
+/**
+ * React Query cache configurations for specific data types
+ */
+export const CACHE_CONFIG = {
+  DOCUMENT_DETAIL: {
+    STALE_TIME: 1000 * 60 * 5,   // 5 minutes
+    CACHE_TIME: 1000 * 60 * 30,  // 30 minutes
+  },
+} as const
+

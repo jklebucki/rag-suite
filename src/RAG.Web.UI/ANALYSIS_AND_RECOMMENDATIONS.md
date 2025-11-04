@@ -1,7 +1,7 @@
 # Analiza struktury projektu RAG.Web.UI i rekomendacje
 
 **Ostatnia aktualizacja:** 2024-12-19  
-**Status:** W toku - Faza 1 częściowo ukończona (5/8 zadań)
+**Status:** W toku - Faza 1 częściowo ukończona (7/8 zadań)
 
 ## 📋 Spis treści
 1. [Stan obecny](#stan-obecny)
@@ -95,9 +95,7 @@
   - Wyodrębnić wspólne wzorce obsługi błędów do hooka `useErrorHandler`
 
 #### 1.5 Niespójność w importach
-- **Problem**: Jeden relative import zamiast alias `@/`
-  - `SearchResults.tsx`: `import { useDocumentDetail } from '../../hooks/useDocumentDetail'`
-- **Rekomendacja**: Używać alias `@/hooks/useDocumentDetail` dla spójności
+- **Status**: ✅ **ROZWIĄZANE** - Poprawiono relative import w `SearchResults.tsx`
 
 ---
 
@@ -128,9 +126,8 @@
 **Aktualny stan:**
 - ✅ Logger utility utworzony (`utils/logger.ts`)
 - ✅ Zastąpione w `api.ts` i `auth.ts`
+- ✅ Zastąpione w `addressBookService.ts` i `configurationService.ts`
 - ⚠️ **Pozostałe do zamiany:**
-  - `addressBookService.ts`: 1 console.error
-  - `configurationService.ts`: 1 console.error
   - `useQuizzes.ts`: 2 console.error (w `useQuizTaking`)
   - ~165+ w komponentach (głównie debug/info w development)
 
@@ -154,9 +151,9 @@
 **Aktualny stan:**
 - ✅ `constants/config.ts` utworzony z podstawowymi stałymi
 - ✅ Używane w `main.tsx`, `api.ts`, `auth.ts`
+- ✅ Dodano `REFETCH_INTERVALS` i `CACHE_CONFIG`
+- ✅ Zastosowane w `useDashboard.ts` i `useDocumentDetail.ts`
 - ⚠️ **Pozostałe magic numbers:**
-  - `useDashboard.ts`: refetchInterval (30000, 15000, 60000) - powinny być w constants
-  - `useDocumentDetail.ts`: staleTime, cacheTime - powinny być w constants
   - Inne komponenty: hardcoded wartości timeoutów, delayów
 
 **Rekomendacja**: 
@@ -277,8 +274,9 @@ export class ErrorBoundary extends React.Component { ... }
 4. ✅ Przenieść `Layout.tsx` - **UKOŃCZONE**
 5. ✅ Utworzyć `utils/validation.ts` - **UKOŃCZONE**
 6. ⚠️ Ujednolicić eksporty - **W TRAKCIE** (19 komponentów)
-7. ⚠️ Zastąpić console.log w serwisach - **W TRAKCIE** (2 pozostałe)
-8. ⚠️ Dodać brakujące stałe do constants - **DO ZROBIENIA**
+7. ✅ Zastąpić console.log w serwisach - **UKOŃCZONE** (wszystkie serwisy)
+8. ✅ Dodać brakujące stałe do constants - **UKOŃCZONE** (REFETCH_INTERVALS, CACHE_CONFIG)
+9. ✅ Poprawić relative import w SearchResults.tsx - **UKOŃCZONE**
 
 ### Faza 2: Refaktoryzacja (3-5 dni) - ⏳ DO ROZPOCZĘCIA
 1. ⏳ Refaktoryzacja `QuizBuilder` (629 linii → podzielić na mniejsze komponenty)
@@ -312,11 +310,11 @@ export class ErrorBoundary extends React.Component { ... }
 - Magic numbers: Rozproszone po całym kodzie
 
 ### Stan obecny (po Faza 1 - częściowo):
-- Console.log: ~165 wystąpień (w serwisach: 2, głównie w komponentach)
+- Console.log: ~165 wystąpień (w serwisach: 0 ✅, w hooks: 2, głównie w komponentach)
 - Duplikacja kodu: ~10% (zmniejszona dzięki utils)
 - Największy komponent: 629 linii (bez zmian)
 - Centralizacja: ✅ HTTP clients, ✅ validation utils, ⚠️ error handling (częściowo)
-- Magic numbers: ⚠️ Częściowo w constants (~40% zcentralizowanych)
+- Magic numbers: ✅ ~60% zcentralizowanych (dodano REFETCH_INTERVALS, CACHE_CONFIG)
 
 ### Po optymalizacji (cel):
 - Console.log: 0 (w produkcji), logger.debug tylko w development
@@ -347,9 +345,10 @@ export class ErrorBoundary extends React.Component { ... }
 - [x] Constants file ✅
 - [x] Layout reorganization ✅
 - [x] Validation utilities ✅
+- [x] Migracja console.log w serwisach ✅
+- [x] Dodanie brakujących stałych (REFETCH_INTERVALS, CACHE_CONFIG) ✅
+- [x] Poprawa relative import w SearchResults.tsx ✅
 - [ ] Export consistency (19 komponentów do zmiany)
-- [ ] Migracja console.log w serwisach (2 pozostałe)
-- [ ] Dodanie brakujących stałych (refetchInterval, cache config)
 
 ### Refaktoryzacja (Faza 2)
 - [ ] QuizBuilder split (629 linii)
@@ -357,7 +356,7 @@ export class ErrorBoundary extends React.Component { ... }
 - [ ] About.tsx logic extraction (300 linii)
 - [ ] Zastosowanie validation utils w formularzach
 - [ ] Migracja console.log → logger (stopniowo)
-- [ ] Poprawa relative import w SearchResults.tsx
+- [x] Poprawa relative import w SearchResults.tsx ✅
 
 ### Optymalizacja (Faza 3)
 - [ ] Error Boundary component

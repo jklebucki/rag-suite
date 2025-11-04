@@ -3,6 +3,7 @@
 // Delegates to centralized ApiClient in api.ts
 
 import apiClient from './api'
+import { logger } from '@/utils/logger'
 import type {
   ListContactsRequest,
   ListContactsResponse,
@@ -123,7 +124,7 @@ class AddressBookService {
         skipDuplicates
       })
     } catch (error) {
-      console.error('File import failed:', error)
+      logger.error('File import failed:', error)
       throw error
     }
   }

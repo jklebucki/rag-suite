@@ -1,4 +1,5 @@
 import { RegistrationConfiguration } from '@/types/configuration'
+import { logger } from '@/utils/logger'
 
 class ConfigurationService {
   private baseUrl: string
@@ -31,7 +32,7 @@ class ConfigurationService {
 
       return configuration
     } catch (error) {
-      console.error('Error fetching registration configuration:', error)
+      logger.error('Error fetching registration configuration:', error)
       throw error
     }
   }
