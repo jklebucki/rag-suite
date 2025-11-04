@@ -13,6 +13,8 @@ export const en: TranslationKeys = {
   'nav.user_guide': 'User Guide',
   'nav.app_info': 'App Info',
   'nav.cyberpanel': 'Cyber Panel',
+  'nav.landing': 'Home',
+  'app.title': 'RAG Suite',
 
   // User Guide
   'userguide.description': 'Explore features and capabilities of RAG Suite',
@@ -54,6 +56,20 @@ export const en: TranslationKeys = {
   'dashboard.features.search.description': 'Find relevant information across all your documents',
   'dashboard.features.analytics.title': 'Analytics & Insights',
   'dashboard.features.analytics.description': 'Monitor usage and performance metrics',
+
+  // Landing page
+  'landing.logo_alt': 'RAG Suite logo',
+  'landing.title_prefix': 'Welcome to',
+  'landing.title_brand': 'RAG Suite',
+  'landing.subtitle': 'Advanced Retrieval-Augmented Generation platform for intelligent document processing and conversational AI.',
+  'landing.cta.get_started': 'Get Started',
+  'landing.cta.learn_more': 'Learn More',
+  'landing.features.ingestion.title': 'Document Ingestion',
+  'landing.features.ingestion.desc': 'Seamlessly upload and process various document formats with advanced parsing capabilities.',
+  'landing.features.search.title': 'Intelligent Search',
+  'landing.features.search.desc': 'Hybrid search combining lexical and vector-based retrieval for accurate results.',
+  'landing.features.chat.title': 'Conversational AI',
+  'landing.features.chat.desc': 'Engage in natural conversations powered by state-of-the-art language models.',
 
   // Chat
   'chat.title': 'Chat Interface',

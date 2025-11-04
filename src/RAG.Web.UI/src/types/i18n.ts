@@ -26,6 +26,7 @@ export interface TranslationKeys {
   'nav.documents': string;
   'nav.ingestion': string;
   'nav.analytics': string;
+  'nav.landing': string;
   'nav.settings': string;
   'nav.addressBook': string;
   'nav.user_guide': string;
@@ -72,6 +73,22 @@ export interface TranslationKeys {
   'dashboard.features.search.description': string;
   'dashboard.features.analytics.title': string;
   'dashboard.features.analytics.description': string;
+
+  // Landing page
+  'landing.logo_alt': string;
+  'landing.title_prefix': string;
+  'landing.title_brand': string;
+  'landing.subtitle': string;
+  'landing.cta.get_started': string;
+  'landing.cta.learn_more': string;
+  'landing.features.ingestion.title': string;
+  'landing.features.ingestion.desc': string;
+  'landing.features.search.title': string;
+  'landing.features.search.desc': string;
+  'landing.features.chat.title': string;
+  'landing.features.chat.desc': string;
+  // App / UI
+  'app.title': string;
 
   // Chat
   'chat.title': string;

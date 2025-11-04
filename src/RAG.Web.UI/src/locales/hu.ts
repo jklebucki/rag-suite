@@ -13,6 +13,8 @@ export const hu: TranslationKeys = {
   'nav.user_guide': 'Felhasználói kézikönyv',
   'nav.app_info': 'Alkalmazás Info',
   'nav.cyberpanel': 'Cyber Panel',
+  'nav.landing': 'Kezdőlap',
+  'app.title': 'RAG Suite',
 
   // User Guide
   'userguide.description': 'Fedezze fel a RAG Suite funkcióit és képességeit',
@@ -54,6 +56,20 @@ export const hu: TranslationKeys = {
   'dashboard.features.search.description': 'Találj releváns információkat minden dokumentumban',
   'dashboard.features.analytics.title': 'Analitika és Betekintés',
   'dashboard.features.analytics.description': 'Figyelj a használatra és teljesítménymutatókra',
+
+  // Landing page
+  'landing.logo_alt': 'RAG Suite logó',
+  'landing.title_prefix': 'Üdvözöljük a',
+  'landing.title_brand': 'RAG Suite',
+  'landing.subtitle': 'Fejlett Retrieval-Augmented Generation platform intelligens dokumentumfeldolgozáshoz és beszélgetési AI-hoz.',
+  'landing.cta.get_started': 'Kezdés',
+  'landing.cta.learn_more': 'Tudj meg többet',
+  'landing.features.ingestion.title': 'Dokumentum Beolvasás',
+  'landing.features.ingestion.desc': 'Egyszerűen tölthet fel és dolgozhat fel különböző dokumentumformátumokat fejlett elemzési képességekkel.',
+  'landing.features.search.title': 'Intelligens Keresés',
+  'landing.features.search.desc': 'Hibrid keresés, amely lexikai és vektoros visszakeresést kombinál a pontos eredményekért.',
+  'landing.features.chat.title': 'Beszélgető AI',
+  'landing.features.chat.desc': 'Vegyen részt természetes beszélgetésekben korszerű nyelvi modellekkel.',
 
   // Chat
   'chat.title': 'Chat Felület',

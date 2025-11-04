@@ -23,7 +23,7 @@ export function useLayout() {
   const isPowerUser = user?.roles?.includes('PowerUser') ?? false
 
   const baseNavigation = [
-    { name: 'Landing', href: '/', icon: Home },
+    { name: t('nav.landing'), href: '/', icon: Home },
     { name: t('nav.dashboard'), href: '/dashboard', icon: BarChart3 },
     { name: t('nav.chat'), href: '/chat', icon: MessageSquare },
     { name: t('nav.search'), href: '/search', icon: Search },
@@ -34,7 +34,7 @@ export function useLayout() {
   ]
 
   const adminNavigation = [
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: t('nav.settings'), href: '/settings', icon: Settings },
   ]
 
   // Cyber Panel navigation entry - visible to any authenticated user and placed before admin items

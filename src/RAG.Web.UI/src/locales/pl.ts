@@ -13,6 +13,8 @@ export const pl: TranslationKeys = {
   'nav.user_guide': 'Podręcznik użytkownika',
   'nav.app_info': 'O Aplikacji',
   'nav.cyberpanel': 'Cyber Panel',
+  'nav.landing': 'Strona główna',
+  'app.title': 'RAG Suite',
 
   // User Guide
   'userguide.description': 'Poznaj funkcje i możliwości aplikacji RAG Suite',
@@ -34,6 +36,20 @@ export const pl: TranslationKeys = {
   'dashboard.features.search.description': 'Znajdź odpowiednie informacje we wszystkich dokumentach',
   'dashboard.features.analytics.title': 'Analityka i Wgląd',
   'dashboard.features.analytics.description': 'Monitoruj użycie i metryki wydajności',
+
+  // Landing page
+  'landing.logo_alt': 'Logo RAG Suite',
+  'landing.title_prefix': 'Witamy w',
+  'landing.title_brand': 'RAG Suite',
+  'landing.subtitle': 'Zaawansowana platforma Retrieval-Augmented Generation do inteligentnego przetwarzania dokumentów i konwersacyjnej AI.',
+  'landing.cta.get_started': 'Rozpocznij',
+  'landing.cta.learn_more': 'Dowiedz się więcej',
+  'landing.features.ingestion.title': 'Wczytywanie dokumentów',
+  'landing.features.ingestion.desc': 'Bezproblemowe przesyłanie i przetwarzanie różnych formatów dokumentów z zaawansowanymi możliwościami parsowania.',
+  'landing.features.search.title': 'Inteligentne wyszukiwanie',
+  'landing.features.search.desc': 'Wyszukiwanie hybrydowe łączące odzyskiwanie leksykalne i wektorowe dla dokładnych wyników.',
+  'landing.features.chat.title': 'Konwersacyjna AI',
+  'landing.features.chat.desc': 'Angażuj się w naturalne rozmowy napędzane nowoczesnymi modelami językowymi.',
 
   // Chat
   'chat.title': 'Interfejs Czatu',

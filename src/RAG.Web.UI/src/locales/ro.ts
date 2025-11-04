@@ -13,6 +13,8 @@ export const ro: TranslationKeys = {
   'nav.user_guide': 'Ghid utilizator',
   'nav.app_info': 'Despre Aplicație',
   'nav.cyberpanel': 'Cyber Panel',
+  'nav.landing': 'Acasă',
+  'app.title': 'RAG Suite',
 
   // User Guide
   'userguide.description': 'Explorează funcțiile și capabilitățile RAG Suite',
@@ -159,6 +161,20 @@ export const ro: TranslationKeys = {
   'dashboard.features.search.description': 'Găsește informații relevante în toate documentele',
   'dashboard.features.analytics.title': 'Analiză și Insight-uri',
   'dashboard.features.analytics.description': 'Monitorizează utilizarea și metricile de performanță',
+
+  // Landing page
+  'landing.logo_alt': 'Logo RAG Suite',
+  'landing.title_prefix': 'Bine ai venit la',
+  'landing.title_brand': 'RAG Suite',
+  'landing.subtitle': 'Platformă avansată Retrieval-Augmented Generation pentru procesarea inteligentă a documentelor și AI conversațională.',
+  'landing.cta.get_started': 'Începe',
+  'landing.cta.learn_more': 'Află mai multe',
+  'landing.features.ingestion.title': 'Ingestie Documente',
+  'landing.features.ingestion.desc': 'Încarcă și procesează fără probleme diverse formate de documente cu capabilități avansate de parsare.',
+  'landing.features.search.title': 'Căutare Inteligentă',
+  'landing.features.search.desc': 'Căutare hibridă care combină recuperarea lexicală și pe bază de vectori pentru rezultate precise.',
+  'landing.features.chat.title': 'AI Conversațională',
+  'landing.features.chat.desc': 'Angajează conversații naturale propulsate de modele de limbaj de ultimă generație.',
 
   // Chat
   'chat.title': 'Interfață Chat',

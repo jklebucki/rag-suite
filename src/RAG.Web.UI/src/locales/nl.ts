@@ -13,6 +13,8 @@ export const nl: TranslationKeys = {
   'nav.user_guide': 'Gebruikershandleiding',
   'nav.app_info': 'App Info',
   'nav.cyberpanel': 'Cyber Panel',
+  'nav.landing': 'Start',
+  'app.title': 'RAG Suite',
 
   // User Guide
   'userguide.description': 'Ontdek functies en mogelijkheden van RAG Suite',
@@ -54,6 +56,20 @@ export const nl: TranslationKeys = {
   'dashboard.features.search.description': 'Vind relevante informatie in al uw documenten',
   'dashboard.features.analytics.title': 'Analytics & Inzichten',
   'dashboard.features.analytics.description': 'Monitor gebruik en prestatiemetrieken',
+
+  // Landing page
+  'landing.logo_alt': 'RAG Suite logo',
+  'landing.title_prefix': 'Welkom bij',
+  'landing.title_brand': 'RAG Suite',
+  'landing.subtitle': 'Geavanceerd Retrieval-Augmented Generation platform voor intelligent documentverwerking en conversatie-AI.',
+  'landing.cta.get_started': 'Aan de slag',
+  'landing.cta.learn_more': 'Meer informatie',
+  'landing.features.ingestion.title': 'Document Inname',
+  'landing.features.ingestion.desc': 'Naadloos uploaden en verwerken van verschillende documentformaten met geavanceerde parsing-mogelijkheden.',
+  'landing.features.search.title': 'Intelligente Zoekfunctie',
+  'landing.features.search.desc': 'Hybride zoeken dat lexicale en vector-gebaseerde terugwinning combineert voor nauwkeurige resultaten.',
+  'landing.features.chat.title': 'Conversatie-AI',
+  'landing.features.chat.desc': 'Ga natuurlijke gesprekken aan met geavanceerde taalmodellen.',
 
   // Chat
   'chat.title': 'Chat Interface',

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface NavigationItem {
   name: string
@@ -20,6 +21,7 @@ interface SidebarProps {
 
 export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isActiveRoute }: SidebarProps) {
   const { user } = useAuth()
+  const { t } = useI18n()
   const roles = user?.roles || []
   
   return (
@@ -41,7 +43,7 @@ export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isA
       )}>
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-6">
-          <h1 className="text-xl font-bold text-gray-900">RAG Suite</h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('app.title')}</h1>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
