@@ -9,7 +9,7 @@ import { Trophy, Calendar, CheckCircle, XCircle, ArrowRight, Trash2 } from 'luci
 import { DeleteConfirmationModal } from '@/components/common/DeleteConfirmationModal'
 import type { QuizAttemptDto } from '@/types'
 
-export default function QuizResults() {
+export function QuizResults() {
   const { t } = useI18n()
   const { user } = useAuth()
   const navigate = useNavigate()

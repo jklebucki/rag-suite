@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, User, Calendar, Trophy } from 'lucide-react'
 import type { AttemptDetailDto } from '@/types'
 
-export default function AttemptDetail() {
+export function AttemptDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useI18n()

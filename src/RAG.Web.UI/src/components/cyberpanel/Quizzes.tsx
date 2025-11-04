@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Play, FileText, Calendar } from 'lucide-react'
 import type { QuizListItem } from '@/types'
 
-export default function Quizzes() {
+export function Quizzes() {
   const { t, language } = useI18n()
   const navigate = useNavigate()
   const {

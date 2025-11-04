@@ -10,7 +10,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import type { ChatMessage } from '@/types'
 
-export default function ChatInterface() {
+export function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()
   const inputRef = useRef<HTMLTextAreaElement>(null)
 

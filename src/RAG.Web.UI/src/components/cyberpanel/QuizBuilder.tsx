@@ -17,7 +17,7 @@ interface QuizBuilderProps {
   onCancel?: () => void
 }
 
-export default function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) {
+export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) {
   const { t, language } = useI18n()
   const { createQuiz, updateQuiz, loading, exportQuiz } = useQuizzes()
   const { showSuccess, showError } = useToast()

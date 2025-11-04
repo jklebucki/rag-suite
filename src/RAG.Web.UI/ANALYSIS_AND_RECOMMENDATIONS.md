@@ -65,16 +65,14 @@
 ### ⚠️ Problemy strukturalne
 
 #### 1.1 Niespójność w eksportach
-- **Status**: ⚠️ **DO ZROBIENIA** - 19 komponentów nadal używa `export default`
+- **Status**: ✅ **ROZWIĄZANE** - Wszystkie komponenty używają teraz `named exports`
 
 **Status:**
-- ✅ Ukończone: Settings, Dashboard, About, SearchInterface
-- ⚠️ **Pozostałe do zmiany (15 komponentów):**
-  - `components/auth/`: LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm
-  - `components/chat/`: ChatInterface
-  - `components/addressbook/`: AddressBook
-  - `components/userguide/`: UserGuide
-  - `components/cyberpanel/`: Wszystkie 8 komponentów (Quizzes, QuizManager, QuizBuilder, QuizResults, QuizDetail, AttemptDetail, CyberPanelLayout, CyberPanelSidebar)
+- ✅ **UKOŃCZONE** - Wszystkie 19 komponentów ujednolicone do named exports!
+  - Settings, Dashboard, About, SearchInterface
+  - LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm
+  - ChatInterface, AddressBook, UserGuide
+  - Quizzes, QuizManager, QuizBuilder, QuizResults, QuizDetail, AttemptDetail, CyberPanelLayout, CyberPanelSidebar
 
 **Rekomendacja**: Ujednolicić do `named exports` dla lepszej tree-shaking i refactoring
 
@@ -272,7 +270,7 @@ export class ErrorBoundary extends React.Component { ... }
 3. ✅ Utworzyć `constants/config.ts` - **UKOŃCZONE**
 4. ✅ Przenieść `Layout.tsx` - **UKOŃCZONE**
 5. ✅ Utworzyć `utils/validation.ts` - **UKOŃCZONE**
-6. 🔄 Ujednolicić eksporty - **W TRAKCIE** (15 komponentów pozostało, 4 ukończone)
+6. ✅ Ujednolicić eksporty - **UKOŃCZONE** (wszystkie 19 komponentów - 100%)
 7. ✅ Zastąpić console.log w serwisach - **UKOŃCZONE** (wszystkie serwisy)
 8. ✅ Dodać brakujące stałe do constants - **UKOŃCZONE** (REFETCH_INTERVALS, CACHE_CONFIG)
 9. ✅ Poprawić relative import w SearchResults.tsx - **UKOŃCZONE**
@@ -350,7 +348,7 @@ export class ErrorBoundary extends React.Component { ... }
 - [x] Dodanie brakujących stałych (REFETCH_INTERVALS, CACHE_CONFIG) ✅
 - [x] Poprawa relative import w SearchResults.tsx ✅
 - [x] Zastąpienie console.error w useQuizzes.ts ✅
-- [ ] Export consistency (15 komponentów pozostało, 4 ukończone)
+- [x] Export consistency ✅ (wszystkie 19 komponentów ukończone)
 
 ### Refaktoryzacja (Faza 2)
 - [ ] QuizBuilder split (629 linii)

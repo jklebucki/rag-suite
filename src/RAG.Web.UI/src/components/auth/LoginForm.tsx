@@ -235,5 +235,3 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     </div>
   )
 }
-
-export default LoginForm

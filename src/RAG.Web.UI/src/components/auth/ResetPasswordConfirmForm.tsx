@@ -256,5 +256,3 @@ export function ResetPasswordConfirmForm() {
     </div>
   )
 }
-
-export default ResetPasswordConfirmForm

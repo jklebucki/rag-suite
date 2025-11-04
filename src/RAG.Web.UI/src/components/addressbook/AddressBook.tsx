@@ -17,7 +17,7 @@ import { ChangeProposalType, ProposalStatus } from '@/types/addressbook'
 
 type TabType = 'contacts' | 'import' | 'proposals'
 
-export default function AddressBook() {
+export function AddressBook() {
   const { user, isAuthenticated } = useAuth()
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<TabType>('contacts')

@@ -66,4 +66,3 @@ export function UserGuide() {
   )
 }
 
-export default UserGuide

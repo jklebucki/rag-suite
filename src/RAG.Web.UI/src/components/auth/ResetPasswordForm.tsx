@@ -190,5 +190,3 @@ export function ResetPasswordForm() {
     </div>
   )
 }
-
-export default ResetPasswordForm

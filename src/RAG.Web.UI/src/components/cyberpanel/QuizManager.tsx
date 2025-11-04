@@ -7,11 +7,11 @@ import { useQuizzes } from '@/hooks/useQuizzes'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DeleteConfirmationModal } from '@/components/common/DeleteConfirmationModal'
-import QuizBuilder from './QuizBuilder'
+import { QuizBuilder } from './QuizBuilder'
 import { Plus, Edit, Trash2, Eye, EyeOff, Calendar, FileText, Upload } from 'lucide-react'
 import type { QuizListItem, DeleteQuizResponse } from '@/types'
 
-export default function QuizManager() {
+export function QuizManager() {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { showSuccess, showError } = useToast()

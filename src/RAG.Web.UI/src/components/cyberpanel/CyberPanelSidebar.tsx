@@ -9,7 +9,7 @@ interface Props {
   isActiveRoute: (href: string) => boolean
 }
 
-export default function CyberPanelSidebar({ isActiveRoute }: Props) {
+export function CyberPanelSidebar({ isActiveRoute }: Props) {
   const { user } = useAuth()
   const roles = user?.roles || []
   const isAdmin = roles.includes('Admin')

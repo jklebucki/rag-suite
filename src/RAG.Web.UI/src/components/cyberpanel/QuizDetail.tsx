@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import type { QuizQuestionDto, SubmitAttemptResponse } from '@/types'
 
-export default function QuizDetail() {
+export function QuizDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useI18n()

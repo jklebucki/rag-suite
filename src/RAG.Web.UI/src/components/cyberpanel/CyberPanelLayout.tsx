@@ -1,10 +1,10 @@
 import React from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import CyberPanelSidebar from '@/components/cyberpanel/CyberPanelSidebar'
+import { CyberPanelSidebar } from '@/components/cyberpanel/CyberPanelSidebar'
 import { useI18n } from '@/contexts/I18nContext'
 
-export default function CyberPanelLayout() {
+export function CyberPanelLayout() {
   const { user } = useAuth()
   const roles = user?.roles || []
   const isAdmin = roles.includes('Admin')
