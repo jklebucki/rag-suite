@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface RoleProtectedRouteProps {
@@ -10,6 +10,7 @@ interface RoleProtectedRouteProps {
 
 export function RoleProtectedRoute({ children, allowedRoles, redirectTo = '/' }: RoleProtectedRouteProps) {
   const { isAuthenticated, user, loading } = useAuth()
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -19,7 +20,7 @@ export function RoleProtectedRoute({ children, allowedRoles, redirectTo = '/' }:
     )
   }
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location }} />
 
   const hasRole = allowedRoles.some(r => user?.roles?.includes(r))
 

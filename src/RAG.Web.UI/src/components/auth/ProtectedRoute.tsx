@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -19,7 +20,8 @@ export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRou
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+    // preserve the current location so we can return after login
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 
   return <>{children}</>;

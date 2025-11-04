@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
@@ -14,6 +14,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const { login, loading, error, clearError } = useAuth()
   const { t } = useI18n()
   const { addToast } = useToast()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const [formData, setFormData] = useState<LoginRequest>({
     email: '',
@@ -79,6 +81,10 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         message: t('auth.login.success_message')
       })
       onSuccess?.()
+
+      // Navigate back to the page that required auth, if provided
+      const from = (location.state as any)?.from?.pathname || '/'
+      navigate(from, { replace: true })
     }
   }
 
