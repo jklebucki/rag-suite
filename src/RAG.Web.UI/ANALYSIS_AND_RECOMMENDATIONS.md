@@ -21,10 +21,26 @@
   - Podzielić na mniejsze komponenty (QuestionEditor, AnswerEditor, etc.)
 
 #### RegisterForm.tsx (460 linii)
-- **Problem**: Złożona walidacja i logika formularza w komponencie
-- **Rekomendacja**:
-  - Użyć `react-hook-form` dla zarządzania formularzem
-  - Wyodrębnić walidację do osobnych funkcji/utils
+**Status**: ✅ **UKOŃCZONE** - Zrefaktoryzowano z react-hook-form
+
+**Wykonane zmiany:**
+- ✅ Zainstalowano `react-hook-form` (7.x)
+- ✅ Utworzono `utils/registerValidation.ts` z hooks walidacyjnymi:
+  - `useRegisterValidation()` - dynamiczne reguły walidacji z backend config
+  - `usePasswordRequirements()` - wyświetlanie wymagań hasła
+- ✅ Zrefaktoryzowano komponent z 460 → 275 linii (-185 linii, -40%)
+- ✅ Usunięto ręczną walidację (150+ linii kodu)
+- ✅ Usunięto ręczne zarządzanie stanem formularza
+- ✅ Dodano wizualne podpowiedzi wymagań hasła
+- ✅ Lepsza wydajność dzięki `mode: 'onBlur'`
+- ✅ Brak błędów kompilacji
+
+**Korzyści:**
+- Deklaratywna walidacja (czytelniejszy kod)
+- Automatyczne śledzenie dirty/touched fields
+- Built-in error handling
+- Lepsze UX (walidacja onBlur zamiast onChange)
+- Łatwiejsza rozbudowa i utrzymanie
 
 ### 1.2 Console.log w kodzie produkcyjnym
 
@@ -127,7 +143,7 @@ const result = await handleAsyncError(
 ### Faza 2: Refaktoryzacja (3-5 dni) - 🔄 W TRAKCIE
 
 1. ⏳ Refaktoryzacja `QuizBuilder` (629 linii → podzielić na mniejsze komponenty)
-2. ⏳ Refaktoryzacja `RegisterForm` (460 linii → react-hook-form + validation utils)
+2. ✅ Refaktoryzacja `RegisterForm` (460 → 275 linii, -40%) - `react-hook-form` + validation utils
 
 ### Faza 3: Optymalizacja (2-3 dni) - ✅ UKOŃCZONA
 
@@ -154,17 +170,18 @@ const result = await handleAsyncError(
 
 ### Stan obecny:
 - ✅ Console.log: 0 w całym projekcie (komponenty) - kilka debug w contexts (niski priorytet)
-- ✅ Największy komponent: 629 linii (do refaktoryzacji w Fazie 2)
+- ✅ Największy komponent: 629 linii (QuizBuilder - pozostał do refaktoryzacji)
+- ✅ RegisterForm: 460 → 275 linii (-40% redukcja)
 - ✅ Centralizacja: HTTP clients ✅, validation utils ✅, constants ✅, logger ✅, ErrorBoundary ✅, useErrorHandler ✅
 - ✅ Named exports: 100% komponentów
 - ✅ Layout: Przeniesiony do właściwej lokalizacji
 - ✅ Bundle optimization: Zaawansowany chunk splitting (9 vendor chunks), lazy loading, cache busting
 - ✅ Faza 3 ukończona: 100%
+- 🔄 Faza 2: 50% (RegisterForm ✅, QuizBuilder pozostał)
 
 ### Następne kroki:
-**Faza 2 (Refaktoryzacja)** - pozostałe zadania:
-1. ⏳ QuizBuilder.tsx (629 linii) → podzielić na mniejsze komponenty
-2. ⏳ RegisterForm.tsx (460 linii) → react-hook-form + validation utils
+**Faza 2 (Refaktoryzacja)** - ostatnie zadanie:
+1. ⏳ QuizBuilder.tsx (629 linii) → podzielić na mniejsze komponenty (hook `useQuizBuilder`, sub-komponenty)
 - ✅ Error handling: ErrorBoundary + useErrorHandler hook zaimplementowane
 
 ### Cel końcowy:

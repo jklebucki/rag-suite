@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, User, Mail, Lock, Check } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
-import { useConfiguration, usePasswordValidation } from '@/contexts/ConfigurationContext'
+import { useRegisterValidation, usePasswordRequirements } from '@/utils/registerValidation'
 
-interface RegisterData {
+interface RegisterFormData {
   firstName: string
   lastName: string
   userName: string
@@ -16,185 +17,72 @@ interface RegisterData {
   acceptTerms: boolean
 }
 
-interface ValidationErrors {
-  firstName?: string
-  lastName?: string
-  userName?: string
-  email?: string
-  password?: string
-  confirmPassword?: string
-  acceptTerms?: string
-}
-
 export function RegisterForm() {
   const { t } = useI18n()
-  const { register } = useAuth()
+  const { register: registerUser } = useAuth()
   const { addToast } = useToast()
-  const { configuration } = useConfiguration()
-  const { validatePassword } = usePasswordValidation()
+  const validationRules = useRegisterValidation()
+  const passwordRequirements = usePasswordRequirements()
 
-  const [formData, setFormData] = useState<RegisterData>({
-    firstName: '',
-    lastName: '',
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    acceptTerms: false
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    watch,
+  } = useForm<RegisterFormData>({
+    mode: 'onBlur',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      userName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false,
+    },
   })
 
-  const [errors, setErrors] = useState<ValidationErrors>({})
-  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const validateForm = (): boolean => {
-    const newErrors: ValidationErrors = {}
+  const password = watch('password')
 
-    if (!configuration) {
-      newErrors.firstName = 'Configuration not loaded'
-      setErrors(newErrors)
-      return false
-    }
-
-    const { userFieldRequirements } = configuration
-
-    // First name validation
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = t('auth.validation.first_name_required')
-    } else if (userFieldRequirements.firstName.maxLength && formData.firstName.length > userFieldRequirements.firstName.maxLength) {
-      newErrors.firstName = `First name cannot exceed ${userFieldRequirements.firstName.maxLength} characters`
-    }
-
-    // Last name validation
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = t('auth.validation.last_name_required')
-    } else if (userFieldRequirements.lastName.maxLength && formData.lastName.length > userFieldRequirements.lastName.maxLength) {
-      newErrors.lastName = `Last name cannot exceed ${userFieldRequirements.lastName.maxLength} characters`
-    }
-
-    // Username validation
-    if (!formData.userName.trim()) {
-      newErrors.userName = t('auth.validation.username_required')
-    } else {
-      const minLength = userFieldRequirements.userName.minLength || 3
-      const maxLength = userFieldRequirements.userName.maxLength || 50
-
-      if (formData.userName.trim().length < minLength) {
-        newErrors.userName = t('auth.validation.username_min_length')
-      } else if (formData.userName.length > maxLength) {
-        newErrors.userName = `Username cannot exceed ${maxLength} characters`
-      }
-    }
-
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = t('auth.validation.email_required')
-    } else if (userFieldRequirements.email.pattern && !new RegExp(userFieldRequirements.email.pattern).test(formData.email)) {
-      newErrors.email = t('auth.validation.email_invalid')
-    } else if (userFieldRequirements.email.maxLength && formData.email.length > userFieldRequirements.email.maxLength) {
-      newErrors.email = `Email cannot exceed ${userFieldRequirements.email.maxLength} characters`
-    }
-
-    // Password validation using dynamic validation
-    if (!formData.password) {
-      newErrors.password = t('auth.validation.password_required')
-    } else {
-      const passwordValidation = validatePassword(formData.password)
-      if (!passwordValidation.isValid && passwordValidation.errors.length > 0) {
-        // Map validation errors to user-friendly messages
-        const errorKey = passwordValidation.errors[0]
-
-        if (errorKey.includes('password_min_length')) {
-          const minLength = configuration.passwordRequirements.requiredLength
-          newErrors.password = `Password must be at least ${minLength} characters`
-        } else if (errorKey.includes('password_require_digit')) {
-          newErrors.password = t('auth.validation.password_require_digit')
-        } else if (errorKey.includes('password_require_uppercase')) {
-          newErrors.password = t('auth.validation.password_require_uppercase')
-        } else if (errorKey.includes('password_require_lowercase')) {
-          newErrors.password = t('auth.validation.password_require_lowercase')
-        } else if (errorKey.includes('password_require_special')) {
-          newErrors.password = t('auth.validation.password_require_special')
-        } else {
-          newErrors.password = t('auth.validation.password_min_length')
-        }
-      }
-    }
-
-    // Confirm password validation
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('auth.validation.password_mismatch')
-    }
-
-    // Terms validation
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = t('auth.validation.terms_required')
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
-
-    // Clear error when user starts typing
-    if (errors[name as keyof ValidationErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }))
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
-
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      await register({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        userName: formData.userName,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        acceptTerms: formData.acceptTerms
+      await registerUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userName: data.userName,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        acceptTerms: data.acceptTerms,
       })
 
       addToast({
         type: 'success',
         title: t('auth.register.success_title'),
-        message: t('auth.register.success_message')
+        message: t('auth.register.success_message'),
       })
 
-      // Reset form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        userName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        acceptTerms: false
-      })
+      reset()
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.'
       addToast({
         type: 'error',
         title: 'Registration Error',
-        message: errorMessage
+        message: errorMessage,
       })
-    } finally {
-      setLoading(false)
     }
+  }
+
+  if (!validationRules) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading configuration...</div>
+      </div>
+    )
   }
 
   return (
@@ -212,7 +100,7 @@ export function RegisterForm() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             {/* First Name */}
             <div>
@@ -225,11 +113,8 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="firstName"
-                  name="firstName"
                   type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={handleInputChange}
+                  {...register('firstName', validationRules.firstName)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
                     errors.firstName ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -237,7 +122,7 @@ export function RegisterForm() {
                 />
               </div>
               {errors.firstName && (
-                <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
               )}
             </div>
 
@@ -252,11 +137,8 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="lastName"
-                  name="lastName"
                   type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={handleInputChange}
+                  {...register('lastName', validationRules.lastName)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
                     errors.lastName ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -264,7 +146,7 @@ export function RegisterForm() {
                 />
               </div>
               {errors.lastName && (
-                <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
               )}
             </div>
 
@@ -279,11 +161,8 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="userName"
-                  name="userName"
                   type="text"
-                  required
-                  value={formData.userName}
-                  onChange={handleInputChange}
+                  {...register('userName', validationRules.userName)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
                     errors.userName ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -291,7 +170,7 @@ export function RegisterForm() {
                 />
               </div>
               {errors.userName && (
-                <p className="mt-1 text-sm text-red-600">{errors.userName}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.userName.message}</p>
               )}
             </div>
 
@@ -306,12 +185,9 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="email"
-                  name="email"
                   type="email"
                   autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  {...register('email', validationRules.email)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -319,7 +195,7 @@ export function RegisterForm() {
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
 
@@ -334,12 +210,9 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  {...register('password', validationRules.password)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-10 py-2 border ${
                     errors.password ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -358,7 +231,17 @@ export function RegisterForm() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+              {password && passwordRequirements.length > 0 && (
+                <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                  <p className="font-medium mb-1">Password must contain:</p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {passwordRequirements.map((req, index) => (
+                      <li key={index}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
 
@@ -373,12 +256,9 @@ export function RegisterForm() {
                 </div>
                 <input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
+                  {...register('confirmPassword', validationRules.confirmPassword)}
                   className={`appearance-none rounded-md relative block w-full pl-10 pr-10 py-2 border ${
                     errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
@@ -397,7 +277,7 @@ export function RegisterForm() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -405,10 +285,8 @@ export function RegisterForm() {
             <div className="flex items-center">
               <input
                 id="acceptTerms"
-                name="acceptTerms"
                 type="checkbox"
-                checked={formData.acceptTerms}
-                onChange={handleInputChange}
+                {...register('acceptTerms', validationRules.acceptTerms)}
                 className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${
                   errors.acceptTerms ? 'border-red-300' : ''
                 }`}
@@ -418,17 +296,17 @@ export function RegisterForm() {
               </label>
             </div>
             {errors.acceptTerms && (
-              <p className="text-sm text-red-600">{errors.acceptTerms}</p>
+              <p className="text-sm text-red-600">{errors.acceptTerms.message}</p>
             )}
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   {t('auth.register.signing_up')}
