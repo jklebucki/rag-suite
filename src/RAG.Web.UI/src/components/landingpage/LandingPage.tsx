@@ -30,7 +30,7 @@ export function LandingPage() {
         {/* Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            to="/login"
+            to="/guide"
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300"
           >
             {t('landing.cta.get_started')}
