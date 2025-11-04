@@ -1,5 +1,5 @@
 // Main components index - centralized exports
-export { Layout } from './Layout';
+export { Layout } from './layout/Layout';
 
 // Auth components
 export * from './auth';
