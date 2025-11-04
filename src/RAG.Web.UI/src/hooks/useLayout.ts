@@ -8,6 +8,7 @@ import {
   Info,
   Users,
   BookOpen,
+  Home,
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -22,7 +23,8 @@ export function useLayout() {
   const isPowerUser = user?.roles?.includes('PowerUser') ?? false
 
   const baseNavigation = [
-    { name: t('nav.dashboard'), href: '/', icon: BarChart3 },
+    { name: 'Landing', href: '/', icon: Home },
+    { name: t('nav.dashboard'), href: '/dashboard', icon: BarChart3 },
     { name: t('nav.chat'), href: '/chat', icon: MessageSquare },
     { name: t('nav.search'), href: '/search', icon: Search },
   ]

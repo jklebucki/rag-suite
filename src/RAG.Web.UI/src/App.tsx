@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Layout } from '@/components/Layout'
+import { LandingPage } from '@/components/landingpage/LandingPage'
 const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'))
 const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'))
 const SearchInterface = lazy(() => import('@/components/search/SearchInterface'))
@@ -42,51 +43,77 @@ function AppRoutes() {
       <Route
         path="/"
         element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
+          <Layout>
+            <ProtectedRoute>
+              <LandingPage />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <Layout>
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </Layout>
         }
       />
       <Route
         path="/chat"
         element={
-          <ProtectedRoute>
-            <ChatInterface key={chatKey} />
-          </ProtectedRoute>
+          <Layout>
+            <ProtectedRoute>
+              <ChatInterface key={chatKey} />
+            </ProtectedRoute>
+          </Layout>
         }
       />
       <Route
         path="/search"
         element={
-          <ProtectedRoute>
-            <SearchInterface />
-          </ProtectedRoute>
+          <Layout>
+            <ProtectedRoute>
+              <SearchInterface />
+            </ProtectedRoute>
+          </Layout>
         }
       />
       <Route
         path="/address-book"
         element={
-          <AddressBook />
+          <Layout>
+            <ProtectedRoute>
+              <AddressBook />
+            </ProtectedRoute>
+          </Layout>
         }
       />
       <Route
         path="/guide"
         element={
-          <UserGuide />
+          <Layout>
+            <UserGuide />
+          </Layout>
         }
       />
       <Route
         path="/about"
         element={
-          <About />
+          <Layout>
+            <About />
+          </Layout>
         }
       />
       <Route
         path="/settings"
         element={
-          <AdminProtectedRoute>
-            <Settings />
-          </AdminProtectedRoute>
+          <Layout>
+            <AdminProtectedRoute>
+              <Settings />
+            </AdminProtectedRoute>
+          </Layout>
         }
       />
 
@@ -94,9 +121,11 @@ function AppRoutes() {
       <Route
         path="/cyberpanel/*"
         element={
-          <ProtectedRoute>
-            <CyberPanelLayout />
-          </ProtectedRoute>
+          <Layout>
+            <ProtectedRoute>
+              <CyberPanelLayout />
+            </ProtectedRoute>
+          </Layout>
         }
       >
         <Route index element={<Quizzes />} />
@@ -149,11 +178,9 @@ function App() {
       <ToastProvider>
         <ConfigurationProvider>
           <AuthProvider>
-            <Layout>
-              <Suspense fallback={<div>Loading...</div>}>
-                <AppRoutes />
-              </Suspense>
-            </Layout>
+            <Suspense fallback={<div>Loading...</div>}>
+              <AppRoutes />
+            </Suspense>
           </AuthProvider>
         </ConfigurationProvider>
       </ToastProvider>
