@@ -82,9 +82,7 @@ function AppRoutes() {
         path="/address-book"
         element={
           <Layout>
-            <ProtectedRoute>
               <AddressBook />
-            </ProtectedRoute>
           </Layout>
         }
       />
