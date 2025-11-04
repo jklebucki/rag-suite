@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react'
 import { authService } from '@/services/auth'
 import { useOnlineStatus } from './useOnlineStatus'
+import { logger } from '@/utils/logger'
 
 /**
  * Custom hook for automatic token refresh management
@@ -37,7 +38,7 @@ export const useTokenRefresh = (
       
       return Math.max(0, refreshTime - now)
     } catch (error) {
-      console.warn('Failed to parse token for refresh calculation:', error)
+      logger.warn('Failed to parse token for refresh calculation:', error)
       return 0
     }
   }, [])
@@ -48,18 +49,18 @@ export const useTokenRefresh = (
     
     // Check if enough time has passed since last attempt
     if (now - lastRefreshAttemptRef.current < MIN_REFRESH_INTERVAL) {
-      console.debug('🔄 Token refresh skipped (too soon since last attempt)')
+      logger.debug('Token refresh skipped (too soon since last attempt)')
       return
     }
     
     if (isRefreshingRef.current || !isOnline) {
-      console.debug('🔄 Token refresh skipped (already refreshing or offline)')
+      logger.debug('Token refresh skipped (already refreshing or offline)')
       return
     }
     
     isRefreshingRef.current = true
     lastRefreshAttemptRef.current = now
-    console.debug('🔄 Starting token refresh...')
+    logger.debug('Starting token refresh...')
     
     try {
       const success = await authService.refreshToken()
@@ -69,24 +70,24 @@ export const useTokenRefresh = (
         
         if (newToken && newRefreshToken) {
           onTokenRefresh(newToken, newRefreshToken)
-          console.debug('🔄 Token refreshed successfully')
+          logger.debug('Token refreshed successfully')
         } else {
-          console.warn('🔄 Token refresh succeeded but tokens are missing')
+          logger.warn('Token refresh succeeded but tokens are missing')
           onRefreshError?.()
           onLogout()
         }
       } else {
-        console.warn('🔄 Token refresh failed, logging out')
+        logger.warn('Token refresh failed, logging out')
         onRefreshError?.()
         onLogout()
       }
     } catch (error) {
-      console.error('🔄 Token refresh error:', error)
+      logger.error('Token refresh error:', error)
       onRefreshError?.()
       onLogout()
     } finally {
       isRefreshingRef.current = false
-      console.debug('🔄 Token refresh process completed')
+      logger.debug('Token refresh process completed')
     }
   }, [onTokenRefresh, onLogout, onRefreshError, isOnline, MIN_REFRESH_INTERVAL])
 
@@ -103,28 +104,28 @@ export const useTokenRefresh = (
     if (timeUntilRefresh <= 0) {
       // Token expired or expiring soon - schedule in 1 minute to avoid immediate loop
       const delayTime = 60 * 1000 // 1 minute
-      console.debug('🔄 Token expired/expiring, scheduling refresh in 1 minute to avoid loops')
+      logger.debug('Token expired/expiring, scheduling refresh in 1 minute to avoid loops')
       
       refreshTimeoutRef.current = setTimeout(() => {
-        console.debug('🔄 Delayed token refresh triggered for expired token')
+        logger.debug('Delayed token refresh triggered for expired token')
         performTokenRefresh()
       }, delayTime)
       return
     } else {
       // Schedule refresh
       refreshTimeoutRef.current = setTimeout(() => {
-        console.debug('🔄 Scheduled token refresh triggered')
+        logger.debug('Scheduled token refresh triggered')
         performTokenRefresh()
       }, timeUntilRefresh)
       
-      console.debug(`🔄 Token refresh scheduled in ${Math.round(timeUntilRefresh / 1000)} seconds`)
+      logger.debug(`Token refresh scheduled in ${Math.round(timeUntilRefresh / 1000)} seconds`)
     }
   }, [isAuthenticated, getTimeUntilRefresh, performTokenRefresh])
 
   // Setup automatic token refresh
   useEffect(() => {
     if (isAuthenticated) {
-      console.debug('🔄 Setting up automatic token refresh with safeguards')
+      logger.debug('Setting up automatic token refresh with safeguards')
       scheduleTokenRefresh()
     } else {
       if (refreshTimeoutRef.current) {
@@ -146,7 +147,7 @@ export const useTokenRefresh = (
       if (!document.hidden && isAuthenticated) {
         // Page became visible, check if we need to refresh token
         if (authService.isTokenExpiringSoon()) {
-          console.debug('🔄 Page visible and token expiring soon, attempting refresh')
+          logger.debug('Page visible and token expiring soon, attempting refresh')
           performTokenRefresh()
         } else {
           // Reschedule refresh based on current token
@@ -162,7 +163,7 @@ export const useTokenRefresh = (
   // Handle coming back online
   useEffect(() => {
     if (wasOffline && isOnline && isAuthenticated) {
-      console.debug('🔄 Just came back online, checking token status')
+      logger.debug('Just came back online, checking token status')
       // Just came back online, check if token needs refresh
       if (authService.isTokenExpiringSoon()) {
         performTokenRefresh()

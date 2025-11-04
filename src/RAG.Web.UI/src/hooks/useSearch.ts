@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
 import { useI18n } from '@/contexts/I18nContext'
+import { logger } from '@/utils/logger'
 import { formatDate } from '@/utils/date'
 
 export function useSearch() {
@@ -30,13 +31,13 @@ export function useSearch() {
   } = useQuery({
     queryKey: ['search', query, filters],
     queryFn: async () => {
-      console.log('🔍 Searching for:', query)
+      logger.debug('Searching for:', query)
       try {
         const result = await apiClient.search({
           query,
           limit: 20,
         })
-        console.log('🔍 Search results:', result)
+        logger.debug('Search results:', result)
         // Ensure we always return a valid SearchResponse object
         return result || {
           results: [],
@@ -45,7 +46,7 @@ export function useSearch() {
           query: query
         }
       } catch (error) {
-        console.error('🔍 Search error:', error)
+        logger.error('Search error:', error)
         throw error
       }
     },
@@ -62,7 +63,7 @@ export function useSearch() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('🔍 Handle search triggered, query:', query)
+    logger.debug('Handle search triggered, query:', query)
     if (query.trim()) {
       setHasSearched(true)
       refetch()

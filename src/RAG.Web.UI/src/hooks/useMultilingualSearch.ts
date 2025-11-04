@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
 import { useI18n } from '@/contexts/I18nContext'
+import { logger } from '@/utils/logger'
 import type { MultilingualSearchQuery, SearchResponse } from '@/types'
 
 export function useMultilingualSearch() {
@@ -32,7 +33,7 @@ export function useMultilingualSearch() {
   } = useQuery({
     queryKey: ['multilingual-search', query, filters, currentLanguage],
     queryFn: async () => {
-      console.log('🌐 Multilingual searching for:', query, 'in language:', currentLanguage)
+      logger.debug('Multilingual searching for:', query, 'in language:', currentLanguage)
       try {
         const searchQuery: MultilingualSearchQuery = {
           query,
@@ -48,7 +49,7 @@ export function useMultilingualSearch() {
         }
 
         const result = await apiClient.searchMultilingual(searchQuery)
-        console.log('🌐 Multilingual search results:', result)
+        logger.debug('Multilingual search results:', result)
 
         // Show language detection info if available
         if (result.detectedLanguage && result.detectedLanguage !== currentLanguage) {
@@ -67,7 +68,7 @@ export function useMultilingualSearch() {
           query: query
         }
       } catch (error) {
-        console.error('🌐 Multilingual search error:', error)
+        logger.error('Multilingual search error:', error)
         throw error
       }
     },
@@ -80,14 +81,14 @@ export function useMultilingualSearch() {
       return
     }
 
-    console.log('🔍 Starting multilingual search for:', query)
+    logger.debug('Starting multilingual search for:', query)
     setHasSearched(true)
     setIsSearching(true)
 
     try {
       await refetch()
     } catch (error) {
-      console.error('Search failed:', error)
+      logger.error('Search failed:', error)
       showError('Search failed', 'Unable to search at this time. Please try again.')
     } finally {
       setIsSearching(false)

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
 import { useI18n } from '@/contexts/I18nContext'
+import { logger } from '@/utils/logger'
 import type { MultilingualChatRequest, MultilingualChatResponse, ChatSession, ChatMessage } from '@/types'
 
 export function useMultilingualChat() {
@@ -35,12 +36,12 @@ export function useMultilingualChat() {
   // Send multilingual message mutation
   const sendMultilingualMessageMutation = useMutation({
     mutationFn: ({ sessionId, request }: { sessionId: string; request: MultilingualChatRequest }) => {
-      console.log('Calling sendMultilingualMessage API with:', { sessionId, request })
+      logger.debug('Calling sendMultilingualMessage API with:', { sessionId, request })
       return apiClient.sendMultilingualMessage(sessionId, request)
     },
     retry: false, // 🆕 No retry to prevent double sending
     onSuccess: (response) => {
-      console.log('sendMultilingualMessage success:', response)
+      logger.debug('sendMultilingualMessage success:', response)
       setLastResponse(response)
 
       // Check if documents are available from metadata
@@ -65,7 +66,7 @@ export function useMultilingualChat() {
       }
     },
     onError: (error) => {
-      console.error('Failed to send multilingual message:', error)
+      logger.error('Failed to send multilingual message:', error)
       showError('Failed to send message', 'Please check your connection and try again')
       setIsTyping(false)
     },
@@ -75,7 +76,7 @@ export function useMultilingualChat() {
   const createSessionMutation = useMutation({
     mutationFn: ({ title, language }: { title?: string; language?: string }) => apiClient.createChatSession(title, language),
     onSuccess: (newSession) => {
-      console.log('Session created:', newSession)
+      logger.debug('Session created:', newSession)
       // Immediately add the new session to the cache for instant UI update
       queryClient.setQueryData(['chat-sessions'], (old: ChatSession[] = []) => [...old, newSession])
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
@@ -83,7 +84,7 @@ export function useMultilingualChat() {
       setIsNewSession(true)
     },
     onError: (error) => {
-      console.error('Failed to create session:', error)
+      logger.error('Failed to create session:', error)
       showError('Failed to create new session', 'Please try again')
     },
   })
@@ -103,7 +104,7 @@ export function useMultilingualChat() {
       showSuccess('Session deleted', 'Chat session has been deleted successfully')
     },
     onError: (error) => {
-      console.error('Failed to delete session:', error)
+      logger.error('Failed to delete session:', error)
       showError('Failed to delete session', 'Please try again')
       setSessionToDelete(null)
     },
@@ -114,21 +115,21 @@ export function useMultilingualChat() {
       e.preventDefault()
     }
 
-    console.log('handleSendMessage called', { message: message.trim(), currentSessionId, isTyping })
+    logger.debug('handleSendMessage called', { message: message.trim(), currentSessionId, isTyping })
 
     if (!message.trim()) {
-      console.log('Message is empty, aborting')
+      logger.debug('Message is empty, aborting')
       return
     }
 
     if (!currentSessionId) {
-      console.log('No current session, aborting')
+      logger.debug('No current session, aborting')
       return
     }
 
     // 🆕 Prevent double sending when already sending
     if (isTyping || sendMultilingualMessageMutation.isPending) {
-      console.log('Already sending message, aborting')
+      logger.debug('Already sending message, aborting')
       return
     }
 
@@ -152,7 +153,7 @@ export function useMultilingualChat() {
       }
     })
 
-    console.log('Setting isTyping to true')
+    logger.debug('Setting isTyping to true')
     setIsTyping(true)
     setMessage('') // Clear input immediately
 
@@ -168,7 +169,7 @@ export function useMultilingualChat() {
       }
     }
 
-    console.log('Sending multilingual message:', request)
+    logger.debug('Sending multilingual message:', request)
     sendMultilingualMessageMutation.mutate({ sessionId: currentSessionId, request })
   }
 
@@ -208,9 +209,9 @@ export function useMultilingualChat() {
 
   // Set first session as current if none selected
   useEffect(() => {
-    console.log('Session selection effect:', { currentSessionId, sessionsLength: sessions.length, sessions })
+    logger.debug('Session selection effect:', { currentSessionId, sessionsLength: sessions.length, sessions })
     if (!currentSessionId && sessions.length > 0) {
-      console.log('Setting first session as current:', sessions[0].id)
+      logger.debug('Setting first session as current:', sessions[0].id)
       setCurrentSessionId(sessions[0].id)
     }
   }, [sessions, currentSessionId])
@@ -220,7 +221,7 @@ export function useMultilingualChat() {
     if (currentSessionId && sessions.length > 0) {
       const sessionExists = sessions.some(session => session.id === currentSessionId)
       if (!sessionExists) {
-        console.log('Current session no longer exists, clearing:', currentSessionId)
+        logger.debug('Current session no longer exists, clearing:', currentSessionId)
         setCurrentSessionId(null)
         // Clear the session data from cache
         queryClient.setQueryData(['chat-session', currentSessionId], null)
@@ -231,7 +232,7 @@ export function useMultilingualChat() {
   // Cleanup on unmount - reset state
   useEffect(() => {
     return () => {
-      console.log('useMultilingualChat cleanup: resetting state')
+      logger.debug('useMultilingualChat cleanup: resetting state')
       setCurrentSessionId(null)
       setMessage('')
       setIsTyping(false)

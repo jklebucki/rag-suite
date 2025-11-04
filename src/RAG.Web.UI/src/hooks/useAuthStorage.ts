@@ -1,5 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { authService } from '@/services/auth'
+import { logger } from '@/utils/logger'
+import { STORAGE_KEYS } from '@/constants/config'
 
 /**
  * Custom hook for handling authentication storage synchronization
@@ -11,7 +13,7 @@ export const useAuthStorage = (
 ) => {
   // Handle storage events for cross-tab synchronization
   const handleStorageChange = useCallback((e: StorageEvent) => {
-    if (e.key === 'auth_token') {
+    if (e.key === STORAGE_KEYS.AUTH_TOKEN) {
       if (e.newValue === null) {
         // Token was removed in another tab
         onLogout()
@@ -37,7 +39,7 @@ export const useAuthStorage = (
           onLogout()
         }
       } catch (error) {
-        console.warn('Failed to verify auth on tab focus:', error)
+        logger.warn('Failed to verify auth on tab focus:', error)
         // Optionally logout on error, depending on your security requirements
         // onLogout()
       }
@@ -59,14 +61,14 @@ export const useAuthStorage = (
 
   // Function to safely store auth data
   const storeAuthData = useCallback((token: string, refreshToken: string, user: any) => {
-    console.debug('🔐 storeAuthData called with:', { hasToken: !!token, hasRefreshToken: !!refreshToken, hasUser: !!user })
+    logger.debug('storeAuthData called with:', { hasToken: !!token, hasRefreshToken: !!refreshToken, hasUser: !!user })
     
     try {
-      localStorage.setItem('auth_token', token)
-      localStorage.setItem('refresh_token', refreshToken)
-      localStorage.setItem('user_data', JSON.stringify(user))
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token)
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user))
       
-      console.debug('🔐 Data stored in localStorage successfully')
+      logger.debug('Data stored in localStorage successfully')
       
       // Dispatch custom event for same-tab updates
       window.dispatchEvent(new CustomEvent('authStateChanged', {
@@ -74,13 +76,13 @@ export const useAuthStorage = (
       }))
       
       // Verify storage worked
-      console.debug('🔐 Verification - localStorage now contains:', {
-        token: localStorage.getItem('auth_token') ? 'EXISTS' : 'MISSING',
-        refreshToken: localStorage.getItem('refresh_token') ? 'EXISTS' : 'MISSING',
-        userData: localStorage.getItem('user_data') ? 'EXISTS' : 'MISSING'
+      logger.debug('Verification - localStorage now contains:', {
+        token: localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) ? 'EXISTS' : 'MISSING',
+        refreshToken: localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) ? 'EXISTS' : 'MISSING',
+        userData: localStorage.getItem(STORAGE_KEYS.USER) ? 'EXISTS' : 'MISSING'
       })
     } catch (error) {
-      console.error('🔐 Failed to store auth data:', error)
+      logger.error('Failed to store auth data:', error)
       throw new Error('Failed to persist authentication data')
     }
   }, [])
@@ -88,16 +90,16 @@ export const useAuthStorage = (
   // Function to safely clear auth data
   const clearAuthData = useCallback(() => {
     try {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('user_data')
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+      localStorage.removeItem(STORAGE_KEYS.USER)
       
       // Dispatch custom event for same-tab updates
       window.dispatchEvent(new CustomEvent('authStateChanged', {
         detail: { type: 'logout' }
       }))
     } catch (error) {
-      console.error('Failed to clear auth data:', error)
+      logger.error('Failed to clear auth data:', error)
     }
   }, [])
 

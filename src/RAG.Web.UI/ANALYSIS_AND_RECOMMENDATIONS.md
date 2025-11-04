@@ -1,7 +1,7 @@
 # Analiza struktury projektu RAG.Web.UI i rekomendacje
 
 **Ostatnia aktualizacja:** 2024-12-19  
-**Status:** W toku - Faza 1 ukończona (8/8 zadań), Faza 2 rozpoczęta
+**Status:** W toku - Faza 1 ukończona (8/8), Faza 2 w toku (2/6 zadań)
 
 ## 📋 Spis treści
 1. [Stan obecny](#stan-obecny)
@@ -124,8 +124,13 @@
 - ✅ Zastąpione w `api.ts` i `auth.ts`
 - ✅ Zastąpione w `addressBookService.ts` i `configurationService.ts`
 - ✅ Zastąpione w `useQuizzes.ts` (10 console.error)
+- ✅ Zastąpione w `useMultilingualChat.ts` (16 console.*)
+- ✅ Zastąpione w `useTokenRefresh.ts` (16 console.*)
+- ✅ Zastąpione w `useAuthStorage.ts` (6 console.*)
+- ✅ Zastąpione w `useChat.ts` (6 console.*)
+- ✅ Zastąpione w `useSearch.ts` (4 console.*)
+- ✅ Zastąpione w `useMultilingualSearch.ts` (5 console.*)
 - ⚠️ **Pozostałe do zamiany:**
-  - Hooks: ~53 console.* w różnych hooks (useMultilingualChat, useMultilingualSearch, useTokenRefresh, useChat, useSearch, useAuthStorage)
   - ~165+ w komponentach (głównie debug/info w development)
 
 **Rekomendacja**: Stopniowo zastępować console.* przez logger w całym projekcie
@@ -280,9 +285,15 @@ export class ErrorBoundary extends React.Component { ... }
 2. ⏳ Refaktoryzacja `RegisterForm` (460 linii → react-hook-form + validation utils)
 3. ⏳ Refaktoryzacja `About.tsx` (300 linii → wyodrębnić logikę parsowania)
 4. ⏳ Zastosować validation utils w formularzach
-5. 🔄 Migracja console.log → logger (stopniowo w całym projekcie)
+5. ✅ Migracja console.log → logger w hooks - **UKOŃCZONE** (wszystkie hooks)
    - ✅ useQuizzes.ts (10 console.error)
-   - ⚠️ Pozostałe hooks (~53 console.*)
+   - ✅ useMultilingualChat.ts (16 console.*)
+   - ✅ useTokenRefresh.ts (16 console.*)
+   - ✅ useAuthStorage.ts (6 console.*)
+   - ✅ useChat.ts (6 console.*)
+   - ✅ useSearch.ts (4 console.*)
+   - ✅ useMultilingualSearch.ts (5 console.*)
+   - ⚠️ Pozostałe: ~165+ w komponentach (stopniowa migracja)
 6. ⏳ Poprawić relative import w `SearchResults.tsx`
 
 ### Faza 3: Optymalizacja (2-3 dni) - ⏳ DO ROZPOCZĘCIA
@@ -309,7 +320,7 @@ export class ErrorBoundary extends React.Component { ... }
 - Magic numbers: Rozproszone po całym kodzie
 
 ### Stan obecny (po Faza 1 + część Fazy 2):
-- Console.log: ~155 wystąpień (w serwisach: 0 ✅, w hooks: ~53, głównie w komponentach)
+- Console.log: ~165 wystąpień (w serwisach: 0 ✅, w hooks: 0 ✅, głównie w komponentach)
 - Duplikacja kodu: ~10% (zmniejszona dzięki utils)
 - Największy komponent: 629 linii (bez zmian)
 - Centralizacja: ✅ HTTP clients, ✅ validation utils, ⚠️ error handling (częściowo)
@@ -355,8 +366,8 @@ export class ErrorBoundary extends React.Component { ... }
 - [ ] RegisterForm with react-hook-form (460 linii)
 - [ ] About.tsx logic extraction (300 linii)
 - [ ] Zastosowanie validation utils w formularzach
-- [x] Migracja console.error w useQuizzes.ts ✅
-- [ ] Migracja console.* w pozostałych hooks (~53)
+- [x] Migracja console.* w hooks ✅ (wszystkie hooks - 63 wystąpienia)
+- [x] Migracja console.* w serwisach ✅ (wszystkie serwisy)
 - [x] Poprawa relative import w SearchResults.tsx ✅
 
 ### Optymalizacja (Faza 3)

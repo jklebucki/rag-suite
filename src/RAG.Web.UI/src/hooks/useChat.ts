@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
+import { logger } from '@/utils/logger'
 import type { ChatRequest } from '@/types'
 
 export function useChat() {
@@ -37,7 +38,7 @@ export function useChat() {
       setIsTyping(false)
     },
     onError: (error) => {
-      console.error('Failed to send message:', error)
+      logger.error('Failed to send message:', error)
       showError('Failed to send message', 'Please check your connection and try again')
       setIsTyping(false)
     },
@@ -47,13 +48,13 @@ export function useChat() {
   const createSessionMutation = useMutation({
     mutationFn: () => apiClient.createChatSession(),
     onSuccess: (newSession) => {
-      console.log('Session created:', newSession)
+      logger.debug('Session created:', newSession)
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setCurrentSessionId(newSession.id)
       showSuccess('Chat session created', 'New conversation started successfully')
     },
     onError: (error) => {
-      console.error('Failed to create session:', error)
+      logger.error('Failed to create session:', error)
       showError('Failed to create chat session', 'Please try again later')
     },
   })
@@ -72,7 +73,7 @@ export function useChat() {
       showSuccess('Chat session deleted', 'Conversation has been removed successfully')
     },
     onError: (error) => {
-      console.error('Failed to delete session:', error)
+      logger.error('Failed to delete session:', error)
       showError('Failed to delete chat session', 'Please try again later')
     },
   })
@@ -107,7 +108,7 @@ export function useChat() {
   }
 
   const handleNewSession = () => {
-    console.log('Creating new session...')
+    logger.debug('Creating new session...')
     createSessionMutation.mutate()
   }
 
@@ -136,7 +137,7 @@ export function useChat() {
     if (currentSessionId && sessions.length > 0) {
       const sessionExists = sessions.some(session => session.id === currentSessionId)
       if (!sessionExists) {
-        console.log('Current session no longer exists, clearing:', currentSessionId)
+        logger.debug('Current session no longer exists, clearing:', currentSessionId)
         setCurrentSessionId(null)
         // Clear the session data from cache
         queryClient.setQueryData(['chat-session', currentSessionId], null)
