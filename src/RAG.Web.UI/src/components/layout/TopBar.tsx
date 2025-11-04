@@ -6,6 +6,7 @@ import { UserAccountModal } from '@/components/account/UserAccountModal'
 import { SessionExpiredModal } from '@/components/ui/SessionExpiredModal'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { logger } from '@/utils/logger'
 
 interface TopBarProps {
   onToggleSidebar: () => void
@@ -39,7 +40,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       await logout()
       setIsUserMenuOpen(false)
     } catch (error) {
-      console.error('Logout error:', error)
+      logger.error('Logout error:', error)
     }
   }
 

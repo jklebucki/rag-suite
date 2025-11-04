@@ -8,6 +8,7 @@ import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@
 import { validateLlmSettings } from './llmValidation'
 import { LlmFormField, ModelSelectField } from './LlmFormFields'
 import type { LlmFormErrors } from '@/types'
+import { logger } from '@/utils/logger'
 
 interface SettingsFormProps {
   onSettingsChange?: (settings: LlmSettings) => void
@@ -53,7 +54,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       setSettings(data)
       onSettingsChange?.(data)
     } catch (error) {
-      console.error('Failed to load LLM settings:', error)
+      logger.error('Failed to load LLM settings:', error)
       addToast({
         type: 'error',
         title: 'Error',
@@ -72,7 +73,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       const data: AvailableModelsResponse = await apiClient.getAvailableLlmModelsFromUrl(settings.url, settings.isOllama)
       setAvailableModels(data.models || [])
     } catch (error) {
-      console.error('Failed to load available models:', error)
+      logger.error('Failed to load available models:', error)
       setAvailableModels([])
       // Don't show error toast for model loading as it's expected to fail for invalid URLs
     } finally {
@@ -135,7 +136,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       })
       onSettingsChange?.(settings)
     } catch (error) {
-      console.error('Failed to update LLM settings:', error)
+      logger.error('Failed to update LLM settings:', error)
       addToast({
         type: 'error',
         title: 'Error',

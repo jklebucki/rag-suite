@@ -4,6 +4,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
 import type { DocumentDetailResponse } from '@/types'
+import { logger } from '@/utils/logger'
 
 interface DocumentDetailProps {
   document: DocumentDetailResponse
@@ -19,7 +20,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
       try {
         await apiClient.downloadFile(filePath)
       } catch (error) {
-        console.error('Download failed:', error)
+        logger.error('Download failed:', error)
         // TODO: Show error toast
       }
     }

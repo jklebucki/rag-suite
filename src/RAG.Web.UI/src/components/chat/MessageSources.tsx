@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal'
 import { DocumentDetail } from '@/components/search/DocumentDetail'
 import { useDocumentDetail } from '@/hooks/useDocumentDetail'
 import type { SearchResult } from '@/types/api'
+import { logger } from '@/utils/logger'
 
 // Lazy load PDFViewerModal
 const PDFViewerModal = React.lazy(() => import('@/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
@@ -35,7 +36,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
     try {
       await apiClient.downloadFile(filePath)
     } catch (error) {
-      console.error('Download failed:', error)
+      logger.error('Download failed:', error)
       // TODO: Show error toast
     }
   }

@@ -7,6 +7,7 @@ import { useDocumentDetail } from '@/hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
 import { apiClient } from '@/services/api'
 import type { SearchResult } from '@/types'
+import { logger } from '@/utils/logger'
 
 // Lazy load PDFViewerModal
 const PDFViewerModal = React.lazy(() => import('@/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
@@ -39,7 +40,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
     }
   }, [searchResults])
 
-  console.log('🔍 SearchResults render:', { searchResults, isLoading, error, hasSearched })
+  logger.debug('SearchResults render:', { searchResults, isLoading, error, hasSearched })
 
   const renderError = (err: unknown) => {
     if (!err) return null
@@ -61,7 +62,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   }
 
   if (error && hasSearched) {
-    console.error('🔍 Search error in component:', error)
+    logger.error('Search error in component:', error)
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4 mx-4 sm:mx-0">
         <p className="text-red-700 text-sm sm:text-base">{t('search.error')}</p>
@@ -198,7 +199,7 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
       try {
         await apiClient.downloadFile(result.filePath)
       } catch (error) {
-        console.error('Download failed:', error)
+        logger.error('Download failed:', error)
         // TODO: Show error toast
       }
     }

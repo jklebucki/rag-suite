@@ -3,6 +3,7 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, X } from 'lucide-react'
 import { Modal } from './Modal'
 import { apiClient } from '@/services/api'
+import { logger } from '@/utils/logger'
 
 // Configure PDF.js worker
 //pdfjs.GlobalWorkerOptions.workerSrc = new URL('/pdf.worker.min.js', import.meta.url).toString()
@@ -101,7 +102,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
         setPdfUrl(url)
       }
     } catch (err) {
-      console.error('Failed to load PDF:', err)
+      logger.error('Failed to load PDF:', err)
       setError('Failed to load PDF document')
     } finally {
       setLoading(false)
@@ -114,7 +115,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
   }
 
   const onDocumentLoadError = (error: Error) => {
-    console.error('PDF load error:', error)
+    logger.error('PDF load error:', error)
     setError('Failed to load PDF document')
   }
 
@@ -144,7 +145,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
 
   const handleDownload = async () => {
     if (!pdfBlob) {
-      console.error('No PDF blob available for download')
+      logger.error('No PDF blob available for download')
       return
     }
 
@@ -159,7 +160,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
       link.remove()
       URL.revokeObjectURL(url)
     } catch (err) {
-      console.error('Download failed:', err)
+      logger.error('Download failed:', err)
     }
   }
 

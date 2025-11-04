@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import type { ProposalListItem } from '@/types/addressbook'
 import { ChangeProposalType, ProposalStatus } from '@/types/addressbook'
 import { useI18n } from '@/contexts/I18nContext'
+import { logger } from '@/utils/logger'
 
 interface ProposalsListProps {
   proposals: ProposalListItem[]
@@ -87,7 +88,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       setReviewingId(null)
       setReviewComment('')
     } catch (err) {
-      console.error('Review failed:', err)
+      logger.error('Review failed:', err)
       alert(t('addressBook.proposals.failedToReview') + ': ' + (err instanceof Error ? err.message : 'Unknown error'))
     } finally {
       setIsSubmitting(false)

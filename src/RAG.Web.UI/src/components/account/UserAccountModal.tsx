@@ -3,6 +3,7 @@ import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-re
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { logger } from '@/utils/logger'
 
 interface UserAccountModalProps {
   isOpen: boolean
@@ -30,12 +31,12 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
 
   const handleUpdateProfile = () => {
     // TODO: Implement profile update functionality
-    console.log('Update profile clicked')
+    logger.debug('Update profile clicked')
   }
 
   const handleDeleteAccount = () => {
     // TODO: Implement account deletion functionality
-    console.log('Delete account clicked')
+    logger.debug('Delete account clicked')
   }
 
   const handleLogoutAllDevices = () => {
@@ -49,7 +50,7 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
       setShowLogoutConfirm(false)
       onClose()
     } catch (error) {
-      console.error('Failed to logout from all devices:', error)
+      logger.error('Failed to logout from all devices:', error)
     } finally {
       setIsLoggingOut(false)
     }

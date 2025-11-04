@@ -14,6 +14,7 @@ import type {
   ProposalListItem
 } from '@/types/addressbook'
 import { ChangeProposalType, ProposalStatus } from '@/types/addressbook'
+import { logger } from '@/utils/logger'
 
 type TabType = 'contacts' | 'import' | 'proposals'
 
@@ -68,7 +69,7 @@ export function AddressBook() {
       })
       setProposals(response.proposals)
     } catch (err) {
-      console.error('Failed to load proposals:', err)
+      logger.error('Failed to load proposals:', err)
     } finally {
       setProposalsLoading(false)
     }

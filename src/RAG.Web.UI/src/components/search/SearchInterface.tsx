@@ -3,6 +3,7 @@ import { useMultilingualSearch } from '@/hooks/useMultilingualSearch'
 import { useI18n } from '@/contexts/I18nContext'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
+import { logger } from '@/utils/logger'
 
 export function SearchInterface() {
   const { t } = useI18n()
@@ -59,7 +60,7 @@ export function SearchInterface() {
         hasSearched={hasSearched}
         onExport={() => {
           // TODO: Implement export functionality
-          console.log('Export results:', searchResults)
+          logger.debug('Export results:', searchResults)
         }}
       />
     </div>
