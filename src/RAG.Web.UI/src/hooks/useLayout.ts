@@ -7,6 +7,7 @@ import {
   Settings,
   Info,
   Users,
+  BookOpen,
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -40,6 +41,7 @@ export function useLayout() {
     : []
 
   const footerNavigation = [
+    { name: t('nav.user_guide'), href: '/guide', icon: BookOpen },
     { name: t('nav.app_info'), href: '/about', icon: Info },
   ]
 

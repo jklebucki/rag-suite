@@ -10,8 +10,14 @@ export const hu: TranslationKeys = {
   'nav.analytics': 'Analitika',
   'nav.settings': 'Beállítások',
   'nav.addressBook': 'Címjegyzék',
+  'nav.user_guide': 'Felhasználói kézikönyv',
   'nav.app_info': 'Alkalmazás Info',
   'nav.cyberpanel': 'Cyber Panel',
+
+  // User Guide
+  'userguide.description': 'Fedezze fel a RAG Suite funkcióit és képességeit',
+  'userguide.browser_not_supported': 'Az Ön böngészője nem támogatja a beágyazott PDF megjelenítést.',
+  'userguide.download_pdf': 'PDF letöltése',
 
   // Common
   'common.loading': 'Betöltés...',

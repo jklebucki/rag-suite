@@ -28,8 +28,14 @@ export interface TranslationKeys {
   'nav.analytics': string;
   'nav.settings': string;
   'nav.addressBook': string;
+  'nav.user_guide': string;
   'nav.app_info': string;
   'nav.cyberpanel': string;
+
+  // User Guide
+  'userguide.description': string;
+  'userguide.browser_not_supported': string;
+  'userguide.download_pdf': string;
 
   // Common keys
   'common.loading': string;

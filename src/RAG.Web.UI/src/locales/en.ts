@@ -10,8 +10,14 @@ export const en: TranslationKeys = {
   'nav.analytics': 'Analytics',
   'nav.settings': 'Settings',
   'nav.addressBook': 'Address Book',
+  'nav.user_guide': 'User Guide',
   'nav.app_info': 'App Info',
   'nav.cyberpanel': 'Cyber Panel',
+
+  // User Guide
+  'userguide.description': 'Explore features and capabilities of RAG Suite',
+  'userguide.browser_not_supported': 'Your browser does not support embedded PDF viewing.',
+  'userguide.download_pdf': 'Download PDF',
 
   // Common
   'common.loading': 'Loading...',

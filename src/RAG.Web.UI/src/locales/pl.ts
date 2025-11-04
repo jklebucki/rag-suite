@@ -10,8 +10,14 @@ export const pl: TranslationKeys = {
   'nav.analytics': 'Analityka',
   'nav.settings': 'Ustawienia',
   'nav.addressBook': 'Książka adresowa',
+  'nav.user_guide': 'Podręcznik użytkownika',
   'nav.app_info': 'O Aplikacji',
   'nav.cyberpanel': 'Cyber Panel',
+
+  // User Guide
+  'userguide.description': 'Poznaj funkcje i możliwości aplikacji RAG Suite',
+  'userguide.browser_not_supported': 'Twoja przeglądarka nie obsługuje osadzonego wyświetlania PDF.',
+  'userguide.download_pdf': 'Pobierz PDF',
 
   // Dashboard
   'dashboard.title': 'Panel RAG Suite',

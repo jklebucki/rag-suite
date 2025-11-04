@@ -10,8 +10,14 @@ export const nl: TranslationKeys = {
   'nav.analytics': 'Analytics',
   'nav.settings': 'Instellingen',
   'nav.addressBook': 'Adresboek',
+  'nav.user_guide': 'Gebruikershandleiding',
   'nav.app_info': 'App Info',
   'nav.cyberpanel': 'Cyber Panel',
+
+  // User Guide
+  'userguide.description': 'Ontdek functies en mogelijkheden van RAG Suite',
+  'userguide.browser_not_supported': 'Uw browser ondersteunt geen ingesloten PDF-weergave.',
+  'userguide.download_pdf': 'PDF downloaden',
 
   // Common
   'common.loading': 'Laden...',

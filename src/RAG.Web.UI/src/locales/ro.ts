@@ -10,8 +10,14 @@ export const ro: TranslationKeys = {
   'nav.analytics': 'Analiză',
   'nav.settings': 'Setări',
   'nav.addressBook': 'Agendă',
+  'nav.user_guide': 'Ghid utilizator',
   'nav.app_info': 'Despre Aplicație',
   'nav.cyberpanel': 'Cyber Panel',
+
+  // User Guide
+  'userguide.description': 'Explorează funcțiile și capabilitățile RAG Suite',
+  'userguide.browser_not_supported': 'Browserul dvs. nu acceptă afișarea PDF încorporată.',
+  'userguide.download_pdf': 'Descarcă PDF',
 
   // Cyber Panel
   'cyberpanel.quizzes': 'Chestionare',
