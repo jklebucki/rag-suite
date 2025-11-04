@@ -113,7 +113,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Cyber Panel parent with nested routes */}
       <Route
         path="/cyberpanel/*"
         element={
