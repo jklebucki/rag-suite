@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
 import { useToast } from '@/contexts/ToastContext'
+import { validateEmail, validatePassword } from '@/utils/validation'
 import type { LoginRequest } from '@/types/auth'
 
 interface LoginFormProps {
@@ -49,16 +50,17 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {}
 
+    // Email validation using utility
     if (!formData.email) {
       errors.email = t('auth.validation.email_required')
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!validateEmail(formData.email)) {
       errors.email = t('auth.validation.email_invalid')
     }
 
-    if (!formData.password) {
-      errors.password = t('auth.validation.password_required')
-    } else if (formData.password.length < 6) {
-      errors.password = t('auth.validation.password_min_length')
+    // Password validation using utility
+    const passwordValidation = validatePassword(formData.password, 6)
+    if (!passwordValidation.isValid) {
+      errors.password = passwordValidation.error || t('auth.validation.password_required')
     }
 
     setValidationErrors(errors)

@@ -364,8 +364,8 @@ export class ErrorBoundary extends React.Component { ... }
 ### Refaktoryzacja (Faza 2)
 - [ ] QuizBuilder split (629 linii)
 - [ ] RegisterForm with react-hook-form (460 linii)
-- [ ] About.tsx logic extraction (300 linii)
-- [ ] Zastosowanie validation utils w formularzach
+- [x] About.tsx logic extraction ✅ (wyodrębniono markdownParser.ts - ~150 linii)
+- [x] Zastosowanie validation utils w formularzach ✅ (LoginForm, ResetPasswordForm, ResetPasswordConfirmForm)
 - [x] Migracja console.* w hooks ✅ (wszystkie hooks - 63 wystąpienia)
 - [x] Migracja console.* w serwisach ✅ (wszystkie serwisy)
 - [x] Poprawa relative import w SearchResults.tsx ✅

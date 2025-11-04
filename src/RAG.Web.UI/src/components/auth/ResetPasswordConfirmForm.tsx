@@ -4,6 +4,7 @@ import { Lock, ArrowLeft, CheckCircle } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
+import { validatePassword, validatePasswordMatch } from '@/utils/validation'
 
 interface ResetPasswordConfirmData {
   newPassword: string
@@ -49,18 +50,20 @@ export function ResetPasswordConfirmForm() {
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {}
 
-    // New password validation
-    if (!formData.newPassword.trim()) {
-      newErrors.newPassword = t('auth.validation.password_required')
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = t('auth.validation.password_min_length')
+    // New password validation using utility
+    const passwordValidation = validatePassword(formData.newPassword, 6)
+    if (!passwordValidation.isValid) {
+      newErrors.newPassword = passwordValidation.error || t('auth.validation.password_required')
     }
 
-    // Confirm password validation
+    // Confirm password validation using utility
     if (!formData.confirmPassword.trim()) {
       newErrors.confirmPassword = t('auth.validation.confirm_password_required')
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('auth.validation.passwords_do_not_match')
+    } else {
+      const matchValidation = validatePasswordMatch(formData.newPassword, formData.confirmPassword)
+      if (!matchValidation.isValid) {
+        newErrors.confirmPassword = matchValidation.error || t('auth.validation.passwords_do_not_match')
+      }
     }
 
     setErrors(newErrors)

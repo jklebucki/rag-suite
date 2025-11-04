@@ -8,6 +8,19 @@ import {
   Activity
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
+import {
+  getSectionById,
+  getSectionContentById,
+  getSectionTitleById,
+  getSubtitleById,
+  getHeroSubtitle,
+  getSectionSubtitleById,
+  getSectionByTitle,
+  getSection,
+  getTop,
+  getSubsections
+} from '@/utils/markdownParser'
+import { logger } from '@/utils/logger'
 
 export function About() {
   const { language } = useI18n()
@@ -34,7 +47,7 @@ export function About() {
           setContent(text)
         }
       } catch (err) {
-        console.error('Failed to load about content:', err)
+        logger.error('Failed to load about content:', err)
         setError('Failed to load application information')
       } finally {
         setLoading(false)
@@ -43,110 +56,10 @@ export function About() {
     loadContent()
   }, [language])
 
-  // ---- Enhanced parsers with ID support ----
-  const getSectionById = (md: string, id: string) => {
-    // Pattern for ## Section {#id} or ### Section {#id}
-    const pattern = new RegExp(`(^|\\n)##?#?\\s+[^{\\n]*\\{#${escapeRegExp(id)}\\}\\s*\\n([\\s\\S]*?)(?=\\n##\\s+|$)`, 'i')
-    const match = md.match(pattern)
-    return match ? match[2].trim() : ''
-  }
-
-  const getSectionContentById = (md: string, id: string) => {
-    // Get section content but remove subtitle lines
-    let content = getSectionById(md, id)
-    if (!content) return ''
-    
-    // Remove subtitle lines (### Text {#subtitle-xxx})
-    content = content.replace(/^###\s+[^{]*\{#subtitle-[^}]+\}\s*$/gm, '')
-    
-    // Remove empty lines at the beginning
-    content = content.replace(/^\s*\n+/, '')
-    
-    return content.trim()
-  }
-
-  const getSectionTitleById = (md: string, id: string) => {
-    // Extract section title by ID
-    const pattern = new RegExp(`(^|\\n)##\\s+([^{\\n]+?)\\s*\\{#${escapeRegExp(id)}\\}`, 'i')
-    const match = md.match(pattern)
-    return match ? match[2].trim() : ''
-  }
-
-  const getSubtitleById = (md: string, id: string) => {
-    // Extract subtitle by dedicated ID - looks for ### Subtitle {#subtitle-xxx}
-    const pattern = new RegExp(`(^|\\n)###\\s+([^{\\n]+?)\\s*\\{#${escapeRegExp(id)}\\}`, 'i')
-    const match = md.match(pattern)
-    return match ? match[2].trim() : ''
-  }
-
-  const getHeroSubtitle = (md: string) => {
-    // Get hero subtitle by ID or fallback to tagline extraction
-    const subtitleById = getSubtitleById(md, 'subtitle-hero')
-    if (subtitleById) return subtitleById
-    
-    // Fallback to existing tagline logic
-    return md.match(/^\s*_(.+)_\s*$/m)?.[1]?.trim() ?? ''
-  }
-
-  const getSectionSubtitleById = (md: string, id: string) => {
-    // Extract subtitle by ID - looks for first paragraph after section header
-    const sectionContent = getSectionById(md, id)
-    if (!sectionContent) return ''
-    
-    // Find first paragraph that's not empty
-    const lines = sectionContent.split('\n').filter(line => line.trim())
-    const firstParagraph = lines.find(line => 
-      !line.startsWith('#') && 
-      !line.startsWith('-') && 
-      !line.startsWith('*') && 
-      line.trim().length > 0
-    )
-    
-    return firstParagraph?.trim() || ''
-  }
-
-  const getSectionByTitle = (md: string, title: string) => {
-    const pattern = new RegExp(`(^|\\n)##\\s+${escapeRegExp(title)}\\s*(?:\\{#[^}]+\\})?\\s*\\n([\\s\\S]*?)(?=\\n##\\s+|$)`, 'i')
-    const match = md.match(pattern)
-    return match ? match[2].trim() : ''
-  }
-
-  const getSection = (md: string, identifier: string) => {
-    // Try ID first, then fallback to title
-    const byId = getSectionById(md, identifier.toLowerCase().replace(/\s+/g, '-'))
-    if (byId) return byId
-    
-    const byTitle = getSectionByTitle(md, identifier)
-    return byTitle
-  }
-
-  const getTop = (md: string) => {
-    // Title (H1) + first paragraph as description
-    const h1 = md.match(/^\s*#\s+(.+)\s*$/m)?.[1]?.trim() ?? 'App Info'
-    // Tagline in quotes or > blockquote or first paragraph
-    const tagline =
-      md.match(/^\s*>\s+(.+)\s*$/m)?.[1]?.trim() ??
-      md.match(/^\s*_(.+)_\s*$/m)?.[1]?.trim() ??
-      md.match(/^\s*(?:[^#>\-\n][^\n]+)\s*$/m)?.[0]?.trim() ??
-      ''
-    return { h1, tagline }
-  }
-
-  const getSubsections = (mdSection: string) => {
-    // Split section by ### Title {#id} or ### Title
-    const blocks = mdSection.split(/\n(?=###\s+)/g).filter(Boolean)
-    return blocks.map(b => {
-      const titleMatch = b.match(/^\s*###\s+([^{]+?)(?:\s*\{#([^}]+)\})?\s*$/m)
-      const title = titleMatch?.[1]?.trim() ?? ''
-      const id = titleMatch?.[2]?.trim() ?? ''
-      const body = b.replace(/^\s*###\s+.+\s*$/m, '').trim()
-      return { title, body, id }
-    }).filter(s => s.title || s.body)
-  }
-
   const { top, sections } = useMemo(() => {
-    const h1 = content.match(/^\s*#\s+(.+)\s*$/m)?.[1]?.trim() ?? 'App Info'
-    const tagline = getHeroSubtitle(content)
+    const topData = getTop(content)
+    const h1 = topData.h1
+    const tagline = topData.tagline
     
     return {
       top: { h1, tagline },
@@ -400,9 +313,6 @@ function AuthorsList({ md }: { md: string }) {
 }
 
 // ---- utils ----
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).slice(0, 2)
   return parts.map(p => p[0]?.toUpperCase() ?? '').join('')

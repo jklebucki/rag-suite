@@ -4,6 +4,7 @@ import { Mail, ArrowLeft } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
+import { validateEmail } from '@/utils/validation'
 
 interface ResetPasswordData {
   email: string
@@ -29,10 +30,10 @@ export function ResetPasswordForm() {
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {}
 
-    // Email validation
+    // Email validation using utility
     if (!formData.email.trim()) {
       newErrors.email = t('auth.validation.email_required')
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!validateEmail(formData.email)) {
       newErrors.email = t('auth.validation.email_invalid')
     }
 
