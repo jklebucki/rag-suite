@@ -4,7 +4,7 @@ import { useI18n } from '@/contexts/I18nContext'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
 
-export default function SearchInterface() {
+export function SearchInterface() {
   const { t } = useI18n()
   const {
     query,

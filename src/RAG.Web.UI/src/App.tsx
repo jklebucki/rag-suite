@@ -2,11 +2,11 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Layout } from '@/components/layout'
 import { LandingPage } from '@/components/landingpage/LandingPage'
-const Dashboard = lazy(() => import('@/components/dashboard/Dashboard'))
+const Dashboard = lazy(() => import('@/components/dashboard/Dashboard').then(module => ({ default: module.Dashboard })))
 const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'))
-const SearchInterface = lazy(() => import('@/components/search/SearchInterface'))
-const Settings = lazy(() => import('@/components/settings/Settings'))
-const About = lazy(() => import('@/components/about/About'))
+const SearchInterface = lazy(() => import('@/components/search/SearchInterface').then(module => ({ default: module.SearchInterface })))
+const Settings = lazy(() => import('@/components/settings/Settings').then(module => ({ default: module.Settings })))
+const About = lazy(() => import('@/components/about/About').then(module => ({ default: module.About })))
 const UserGuide = lazy(() => import('@/components/userguide/UserGuide'))
 const AddressBook = lazy(() => import('@/components/addressbook/AddressBook'))
 const LoginForm = lazy(() => import('@/components/auth/LoginForm'))

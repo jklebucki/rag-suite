@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import cyberPanelService from '@/services/cyberPanelService'
+import { logger } from '@/utils/logger'
 import type {
   ListQuizzesResponse,
   GetQuizResponse,
@@ -42,7 +43,7 @@ export function useQuizzes(): UseQuizzesReturn {
       setQuizzes(data)
     } catch (err: any) {
       setError(err.message || 'Failed to fetch quizzes')
-      console.error('Error fetching quizzes:', err)
+      logger.error('Error fetching quizzes:', err)
     } finally {
       setLoading(false)
     }
@@ -57,7 +58,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.response?.data?.title || err.message || 'Failed to create quiz')
-      console.error('Error creating quiz:', err)
+      logger.error('Error creating quiz:', err)
       return null
     } finally {
       setLoading(false)
@@ -73,7 +74,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.response?.data?.title || err.message || 'Failed to update quiz')
-      console.error('Error updating quiz:', err)
+      logger.error('Error updating quiz:', err)
       return null
     } finally {
       setLoading(false)
@@ -89,7 +90,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return true
     } catch (err: any) {
       setError(err.message || 'Failed to delete quiz')
-      console.error('Error deleting quiz:', err)
+      logger.error('Error deleting quiz:', err)
       return false
     } finally {
       setLoading(false)
@@ -104,7 +105,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.message || 'Failed to export quiz')
-      console.error('Error exporting quiz:', err)
+      logger.error('Error exporting quiz:', err)
       return null
     } finally {
       setLoading(false)
@@ -120,7 +121,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.response?.data?.title || err.message || 'Failed to import quiz')
-      console.error('Error importing quiz:', err)
+      logger.error('Error importing quiz:', err)
       return null
     } finally {
       setLoading(false)
@@ -136,7 +137,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.response?.data?.title || err.message || 'Failed to import quiz from file')
-      console.error('Error importing quiz from file:', err)
+      logger.error('Error importing quiz from file:', err)
       return null
     } finally {
       setLoading(false)
@@ -152,7 +153,7 @@ export function useQuizzes(): UseQuizzesReturn {
       return result
     } catch (err: any) {
       setError(err.message || 'Failed to clone quiz')
-      console.error('Error cloning quiz:', err)
+      logger.error('Error cloning quiz:', err)
       return null
     } finally {
       setLoading(false)
@@ -202,7 +203,7 @@ export function useQuizTaking(): UseQuizTakingReturn {
       setQuiz(data)
     } catch (err: any) {
       setError(err.message || 'Failed to fetch quiz')
-      console.error('Error fetching quiz:', err)
+      logger.error('Error fetching quiz:', err)
     } finally {
       setLoading(false)
     }
@@ -217,7 +218,7 @@ export function useQuizTaking(): UseQuizTakingReturn {
       return attemptResult
     } catch (err: any) {
       setError(err.message || 'Failed to submit quiz')
-      console.error('Error submitting quiz:', err)
+      logger.error('Error submitting quiz:', err)
       return null
     } finally {
       setLoading(false)

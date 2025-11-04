@@ -1,7 +1,7 @@
 # Analiza struktury projektu RAG.Web.UI i rekomendacje
 
 **Ostatnia aktualizacja:** 2024-12-19  
-**Status:** W toku - Faza 1 częściowo ukończona (7/8 zadań)
+**Status:** W toku - Faza 1 ukończona (8/8 zadań), Faza 2 rozpoczęta
 
 ## 📋 Spis treści
 1. [Stan obecny](#stan-obecny)
@@ -67,16 +67,14 @@
 #### 1.1 Niespójność w eksportach
 - **Status**: ⚠️ **DO ZROBIENIA** - 19 komponentów nadal używa `export default`
 
-**Komponenty wymagające zmiany:**
-- `components/auth/`: LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm
-- `components/chat/`: ChatInterface
-- `components/search/`: SearchInterface
-- `components/about/`: About
-- `components/dashboard/`: Dashboard
-- `components/settings/`: Settings
-- `components/addressbook/`: AddressBook
-- `components/userguide/`: UserGuide
-- `components/cyberpanel/`: Wszystkie 8 komponentów
+**Status:**
+- ✅ Ukończone: Settings, Dashboard, About, SearchInterface
+- ⚠️ **Pozostałe do zmiany (15 komponentów):**
+  - `components/auth/`: LoginForm, RegisterForm, ResetPasswordForm, ResetPasswordConfirmForm
+  - `components/chat/`: ChatInterface
+  - `components/addressbook/`: AddressBook
+  - `components/userguide/`: UserGuide
+  - `components/cyberpanel/`: Wszystkie 8 komponentów (Quizzes, QuizManager, QuizBuilder, QuizResults, QuizDetail, AttemptDetail, CyberPanelLayout, CyberPanelSidebar)
 
 **Rekomendacja**: Ujednolicić do `named exports` dla lepszej tree-shaking i refactoring
 
@@ -127,8 +125,9 @@
 - ✅ Logger utility utworzony (`utils/logger.ts`)
 - ✅ Zastąpione w `api.ts` i `auth.ts`
 - ✅ Zastąpione w `addressBookService.ts` i `configurationService.ts`
+- ✅ Zastąpione w `useQuizzes.ts` (10 console.error)
 - ⚠️ **Pozostałe do zamiany:**
-  - `useQuizzes.ts`: 2 console.error (w `useQuizTaking`)
+  - Hooks: ~53 console.* w różnych hooks (useMultilingualChat, useMultilingualSearch, useTokenRefresh, useChat, useSearch, useAuthStorage)
   - ~165+ w komponentach (głównie debug/info w development)
 
 **Rekomendacja**: Stopniowo zastępować console.* przez logger w całym projekcie
@@ -273,17 +272,19 @@ export class ErrorBoundary extends React.Component { ... }
 3. ✅ Utworzyć `constants/config.ts` - **UKOŃCZONE**
 4. ✅ Przenieść `Layout.tsx` - **UKOŃCZONE**
 5. ✅ Utworzyć `utils/validation.ts` - **UKOŃCZONE**
-6. ⚠️ Ujednolicić eksporty - **W TRAKCIE** (19 komponentów)
+6. 🔄 Ujednolicić eksporty - **W TRAKCIE** (15 komponentów pozostało, 4 ukończone)
 7. ✅ Zastąpić console.log w serwisach - **UKOŃCZONE** (wszystkie serwisy)
 8. ✅ Dodać brakujące stałe do constants - **UKOŃCZONE** (REFETCH_INTERVALS, CACHE_CONFIG)
 9. ✅ Poprawić relative import w SearchResults.tsx - **UKOŃCZONE**
 
-### Faza 2: Refaktoryzacja (3-5 dni) - ⏳ DO ROZPOCZĘCIA
+### Faza 2: Refaktoryzacja (3-5 dni) - 🔄 W TRAKCIE
 1. ⏳ Refaktoryzacja `QuizBuilder` (629 linii → podzielić na mniejsze komponenty)
 2. ⏳ Refaktoryzacja `RegisterForm` (460 linii → react-hook-form + validation utils)
 3. ⏳ Refaktoryzacja `About.tsx` (300 linii → wyodrębnić logikę parsowania)
 4. ⏳ Zastosować validation utils w formularzach
-5. ⏳ Migracja console.log → logger (stopniowo w całym projekcie)
+5. 🔄 Migracja console.log → logger (stopniowo w całym projekcie)
+   - ✅ useQuizzes.ts (10 console.error)
+   - ⚠️ Pozostałe hooks (~53 console.*)
 6. ⏳ Poprawić relative import w `SearchResults.tsx`
 
 ### Faza 3: Optymalizacja (2-3 dni) - ⏳ DO ROZPOCZĘCIA
@@ -309,8 +310,8 @@ export class ErrorBoundary extends React.Component { ... }
 - Brak centralizacji: HTTP clients, error handling, validation
 - Magic numbers: Rozproszone po całym kodzie
 
-### Stan obecny (po Faza 1 - częściowo):
-- Console.log: ~165 wystąpień (w serwisach: 0 ✅, w hooks: 2, głównie w komponentach)
+### Stan obecny (po Faza 1 + część Fazy 2):
+- Console.log: ~155 wystąpień (w serwisach: 0 ✅, w hooks: ~53, głównie w komponentach)
 - Duplikacja kodu: ~10% (zmniejszona dzięki utils)
 - Największy komponent: 629 linii (bez zmian)
 - Centralizacja: ✅ HTTP clients, ✅ validation utils, ⚠️ error handling (częściowo)
@@ -348,14 +349,16 @@ export class ErrorBoundary extends React.Component { ... }
 - [x] Migracja console.log w serwisach ✅
 - [x] Dodanie brakujących stałych (REFETCH_INTERVALS, CACHE_CONFIG) ✅
 - [x] Poprawa relative import w SearchResults.tsx ✅
-- [ ] Export consistency (19 komponentów do zmiany)
+- [x] Zastąpienie console.error w useQuizzes.ts ✅
+- [ ] Export consistency (15 komponentów pozostało, 4 ukończone)
 
 ### Refaktoryzacja (Faza 2)
 - [ ] QuizBuilder split (629 linii)
 - [ ] RegisterForm with react-hook-form (460 linii)
 - [ ] About.tsx logic extraction (300 linii)
 - [ ] Zastosowanie validation utils w formularzach
-- [ ] Migracja console.log → logger (stopniowo)
+- [x] Migracja console.error w useQuizzes.ts ✅
+- [ ] Migracja console.* w pozostałych hooks (~53)
 - [x] Poprawa relative import w SearchResults.tsx ✅
 
 ### Optymalizacja (Faza 3)

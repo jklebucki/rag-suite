@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 
-export default function About() {
+export function About() {
   const { language } = useI18n()
   const [content, setContent] = useState<string>('')
   const [loading, setLoading] = useState(true)
