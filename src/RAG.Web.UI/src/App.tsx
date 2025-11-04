@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Layout } from '@/components/layout'
 import { LandingPage } from '@/components/landingpage/LandingPage'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 const Dashboard = lazy(() => import('@/components/dashboard/Dashboard').then(module => ({ default: module.Dashboard })))
 const ChatInterface = lazy(() => import('@/components/chat/ChatInterface').then(module => ({ default: module.ChatInterface })))
 const SearchInterface = lazy(() => import('@/components/search/SearchInterface').then(module => ({ default: module.SearchInterface })))
@@ -177,17 +178,19 @@ function AppRoutes() {
 
 function App() {
   return (
-    <I18nProvider>
-      <ToastProvider>
-        <ConfigurationProvider>
-          <AuthProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <AppRoutes />
-            </Suspense>
-          </AuthProvider>
-        </ConfigurationProvider>
-      </ToastProvider>
-    </I18nProvider>
+    <ErrorBoundary>
+      <I18nProvider>
+        <ToastProvider>
+          <ConfigurationProvider>
+            <AuthProvider>
+              <Suspense fallback={<div>Loading...</div>}>
+                <AppRoutes />
+              </Suspense>
+            </AuthProvider>
+          </ConfigurationProvider>
+        </ToastProvider>
+      </I18nProvider>
+    </ErrorBoundary>
   )
 }
 
