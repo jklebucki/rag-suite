@@ -40,6 +40,25 @@ import type {
   GetAttemptByIdResponse,
   DeleteQuizResponse
 } from '@/types'
+import type {
+  ListContactsRequest,
+  ListContactsResponse,
+  CreateContactRequest,
+  CreateContactResponse,
+  UpdateContactRequest,
+  UpdateContactResponse,
+  SearchContactsResponse,
+  Contact,
+  ProposeChangeRequest,
+  ProposeChangeResponse,
+  ListProposalsRequest,
+  ListProposalsResponse,
+  ContactChangeProposal,
+  ReviewProposalRequest,
+  ReviewProposalResponse,
+  ImportContactsRequest,
+  ImportContactsResponse
+} from '@/types/addressbook'
 
 class ApiClient {
   private client: AxiosInstance
@@ -382,7 +401,7 @@ class ApiClient {
   /**
    * List all contacts with pagination and filtering
    */
-  async listContacts(params?: { includeInactive?: boolean; department?: string | null; location?: string | null }): Promise<unknown> {
+  async listContacts(params?: ListContactsRequest): Promise<ListContactsResponse> {
     const queryParams = new URLSearchParams()
     // includeInactive is required by backend, default to false
     queryParams.append('includeInactive', params?.includeInactive ? 'true' : 'false')
@@ -396,7 +415,7 @@ class ApiClient {
   /**
    * Get a specific contact by ID
    */
-  async getContact(contactId: string): Promise<unknown> {
+  async getContact(contactId: string): Promise<Contact> {
     const response = await this.client.get(`/addressbook/${contactId}`)
     return response.data
   }
@@ -404,7 +423,7 @@ class ApiClient {
   /**
    * Search contacts by query
    */
-  async searchContacts(query?: string, includeInactive?: boolean): Promise<unknown> {
+  async searchContacts(query?: string, includeInactive?: boolean): Promise<SearchContactsResponse> {
     const queryParams = new URLSearchParams()
     if (query) queryParams.append('query', query)
     if (includeInactive) queryParams.append('includeInactive', 'true')
@@ -416,7 +435,7 @@ class ApiClient {
   /**
    * Create a new contact
    */
-  async createContact(request: unknown): Promise<unknown> {
+  async createContact(request: CreateContactRequest): Promise<CreateContactResponse> {
     const response = await this.client.post('/addressbook', request)
     return response.data
   }
@@ -424,7 +443,7 @@ class ApiClient {
   /**
    * Update an existing contact
    */
-  async updateContact(contactId: string, request: unknown): Promise<unknown> {
+  async updateContact(contactId: string, request: UpdateContactRequest): Promise<UpdateContactResponse> {
     const response = await this.client.put(`/addressbook/${contactId}`, request)
     return response.data
   }
@@ -439,7 +458,7 @@ class ApiClient {
   /**
    * Propose a change to a contact
    */
-  async proposeChange(request: unknown): Promise<unknown> {
+  async proposeChange(request: ProposeChangeRequest): Promise<ProposeChangeResponse> {
     const response = await this.client.post('/addressbook/proposals', request)
     return response.data
   }
@@ -447,7 +466,7 @@ class ApiClient {
   /**
    * List all proposals with filtering
    */
-  async listProposals(params?: { status?: number | null; proposalType?: number | null; proposedByUserId?: string | null }): Promise<unknown> {
+  async listProposals(params?: ListProposalsRequest): Promise<ListProposalsResponse> {
     const queryParams = new URLSearchParams()
     if (params?.status !== undefined && params.status !== null) queryParams.append('status', params.status.toString())
     if (params?.proposalType !== undefined && params.proposalType !== null) queryParams.append('proposalType', params.proposalType.toString())
@@ -461,7 +480,7 @@ class ApiClient {
   /**
    * Get a specific proposal by ID
    */
-  async getProposal(proposalId: string): Promise<unknown> {
+  async getProposal(proposalId: string): Promise<ContactChangeProposal> {
     const response = await this.client.get(`/addressbook/proposals/${proposalId}`)
     return response.data
   }
@@ -469,7 +488,7 @@ class ApiClient {
   /**
    * Review (approve/reject) a proposal
    */
-  async reviewProposal(proposalId: string, request: unknown): Promise<unknown> {
+  async reviewProposal(proposalId: string, request: ReviewProposalRequest): Promise<ReviewProposalResponse> {
     const response = await this.client.post(`/addressbook/proposals/${proposalId}/review`, request)
     return response.data
   }
@@ -477,7 +496,7 @@ class ApiClient {
   /**
    * Import contacts from data
    */
-  async importContacts(request: unknown): Promise<unknown> {
+  async importContacts(request: ImportContactsRequest): Promise<ImportContactsResponse> {
     const response = await this.client.post('/addressbook/import', request)
     return response.data
   }
