@@ -115,13 +115,22 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponse?> RefreshTokenAsync(RefreshTokenRequest request)
     {
-        var principal = _jwtService.GetPrincipalFromExpiredToken(request.RefreshToken);
-        if (principal == null)
+        // Get user ID from the expired access token if provided
+        string? userId = null;
+        
+        if (!string.IsNullOrEmpty(request.AccessToken))
         {
-            return null;
+            var principal = _jwtService.GetPrincipalFromExpiredToken(request.AccessToken);
+            userId = principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         }
-
-        var userId = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        
+        // If no access token provided or parsing failed, try to find user by refresh token
+        // This is a fallback mechanism that iterates through all stored refresh tokens
+        if (string.IsNullOrEmpty(userId))
+        {
+            userId = await _jwtService.FindUserIdByRefreshTokenAsync(request.RefreshToken);
+        }
+        
         if (string.IsNullOrEmpty(userId))
         {
             return null;

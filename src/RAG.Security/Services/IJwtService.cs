@@ -11,6 +11,7 @@ public interface IJwtService
     ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
     TokenValidationResponse ValidateToken(string token);
     Task<bool> ValidateRefreshTokenAsync(string userId, string refreshToken);
+    Task<string?> FindUserIdByRefreshTokenAsync(string refreshToken);
     Task SaveRefreshTokenAsync(string userId, string refreshToken);
     Task RevokeRefreshTokenAsync(string userId, string refreshToken);
     Task RevokeAllRefreshTokensAsync(string userId);

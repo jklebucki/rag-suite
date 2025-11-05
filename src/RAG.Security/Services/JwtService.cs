@@ -166,6 +166,20 @@ public class JwtService : IJwtService
         return Task.FromResult(false);
     }
 
+    public Task<string?> FindUserIdByRefreshTokenAsync(string refreshToken)
+    {
+        // Iterate through all stored refresh tokens to find matching userId
+        // This is a fallback mechanism when access token is not provided
+        foreach (var kvp in _refreshTokens)
+        {
+            if (kvp.Value.Contains(refreshToken))
+            {
+                return Task.FromResult<string?>(kvp.Key);
+            }
+        }
+        return Task.FromResult<string?>(null);
+    }
+
     public Task SaveRefreshTokenAsync(string userId, string refreshToken)
     {
         if (!_refreshTokens.ContainsKey(userId))

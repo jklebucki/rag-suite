@@ -5,10 +5,8 @@ import { API_TIMEOUTS, API_ENDPOINTS, STORAGE_KEYS } from '@/constants/config'
 import type {
   LoginRequest,
   RegisterRequest,
-  ResetPasswordRequest,
   ChangePasswordRequest,
   LoginResponse,
-  RefreshTokenResponse,
   User
 } from '@/types/auth'
 import type { ApiResponse } from '@/types/api'
@@ -34,10 +32,15 @@ class AuthService {
         logger.debug('HTTP error intercepted:', {
           status: error.response?.status,
           url: originalRequest?.url,
-          hasRetry: !!originalRequest._retry
+          hasRetry: !!originalRequest._retry,
+          isRefreshEndpoint: originalRequest?.url?.includes('/refresh')
         })
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Skip refresh logic for /refresh endpoint itself to prevent infinite loop
+        const isRefreshEndpoint = originalRequest?.url?.includes('/refresh') ||
+                                  originalRequest?.headers?.['X-Skip-Auth-Refresh'] === 'true'
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
           originalRequest._retry = true
 
           try {
@@ -62,6 +65,17 @@ class AuthService {
             // Don't force navigation here - let React Router handle it
             // The auth context will detect the missing token and redirect appropriately
           }
+        }
+
+        // If this is the refresh endpoint failing, clear storage and dispatch error event
+        if (error.response?.status === 401 && isRefreshEndpoint) {
+          logger.warn('Refresh endpoint returned 401 - invalid refresh token, logging out')
+          this.clearStorage()
+
+          // Dispatch custom event to notify AuthContext about refresh error
+          window.dispatchEvent(new CustomEvent('authRefreshError', {
+            detail: { hasError: true }
+          }))
         }
 
         return Promise.reject(error)
@@ -92,6 +106,8 @@ class AuthService {
   async register(userData: RegisterRequest): Promise<User> {
     // Filter out acceptTerms as backend doesn't expect it
     const { acceptTerms, ...registrationData } = userData
+    // Mark acceptTerms as intentionally unused to satisfy noUnusedLocals
+    void acceptTerms
     const response = await this.client.post<ApiResponse<User>>('/register', registrationData)
     return response.data.data
   }
@@ -133,7 +149,11 @@ class AuthService {
   async refreshToken(): Promise<boolean> {
     try {
       const refreshToken = this.getRefreshToken()
-      logger.debug('Attempting token refresh with:', { hasRefreshToken: !!refreshToken })
+      const accessToken = this.getToken()
+      logger.debug('Attempting token refresh with:', {
+        hasRefreshToken: !!refreshToken,
+        hasAccessToken: !!accessToken
+      })
 
       if (!refreshToken) {
         logger.warn('No refresh token available')
@@ -141,20 +161,30 @@ class AuthService {
       }
 
       logger.debug('Calling POST /refresh endpoint...')
-      const requestPayload = { RefreshToken: refreshToken }
+      const requestPayload = {
+        RefreshToken: refreshToken,
+        AccessToken: accessToken // Send expired access token for faster userId lookup
+      }
       logger.debug('Request payload:', requestPayload)
-      const response = await this.client.post<LoginResponse>('/refresh', requestPayload)
+
+      // Use skipAuthRefresh flag to prevent infinite loop
+      const response = await this.client.post<LoginResponse>('/refresh', requestPayload, {
+        headers: {
+          'X-Skip-Auth-Refresh': 'true'
+        }
+      })
 
       logger.debug('Refresh successful, response received')
       const tokenData = response.data
       this.setTokens(tokenData.token, tokenData.refreshToken)
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; statusText?: string; data?: unknown }; message?: string }
       logger.error('Token refresh failed:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
+        message: axiosError.message
       })
       this.clearStorage()
       return false
@@ -174,12 +204,13 @@ class AuthService {
       logger.debug('Current user received:', user)
       this.setUser(user)
       return user
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; statusText?: string; data?: unknown }; message?: string }
       logger.warn('Failed to get current user:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
+        message: axiosError.message
       })
       return null
     }

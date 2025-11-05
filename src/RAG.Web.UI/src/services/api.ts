@@ -23,7 +23,6 @@ import type {
   SearchStatistics,
   SystemHealth,
   DashboardData,
-  LlmSettings,
   LlmSettingsRequest,
   LlmSettingsResponse,
   AvailableModelsResponse,
@@ -74,7 +73,7 @@ class ApiClient {
     const searchQuery: SearchQuery = {
       query: query.query,
       limit: query.maxResults || 10,
-      filters: query.filters as any
+      filters: query.filters as SearchQuery['filters']
     }
 
     // Add language headers for future API enhancement
@@ -288,7 +287,7 @@ class ApiClient {
   }
 
   // CyberPanel Quiz API methods
-  
+
   /**
    * List all quizzes
    * @param language Optional language filter for published quizzes
@@ -379,17 +378,17 @@ class ApiClient {
   }
 
   // AddressBook Contact API methods
-  
+
   /**
    * List all contacts with pagination and filtering
    */
-  async listContacts(params?: { includeInactive?: boolean; department?: string | null; location?: string | null }): Promise<any> {
+  async listContacts(params?: { includeInactive?: boolean; department?: string | null; location?: string | null }): Promise<unknown> {
     const queryParams = new URLSearchParams()
     // includeInactive is required by backend, default to false
     queryParams.append('includeInactive', params?.includeInactive ? 'true' : 'false')
     if (params?.department) queryParams.append('department', params.department)
     if (params?.location) queryParams.append('location', params.location)
-    
+
     const response = await this.client.get(`/addressbook?${queryParams}`)
     return response.data
   }
@@ -397,7 +396,7 @@ class ApiClient {
   /**
    * Get a specific contact by ID
    */
-  async getContact(contactId: string): Promise<any> {
+  async getContact(contactId: string): Promise<unknown> {
     const response = await this.client.get(`/addressbook/${contactId}`)
     return response.data
   }
@@ -405,11 +404,11 @@ class ApiClient {
   /**
    * Search contacts by query
    */
-  async searchContacts(query?: string, includeInactive?: boolean): Promise<any> {
+  async searchContacts(query?: string, includeInactive?: boolean): Promise<unknown> {
     const queryParams = new URLSearchParams()
     if (query) queryParams.append('query', query)
     if (includeInactive) queryParams.append('includeInactive', 'true')
-    
+
     const response = await this.client.get(`/addressbook/search?${queryParams}`)
     return response.data
   }
@@ -417,7 +416,7 @@ class ApiClient {
   /**
    * Create a new contact
    */
-  async createContact(request: any): Promise<any> {
+  async createContact(request: unknown): Promise<unknown> {
     const response = await this.client.post('/addressbook', request)
     return response.data
   }
@@ -425,7 +424,7 @@ class ApiClient {
   /**
    * Update an existing contact
    */
-  async updateContact(contactId: string, request: any): Promise<any> {
+  async updateContact(contactId: string, request: unknown): Promise<unknown> {
     const response = await this.client.put(`/addressbook/${contactId}`, request)
     return response.data
   }
@@ -440,7 +439,7 @@ class ApiClient {
   /**
    * Propose a change to a contact
    */
-  async proposeChange(request: any): Promise<any> {
+  async proposeChange(request: unknown): Promise<unknown> {
     const response = await this.client.post('/addressbook/proposals', request)
     return response.data
   }
@@ -448,12 +447,12 @@ class ApiClient {
   /**
    * List all proposals with filtering
    */
-  async listProposals(params?: { status?: number | null; proposalType?: number | null; proposedByUserId?: string | null }): Promise<any> {
+  async listProposals(params?: { status?: number | null; proposalType?: number | null; proposedByUserId?: string | null }): Promise<unknown> {
     const queryParams = new URLSearchParams()
     if (params?.status !== undefined && params.status !== null) queryParams.append('status', params.status.toString())
     if (params?.proposalType !== undefined && params.proposalType !== null) queryParams.append('proposalType', params.proposalType.toString())
     if (params?.proposedByUserId) queryParams.append('proposedByUserId', params.proposedByUserId)
-    
+
     const url = queryParams.toString() ? `/addressbook/proposals?${queryParams}` : '/addressbook/proposals'
     const response = await this.client.get(url)
     return response.data
@@ -462,7 +461,7 @@ class ApiClient {
   /**
    * Get a specific proposal by ID
    */
-  async getProposal(proposalId: string): Promise<any> {
+  async getProposal(proposalId: string): Promise<unknown> {
     const response = await this.client.get(`/addressbook/proposals/${proposalId}`)
     return response.data
   }
@@ -470,7 +469,7 @@ class ApiClient {
   /**
    * Review (approve/reject) a proposal
    */
-  async reviewProposal(proposalId: string, request: any): Promise<any> {
+  async reviewProposal(proposalId: string, request: unknown): Promise<unknown> {
     const response = await this.client.post(`/addressbook/proposals/${proposalId}/review`, request)
     return response.data
   }
@@ -478,7 +477,7 @@ class ApiClient {
   /**
    * Import contacts from data
    */
-  async importContacts(request: any): Promise<any> {
+  async importContacts(request: unknown): Promise<unknown> {
     const response = await this.client.post('/addressbook/import', request)
     return response.data
   }
