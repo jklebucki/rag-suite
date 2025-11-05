@@ -6,6 +6,7 @@ using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
+using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
@@ -147,6 +148,7 @@ public static class ServiceCollectionExtensions
         // ChatService now uses Kernel instead of ILlmService
         //services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IPromptBuilder, PromptBuilder>();
+        services.AddScoped<ISessionManager, SessionManager>();
         services.AddScoped<IUserChatService, UserChatService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();
