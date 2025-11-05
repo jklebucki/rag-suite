@@ -13,6 +13,9 @@ using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
 using RAG.Orchestrator.Api.Features.Search;
+using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
+using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
+using RAG.Orchestrator.Api.Features.Search.ResultMapping;
 using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
@@ -154,6 +157,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();
         services.AddScoped<IQueryProcessor, QueryProcessor>();
+
+        // Search refactoring - new services
+        services.AddScoped<ISearchQueryBuilder, SearchQueryBuilder>();
+        services.AddScoped<IDocumentReconstructor, DocumentReconstructor>();
+        services.AddScoped<IResultMapper, ResultMapper>();
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();

@@ -1,4 +1,5 @@
 using RAG.Abstractions.Search;
+using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Localization;
 using RAG.Orchestrator.Api.Models;
 using System.Text;
@@ -16,7 +17,7 @@ public static class ChatHelper
     public static List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<ChatMessage> messages)
     {
         return messages
-            .Where(m => m.Role == "user" || m.Role == "assistant")
+            .Where(m => m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant)
             .Select(m => new LlmChatMessage
             {
                 Role = m.Role,
@@ -31,7 +32,7 @@ public static class ChatHelper
     public static List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<UserChatMessage> messages)
     {
         return messages
-            .Where(m => m.Role == "user" || m.Role == "assistant")
+            .Where(m => m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant)
             .Select(m => new LlmChatMessage
             {
                 Role = m.Role,
@@ -104,7 +105,7 @@ public static class ChatHelper
             promptBuilder.AppendLine(languageService.GetLocalizedString("system_prompts", "conversation_history", language));
             foreach (var msg in recentMessages.SkipLast(1))
             {
-                var roleLabel = msg.Role == "user"
+                var roleLabel = msg.Role == ChatRoles.User
                     ? languageService.GetLocalizedString("ui_labels", "user", language)
                     : languageService.GetLocalizedString("ui_labels", "assistant", language);
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
@@ -186,7 +187,7 @@ public static class ChatHelper
             promptBuilder.AppendLine(languageService.GetLocalizedString("system_prompts", "conversation_history", language));
             foreach (var msg in recentMessages.SkipLast(1))
             {
-                var roleLabel = msg.Role == "user"
+                var roleLabel = msg.Role == ChatRoles.User
                     ? languageService.GetLocalizedString("ui_labels", "user", language)
                     : languageService.GetLocalizedString("ui_labels", "assistant", language);
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
@@ -277,7 +278,7 @@ public static class ChatHelper
 
             foreach (var msg in recentMessages.TakeLast(4))
             {
-                var roleLabel = msg.Role == "user" ? userLabel : assistantLabel;
+                var roleLabel = msg.Role == ChatRoles.User ? userLabel : assistantLabel;
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
             promptBuilder.AppendLine();
@@ -423,7 +424,7 @@ public static class ChatHelper
 
             foreach (var msg in recentMessages.TakeLast(4))
             {
-                var roleLabel = msg.Role == "user" ? userLabel : assistantLabel;
+                var roleLabel = msg.Role == ChatRoles.User ? userLabel : assistantLabel;
                 promptBuilder.AppendLine($"{roleLabel}: {msg.Content}");
             }
             promptBuilder.AppendLine();

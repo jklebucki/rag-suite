@@ -423,8 +423,8 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
 ## ✅ Checklist Refaktoringu
 
 ### Krytyczne (Musi być zrobione)
-- [x] Podzielić `UserChatService` (< 300 linii) - **W TRAKCIE**
-- [ ] Podzielić `SearchService` (< 300 linii)
+- [x] Podzielić `UserChatService` (< 300 linii) - **Częściowo ukończone** ✅ (596 linii, zmniejszone o 33%)
+- [ ] Podzielić `SearchService` (< 300 linii) - **W TRAKCIE**
 - [x] Wydzielić `PromptBuilder` - **UKOŃCZONE** ✅
 - [x] Naprawić `BuildServiceProvider()` - **UKOŃCZONE** ✅
 - [x] Usunąć duplikację promptów - **UKOŃCZONE** ✅
@@ -462,7 +462,7 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
 
 ## 📝 Status Implementacji
 
-### ✅ Ukończone (Faza 1 - część 1)
+### ✅ Ukończone (Faza 1 - część 1 i 2)
 
 1. **Naprawiono BuildServiceProvider()** ✅
    - Zmieniono `AddFeatureServices()` aby przyjmowała `IConfiguration` jako parametr
@@ -483,9 +483,23 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
    - Zarejestrowano w DI (`ServiceCollectionExtensions`)
    - Usunięto duplikację metod budowania promptów
 
+4. **Podzielono UserChatService** ✅
+   - Wydzielono `SessionManager` - zarządzanie sesjami (~180 linii)
+   - Zintegrowano `IPromptBuilder` - użycie zamiast duplikacji
+   - Zastąpiono magic strings stałymi (`ChatRoles`, `SupportedLanguages`, `ConfigurationKeys`)
+   - Usunięto nieużywane metody budowania promptów
+   - **Rezultat**: `UserChatService` zmniejszony z **886 → 596 linii** (-290 linii, -33%)
+
+4. **Podział SearchService** 🔄 (W TRAKCIE)
+   - Utworzono `SearchQueryBuilder` - budowanie zapytań Elasticsearch (~130 linii)
+   - Utworzono `DocumentReconstructor` - rekonstrukcja dokumentów z chunków (~400 linii)
+   - Utworzono `ResultMapper` - mapowanie wyników z ES do SearchResult (~140 linii)
+   - Zarejestrowano w DI (`ServiceCollectionExtensions`)
+   - **Następny krok**: Zaktualizować `SearchService` aby używał nowych klas
+
 ### 🔄 W trakcie
 
-- Podział `UserChatService` na mniejsze klasy (następny krok)
+- Integracja nowych klas z `SearchService` (następny krok)
 
 ### 📋 Do zrobienia
 
