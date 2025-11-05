@@ -423,14 +423,14 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
 ## ✅ Checklist Refaktoringu
 
 ### Krytyczne (Musi być zrobione)
-- [ ] Podzielić `UserChatService` (< 300 linii)
+- [x] Podzielić `UserChatService` (< 300 linii) - **W TRAKCIE**
 - [ ] Podzielić `SearchService` (< 300 linii)
-- [ ] Wydzielić `PromptBuilder`
-- [ ] Naprawić `BuildServiceProvider()`
-- [ ] Usunąć duplikację promptów
+- [x] Wydzielić `PromptBuilder` - **UKOŃCZONE** ✅
+- [x] Naprawić `BuildServiceProvider()` - **UKOŃCZONE** ✅
+- [x] Usunąć duplikację promptów - **UKOŃCZONE** ✅
 
 ### Ważne (Powinno być zrobione)
-- [ ] Stworzyć stałe dla magic strings
+- [x] Stworzyć stałe dla magic strings - **UKOŃCZONE** ✅
 - [ ] Dodać FluentValidation
 - [ ] Ujednolicić obsługę błędów
 - [ ] Usunąć Controllers
@@ -455,6 +455,42 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
 ---
 
 **Data analizy:** 2025-01-27  
-**Wersja:** 1.0  
+**Wersja:** 1.1  
 **Autor:** Clean Code Analysis Tool
+
+---
+
+## 📝 Status Implementacji
+
+### ✅ Ukończone (Faza 1 - część 1)
+
+1. **Naprawiono BuildServiceProvider()** ✅
+   - Zmieniono `AddFeatureServices()` aby przyjmowała `IConfiguration` jako parametr
+   - Usunięto anty-wzorzec `BuildServiceProvider()` w konfiguracji
+
+2. **Utworzono stałe dla magic strings** ✅
+   - `Common/Constants/ChatRoles.cs` - stałe dla ról (user, assistant, system)
+   - `Common/Constants/SupportedLanguages.cs` - stałe dla kodów języków
+   - `Common/Constants/ConfigurationKeys.cs` - stałe dla kluczy konfiguracyjnych
+   - `Common/Constants/LocalizationKeys.cs` - stałe dla kluczy lokalizacji
+   - `Common/Constants/AuthenticationSchemes.cs` - stałe dla schematów autoryzacji
+   - `Common/Constants/ApiEndpoints.cs` - stałe dla endpointów API
+
+3. **Wydzielono PromptBuilder** ✅
+   - Utworzono `Features/Chat/Prompting/PromptContext.cs` - model kontekstu
+   - Utworzono `Features/Chat/Prompting/IPromptBuilder.cs` - interfejs
+   - Utworzono `Features/Chat/Prompting/PromptBuilder.cs` - implementacja
+   - Zarejestrowano w DI (`ServiceCollectionExtensions`)
+   - Usunięto duplikację metod budowania promptów
+
+### 🔄 W trakcie
+
+- Podział `UserChatService` na mniejsze klasy (następny krok)
+
+### 📋 Do zrobienia
+
+- Podział `SearchService` na mniejsze klasy
+- Dodanie FluentValidation
+- Ujednolicenie obsługi błędów
+- Usunięcie Controllers (zastąpienie Minimal APIs)
 

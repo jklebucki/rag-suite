@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
@@ -83,30 +84,29 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddFeatureServices(this IServiceCollection services)
+    public static IServiceCollection AddFeatureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Add HttpClient factory
         services.AddHttpClient();
 
         // Configure LLM endpoint configuration  
         services.AddOptions<LlmEndpointConfig>()
-            .Configure<IConfiguration>((options, configuration) =>
+            .Configure<IConfiguration>((options, config) =>
             {
-                configuration.GetSection(LlmEndpointConfig.SectionName).Bind(options);
+                config.GetSection(LlmEndpointConfig.SectionName).Bind(options);
                 options.Validate(); // Validate on configuration binding
             });
 
         // Configure Gotenberg configuration
         services.AddOptions<GotenbergConfig>()
-            .Configure<IConfiguration>((options, configuration) =>
+            .Configure<IConfiguration>((options, config) =>
             {
-                configuration.GetSection(GotenbergConfig.SectionName).Bind(options);
+                config.GetSection(GotenbergConfig.SectionName).Bind(options);
             });
 
         // Configure Elasticsearch Options
         services.Configure<ElasticsearchOptions>(options =>
         {
-            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
             configuration.GetSection(ElasticsearchOptions.SectionName).Bind(options);
         });
 
@@ -146,6 +146,7 @@ public static class ServiceCollectionExtensions
         // Register feature services
         // ChatService now uses Kernel instead of ILlmService
         //services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IPromptBuilder, PromptBuilder>();
         services.AddScoped<IUserChatService, UserChatService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();

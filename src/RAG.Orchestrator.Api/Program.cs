@@ -30,7 +30,7 @@ builder.Services.AddControllers();
 builder.Services.Configure<SharedFoldersOptions>(builder.Configuration.GetSection("Services"));
 
 // Add feature services
-builder.Services.AddFeatureServices();
+builder.Services.AddFeatureServices(builder.Configuration);
 // Register CyberPanel feature (scaffold)
 builder.Services.AddCyberPanel(builder.Configuration);
 // Register AddressBook feature
