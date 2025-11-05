@@ -1,3 +1,4 @@
+using FluentValidation;
 using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Services;
 
@@ -35,8 +36,17 @@ public static class SettingsEndpoints
         .WithSummary("Get LLM settings")
         .WithDescription("Retrieves the current LLM service configuration settings.");
 
-        group.MapPut("/llm", async (LlmSettingsRequest request, ISettingsService service) =>
+        group.MapPut("/llm", async (
+            LlmSettingsRequest request,
+            ISettingsService service,
+            IValidator<LlmSettingsRequest> validator) =>
         {
+            var validationResult = await validator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return Results.ValidationProblem(validationResult.ToDictionary());
+            }
+
             var settings = new LlmSettings
             {
                 Url = request.Url,

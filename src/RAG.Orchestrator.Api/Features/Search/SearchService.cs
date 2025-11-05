@@ -3,6 +3,9 @@ using Microsoft.Extensions.Options;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
+using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
+using RAG.Orchestrator.Api.Features.Search.ResultMapping;
 using System.Text;
 using System.Text.Json;
 
@@ -35,6 +38,9 @@ public class SearchService : ISearchService
     private readonly IIndexManagementService _indexManagement;
     private readonly IEmbeddingService _embeddingService;
     private readonly IQueryProcessor _queryProcessor;
+    private readonly ISearchQueryBuilder _queryBuilder;
+    private readonly IDocumentReconstructor _documentReconstructor;
+    private readonly IResultMapper _resultMapper;
     private readonly IDocumentReconstructionService _reconstructionService;
     private readonly ElasticsearchOptions _options;
     private readonly string _indexName;
@@ -46,6 +52,9 @@ public class SearchService : ISearchService
         IIndexManagementService indexManagement,
         IEmbeddingService embeddingService,
         IQueryProcessor queryProcessor,
+        ISearchQueryBuilder queryBuilder,
+        IDocumentReconstructor documentReconstructor,
+        IResultMapper resultMapper,
         IDocumentReconstructionService reconstructionService,
         IOptions<ElasticsearchOptions> options)
     {
@@ -55,6 +64,9 @@ public class SearchService : ISearchService
         _indexManagement = indexManagement;
         _embeddingService = embeddingService;
         _queryProcessor = queryProcessor;
+        _queryBuilder = queryBuilder;
+        _documentReconstructor = documentReconstructor;
+        _resultMapper = resultMapper;
         _reconstructionService = reconstructionService;
         _options = options.Value;
         _indexName = _options.DefaultIndexName;
@@ -89,73 +101,8 @@ public class SearchService : ISearchService
 
             _logger.LogInformation("Embedding service not available, using traditional search");
 
-            // Create hybrid search query for better results
-            var searchQuery = new Dictionary<string, object>
-            {
-                ["query"] = new Dictionary<string, object>
-                {
-                    ["bool"] = new Dictionary<string, object>
-                    {
-                        ["should"] = new object[]
-                        {
-                            // Exact phrase match gets highest score
-                            new Dictionary<string, object>
-                            {
-                                ["match_phrase"] = new Dictionary<string, object>
-                                {
-                                    ["content"] = new Dictionary<string, object>
-                                    {
-                                        ["query"] = request.Query,
-                                        ["boost"] = 3.0
-                                    }
-                                }
-                            },
-                            // Important terms match with OR operator
-                            new Dictionary<string, object>
-                            {
-                                ["match"] = new Dictionary<string, object>
-                                {
-                                    ["content"] = new Dictionary<string, object>
-                                    {
-                                        ["query"] = request.Query,
-                                        ["operator"] = "OR",
-                                        ["boost"] = 2.0,
-                                        ["minimum_should_match"] = "30%" // At least 30% of terms should match
-                                    }
-                                }
-                            },
-                            // Fuzzy match for typos
-                            new Dictionary<string, object>
-                            {
-                                ["match"] = new Dictionary<string, object>
-                                {
-                                    ["content"] = new Dictionary<string, object>
-                                    {
-                                        ["query"] = request.Query,
-                                        ["operator"] = "OR",
-                                        ["fuzziness"] = "AUTO",
-                                        ["boost"] = 1.0
-                                    }
-                                }
-                            }
-                        },
-                        ["minimum_should_match"] = 1 // At least one of the should clauses must match
-                    }
-                },
-                ["size"] = request.Limit,
-                ["from"] = request.Offset,
-                ["highlight"] = new Dictionary<string, object>
-                {
-                    ["fields"] = new Dictionary<string, object>
-                    {
-                        ["content"] = new { }
-                    },
-                    ["pre_tags"] = new[] { "<em>" },
-                    ["post_tags"] = new[] { "</em>" },
-                    ["fragment_size"] = 200,
-                    ["number_of_fragments"] = 3
-                }
-            };
+            // Build BM25 query using QueryBuilder
+            var searchQuery = _queryBuilder.BuildBm25Query(request.Query, request.Limit, request.Offset);
 
             var json = JsonSerializer.Serialize(searchQuery);
             _logger.LogDebug("Elasticsearch query: {Query}", json);
@@ -172,90 +119,9 @@ public class SearchService : ISearchService
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
-            using var doc = JsonDocument.Parse(responseJson);
 
-            var hits = doc.RootElement.GetProperty("hits");
-            var totalHits = hits.GetProperty("total").GetProperty("value").GetInt32();
-            var took = doc.RootElement.GetProperty("took").GetInt32();
-
-            var results = new List<SearchResult>();
-
-            // Group chunks by source file to reconstruct complete documents
-            var chunksByFile = new Dictionary<string, List<ChunkInfo>>();
-
-            foreach (var hit in hits.GetProperty("hits").EnumerateArray())
-            {
-                var source = hit.GetProperty("_source");
-                var score = hit.GetProperty("_score").GetSingle();
-                var id = hit.GetProperty("_id").GetString() ?? "";
-
-                // Map fields from ChunkDocument structure
-                var sourceFile = source.TryGetProperty("sourceFile", out var sourceFileProp) ? sourceFileProp.GetString() ?? "" : "";
-                var docContent = source.TryGetProperty("content", out var contentProp) ? contentProp.GetString() ?? "" : "";
-                var fileExtension = source.TryGetProperty("fileExtension", out var extProp) ? extProp.GetString() ?? "" : "";
-
-                // Get chunk information
-                var chunkIndex = 0;
-                var totalChunks = 1;
-                if (source.TryGetProperty("position", out var positionProp))
-                {
-                    if (positionProp.TryGetProperty("chunkIndex", out var chunkIndexProp))
-                        chunkIndex = chunkIndexProp.GetInt32();
-                    if (positionProp.TryGetProperty("totalChunks", out var totalChunksProp))
-                        totalChunks = totalChunksProp.GetInt32();
-                }
-
-                var createdAt = source.TryGetProperty("indexedAt", out var indexedProp)
-                    ? DateTime.TryParse(indexedProp.GetString(), out var indexed) ? indexed : DateTime.Now
-                    : DateTime.Now;
-
-                // Group chunks by source file
-                if (!string.IsNullOrEmpty(sourceFile))
-                {
-                    if (!chunksByFile.ContainsKey(sourceFile))
-                        chunksByFile[sourceFile] = new List<ChunkInfo>();
-
-                    var highlights = new List<string>();
-                    if (hit.TryGetProperty("highlight", out var highlight) &&
-                        highlight.TryGetProperty("content", out var contentHighlight))
-                    {
-                        foreach (var fragment in contentHighlight.EnumerateArray())
-                        {
-                            highlights.Add(fragment.GetString() ?? "");
-                        }
-                    }
-
-                    chunksByFile[sourceFile].Add(new ChunkInfo
-                    {
-                        Id = id,
-                        Content = docContent,
-                        Score = score,
-                        SourceFile = sourceFile,
-                        ChunkIndex = chunkIndex,
-                        TotalChunks = totalChunks,
-                        FileExtension = fileExtension,
-                        CreatedAt = createdAt,
-                        Highlights = highlights
-                    });
-                }
-            }
-
-            // Process each file and reconstruct documents, respecting the limit
-            var filesByScore = chunksByFile
-                .Select(kvp => new { File = kvp.Key, Chunks = kvp.Value, MaxScore = kvp.Value.Max(c => c.Score) })
-                .OrderByDescending(x => x.MaxScore)
-                .Take(request.Limit);
-
-            foreach (var fileGroup in filesByScore)
-            {
-                var reconstructedDoc = await ReconstructDocumentFromChunks(fileGroup.File, fileGroup.Chunks, cancellationToken);
-                if (reconstructedDoc != null)
-                {
-                    results.Add(reconstructedDoc);
-                }
-            }
-
-            return new SearchResponse(results.ToArray(), totalHits, took, request.Query);
+            // Use ResultMapper to process search results
+            return await _resultMapper.MapSearchResponseAsync(responseJson, request, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -328,7 +194,7 @@ public class SearchService : ISearchService
             }
 
             // Get all chunks for this document and reconstruct it
-            var allChunks = await FetchAllChunksForDocument(sourceFile, cancellationToken);
+            var allChunks = await _documentReconstructor.FetchAllChunksForDocumentAsync(sourceFile, cancellationToken);
 
             if (allChunks.Count == 0)
             {
@@ -412,6 +278,10 @@ public class SearchService : ISearchService
         }
     }
 
+    /// <summary>
+    /// NOTE: This method is now deprecated - use IDocumentReconstructor.ReconstructDocumentFromChunksAsync instead
+    /// </summary>
+    [Obsolete("Use IDocumentReconstructor.ReconstructDocumentFromChunksAsync instead")]
     private async Task<SearchResult?> ReconstructDocumentFromChunks(string sourceFile, List<ChunkInfo> chunks, CancellationToken cancellationToken)
     {
         try
@@ -423,7 +293,7 @@ public class SearchService : ISearchService
             var firstChunk = sortedChunks.First();
 
             // Determine if we should fetch all chunks for this document
-            var shouldReconstructFullDocument = ShouldReconstructFullDocument(chunks);
+            var shouldReconstructFullDocument = _documentReconstructor.ShouldReconstructFullDocument(chunks);
 
             string reconstructedContent;
             var allHighlights = new List<string>();
@@ -796,86 +666,8 @@ public class SearchService : ISearchService
             var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(embeddingQuery);
             _logger.LogDebug("Generated query embedding with {Dimensions} dimensions", queryEmbedding.Length);
 
-            // Create hybrid search query with script_score
-            var elasticQuery = new Dictionary<string, object>
-            {
-                ["query"] = new Dictionary<string, object>
-                {
-                    ["script_score"] = new Dictionary<string, object>
-                    {
-                        // Base BM25 query
-                        ["query"] = new Dictionary<string, object>
-                        {
-                            ["bool"] = new Dictionary<string, object>
-                            {
-                                ["should"] = new object[]
-                                {
-                                    // Phrase match for exact terms - use optimized query
-                                    new Dictionary<string, object>
-                                    {
-                                        ["match_phrase"] = new Dictionary<string, object>
-                                        {
-                                            ["content"] = new Dictionary<string, object>
-                                            {
-                                                ["query"] = searchQuery,
-                                                ["boost"] = queryProcessing.Type == QueryType.Keywords ? 3.0 : 2.0
-                                            }
-                                        }
-                                    },
-                                    // Match with OR for broader coverage
-                                    new Dictionary<string, object>
-                                    {
-                                        ["match"] = new Dictionary<string, object>
-                                        {
-                                            ["content"] = new Dictionary<string, object>
-                                            {
-                                                ["query"] = searchQuery,
-                                                ["operator"] = "OR",
-                                                ["minimum_should_match"] = queryProcessing.Type == QueryType.Keywords ? "50%" : "20%"
-                                            }
-                                        }
-                                    }
-                                },
-                                ["minimum_should_match"] = 1
-                            }
-                        },
-                        // Hybrid scoring script combining BM25 and cosine similarity with adaptive weights
-                        ["script"] = new Dictionary<string, object>
-                        {
-                            ["source"] = @"
-                                double bm25Score = _score;
-                                double cosineSim = cosineSimilarity(params.query_vector, 'embedding');
-                                
-                                // Use query-specific weights from processing
-                                double bm25Weight = params.bm25_weight;
-                                double semanticWeight = params.semantic_weight;
-                                
-                                // Combine scores with adaptive weighting
-                                return bm25Weight * bm25Score + semanticWeight * (cosineSim + 1.0) * 10.0;
-                            ",
-                            ["params"] = new Dictionary<string, object>
-                            {
-                                ["query_vector"] = queryEmbedding,
-                                ["bm25_weight"] = queryProcessing.KeywordWeight,
-                                ["semantic_weight"] = queryProcessing.SemanticWeight
-                            }
-                        }
-                    }
-                },
-                ["size"] = request.Limit * 3, // Get more results for better reconstruction
-                ["_source"] = new[] { "content", "sourceFile", "position", "fileExtension", "indexedAt" },
-                ["highlight"] = new Dictionary<string, object>
-                {
-                    ["fields"] = new Dictionary<string, object>
-                    {
-                        ["content"] = new Dictionary<string, object>
-                        {
-                            ["fragment_size"] = 150,
-                            ["number_of_fragments"] = 3
-                        }
-                    }
-                }
-            };
+            // Build hybrid query using QueryBuilder
+            var elasticQuery = _queryBuilder.BuildHybridQuery(searchQuery, queryEmbedding, queryProcessing, request.Limit, request.Offset);
 
             var json = JsonSerializer.Serialize(elasticQuery);
             _logger.LogDebug("Hybrid search query: {Query}", json);
@@ -892,7 +684,7 @@ public class SearchService : ISearchService
             }
 
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            return await ProcessSearchResults(responseBody, request, cancellationToken);
+            return await _resultMapper.MapSearchResponseAsync(responseBody, request, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -906,7 +698,9 @@ public class SearchService : ISearchService
 
     /// <summary>
     /// Processes search results and handles document reconstruction
+    /// NOTE: This method is now deprecated - use IResultMapper.MapSearchResponseAsync instead
     /// </summary>
+    [Obsolete("Use IResultMapper.MapSearchResponseAsync instead")]
     private async Task<SearchResponse> ProcessSearchResults(string responseBody, SearchRequest request, CancellationToken cancellationToken)
     {
         var searchResult = JsonSerializer.Deserialize<JsonElement>(responseBody);
@@ -918,28 +712,7 @@ public class SearchService : ISearchService
 
         foreach (var hit in hits.EnumerateArray())
         {
-            var source = hit.GetProperty("_source");
-            var score = hit.GetProperty("_score").GetDouble();
-
-            var highlights = new List<string>();
-            if (hit.TryGetProperty("highlight", out var highlightProperty) &&
-                highlightProperty.TryGetProperty("content", out var contentHighlights))
-            {
-                highlights.AddRange(contentHighlights.EnumerateArray().Select(h => h.GetString() ?? ""));
-            }
-
-            chunks.Add(new ChunkInfo
-            {
-                Id = hit.GetProperty("_id").GetString() ?? "",
-                Content = source.GetProperty("content").GetString() ?? "",
-                Score = score,
-                SourceFile = source.TryGetProperty("sourceFile", out var sourceFile) ? sourceFile.GetString() ?? "" : "",
-                ChunkIndex = source.TryGetProperty("position", out var position) && position.TryGetProperty("chunkIndex", out var chunkIdx) ? chunkIdx.GetInt32() : 0,
-                TotalChunks = source.TryGetProperty("position", out var positionTotal) && positionTotal.TryGetProperty("totalChunks", out var totalChunks) ? totalChunks.GetInt32() : 1,
-                FileExtension = source.TryGetProperty("fileExtension", out var ext) ? ext.GetString() ?? "" : "",
-                CreatedAt = source.TryGetProperty("indexedAt", out var created) ? DateTime.Parse(created.GetString() ?? "") : DateTime.MinValue,
-                Highlights = highlights
-            });
+            chunks.Add(_resultMapper.MapChunkInfo(hit));
         }
 
         _logger.LogInformation("Found {ChunkCount} chunks from {TotalHits} total hits", chunks.Count, totalHits);
@@ -953,9 +726,9 @@ public class SearchService : ISearchService
 
         foreach (var kvp in chunksByFile)
         {
-            if (ShouldReconstructFullDocument(kvp.Value))
+            if (_documentReconstructor.ShouldReconstructFullDocument(kvp.Value))
             {
-                var reconstructed = await ReconstructDocumentFromChunks(kvp.Key, kvp.Value, cancellationToken);
+                var reconstructed = await _documentReconstructor.ReconstructDocumentFromChunksAsync(kvp.Key, kvp.Value, cancellationToken);
                 if (reconstructed != null)
                 {
                     results.Add(reconstructed);
@@ -966,26 +739,7 @@ public class SearchService : ISearchService
                 // Add individual chunks as separate results
                 foreach (var chunk in kvp.Value.OrderByDescending(c => c.Score).Take(3))
                 {
-                    var metadata = new Dictionary<string, object>();
-                    if (chunk.Highlights.Any())
-                    {
-                        metadata["highlights"] = string.Join(" ... ", chunk.Highlights);
-                    }
-                    metadata["file_extension"] = chunk.FileExtension;
-
-                    results.Add(new SearchResult(
-                        chunk.Id,
-                        Path.GetFileName(kvp.Key),
-                        chunk.Content,
-                        chunk.Score,
-                        kvp.Key,
-                        "chunk",
-                        kvp.Key,
-                        Path.GetFileName(kvp.Key),
-                        metadata,
-                        chunk.CreatedAt,
-                        DateTime.Now
-                    ));
+                    results.Add(_resultMapper.MapChunkToSearchResult(chunk, kvp.Key));
                 }
             }
 

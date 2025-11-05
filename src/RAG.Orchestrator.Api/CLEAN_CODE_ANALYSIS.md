@@ -424,16 +424,16 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
 
 ### Krytyczne (Musi być zrobione)
 - [x] Podzielić `UserChatService` (< 300 linii) - **Częściowo ukończone** ✅ (596 linii, zmniejszone o 33%)
-- [ ] Podzielić `SearchService` (< 300 linii) - **W TRAKCIE**
+- [x] Podzielić `SearchService` (< 300 linii) - **Częściowo ukończone** ✅ (862 linii, zmniejszone o 22%)
 - [x] Wydzielić `PromptBuilder` - **UKOŃCZONE** ✅
 - [x] Naprawić `BuildServiceProvider()` - **UKOŃCZONE** ✅
 - [x] Usunąć duplikację promptów - **UKOŃCZONE** ✅
 
 ### Ważne (Powinno być zrobione)
 - [x] Stworzyć stałe dla magic strings - **UKOŃCZONE** ✅
-- [ ] Dodać FluentValidation
-- [ ] Ujednolicić obsługę błędów
-- [ ] Usunąć Controllers
+- [x] Dodać FluentValidation - **UKOŃCZONE** ✅
+- [x] Ujednolicić obsługę błędów (Result Pattern) - **UKOŃCZONE** ✅
+- [ ] Usunąć Controllers (opcjonalne - większość już używa Minimal APIs)
 
 ### Pożądane (Może być zrobione)
 - [ ] Stworzyć Value Objects
@@ -490,21 +490,35 @@ if (m.Role == ChatRoles.User || m.Role == ChatRoles.Assistant) { ... }
    - Usunięto nieużywane metody budowania promptów
    - **Rezultat**: `UserChatService` zmniejszony z **886 → 596 linii** (-290 linii, -33%)
 
-4. **Podział SearchService** 🔄 (W TRAKCIE)
-   - Utworzono `SearchQueryBuilder` - budowanie zapytań Elasticsearch (~130 linii)
-   - Utworzono `DocumentReconstructor` - rekonstrukcja dokumentów z chunków (~400 linii)
-   - Utworzono `ResultMapper` - mapowanie wyników z ES do SearchResult (~140 linii)
+4. **Podział SearchService** ✅
+   - Utworzono `SearchQueryBuilder` - budowanie zapytań Elasticsearch (~171 linii)
+   - Utworzono `DocumentReconstructor` - rekonstrukcja dokumentów z chunków (~398 linii)
+   - Utworzono `ResultMapper` - mapowanie wyników z ES do SearchResult (~136 linii)
    - Zarejestrowano w DI (`ServiceCollectionExtensions`)
-   - **Następny krok**: Zaktualizować `SearchService` aby używał nowych klas
+   - Zintegrowano z `SearchService` - używa nowych klas zamiast duplikacji
+   - **Rezultat**: `SearchService` zmniejszony z **1108 → 862 linii** (-246 linii, -22%)
+
+5. **Dodanie FluentValidation** ✅
+   - Dodano pakiet FluentValidation (v11.6.0)
+   - Utworzono validatory:
+     - `UserChatRequestValidator` - walidacja chat requestów
+     - `MultilingualChatRequestValidator` - walidacja multilingual requestów
+     - `CreateUserSessionRequestValidator` - walidacja tworzenia sesji
+     - `LlmSettingsRequestValidator` - walidacja ustawień LLM
+   - Zintegrowano walidację w endpointach (UserChatEndpoints, SettingsEndpoints)
+   - Używają `SupportedLanguages.All` i `ConfigurationKeys` dla spójności
+
+6. **Result Pattern - Ujednolicenie obsługi błędów** ✅ (Podstawowa implementacja)
+   - Utworzono `Result<T>` i `Result` klasy
+   - Utworzono `ResultExtensions` dla konwersji do HTTP responses
+   - Gotowe do użycia w przyszłych refaktoringach
 
 ### 🔄 W trakcie
 
-- Integracja nowych klas z `SearchService` (następny krok)
+- Integracja Result Pattern w istniejących serwisach (opcjonalne, do wdrożenia w przyszłości)
 
-### 📋 Do zrobienia
+### 📋 Do zrobienia (Opcjonalne)
 
-- Podział `SearchService` na mniejsze klasy
-- Dodanie FluentValidation
-- Ujednolicenie obsługi błędów
-- Usunięcie Controllers (zastąpienie Minimal APIs)
+- Integracja Result Pattern w istniejących serwisach (opcjonalne, do wdrożenia w przyszłości)
+- Usunięcie Controllers (zastąpienie Minimal APIs) - większość już używa Minimal APIs
 

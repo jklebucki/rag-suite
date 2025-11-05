@@ -12,11 +12,17 @@ using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
+using FluentValidation;
+using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Chat.Validation;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
 using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
 using RAG.Orchestrator.Api.Features.Search.ResultMapping;
 using RAG.Orchestrator.Api.Features.Settings;
+using RAG.Orchestrator.Api.Features.Settings.Validation;
+using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Models.Validation;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Services;
 
@@ -162,6 +168,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISearchQueryBuilder, SearchQueryBuilder>();
         services.AddScoped<IDocumentReconstructor, DocumentReconstructor>();
         services.AddScoped<IResultMapper, ResultMapper>();
+
+        // FluentValidation validators
+        services.AddScoped<IValidator<UserChatRequest>, UserChatRequestValidator>();
+        services.AddScoped<IValidator<MultilingualChatRequest>, MultilingualChatRequestValidator>();
+        services.AddScoped<IValidator<CreateUserSessionRequest>, CreateUserSessionRequestValidator>();
+        services.AddScoped<IValidator<LlmSettingsRequest>, LlmSettingsRequestValidator>();
+
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
