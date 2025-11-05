@@ -36,17 +36,26 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Core React libraries
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+          // Core React libraries - MUST be bundled together first
+          // This ensures React is available before use-sync-external-store-shim tries to use it
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/react/jsx-runtime') ||
+              id.includes('node_modules/react/jsx-dev-runtime')) {
+            return 'vendor-react'
+          }
+          
+          // use-sync-external-store should be with React Query to ensure React is loaded first
+          if (id.includes('node_modules/use-sync-external-store')) {
             return 'vendor-react'
           }
           
           // React Router
-          if (id.includes('node_modules/react-router-dom')) {
+          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router')) {
             return 'vendor-router'
           }
           
-          // React Query
+          // React Query - depends on React, so it should load after vendor-react
           if (id.includes('node_modules/@tanstack/react-query')) {
             return 'vendor-query'
           }
@@ -100,5 +109,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000, // Increase warning limit to 1000kB
     // Minification
     minify: 'terser',
+    // Ensure proper module resolution and deduplication
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+    exclude: [],
   },
 })
