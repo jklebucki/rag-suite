@@ -5,11 +5,6 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   server: {
     port: 3000,
     proxy: {
@@ -113,10 +108,40 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
+      // Handle Prism.js CommonJS exports properly
+      strictRequires: false,
+      // Ensure Prism.js is properly transformed
+      requireReturnsDefault: 'auto',
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+    include: [
+      'react', 
+      'react-dom', 
+      'react/jsx-runtime', 
+      'react/jsx-dev-runtime',
+      'prismjs',
+      'react-syntax-highlighter',
+      'react-syntax-highlighter/dist/esm/styles/prism'
+    ],
     exclude: [],
+    esbuildOptions: {
+      // Handle CommonJS modules properly
+      target: 'es2020',
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+    // Ensure proper resolution of CommonJS modules
+    dedupe: ['react', 'react-dom'],
+    // Ensure proper conditions for module resolution
+    conditions: ['import', 'module', 'browser', 'default'],
+  },
+  // Explicitly handle Prism.js CommonJS issues
+  define: {
+    // Ensure Prism.js works correctly in production
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 })
