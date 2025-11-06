@@ -1,5 +1,6 @@
 using RAG.CyberPanel.Domain;
 using RAG.CyberPanel.Services;
+using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -25,7 +26,7 @@ public class CyberPanelServiceTests
         var svc = new CyberPanelService();
         var score = svc.CalculateScore(quiz, new[] { answer });
 
-        Assert.Equal(2, score);
+        score.Should().Be(2);
     }
 
     [Fact]
@@ -46,7 +47,7 @@ public class CyberPanelServiceTests
         var svc = new CyberPanelService();
         var score = svc.CalculateScore(quiz, new[] { answer });
 
-        Assert.Equal(0, score);
+        score.Should().Be(0);
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public class CyberPanelServiceTests
         var svc = new CyberPanelService();
         var score = svc.CalculateScore(quiz, answers);
 
-        Assert.Equal(2, score); // Only q1 correct
+        score.Should().Be(2); // Only q1 correct
     }
 
     [Fact]
@@ -94,6 +95,6 @@ public class CyberPanelServiceTests
         var svc = new CyberPanelService();
         var score = svc.CalculateScore(quiz, new[] { answer });
 
-        Assert.Equal(0, score);
+        score.Should().Be(0);
     }
 }
