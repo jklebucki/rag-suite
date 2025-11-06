@@ -6,6 +6,13 @@ import { LanguageCode } from '@/types/i18n'
 export function formatDateTime(date: Date | string, _language: LanguageCode): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
   
+  // Check if date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date provided to formatDateTime')
+    // Return a fallback format for invalid dates
+    return new Date().toISOString().replace('T', ' ').substring(0, 19)
+  }
+  
   try {
     // Format: YYYY-MM-DD HH:mm:ss (ISO style but more readable)
     const year = dateObj.getFullYear()
@@ -28,6 +35,13 @@ export function formatDateTime(date: Date | string, _language: LanguageCode): st
  */
 export function formatDate(date: Date | string, language: LanguageCode): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
+  
+  // Check if date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date provided to formatDate')
+    // Return a fallback format for invalid dates
+    return new Date().toISOString().substring(0, 10)
+  }
   
   const localeMap: Record<LanguageCode, string> = {
     'en': 'en-US',

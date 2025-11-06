@@ -53,7 +53,7 @@ export function useLayout() {
   const navigation = [...mainNavigation, ...footerNavigation]
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
+    setIsSidebarOpen((prev) => !prev)
   }
 
   const closeSidebar = () => {

@@ -1,8 +1,8 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { useLayout } from '../useLayout'
+import { useLayout } from './useLayout'
 import { createMockUser } from '@/test-utils/test-utils'
 
 // Mock contexts
@@ -71,9 +71,15 @@ describe('useLayout', () => {
     const { result } = renderHook(() => useLayout(), { wrapper })
     
     expect(result.current.isSidebarOpen).toBe(false)
-    result.current.toggleSidebar()
+    
+    act(() => {
+      result.current.toggleSidebar()
+    })
     expect(result.current.isSidebarOpen).toBe(true)
-    result.current.toggleSidebar()
+    
+    act(() => {
+      result.current.toggleSidebar()
+    })
     expect(result.current.isSidebarOpen).toBe(false)
   })
 
@@ -99,9 +105,14 @@ describe('useLayout', () => {
 
     const { result } = renderHook(() => useLayout(), { wrapper })
     
-    result.current.toggleSidebar()
+    act(() => {
+      result.current.toggleSidebar()
+    })
     expect(result.current.isSidebarOpen).toBe(true)
-    result.current.closeSidebar()
+    
+    act(() => {
+      result.current.closeSidebar()
+    })
     expect(result.current.isSidebarOpen).toBe(false)
   })
 

@@ -1,26 +1,27 @@
+import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { LoginForm } from '../LoginForm'
+import { LoginForm } from './LoginForm'
 import { render as customRender } from '@/test-utils/test-utils'
 
-// Mock contexts
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: vi.fn(),
+// Mock main.tsx to prevent React root creation in tests
+vi.mock('@/main', () => ({
+  queryClient: {
+    invalidateQueries: vi.fn(),
+    setQueryData: vi.fn(),
+    getQueryData: vi.fn(),
+  },
 }))
 
-vi.mock('@/contexts/I18nContext', () => ({
-  useI18n: () => ({
-    t: (key: string) => key,
-    language: 'en',
-  }),
-}))
-
-vi.mock('@/contexts/ToastContext', () => ({
-  useToast: () => ({
-    addToast: vi.fn(),
-  }),
-}))
+// Mock only useAuth hook, providers are provided by customRender
+vi.mock('@/contexts/AuthContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/AuthContext')>()
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+  }
+})
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')

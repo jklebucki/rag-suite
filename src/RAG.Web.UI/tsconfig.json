@@ -31,7 +31,7 @@
     /* Types */
     "types": ["vite/client"]
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}", "src/test-utils/**/*", "node_modules"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}", "src/test-utils/**/*", "node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

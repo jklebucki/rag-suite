@@ -8,7 +8,7 @@ import {
   validateUsername,
   combineValidations,
   createFieldValidator,
-} from '../validation'
+} from './validation'
 
 describe('validation', () => {
   describe('validateEmail', () => {

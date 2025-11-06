@@ -7,8 +7,12 @@
  * Validates email format
  */
 export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
+  if (!email || !email.trim()) {
+    return false
+  }
+  // More strict email regex that rejects consecutive dots and invalid formats
+  const emailRegex = /^[^\s@.]+(\.[^\s@.]+)*@[^\s@.]+(\.[^\s@.]+)*\.[a-zA-Z]{2,}$/
+  return emailRegex.test(email.trim())
 }
 
 /**
