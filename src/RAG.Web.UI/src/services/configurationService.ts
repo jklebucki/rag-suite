@@ -38,11 +38,28 @@ class ConfigurationService {
   }
 
   /**
+   * Type guard to check if object is RegistrationConfiguration
+   */
+  private isRegistrationConfiguration(config: unknown): config is RegistrationConfiguration {
+    return (
+      typeof config === 'object' &&
+      config !== null &&
+      'passwordRequirements' in config &&
+      'userFieldRequirements' in config &&
+      'securitySettings' in config
+    )
+  }
+
+  /**
    * Validates the configuration object structure
    */
-  private validateConfiguration(config: any): void {
+  private validateConfiguration(config: RegistrationConfiguration | unknown): void {
     if (!config) {
       throw new Error('Configuration is null or undefined')
+    }
+
+    if (!this.isRegistrationConfiguration(config)) {
+      throw new Error('Invalid configuration structure')
     }
 
     if (!config.passwordRequirements) {
@@ -64,7 +81,7 @@ class ConfigurationService {
     }
 
     // Validate user field requirements
-    const requiredFields = ['email', 'userName', 'firstName', 'lastName', 'password', 'confirmPassword']
+    const requiredFields: Array<keyof RegistrationConfiguration['userFieldRequirements']> = ['email', 'userName', 'firstName', 'lastName', 'password', 'confirmPassword']
     for (const field of requiredFields) {
       if (!config.userFieldRequirements[field]) {
         throw new Error(`Missing ${field} in userFieldRequirements`)

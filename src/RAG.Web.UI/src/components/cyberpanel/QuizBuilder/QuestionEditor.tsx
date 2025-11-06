@@ -8,13 +8,13 @@ interface QuestionEditorProps {
   question: CreateQuizQuestionDto
   questionIndex: number
   totalQuestions: number
-  onUpdate: (field: keyof CreateQuizQuestionDto, value: string | number | boolean) => void
+  onUpdate: (field: keyof CreateQuizQuestionDto, value: string | number | boolean | null) => void
   onRemove: () => void
   onMove: (direction: 'up' | 'down') => void
   onImageUpload: (file: File) => void
   onAddOption: () => void
   onRemoveOption: (optionIndex: number) => void
-  onUpdateOption: (optionIndex: number, field: keyof CreateQuizOptionDto, value: string | boolean) => void
+  onUpdateOption: (optionIndex: number, field: keyof CreateQuizOptionDto, value: string | boolean | null) => void
   onOptionImageUpload: (optionIndex: number, file: File) => void
 }
 

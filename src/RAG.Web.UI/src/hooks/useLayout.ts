@@ -20,7 +20,6 @@ export function useLayout() {
   const { user, isAuthenticated } = useAuth()
 
   const isAdmin = user?.roles?.includes('Admin') ?? false
-  const isPowerUser = user?.roles?.includes('PowerUser') ?? false
 
   const baseNavigation = [
     { name: t('nav.landing'), href: '/', icon: Home },

@@ -31,9 +31,11 @@ export function PasswordInput({
     return 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
   }
 
+  const inputId = `password-input-${label.toLowerCase().replace(/\s+/g, '-')}`
+  
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
         {label}
       </label>
       <div className="relative">
@@ -41,6 +43,7 @@ export function PasswordInput({
           <Lock className="h-5 w-5 text-gray-400" />
         </div>
         <input
+          id={inputId}
           type={showPassword ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}

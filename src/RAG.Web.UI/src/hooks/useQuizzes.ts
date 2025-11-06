@@ -41,8 +41,8 @@ export function useQuizzes(): UseQuizzesReturn {
     try {
       const data = await cyberPanelService.listQuizzes(language)
       setQuizzes(data)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch quizzes')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch quizzes')
       logger.error('Error fetching quizzes:', err)
     } finally {
       setLoading(false)
@@ -56,8 +56,10 @@ export function useQuizzes(): UseQuizzesReturn {
       const result = await cyberPanelService.createQuiz(quiz)
       await fetchQuizzes() // Refresh list
       return result
-    } catch (err: any) {
-      setError(err.response?.data?.title || err.message || 'Failed to create quiz')
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
+        (err instanceof Error ? err.message : 'Failed to create quiz')
+      setError(errorMessage)
       logger.error('Error creating quiz:', err)
       return null
     } finally {
@@ -72,8 +74,10 @@ export function useQuizzes(): UseQuizzesReturn {
       const result = await cyberPanelService.updateQuiz(quizId, quiz)
       await fetchQuizzes() // Refresh list
       return result
-    } catch (err: any) {
-      setError(err.response?.data?.title || err.message || 'Failed to update quiz')
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
+        (err instanceof Error ? err.message : 'Failed to update quiz')
+      setError(errorMessage)
       logger.error('Error updating quiz:', err)
       return null
     } finally {
@@ -88,8 +92,8 @@ export function useQuizzes(): UseQuizzesReturn {
       await cyberPanelService.deleteQuiz(quizId)
       await fetchQuizzes() // Refresh list
       return true
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete quiz')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete quiz')
       logger.error('Error deleting quiz:', err)
       return false
     } finally {
@@ -119,8 +123,10 @@ export function useQuizzes(): UseQuizzesReturn {
       const result = await cyberPanelService.importQuiz(request)
       await fetchQuizzes() // Refresh list
       return result
-    } catch (err: any) {
-      setError(err.response?.data?.title || err.message || 'Failed to import quiz')
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
+        (err instanceof Error ? err.message : 'Failed to import quiz')
+      setError(errorMessage)
       logger.error('Error importing quiz:', err)
       return null
     } finally {
@@ -135,8 +141,10 @@ export function useQuizzes(): UseQuizzesReturn {
       const result = await cyberPanelService.importQuizFromFile(file)
       await fetchQuizzes() // Refresh list
       return result
-    } catch (err: any) {
-      setError(err.response?.data?.title || err.message || 'Failed to import quiz from file')
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
+        (err instanceof Error ? err.message : 'Failed to import quiz from file')
+      setError(errorMessage)
       logger.error('Error importing quiz from file:', err)
       return null
     } finally {
@@ -151,8 +159,8 @@ export function useQuizzes(): UseQuizzesReturn {
       const result = await cyberPanelService.cloneQuiz(quizId, newTitle)
       await fetchQuizzes() // Refresh list
       return result
-    } catch (err: any) {
-      setError(err.message || 'Failed to clone quiz')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to clone quiz')
       logger.error('Error cloning quiz:', err)
       return null
     } finally {
@@ -201,8 +209,8 @@ export function useQuizTaking(): UseQuizTakingReturn {
     try {
       const data = await cyberPanelService.getQuizForTaking(quizId)
       setQuiz(data)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch quiz')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch quiz')
       logger.error('Error fetching quiz:', err)
     } finally {
       setLoading(false)
@@ -216,8 +224,8 @@ export function useQuizTaking(): UseQuizTakingReturn {
       const attemptResult = await cyberPanelService.submitAttempt(request)
       setResult(attemptResult)
       return attemptResult
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit quiz')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit quiz')
       logger.error('Error submitting quiz:', err)
       return null
     } finally {

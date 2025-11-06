@@ -21,7 +21,7 @@ export function UserSettings() {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false)
 
   // Fetch users
-  const { data: users = [], isLoading, error } = useQuery({
+  const { data: users = [], isLoading, error: fetchError } = useQuery({
     queryKey: ['users'],
     queryFn: () => authService.getUsers(),
     enabled: authService.hasRole('Admin')
@@ -182,7 +182,7 @@ export function UserSettings() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
             <p className="mt-2 text-gray-600">Loading users...</p>
           </div>
-        ) : error ? (
+        ) : fetchError ? (
           <div className="p-6 text-center">
             <p className="text-red-600">Failed to load users</p>
           </div>

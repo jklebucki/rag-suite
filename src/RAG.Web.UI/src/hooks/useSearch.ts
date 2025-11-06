@@ -18,10 +18,6 @@ export function useSearch() {
   const { showError, showSuccess } = useToastContext()
   const { language } = useI18n()
 
-  const hasFilters = () => {
-    return filters.documentType || filters.source || filters.dateRange
-  }
-
   // Search query - only enabled after user clicks search
   const {
     data: searchResults,

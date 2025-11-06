@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
-import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
 
 interface NavigationItem {

@@ -55,7 +55,7 @@ export function SearchInterface() {
       <SearchResults
         searchResults={searchResults}
         isLoading={isSearching}
-        error={error}
+        error={error instanceof Error ? error.message : error ? String(error) : null}
         hasSearched={hasSearched}
         onExport={() => {
           // TODO: Implement export functionality

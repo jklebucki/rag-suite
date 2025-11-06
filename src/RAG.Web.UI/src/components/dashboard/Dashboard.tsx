@@ -83,7 +83,7 @@ export function Dashboard() {
 
       {/* Enhanced System Health */}
       <SystemHealth 
-        systemHealth={systemHealth || undefined} 
+        systemHealth={systemHealth && 'api' in systemHealth ? systemHealth : undefined} 
         analyticsHealth={analyticsHealth}
         clusterStats={clusterStats}
       />

@@ -7,7 +7,7 @@ interface AnswerEditorProps {
   option: CreateQuizOptionDto
   optionIndex: number
   questionIndex: number
-  onUpdate: (field: keyof CreateQuizOptionDto, value: string | boolean) => void
+  onUpdate: (field: keyof CreateQuizOptionDto, value: string | boolean | null) => void
   onRemove: () => void
   onImageUpload: (file: File) => void
   canRemove: boolean
