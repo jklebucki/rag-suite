@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RAG.AddressBook\RAG.AddressBook.csproj" />
     <ProjectReference Include="..\RAG.CyberPanel\RAG.CyberPanel.csproj" />
+    <ProjectReference Include="..\RAG.Collector\RAG.Collector.csproj" />
     <ProjectReference Include="..\RAG.Orchestrator.Api\RAG.Orchestrator.Api.csproj" />
   </ItemGroup>
 
