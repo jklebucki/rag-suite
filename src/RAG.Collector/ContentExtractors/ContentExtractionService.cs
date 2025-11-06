@@ -52,7 +52,7 @@ public class ContentExtractionService
     /// <returns>Extraction result containing content and metadata</returns>
     public async Task<ContentExtractionResult> ExtractContentAsync(string filePath, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(filePath))
+        if (string.IsNullOrWhiteSpace(filePath))
         {
             return ContentExtractionResult.Failure("File path cannot be null or empty");
         }
@@ -62,11 +62,20 @@ public class ContentExtractionService
             return ContentExtractionResult.Failure($"File not found: {filePath}");
         }
 
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        var extension = Path.GetExtension(filePath);
+        if (string.IsNullOrEmpty(extension))
+        {
+            return ContentExtractionResult.Failure($"File has no extension: {filePath}");
+        }
 
         if (!_extractorMap.TryGetValue(extension, out var extractor))
         {
             return ContentExtractionResult.Failure($"No extractor available for file type: {extension}");
+        }
+
+        if (extractor == null)
+        {
+            return ContentExtractionResult.Failure($"Extractor is null for file type: {extension}");
         }
 
         try
@@ -95,26 +104,4 @@ public class ContentExtractionService
         }
     }
 
-    /// <summary>
-    /// Gets the appropriate extractor for the given file extension
-    /// </summary>
-    /// <param name="extension">File extension (including the dot)</param>
-    /// <returns>Content extractor or null if not supported</returns>
-    public IContentExtractor? GetExtractor(string extension)
-    {
-        _extractorMap.TryGetValue(extension, out var extractor);
-        return extractor;
-    }
-
-    /// <summary>
-    /// Gets information about all registered extractors
-    /// </summary>
-    /// <returns>Dictionary mapping extractor types to their supported extensions</returns>
-    public Dictionary<string, IEnumerable<string>> GetExtractorInfo()
-    {
-        return _extractors.ToDictionary(
-            extractor => extractor.GetType().Name,
-            extractor => extractor.SupportedExtensions
-        );
-    }
 }

@@ -1,6 +1,8 @@
 using RAG.Collector.Acl;
+using RAG.Collector.Config;
 using RAG.Collector.Models;
 using System.Runtime.CompilerServices;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Enumerators;
 
@@ -151,7 +153,7 @@ public class FileEnumerator : IFileEnumerator
                 yield return fileItem;
 
                 // Yield control periodically to avoid blocking
-                if (processedCount % 100 == 0)
+                if (processedCount % Constants.EnumerationYieldInterval == 0)
                 {
                     await Task.Yield();
                 }
@@ -173,9 +175,9 @@ public class FileEnumerator : IFileEnumerator
         }
 
         var fileInfo = new FileInfo(filePath);
-        var extension = fileInfo.Extension.ToLowerInvariant();
+        var extension = fileInfo.Extension;
 
-        // Filter by extension
+        // Filter by extension (HashSet already uses case-insensitive comparison)
         if (extensions.Count > 0 && !extensions.Contains(extension))
         {
             return null;

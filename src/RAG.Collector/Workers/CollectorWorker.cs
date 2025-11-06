@@ -5,6 +5,7 @@ using RAG.Collector.ContentExtractors;
 using RAG.Collector.Enumerators;
 using RAG.Collector.Indexing;
 using RAG.Collector.Models;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Workers;
 
@@ -106,8 +107,8 @@ public class CollectorWorker : BackgroundService
             {
                 processedFiles++;
 
-                // Log progress every 50 files
-                if (processedFiles % 50 == 0 || processedFiles == totalFiles)
+                // Log progress every N files
+                if (processedFiles % Constants.ProgressLogInterval == 0 || processedFiles == totalFiles)
                 {
                     var elapsed = DateTime.UtcNow - startTime;
                     var rate = processedFiles / elapsed.TotalSeconds;
@@ -130,9 +131,6 @@ public class CollectorWorker : BackgroundService
                 var indexText = indexedCount > 0 ? $", Indexed: {indexedCount}" : "";
                 _logger.LogInformation("Processed file: {FileName} ({Size:N0} bytes, {Extension}, Modified: {Modified:yyyy-MM-dd HH:mm:ss}, ACL: {AclGroups}{ContentInfo}{ChunkInfo}{IndexInfo})",
                     fileItem.FileName, fileItem.Size, fileItem.Extension, fileItem.LastWriteTimeUtc, aclGroupsText, contentText, chunkText, indexText);
-
-                // Simulate processing time
-                await Task.Delay(10, cancellationToken);
             }
 
             var totalElapsed = DateTime.UtcNow - startTime;
@@ -154,12 +152,24 @@ public class CollectorWorker : BackgroundService
     /// </summary>
     private async Task ExtractContentAsync(FileItem fileItem, CancellationToken cancellationToken)
     {
+        if (fileItem == null)
+        {
+            _logger.LogWarning("FileItem is null, skipping content extraction");
+            return;
+        }
+
         try
         {
             _logger.LogDebug("Extracting content from file: {FilePath}", fileItem.Path);
 
             using var scope = _serviceProvider.CreateScope();
             var contentExtractionService = scope.ServiceProvider.GetRequiredService<ContentExtractionService>();
+
+            if (contentExtractionService == null)
+            {
+                _logger.LogError("ContentExtractionService is not available");
+                return;
+            }
 
             // Generate file hash before extraction
             if (string.IsNullOrEmpty(fileItem.FileHash))
@@ -210,6 +220,12 @@ public class CollectorWorker : BackgroundService
     /// <returns>List of text chunks</returns>
     private async Task<IList<TextChunk>> ChunkContentAsync(FileItem fileItem, CancellationToken cancellationToken)
     {
+        if (fileItem == null)
+        {
+            _logger.LogWarning("FileItem is null, skipping chunking");
+            return new List<TextChunk>();
+        }
+
         if (!fileItem.IsContentExtracted || string.IsNullOrWhiteSpace(fileItem.ExtractedContent))
         {
             _logger.LogDebug("Skipping chunking for {FilePath} - no content extracted", fileItem.Path);
@@ -220,6 +236,12 @@ public class CollectorWorker : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var chunkingService = scope.ServiceProvider.GetRequiredService<ChunkingService>();
+
+            if (chunkingService == null)
+            {
+                _logger.LogError("ChunkingService is not available");
+                return new List<TextChunk>();
+            }
 
             var chunks = await chunkingService.ChunkAsync(
                 fileItem,
@@ -247,7 +269,7 @@ public class CollectorWorker : BackgroundService
     /// <returns>Number of successfully indexed chunks</returns>
     private async Task<int> IndexChunksAsync(IList<TextChunk> chunks, CancellationToken cancellationToken)
     {
-        if (!chunks.Any())
+        if (chunks == null || !chunks.Any())
         {
             _logger.LogDebug("No chunks to index");
             return 0;
@@ -257,6 +279,12 @@ public class CollectorWorker : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var indexingService = scope.ServiceProvider.GetRequiredService<IndexingService>();
+
+            if (indexingService == null)
+            {
+                _logger.LogError("IndexingService is not available");
+                return 0;
+            }
 
             var indexedCount = await indexingService.IndexFileChunksAsync(chunks, cancellationToken);
 

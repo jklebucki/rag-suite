@@ -1,3 +1,6 @@
+using RAG.Collector.Config;
+using static RAG.Collector.Config.Constants;
+
 namespace RAG.Collector.Models;
 
 /// <summary>
@@ -38,7 +41,7 @@ public class TextChunk
     /// <summary>
     /// Estimated token count (rough approximation)
     /// </summary>
-    public int EstimatedTokens => (int)Math.Ceiling(Content.Length / 4.0);
+    public int EstimatedTokens => (int)Math.Ceiling(Content.Length / Constants.CharactersPerToken);
 
     /// <summary>
     /// Hash of the content for deduplication

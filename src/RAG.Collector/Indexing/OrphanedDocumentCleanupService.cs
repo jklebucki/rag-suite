@@ -1,7 +1,4 @@
-using Microsoft.Extensions.Options;
-using RAG.Collector.Config;
 using RAG.Collector.Elasticsearch;
-using System.Collections.Concurrent;
 
 namespace RAG.Collector.Indexing;
 
@@ -13,19 +10,15 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
     private readonly IElasticsearchService _elasticsearchService;
     private readonly IFileChangeDetectionService _fileChangeDetectionService;
     private readonly ILogger<OrphanedDocumentCleanupService> _logger;
-    private readonly CollectorOptions _options;
-    private readonly ConcurrentDictionary<string, DateTime> _cleanupHistory = new();
 
     public OrphanedDocumentCleanupService(
         IElasticsearchService elasticsearchService,
         IFileChangeDetectionService fileChangeDetectionService,
-        ILogger<OrphanedDocumentCleanupService> logger,
-        IOptions<CollectorOptions> options)
+        ILogger<OrphanedDocumentCleanupService> logger)
     {
         _elasticsearchService = elasticsearchService;
         _fileChangeDetectionService = fileChangeDetectionService;
         _logger = logger;
-        _options = options.Value;
     }
 
     public async Task<OrphanedDocumentCleanupResult> FindOrphanedDocumentsAsync(CancellationToken cancellationToken = default)
@@ -134,9 +127,6 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
                 }
             }
 
-            // Record cleanup operation
-            _cleanupHistory.TryAdd(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), DateTime.UtcNow);
-
             _logger.LogInformation("Orphaned document cleanup completed: {DeletedCount} documents deleted for {FileCount} files",
                 deletedCount, filePaths.Count);
 
@@ -176,30 +166,6 @@ public class OrphanedDocumentCleanupService : IOrphanedDocumentCleanupService
         return result;
     }
 
-    public Task<OrphanedCleanupStats> GetCleanupStatsAsync()
-    {
-        try
-        {
-            // For now, return basic stats from in-memory history
-            // In a production system, you might want to persist this data
-            var stats = new OrphanedCleanupStats
-            {
-                TotalCleanupOperations = _cleanupHistory.Count,
-                LastCleanupAt = _cleanupHistory.Values.LastOrDefault(),
-                // Additional stats would require persistent storage
-                TotalDocumentsDeleted = 0,
-                TotalOrphanedFilesDeleted = 0,
-                AverageCleanupTime = null
-            };
-
-            return Task.FromResult(stats);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting cleanup stats");
-            return Task.FromResult(new OrphanedCleanupStats());
-        }
-    }
 
     /// <summary>
     /// Get all unique file paths currently indexed in Elasticsearch with their chunk counts

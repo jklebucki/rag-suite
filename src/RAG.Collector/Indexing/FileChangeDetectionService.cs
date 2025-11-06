@@ -1,4 +1,6 @@
+using RAG.Collector.Config;
 using RAG.Collector.Elasticsearch;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Indexing;
 
@@ -10,7 +12,6 @@ public class FileChangeDetectionService : IFileChangeDetectionService
 {
     private readonly IElasticsearchService _elasticsearchService;
     private readonly ILogger<FileChangeDetectionService> _logger;
-    private const string FILE_METADATA_INDEX = "rag-file-metadata";
 
     public FileChangeDetectionService(
         IElasticsearchService elasticsearchService,
@@ -87,27 +88,6 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         }
     }
 
-    public async Task<FileIndexStats> GetFileIndexStatsAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // For now, return basic stats - this could be implemented later with aggregation queries
-            await Task.CompletedTask;
-
-            return new FileIndexStats
-            {
-                TotalIndexedFiles = 0,
-                TotalChunks = 0,
-                LastIndexedAt = null,
-                FilesByExtension = new Dictionary<string, int>()
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting file index stats");
-            return new FileIndexStats();
-        }
-    }
 
     public async Task<bool> DeleteFileMetadataAsync(string filePath, CancellationToken cancellationToken = default)
     {
@@ -116,7 +96,7 @@ public class FileChangeDetectionService : IFileChangeDetectionService
             var fileId = GenerateFileId(filePath);
 
             // Ensure metadata index exists
-            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(Constants.FileMetadataIndexName, null, cancellationToken);
 
             // Delete the metadata document
             var deleted = await _elasticsearchService.DeleteDocumentByIdAsync(FILE_METADATA_INDEX, fileId, cancellationToken);
@@ -146,11 +126,11 @@ public class FileChangeDetectionService : IFileChangeDetectionService
             var fileId = GenerateFileId(filePath);
 
             // Ensure metadata index exists
-            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(Constants.FileMetadataIndexName, null, cancellationToken);
 
             // Get document by ID
             var metadata = await _elasticsearchService.GetDocumentByIdAsync<FileMetadataDocument>(
-                FILE_METADATA_INDEX, fileId, cancellationToken);
+                Constants.FileMetadataIndexName, fileId, cancellationToken);
 
             if (metadata != null)
             {
@@ -173,11 +153,11 @@ public class FileChangeDetectionService : IFileChangeDetectionService
         try
         {
             // Ensure metadata index exists
-            await _elasticsearchService.EnsureCustomIndexExistsAsync(FILE_METADATA_INDEX, null, cancellationToken);
+            await _elasticsearchService.EnsureCustomIndexExistsAsync(Constants.FileMetadataIndexName, null, cancellationToken);
 
             // Index the metadata document
             var success = await _elasticsearchService.IndexDocumentToCustomIndexAsync(
-                FILE_METADATA_INDEX, metadata.Id, metadata, cancellationToken);
+                Constants.FileMetadataIndexName, metadata.Id, metadata, cancellationToken);
 
             if (success)
             {

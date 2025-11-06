@@ -49,7 +49,7 @@ public class PlainTextExtractor : IContentExtractor
             var lines = content.Split('\n');
             metadata["LineCount"] = lines.Length.ToString();
             metadata["CharacterCount"] = content.Length.ToString();
-            metadata["WordCount"] = EstimateWordCount(content).ToString();
+            metadata["WordCount"] = TextUtilities.EstimateWordCount(content).ToString();
 
             _logger.LogDebug("Extracted {CharCount} characters from {FilePath}", content.Length, filePath);
 
@@ -60,16 +60,5 @@ public class PlainTextExtractor : IContentExtractor
             _logger.LogError(ex, "Failed to extract content from plain text file: {FilePath}", filePath);
             return ContentExtractionResult.Failure($"Error reading file: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Estimates word count in text content
-    /// </summary>
-    private static int EstimateWordCount(string content)
-    {
-        if (string.IsNullOrWhiteSpace(content))
-            return 0;
-
-        return content.Split(new char[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
     }
 }

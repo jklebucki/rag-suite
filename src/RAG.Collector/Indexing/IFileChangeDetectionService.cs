@@ -26,28 +26,10 @@ public interface IFileChangeDetectionService
     Task RecordIndexedFileAsync(string filePath, string fileHash, DateTime lastModified, int chunkCount, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Get statistics about indexed files
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Statistics about indexed files</returns>
-    Task<FileIndexStats> GetFileIndexStatsAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Delete metadata for a file (used during orphaned cleanup)
     /// </summary>
     /// <param name="filePath">Path to the file</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if metadata was deleted or didn't exist</returns>
     Task<bool> DeleteFileMetadataAsync(string filePath, CancellationToken cancellationToken = default);
-}
-
-/// <summary>
-/// Statistics about file indexing
-/// </summary>
-public class FileIndexStats
-{
-    public int TotalIndexedFiles { get; set; }
-    public int TotalChunks { get; set; }
-    public DateTime? LastIndexedAt { get; set; }
-    public Dictionary<string, int> FilesByExtension { get; set; } = new();
 }

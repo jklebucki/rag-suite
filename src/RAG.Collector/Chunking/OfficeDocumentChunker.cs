@@ -1,4 +1,6 @@
+using RAG.Collector.Config;
 using RAG.Collector.Models;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Chunking;
 
@@ -154,7 +156,7 @@ public class OfficeDocumentChunker : ITextChunker
             if (!string.IsNullOrEmpty(trimmed))
             {
                 // Further split very long paragraphs by sentence boundaries
-                if (trimmed.Length > 800)
+                if (trimmed.Length > MinParagraphLengthForSentenceSplit)
                 {
                     var sentences = SplitIntoSentences(trimmed);
                     sections.AddRange(sentences);
@@ -188,7 +190,7 @@ public class OfficeDocumentChunker : ITextChunker
             {
                 currentSection = sentence;
             }
-            else if (currentSection.Length + sentence.Length + 1 <= 600) // Conservative sentence grouping
+            else if (currentSection.Length + sentence.Length + 1 <= SentenceGroupingThreshold)
             {
                 currentSection += " " + sentence;
             }
@@ -264,8 +266,8 @@ public class OfficeDocumentChunker : ITextChunker
         if (endPosition >= text.Length)
             return text.Length;
 
-        // Look for sentence ending within last 20% of chunk
-        var searchStart = startPosition + (int)(idealLength * 0.8);
+        // Look for sentence ending within last portion of chunk
+        var searchStart = startPosition + (int)(idealLength * BreakPointSearchPercentage);
         for (var i = endPosition; i >= searchStart; i--)
         {
             if (i < text.Length && (text[i] == '.' || text[i] == '!' || text[i] == '?'))

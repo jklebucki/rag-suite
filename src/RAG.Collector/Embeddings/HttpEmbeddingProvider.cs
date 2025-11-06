@@ -3,6 +3,7 @@ using RAG.Collector.Config;
 using RAG.Collector.Models;
 using System.Text;
 using System.Text.Json;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Embeddings;
 
@@ -26,8 +27,8 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
     }
 
     public string ModelName => _options.EmbeddingModelName;
-    public int MaxTokens => 512; // Safe default for most models
-    public int VectorDimensions => 768; // Common dimension for multilingual-e5-small
+    public int MaxTokens => Constants.DefaultMaxTokens;
+    public int VectorDimensions => Constants.DefaultEmbeddingDimensions;
 
     public async Task<EmbeddingResult> GenerateEmbeddingAsync(TextChunk chunk, CancellationToken cancellationToken = default)
     {
@@ -47,7 +48,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
             _logger.LogInformation("Generating embedding for chunk {ChunkId} (length: {Length} chars, ~{Tokens} tokens)",
                 chunk.Id, chunk.Content.Length, chunk.EstimatedTokens);
 
-            var response = await _httpClient.PostAsync("/embed", content, cancellationToken);
+            var response = await _httpClient.PostAsync(EmbeddingEndpoint, content, cancellationToken);
 
             if (response.StatusCode == (System.Net.HttpStatusCode)413)
             {
@@ -113,7 +114,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
             results.Add(result);
 
             // Add small delay between requests to be respectful
-            await Task.Delay(50, cancellationToken);
+            await Task.Delay(EmbeddingRequestDelayMs, cancellationToken);
         }
 
         return results;
@@ -126,14 +127,14 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
             var healthCheck = new
             {
                 inputs = "test",
-                parameters = new { normalize = true }
+                truncate = true
             };
 
             var json = JsonSerializer.Serialize(healthCheck);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var response = await _httpClient.PostAsync("/embeddings", content, cts.Token);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(HealthCheckTimeoutSeconds));
+            var response = await _httpClient.PostAsync(EmbeddingEndpoint, content, cts.Token);
 
             return response.IsSuccessStatusCode;
         }
@@ -142,11 +143,5 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
             _logger.LogWarning(ex, "Embedding service health check failed");
             return false;
         }
-    }
-
-    private class EmbeddingResponse
-    {
-        public float[]? Embeddings { get; set; }
-        public string? Error { get; set; }
     }
 }

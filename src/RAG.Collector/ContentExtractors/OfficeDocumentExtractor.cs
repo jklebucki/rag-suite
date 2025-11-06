@@ -299,18 +299,7 @@ public class OfficeDocumentExtractor : IContentExtractor
     private static void AddContentStatistics(string content, Dictionary<string, string> metadata)
     {
         metadata["CharacterCount"] = content.Length.ToString();
-        metadata["WordCount"] = EstimateWordCount(content).ToString();
+        metadata["WordCount"] = TextUtilities.EstimateWordCount(content).ToString();
         metadata["LineCount"] = content.Split('\n').Length.ToString();
-    }
-
-    /// <summary>
-    /// Estimates word count in text content
-    /// </summary>
-    private static int EstimateWordCount(string content)
-    {
-        if (string.IsNullOrWhiteSpace(content))
-            return 0;
-
-        return content.Split(new char[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
     }
 }

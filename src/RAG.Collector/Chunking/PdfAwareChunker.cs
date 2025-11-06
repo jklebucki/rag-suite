@@ -1,6 +1,8 @@
+using RAG.Collector.Config;
 using RAG.Collector.Models;
 using System.Text;
 using System.Text.RegularExpressions;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Chunking;
 
@@ -301,7 +303,7 @@ public class PdfAwareChunker : ITextChunker
     {
         using var sha256 = System.Security.Cryptography.SHA256.Create();
         var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
-        return Convert.ToBase64String(hashBytes)[..12]; // First 12 characters for brevity
+        return Convert.ToBase64String(hashBytes)[..ContentHashDisplayLength];
     }
 
     private class PageContent

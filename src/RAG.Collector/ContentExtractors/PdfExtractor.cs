@@ -103,22 +103,11 @@ public class PdfExtractor : IContentExtractor
 
         // Add content statistics
         metadata["CharacterCount"] = fullContent.Length.ToString();
-        metadata["WordCount"] = EstimateWordCount(fullContent).ToString();
+        metadata["WordCount"] = TextUtilities.EstimateWordCount(fullContent).ToString();
 
         _logger.LogDebug("Extracted {CharCount} characters from {PageCount} pages in {FilePath}",
             fullContent.Length, document.NumberOfPages, filePath);
 
         return ContentExtractionResult.Success(fullContent, metadata, document.NumberOfPages);
-    }
-
-    /// <summary>
-    /// Estimates word count in text content
-    /// </summary>
-    private static int EstimateWordCount(string content)
-    {
-        if (string.IsNullOrWhiteSpace(content))
-            return 0;
-
-        return content.Split(new char[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
     }
 }

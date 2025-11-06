@@ -4,6 +4,7 @@ using RAG.Collector.Config;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Elasticsearch;
 
@@ -262,7 +263,7 @@ public class ElasticsearchService : IElasticsearchService
                     embedding = new
                     {
                         type = "dense_vector",
-                        dims = 768, // For multilingual-e5-small
+                        dims = Constants.DefaultEmbeddingDimensions,
                         index = true,
                         similarity = "cosine"
                     },

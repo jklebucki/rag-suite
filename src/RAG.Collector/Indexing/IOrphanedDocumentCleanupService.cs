@@ -22,12 +22,6 @@ public interface IOrphanedDocumentCleanupService
     Task<int> DeleteOrphanedDocumentsAsync(IEnumerable<string> orphanedFilePaths, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Get statistics about orphaned documents cleanup
-    /// </summary>
-    /// <returns>Cleanup statistics</returns>
-    Task<OrphanedCleanupStats> GetCleanupStatsAsync();
-
-    /// <summary>
     /// Perform a dry run to see what would be deleted without actually deleting
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -74,35 +68,4 @@ public class OrphanedDocumentCleanupResult
     /// Any errors encountered during the operation
     /// </summary>
     public List<string> Errors { get; set; } = new();
-}
-
-/// <summary>
-/// Statistics about orphaned document cleanup operations
-/// </summary>
-public class OrphanedCleanupStats
-{
-    /// <summary>
-    /// Total number of cleanup operations performed
-    /// </summary>
-    public int TotalCleanupOperations { get; set; }
-
-    /// <summary>
-    /// Total number of orphaned documents deleted
-    /// </summary>
-    public int TotalDocumentsDeleted { get; set; }
-
-    /// <summary>
-    /// Total number of orphaned files found and cleaned
-    /// </summary>
-    public int TotalOrphanedFilesDeleted { get; set; }
-
-    /// <summary>
-    /// Last cleanup operation timestamp
-    /// </summary>
-    public DateTime? LastCleanupAt { get; set; }
-
-    /// <summary>
-    /// Average time taken for cleanup operations
-    /// </summary>
-    public TimeSpan? AverageCleanupTime { get; set; }
 }
