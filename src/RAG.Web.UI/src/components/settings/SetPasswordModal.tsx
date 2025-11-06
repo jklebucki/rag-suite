@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { User, Key } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { PasswordInput } from './PasswordInput'
-import { getPasswordStrength } from './passwordValidation'
+import { getPasswordStrength } from '@/utils/passwordValidation'
 import type { User as UserType } from '@/types/auth'
 
 interface SetPasswordModalProps {

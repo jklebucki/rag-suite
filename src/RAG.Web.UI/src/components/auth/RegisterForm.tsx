@@ -5,7 +5,7 @@ import { Eye, EyeOff, User, Mail, Lock, Check } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
-import { useRegisterValidation, usePasswordRequirements } from '@/utils/registerValidation'
+import { useRegisterValidation, usePasswordRequirements } from '@/hooks/useRegisterValidation'
 
 interface RegisterFormData {
   firstName: string
