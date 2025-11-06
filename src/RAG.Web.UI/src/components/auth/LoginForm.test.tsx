@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LoginForm } from '../LoginForm'
 import { render as customRender } from '@/test-utils/test-utils'
@@ -166,7 +166,6 @@ describe('LoginForm', () => {
   })
 
   it('should display error message when login fails', async () => {
-    const user = userEvent.setup()
     mockLogin.mockResolvedValue(false)
     
     vi.mocked(useAuth).mockReturnValue({

@@ -13,7 +13,6 @@ interface PasswordInputProps {
   label: string
   strength?: PasswordStrength
   matchStatus?: 'match' | 'mismatch' | 'none'
-  autoComplete?: string
 }
 
 export function PasswordInput({
@@ -24,8 +23,7 @@ export function PasswordInput({
   placeholder,
   label,
   strength,
-  matchStatus = 'none',
-  autoComplete = 'new-password'
+  matchStatus = 'none'
 }: PasswordInputProps) {
   const getBorderClass = () => {
     if (matchStatus === 'mismatch') return 'border-red-300 focus:ring-red-500 focus:border-red-500'

@@ -3,19 +3,13 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
   Info, Brain, Search, BarChart3, Rocket, CheckCircle2, Star, Users,
-  Pyramid,
-  ArrowRight,
   Activity
 } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import {
-  getSectionById,
   getSectionContentById,
   getSectionTitleById,
   getSubtitleById,
-  getHeroSubtitle,
-  getSectionSubtitleById,
-  getSectionByTitle,
   getSection,
   getTop,
   getSubsections

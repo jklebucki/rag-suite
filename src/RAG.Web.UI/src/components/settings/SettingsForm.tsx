@@ -16,7 +16,6 @@ interface SettingsFormProps {
 
 export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   const { addToast } = useToast()
-  const { t } = useI18n()
 
   const [settings, setSettings] = useState<LlmSettings>({
     url: '',

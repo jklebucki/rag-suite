@@ -28,5 +28,5 @@ export const debugAuth = () => {
 
 // Add to window object for easy access in browser console
 if (typeof window !== 'undefined') {
-  (window as any).debugAuth = debugAuth
+  (window as typeof window & { debugAuth?: typeof debugAuth }).debugAuth = debugAuth
 }

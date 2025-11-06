@@ -1,6 +1,6 @@
 import React from 'react'
 import { Activity, Brain, Database, Server, Clock } from 'lucide-react'
-import type { SystemHealthResponse, SystemHealth as AnalyticsSystemHealth, ElasticsearchStats } from '@/types'
+import type { SystemHealthResponse, SystemHealth as AnalyticsSystemHealth, ElasticsearchStats, IndexStats, NodeStats } from '@/types'
 
 interface HealthMetricProps {
   label: string
@@ -41,8 +41,8 @@ function HealthMetric({ label, status, value, subtext }: HealthMetricProps) {
 
 interface ElasticsearchHealthProps {
   elasticsearchStats?: ElasticsearchStats
-  indices?: any[]
-  nodes?: any[]
+  indices?: IndexStats[]
+  nodes?: NodeStats[]
 }
 
 function ElasticsearchHealth({ elasticsearchStats, indices, nodes }: ElasticsearchHealthProps) {
@@ -114,7 +114,6 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
   // Legacy system health data
   const api = systemHealth?.api
   const es = systemHealth?.elasticsearch
-  const vector = systemHealth?.vectorStore
   const llm = systemHealth?.llm
   const models: string[] = (llm?.details?.models) || []
 
@@ -132,14 +131,14 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <HealthMetric
           label="API"
-          status={effectiveAnalyticsHealth ? 'healthy' : (api?.status as any) || 'healthy'}
+          status={effectiveAnalyticsHealth ? 'healthy' : (api?.status as string) || 'healthy'}
           value={api?.message || 'Running'}
         />
         <HealthMetric
           label="Elasticsearch"
           status={effectiveAnalyticsHealth?.elasticsearchAvailable 
             ? effectiveClusterStats?.status || 'healthy'
-            : (es?.status as any) || 'healthy'}
+            : (es?.status as string) || 'healthy'}
           value={effectiveClusterStats?.clusterName || es?.message || 'Cluster OK'}
           subtext={effectiveClusterStats ? `${effectiveClusterStats.numberOfNodes} nodes` : undefined}
         />
@@ -147,7 +146,7 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
           label="LLM Service"
           status={effectiveAnalyticsHealth?.llmServiceAvailable 
             ? 'healthy' 
-            : (llm?.status as any) || 'healthy'}
+            : (llm?.status as string) || 'healthy'}
           value={llm?.message || 'Operational'}
           subtext={models.length > 0 ? `${models.length} models` : undefined}
         />

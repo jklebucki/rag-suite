@@ -98,14 +98,15 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     },
 
     // Links
-    // eslint-disable-next-line jsx-a11y/anchor-has-content
-    a: ({ node: _node, ...props }) => (
+    a: ({ node: _node, children, ...props }) => (
       <a
         className={`underline hover:no-underline ${isUserMessage ? 'text-blue-100' : 'text-blue-600'}`}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
-      />
+      >
+        {children || props.href}
+      </a>
     ),
 
     // Blockquotes

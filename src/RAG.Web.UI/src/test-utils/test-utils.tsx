@@ -25,17 +25,11 @@ const createTestQueryClient = () =>
 interface AllTheProvidersProps {
   children: React.ReactNode
   queryClient?: QueryClient
-  initialAuthState?: {
-    user?: User | null
-    token?: string | null
-    isAuthenticated?: boolean
-  }
 }
 
 function AllTheProviders({
   children,
   queryClient = createTestQueryClient(),
-  initialAuthState,
 }: AllTheProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -43,7 +37,7 @@ function AllTheProviders({
         <I18nProvider>
           <ToastProvider>
             <ConfigurationProvider>
-              <AuthProvider initialAuthState={initialAuthState}>
+              <AuthProvider>
                 {children}
               </AuthProvider>
             </ConfigurationProvider>
@@ -56,24 +50,18 @@ function AllTheProviders({
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient
-  initialAuthState?: {
-    user?: User | null
-    token?: string | null
-    isAuthenticated?: boolean
-  }
 }
 
 const customRender = (
   ui: ReactElement,
   options: CustomRenderOptions = {}
 ) => {
-  const { queryClient, initialAuthState, ...renderOptions } = options
+  const { queryClient, ...renderOptions } = options
 
   return render(ui, {
-    wrapper: (props) => (
+    wrapper: (props: { children: React.ReactNode }) => (
       <AllTheProviders
         queryClient={queryClient}
-        initialAuthState={initialAuthState}
         {...props}
       />
     ),
@@ -88,9 +76,14 @@ export { customRender as render, createTestQueryClient }
 // Helper to create mock user
 export const createMockUser = (overrides?: Partial<User>): User => ({
   id: '1',
-  username: 'testuser',
+  userName: 'testuser',
   email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  fullName: 'Test User',
   roles: ['User'],
+  isActive: true,
+  createdAt: new Date().toISOString(),
   ...overrides,
 })
 

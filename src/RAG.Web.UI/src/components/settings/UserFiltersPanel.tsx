@@ -19,7 +19,7 @@ export function UserFiltersPanel({
   onClear,
   onApplyDatePreset
 }: UserFiltersProps) {
-  const updateFilter = (key: keyof UserFilters, value: any) => {
+  const updateFilter = (key: keyof UserFilters, value: string | string[] | Date | null) => {
     onFiltersChange({ ...filters, [key]: value })
   }
 

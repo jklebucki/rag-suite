@@ -180,8 +180,9 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Language</label>
+            <label htmlFor="quizLanguage" className="block text-sm font-medium mb-2">Language</label>
             <select
+              id="quizLanguage"
               value={quizLanguage}
               onChange={(e) => setQuizLanguage(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

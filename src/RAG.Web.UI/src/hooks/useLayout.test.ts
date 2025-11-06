@@ -1,3 +1,4 @@
+import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -19,9 +20,9 @@ vi.mock('@/contexts/AuthContext', () => ({
 import { useAuth } from '@/contexts/AuthContext'
 
 describe('useLayout', () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter initialEntries={['/dashboard']}>{children}</MemoryRouter>
-  )
+  const wrapper = ({ children }: { children: React.ReactNode }) => {
+    return React.createElement(MemoryRouter, { initialEntries: ['/dashboard'] }, children)
+  }
 
   it('should initialize with sidebar closed', () => {
     vi.mocked(useAuth).mockReturnValue({
@@ -128,7 +129,7 @@ describe('useLayout', () => {
 
     const { result } = renderHook(() => useLayout(), { wrapper })
     
-    const settingsNav = result.current.navigation.find(nav => nav.href === '/settings')
+    const settingsNav = result.current.navigation.find((nav: { href: string }) => nav.href === '/settings')
     expect(settingsNav).toBeDefined()
   })
 
@@ -156,7 +157,7 @@ describe('useLayout', () => {
 
     const { result } = renderHook(() => useLayout(), { wrapper })
     
-    const settingsNav = result.current.navigation.find(nav => nav.href === '/settings')
+    const settingsNav = result.current.navigation.find((nav: { href: string }) => nav.href === '/settings')
     expect(settingsNav).toBeUndefined()
   })
 
@@ -210,7 +211,7 @@ describe('useLayout', () => {
 
     const { result } = renderHook(() => useLayout(), { wrapper })
     
-    const cyberNav = result.current.navigation.find(nav => nav.href === '/cyberpanel')
+    const cyberNav = result.current.navigation.find((nav: { href: string }) => nav.href === '/cyberpanel')
     expect(cyberNav).toBeDefined()
   })
 })

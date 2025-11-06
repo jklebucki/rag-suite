@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Hammer, List, Menu, Settings } from 'lucide-react'
-import { cn } from '@/utils/cn'
+import { BookOpen, List, Menu, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useI18n } from '@/contexts/I18nContext'
 

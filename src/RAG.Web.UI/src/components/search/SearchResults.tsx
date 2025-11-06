@@ -19,7 +19,7 @@ interface SearchResultsProps {
     took: number
   }
   isLoading: boolean
-  error: any
+  error: string | null
   hasSearched: boolean
   onExport: () => void
 }

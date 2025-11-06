@@ -15,7 +15,6 @@ export function SearchInterface() {
     lastSearchLanguage,
     currentLanguage,
     searchResults,
-    isLoading,
     error,
     isSearching,
     setQuery,

@@ -67,7 +67,7 @@ export function clearSavedLanguage(): void {
 export function isLanguageAutoDetected(): boolean {
   try {
     return !localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  } catch (error) {
+  } catch {
     return true;
   }
 }

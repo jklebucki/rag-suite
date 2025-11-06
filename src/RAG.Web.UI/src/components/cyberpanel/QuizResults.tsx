@@ -41,8 +41,8 @@ export function QuizResults() {
     try {
       const response = await apiClient.listQuizAttempts()
       setAttempts(response.attempts)
-    } catch (err: any) {
-      setError(err.message || 'Failed to load quiz results')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load quiz results')
     } finally {
       setLoading(false)
     }
@@ -69,8 +69,8 @@ export function QuizResults() {
       await apiClient.deleteAttempt(deleteModal.attemptId)
       setAttempts(attempts.filter((a) => a.id !== deleteModal.attemptId))
       setDeleteModal({ isOpen: false, attemptId: null, quizTitle: '', userName: '' })
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete attempt')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete attempt')
     } finally {
       setDeleting(false)
     }

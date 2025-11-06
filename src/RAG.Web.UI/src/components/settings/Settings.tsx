@@ -1,14 +1,12 @@
 // All code comments must be written in English, regardless of the conversation language.
 
 import React, { useState } from 'react'
-import { useI18n } from '@/contexts/I18nContext'
 import { SettingsForm } from './SettingsForm'
 import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
 import type { SettingsTab } from '@/types'
 
 export function Settings() {
-  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<SettingsTab>('llm')
 
   return (

@@ -50,7 +50,7 @@ export function TopQueries({ queries, searchStats }: TopQueriesProps) {
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-gray-700 mb-2">Most Searched Indices</h3>
         {topIndices.length > 0 ? (
-          topIndices.map(([indexName, count], index) => {
+          topIndices.map(([indexName, count]) => {
             const maxCount = topIndices[0][1]
             const percentage = (count / maxCount) * 100
             

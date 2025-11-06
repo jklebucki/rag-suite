@@ -6,7 +6,7 @@ import { useQuizTaking } from '@/hooks/useQuizzes'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import type { QuizQuestionDto, SubmitAttemptResponse } from '@/types'
+import type { SubmitAttemptResponse } from '@/types'
 
 export function QuizDetail() {
   const { id } = useParams<{ id: string }>()
@@ -77,7 +77,7 @@ export function QuizDetail() {
       if (submitResult) {
         setResult(submitResult)
       }
-    } catch (err) {
+    } catch {
       showError(t('common.error'))
     } finally {
       setSubmitting(false)
@@ -343,7 +343,15 @@ export function QuizDetail() {
                   return (
                     <div
                       key={option.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleOptionToggle(question.id, option.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleOptionToggle(question.id, option.id)
+                        }
+                      }}
                       className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50'

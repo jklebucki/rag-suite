@@ -48,7 +48,7 @@ describe('date utilities', () => {
       { language: 'nl', expected: '15-01-2024' },
     ]
 
-    testCases.forEach(({ language, expected }) => {
+    testCases.forEach(({ language }) => {
       it(`should format date for ${language} locale`, () => {
         const date = new Date('2024-01-15T10:30:45Z')
         const result = formatDate(date, language)

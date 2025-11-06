@@ -161,10 +161,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           {/* Required Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                 First Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="firstName"
                 type="text"
                 required
                 value={formData.firstName}
@@ -174,10 +175,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
                 Last Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="lastName"
                 type="text"
                 required
                 value={formData.lastName}
@@ -190,8 +192,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           {/* Optional Fields */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+            <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
             <input
+              id="displayName"
               type="text"
               value={formData.displayName || ''}
               onChange={(e) => handleInputChange('displayName', e.target.value)}
@@ -202,8 +205,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
+                id="email"
                 type="email"
                 value={formData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
@@ -212,8 +216,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Phone</label>
+              <label htmlFor="mobilePhone" className="block text-sm font-medium text-gray-700 mb-1">Mobile Phone</label>
               <input
+                id="mobilePhone"
                 type="tel"
                 value={formData.mobilePhone || ''}
                 onChange={(e) => handleInputChange('mobilePhone', e.target.value)}
@@ -225,8 +230,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Work Phone</label>
+              <label htmlFor="workPhone" className="block text-sm font-medium text-gray-700 mb-1">Work Phone</label>
               <input
+                id="workPhone"
                 type="tel"
                 value={formData.workPhone || ''}
                 onChange={(e) => handleInputChange('workPhone', e.target.value)}
@@ -235,8 +241,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">Company</label>
               <input
+                id="company"
                 type="text"
                 value={formData.company || ''}
                 onChange={(e) => handleInputChange('company', e.target.value)}
@@ -248,8 +255,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
               <input
+                id="department"
                 type="text"
                 value={formData.department || ''}
                 onChange={(e) => handleInputChange('department', e.target.value)}
@@ -258,8 +266,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+              <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">Position</label>
               <input
+                id="position"
                 type="text"
                 value={formData.position || ''}
                 onChange={(e) => handleInputChange('position', e.target.value)}
@@ -268,8 +277,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
               <input
+                id="location"
                 type="text"
                 value={formData.location || ''}
                 onChange={(e) => handleInputChange('location', e.target.value)}
@@ -280,8 +290,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
             <textarea
+              id="notes"
               value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={3}
@@ -291,8 +302,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
+            <label htmlFor="photoUrl" className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
             <input
+              id="photoUrl"
               type="url"
               value={formData.photoUrl || ''}
               onChange={(e) => handleInputChange('photoUrl', e.target.value)}
@@ -303,9 +315,10 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+            <label htmlFor="tagInput" className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
             <div className="flex gap-2 mb-2">
               <input
+                id="tagInput"
                 type="text"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}

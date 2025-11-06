@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
-import { useI18n } from '@/contexts/I18nContext'
 import type { SettingsTab } from '@/types'
 
 export function SettingsSidebar({
@@ -10,9 +9,8 @@ export function SettingsSidebar({
   setActiveTab,
 }: {
   activeTab: SettingsTab
-  setActiveTab: (t: SettingsTab) => void
+  setActiveTab: (tab: SettingsTab) => void
 }) {
-  const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const toggleRef = useRef<HTMLButtonElement | null>(null)

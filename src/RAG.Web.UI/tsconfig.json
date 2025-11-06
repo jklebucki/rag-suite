@@ -29,8 +29,9 @@
     },
     
     /* Types */
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vite/client"]
   },
   "include": ["src"],
+  "exclude": ["src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}", "src/test-utils/**/*", "node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

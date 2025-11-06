@@ -85,7 +85,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       onSuccess?.()
 
       // Navigate back to the page that required auth, if provided
-      const from = (location.state as any)?.from?.pathname || '/'
+      const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/'
       navigate(from, { replace: true })
     }
   }

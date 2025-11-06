@@ -1,6 +1,8 @@
 // CyberPanel Quiz Helper Functions
 // Utility functions for working with quiz images and validation
 
+import type { CreateQuizRequest, GetQuizResponse } from '@/types/api'
+
 /**
  * Helper type for image handling (URL or base64)
  */
@@ -60,13 +62,14 @@ export function fileToDataUri(file: File): Promise<string> {
 /**
  * Download JSON file with quiz data
  */
-export function downloadQuizJson(quiz: any, filename?: string): void {
+export function downloadQuizJson(quiz: CreateQuizRequest | GetQuizResponse, filename?: string): void {
   const json = JSON.stringify(quiz, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = filename || `quiz-${quiz.id || 'export'}-${Date.now()}.json`
+  const quizId = 'id' in quiz ? quiz.id : 'export'
+  link.download = filename || `quiz-${quizId}-${Date.now()}.json`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -76,14 +79,14 @@ export function downloadQuizJson(quiz: any, filename?: string): void {
 /**
  * Read JSON file and parse quiz data
  */
-export function readQuizJsonFile(file: File): Promise<any> {
+export function readQuizJsonFile(file: File): Promise<CreateQuizRequest> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       try {
-        const quiz = JSON.parse(reader.result as string)
+        const quiz = JSON.parse(reader.result as string) as CreateQuizRequest
         resolve(quiz)
-      } catch (error) {
+      } catch {
         reject(new Error('Invalid JSON file'))
       }
     }

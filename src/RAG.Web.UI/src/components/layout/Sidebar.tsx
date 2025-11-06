@@ -20,9 +20,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isActiveRoute }: SidebarProps) {
-  const { user } = useAuth()
   const { t } = useI18n()
-  const roles = user?.roles || []
   
   return (
     <>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calendar, FileText, Database, Tag, Hash, File, HardDrive, Clock, Download } from 'lucide-react'
+import { Database, Tag, File, Download } from 'lucide-react'
 import { useI18n } from '@/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
 import { apiClient } from '@/services/api'
@@ -11,7 +11,6 @@ interface DocumentDetailProps {
 }
 
 export function DocumentDetail({ document }: DocumentDetailProps) {
-  const formatScore = (score: number) => Math.round(score)
   const { language } = useI18n()
 
   const handleDownload = async () => {

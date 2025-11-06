@@ -3,7 +3,7 @@ import { LanguageCode } from '@/types/i18n'
 /**
  * Format date with time based on language preference
  */
-export function formatDateTime(date: Date | string, language: LanguageCode): string {
+export function formatDateTime(date: Date | string, _language: LanguageCode): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
   
   try {

@@ -88,6 +88,8 @@ export function ChatSidebar({
                     sessions.map((session) => (
                       <div
                         key={session.id}
+                        role="button"
+                        tabIndex={0}
                         className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                           currentSessionId === session.id
                             ? 'bg-primary-50 border border-primary-200'
@@ -96,6 +98,13 @@ export function ChatSidebar({
                         onClick={() => {
                           onSelectSession(session.id)
                           setIsMenuOpen(false)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onSelectSession(session.id)
+                            setIsMenuOpen(false)
+                          }
                         }}
                       >
                         <div className="flex-1 min-w-0">
@@ -158,12 +167,20 @@ export function ChatSidebar({
             {sessions.map((session) => (
               <div
                 key={session.id}
+                role="button"
+                tabIndex={0}
                 className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors w-full text-left ${
                   currentSessionId === session.id
                     ? 'bg-primary-50 border border-primary-200'
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => onSelectSession(session.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onSelectSession(session.id)
+                  }
+                }}
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
