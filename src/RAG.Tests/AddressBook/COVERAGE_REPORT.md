@@ -2,14 +2,15 @@
 
 ## 📊 Obecne pokrycie
 
-**Ogólne pokrycie:** 51.16% (line-rate: 0.5116) ⬆️ **+42.92%**  
-**Pokrycie branch:** 70.93% (branch-rate: 0.7093) ⬆️ **+67.45%**  
+**Ogólne pokrycie:** 53.01% (line-rate: 0.5301) ⬆️ **+44.77%**  
+**Pokrycie branch:** 72.09% (branch-rate: 0.7209) ⬆️ **+68.61%**  
 **Złożoność:** 432
 
 ### 📈 Postęp
-- **Przed:** 8.24% line-rate, 3.48% branch-rate
-- **Po:** 51.16% line-rate, 70.93% branch-rate
-- **Wzrost:** +42.92% line-rate, +67.45% branch-rate
+- **Początkowe:** 8.24% line-rate, 3.48% branch-rate
+- **Po handlerach i serwisach:** 51.16% line-rate, 70.93% branch-rate
+- **Po validatorach:** 53.01% line-rate, 72.09% branch-rate
+- **Całkowity wzrost:** +44.77% line-rate, +68.61% branch-rate
 
 ## ✅ Przetestowane komponenty
 
@@ -173,7 +174,50 @@
 
 **Liczba testów:** 5
 
-**Łączna liczba testów dla AddressBook:** 109 (było 12, +97 nowych)
+### ImportContactsValidator - NOWE ✅
+- ✅ `Validate` poprawny CSV content - testowane
+- ✅ `Validate` pusty CSV content - testowane
+- ✅ `Validate` whitespace CSV content - testowane
+- ✅ `Validate` CSV bez średnika - testowane
+- ✅ `Validate` CSV ze średnikiem - testowane
+- ✅ `Validate` SkipDuplicates nie wpływa na walidację - testowane
+
+**Liczba testów:** 6
+
+### ProposeChangeValidator - NOWE ✅
+- ✅ `Validate` Create proposal - testowane
+- ✅ `Validate` Create proposal bez ContactId - testowane
+- ✅ `Validate` Update proposal z ContactId - testowane
+- ✅ `Validate` Update proposal bez ContactId - testowane
+- ✅ `Validate` Delete proposal z ContactId - testowane
+- ✅ `Validate` Delete proposal bez ContactId - testowane
+- ✅ `Validate` Create proposal z pustym FirstName - testowane
+- ✅ `Validate` Create proposal z pustym LastName - testowane
+- ✅ `Validate` Delete proposal z pustym FirstName/LastName - testowane
+- ✅ `Validate` FirstName za długie - testowane
+- ✅ `Validate` LastName za długie - testowane
+- ✅ `Validate` nieprawidłowy email - testowane
+- ✅ `Validate` prawidłowy email - testowane
+- ✅ `Validate` pusty/null email - testowane
+- ✅ `Validate` Reason za długie - testowane
+- ✅ `Validate` Reason max length - testowane
+- ✅ `Validate` nieprawidłowy ProposalType - testowane
+
+**Liczba testów:** 18
+
+### ReviewProposalValidator - NOWE ✅
+- ✅ `Validate` Approved decision - testowane
+- ✅ `Validate` Rejected decision - testowane
+- ✅ `Validate` Pending decision (nieprawidłowe) - testowane
+- ✅ `Validate` Applied decision (nieprawidłowe) - testowane
+- ✅ `Validate` ReviewComment za długie - testowane
+- ✅ `Validate` ReviewComment max length - testowane
+- ✅ `Validate` ReviewComment null - testowane
+- ✅ `Validate` ReviewComment empty - testowane
+
+**Liczba testów:** 8
+
+**Łączna liczba testów dla AddressBook:** 141 (było 12, +129 nowych)
 
 ## ❌ Brak pokrycia testami
 
@@ -193,12 +237,12 @@
 - ✅ `GetProposalService` - **PRZETESTOWANE** (5 testów) - NOWE
 - ✅ `AddressBookAuthorizationService` - **PRZETESTOWANE** (8 testów)
 
-### 3. Validatory (częściowe pokrycie)
+### 3. Validatory (100% pokrycia) ✅
 - ✅ `CreateContactValidator` - **PRZETESTOWANE** (9 testów)
-- ✅ `UpdateContactValidator` - **PRZETESTOWANE** (8 testów) - NOWE
-- ❌ `ImportContactsValidator` - brak testów
-- ❌ `ProposeChangeValidator` - brak testów
-- ❌ `ReviewProposalValidator` - brak testów
+- ✅ `UpdateContactValidator` - **PRZETESTOWANE** (8 testów)
+- ✅ `ImportContactsValidator` - **PRZETESTOWANE** (6 testów) - NOWE
+- ✅ `ProposeChangeValidator` - **PRZETESTOWANE** (18 testów) - NOWE
+- ✅ `ReviewProposalValidator` - **PRZETESTOWANE** (8 testów) - NOWE
 
 ### 4. Endpoints (0% pokrycia)
 - ❌ Wszystkie endpointy - brak testów integracyjnych
@@ -228,19 +272,20 @@
 
 ## 🎯 Cel pokrycia
 
-**Minimalne:** 60% ⚠️ (51.16% - prawie osiągnięte!)  
+**Minimalne:** 60% ⚠️ (53.01% - blisko celu!)  
 **Docelowe:** 80%  
 **Idealne:** 90%+
 
 ### 📊 Status
-- ✅ **Branch coverage:** 70.93% - **OSIĄGNIĘTE** (cel: 60%)
-- ⚠️ **Line coverage:** 51.16% - blisko celu (cel: 60%)
+- ✅ **Branch coverage:** 72.09% - **OSIĄGNIĘTE** (cel: 60%, docelowe: 80%)
+- ⚠️ **Line coverage:** 53.01% - blisko celu (cel: 60%)
 
 ## 📝 Rekomendacje
 
-1. **Dodać testy dla wszystkich handlerów** - to główne komponenty biznesowe
-2. **Dodać testy dla validatory** - zapewnienie poprawności danych
-3. **Dodać testy dla serwisów** - logika biznesowa
-4. **Dodać testy dla AddressBookAuthorizationService** - bezpieczeństwo
-5. **Rozważyć testy integracyjne** - dla endpointów
+1. ✅ **Dodać testy dla wszystkich handlerów** - UKOŃCZONE
+2. ✅ **Dodać testy dla validatory** - UKOŃCZONE (100% pokrycia validatorów)
+3. ✅ **Dodać testy dla serwisów** - UKOŃCZONE
+4. ✅ **Dodać testy dla AddressBookAuthorizationService** - UKOŃCZONE
+5. ⚠️ **Rozważyć testy integracyjne** - dla endpointów (opcjonalne)
+6. ⚠️ **Dodać testy dla pozostałych komponentów** - jeśli istnieją inne nieprzetestowane klasy
 
