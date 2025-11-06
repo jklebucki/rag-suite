@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using RAG.Orchestrator.Api.Services;
+using RAG.Abstractions.Conversion;
 
 namespace RAG.Orchestrator.Api.Features.FileDownload;
 
@@ -14,16 +14,16 @@ public class FileDownloadService : IFileDownloadService
 {
     private readonly SharedFoldersOptions _options;
     private readonly ILogger<FileDownloadService> _logger;
-    private readonly IGotenbergService _gotenbergService;
+    private readonly IGotenbergClient _gotenbergClient;
 
     public FileDownloadService(
         IOptions<SharedFoldersOptions> options,
         ILogger<FileDownloadService> logger,
-        IGotenbergService gotenbergService)
+        IGotenbergClient gotenbergClient)
     {
         _options = options.Value;
         _logger = logger;
-        _gotenbergService = gotenbergService;
+        _gotenbergClient = gotenbergClient;
     }
 
     public Task<IResult> DownloadFileAsync(string filePath, CancellationToken cancellationToken = default)
@@ -221,7 +221,7 @@ public class FileDownloadService : IFileDownloadService
         {
             // Check if we can convert the file to PDF
             var fileExtension = Path.GetExtension(filePath);
-            var canConvert = await _gotenbergService.CanConvertAsync(fileExtension);
+            var canConvert = await _gotenbergClient.CanConvertAsync(fileExtension);
 
             if (!canConvert && !forceConvert)
             {
@@ -241,7 +241,7 @@ public class FileDownloadService : IFileDownloadService
             await using var fileStream = File.OpenRead(fileInfo.FullPath);
 
             // Try to convert the file to PDF
-            var pdfStream = await _gotenbergService.ConvertToPdfAsync(fileStream, fileInfo.FileName);
+            var pdfStream = await _gotenbergClient.ConvertToPdfAsync(fileStream, fileInfo.FileName);
 
             if (pdfStream == null)
             {

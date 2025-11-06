@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
+using RAG.Abstractions.Conversion;
 using RAG.Orchestrator.Api.Models.Configuration;
-using RAG.Orchestrator.Api.Services;
 using System.Net.Http.Headers;
 
-public class GotenbergService : IGotenbergService
+public class GotenbergService : IGotenbergClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<GotenbergService> _logger;

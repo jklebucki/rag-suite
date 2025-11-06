@@ -145,8 +145,8 @@ public static class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromMinutes(2); // Reasonable timeout for search operations
         });
 
-        // Add HttpClient for GotenbergService
-        services.AddHttpClient<IGotenbergService, GotenbergService>((serviceProvider, client) =>
+        // Add HttpClient for GotenbergClient
+        services.AddHttpClient<RAG.Abstractions.Conversion.IGotenbergClient, GotenbergService>((serviceProvider, client) =>
         {
             var config = serviceProvider.GetRequiredService<IOptions<GotenbergConfig>>().Value;
             client.BaseAddress = new Uri(config.Url);
@@ -180,7 +180,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IDocumentReconstructionService, DocumentReconstructionService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
-        services.AddScoped<IGotenbergService, GotenbergService>();
+        services.AddScoped<RAG.Abstractions.Conversion.IGotenbergClient, GotenbergService>();
         services.AddScoped<IGlobalSettingsService, GlobalSettingsService>();
         services.AddScoped<ISettingsService, SettingsService>();
 

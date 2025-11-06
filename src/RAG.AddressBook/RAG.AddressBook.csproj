@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RAG.Security\RAG.Security.csproj" />
-    <ProjectReference Include="..\RAG.Abstractions\RAG.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
