@@ -13,7 +13,6 @@ using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
 using FluentValidation;
-using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Chat.Validation;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
