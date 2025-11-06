@@ -99,7 +99,7 @@ public class FileChangeDetectionService : IFileChangeDetectionService
             await _elasticsearchService.EnsureCustomIndexExistsAsync(Constants.FileMetadataIndexName, null, cancellationToken);
 
             // Delete the metadata document
-            var deleted = await _elasticsearchService.DeleteDocumentByIdAsync(FILE_METADATA_INDEX, fileId, cancellationToken);
+            var deleted = await _elasticsearchService.DeleteDocumentByIdAsync(Constants.FileMetadataIndexName, fileId, cancellationToken);
 
             if (deleted)
             {

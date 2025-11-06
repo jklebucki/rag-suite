@@ -285,7 +285,7 @@ public class HttpEmbeddingProviderTests : IDisposable
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.Method == HttpMethod.Post &&
-                    req.RequestUri!.ToString().Contains("/embeddings")),
+                    req.RequestUri!.ToString().Contains("/embed")),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(response);
 

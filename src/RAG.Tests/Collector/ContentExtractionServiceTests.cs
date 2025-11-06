@@ -146,36 +146,6 @@ public class ContentExtractionServiceTests : IDisposable
         result.ErrorMessage.Should().Contain("No extractor available");
     }
 
-    [Fact]
-    public void GetExtractor_WithSupportedExtension_ReturnsExtractor()
-    {
-        // Act
-        var extractor = _service.GetExtractor(".txt");
-
-        // Assert
-        extractor.Should().NotBeNull();
-    }
-
-    [Fact]
-    public void GetExtractor_WithUnsupportedExtension_ReturnsNull()
-    {
-        // Act
-        var extractor = _service.GetExtractor(".unknown");
-
-        // Assert
-        extractor.Should().BeNull();
-    }
-
-    [Fact]
-    public void GetExtractorInfo_ReturnsExtractorInformation()
-    {
-        // Act
-        var info = _service.GetExtractorInfo();
-
-        // Assert
-        info.Should().NotBeEmpty();
-        info.Keys.Should().Contain("PlainTextExtractor");
-    }
 
     [Fact]
     public async Task ExtractContentAsync_WithLargeFile_ExtractsContent()

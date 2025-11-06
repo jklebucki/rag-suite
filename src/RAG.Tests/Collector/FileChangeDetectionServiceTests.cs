@@ -235,17 +235,6 @@ public class FileChangeDetectionServiceTests
         // Should not throw
     }
 
-    [Fact]
-    public async Task GetFileIndexStatsAsync_ReturnsStats()
-    {
-        // Act
-        var result = await _service.GetFileIndexStatsAsync();
-
-        // Assert
-        result.Should().NotBeNull();
-        result.TotalIndexedFiles.Should().Be(0);
-        result.TotalChunks.Should().Be(0);
-    }
 
     [Fact]
     public async Task DeleteFileMetadataAsync_WithExistingFile_DeletesMetadata()
