@@ -19,6 +19,24 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string
+    }
+  }
+  message?: string
+}
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (typeof error === 'object' && error !== null) {
+    const apiError = error as ApiError
+    return apiError.response?.data?.message ?? apiError.message ?? fallback
+  }
+
+  return fallback
+}
+
 type AuthAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_USER'; payload: User | null }
@@ -146,6 +164,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setTimeout(() => {
             verifyAuthInBackground()
           }, 1000) // Increase delay to avoid conflicts
+
+          void performTokenRefresh()
         } else {
           console.debug('🔐 No valid auth found')
           dispatch({ type: 'LOGOUT' })
@@ -190,7 +210,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Run initialization immediately (synchronously)
     initializeAuth()
-  }, [performTokenRefresh])
+  }, [clearAuthData, performTokenRefresh])
 
   // Handle refresh error events from auth service
   useEffect(() => {
@@ -225,8 +245,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'SET_REFRESH_TOKEN', payload: loginData.refreshToken })
       dispatch({ type: 'SET_USER', payload: loginData.user })
       return true
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Login failed'
+    } catch (error) {
+      const errorMessage = getErrorMessage(error, 'Login failed')
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
       throw error
     } finally {
@@ -241,8 +261,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.register(userData)
       return true
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Registration failed'
+    } catch (error) {
+      const errorMessage = getErrorMessage(error, 'Registration failed')
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
       throw error
     } finally {
@@ -256,8 +276,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       await authService.requestPasswordReset(data.email, data.uiUrl)
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Password reset failed'
+    } catch (error) {
+      const errorMessage = getErrorMessage(error, 'Password reset failed')
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
       throw error
     } finally {
@@ -271,8 +291,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       await authService.confirmPasswordReset(data.token, data.NewPassword, data.ConfirmNewPassword)
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Password reset confirmation failed'
+    } catch (error) {
+      const errorMessage = getErrorMessage(error, 'Password reset confirmation failed')
       dispatch({ type: 'SET_ERROR', payload: errorMessage })
       throw error
     } finally {

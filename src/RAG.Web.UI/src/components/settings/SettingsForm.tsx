@@ -1,8 +1,8 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
-import { useToast, useI18n } from '@/contexts'
+import { useToast } from '@/contexts'
 import apiClient from '@/services/api'
 import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/types'
 import { validateLlmSettings } from '@/utils/llmValidation'
@@ -34,19 +34,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   const [loadingModels, setLoadingModels] = useState(false)
   const [validationErrors, setValidationErrors] = useState<LlmFormErrors>({})
 
-  // Load settings on component mount
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
-  // Load available models when URL changes
-  useEffect(() => {
-    if (settings.url.trim()) {
-      loadAvailableModels()
-    }
-  }, [settings.url])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       const data = await apiClient.getLlmSettings()
@@ -62,14 +50,17 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [addToast, onSettingsChange])
 
-  const loadAvailableModels = async () => {
+  const loadAvailableModels = useCallback(async () => {
     if (!settings.url.trim()) return
 
     try {
       setLoadingModels(true)
-      const data: AvailableModelsResponse = await apiClient.getAvailableLlmModelsFromUrl(settings.url, settings.isOllama)
+      const data: AvailableModelsResponse = await apiClient.getAvailableLlmModelsFromUrl(
+        settings.url,
+        settings.isOllama
+      )
       setAvailableModels(data.models || [])
     } catch (error) {
       logger.error('Failed to load available models:', error)
@@ -78,7 +69,19 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     } finally {
       setLoadingModels(false)
     }
-  }
+  }, [settings.isOllama, settings.url])
+
+  // Load settings on component mount
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
+
+  // Load available models when URL changes
+  useEffect(() => {
+    if (settings.url.trim()) {
+      loadAvailableModels()
+    }
+  }, [loadAvailableModels, settings.url])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target

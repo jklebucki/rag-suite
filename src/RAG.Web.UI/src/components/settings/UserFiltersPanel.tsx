@@ -35,9 +35,9 @@ export function UserFiltersPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Role Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <p className="block text-sm font-medium text-gray-700 mb-2" id="roles-heading">
             Roles
-          </label>
+          </p>
           <div className="space-y-2 max-h-32 overflow-y-auto">
             {availableRoles.map((role) => (
               <label key={role} className="flex items-center">
@@ -55,9 +55,9 @@ export function UserFiltersPanel({
 
         {/* Active Status Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <p className="block text-sm font-medium text-gray-700 mb-2" id="status-heading">
             Status
-          </label>
+          </p>
           <div className="space-y-2">
             {[
               { value: 'all', label: 'All Users' },

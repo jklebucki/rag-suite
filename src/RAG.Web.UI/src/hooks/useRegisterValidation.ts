@@ -10,12 +10,16 @@ interface RegisterFormData {
   acceptTerms: boolean
 }
 
-export interface ValidationRule {
+type LengthRule = { value: number; message: string }
+type PatternRule = { value: RegExp; message: string }
+type Validator<TValue> = (value: TValue, formValues: RegisterFormData) => string | boolean
+
+export interface ValidationRule<TValue> {
   required?: string
-  minLength?: { value: number; message: string }
-  maxLength?: { value: number; message: string }
-  pattern?: { value: RegExp; message: string }
-  validate?: Record<string, (value: any, formValues?: any) => string | boolean>
+  minLength?: TValue extends string ? LengthRule : never
+  maxLength?: TValue extends string ? LengthRule : never
+  pattern?: TValue extends string ? PatternRule : never
+  validate?: Record<string, Validator<TValue>>
 }
 
 /**
@@ -32,7 +36,7 @@ export function useRegisterValidation() {
 
   const { userFieldRequirements, passwordRequirements } = configuration
 
-  const validationRules: Record<keyof RegisterFormData, ValidationRule> = {
+  const validationRules: { [K in keyof RegisterFormData]: ValidationRule<RegisterFormData[K]> } = {
     firstName: {
       required: 'First name is required',
       maxLength: {
@@ -40,7 +44,7 @@ export function useRegisterValidation() {
         message: `First name cannot exceed ${userFieldRequirements.firstName.maxLength || 100} characters`,
       },
       validate: {
-        noWhitespace: (value: string) =>
+        noWhitespace: (value: string, _formValues: RegisterFormData) =>
           value.trim().length > 0 || 'First name cannot be only whitespace',
       },
     },
@@ -52,7 +56,7 @@ export function useRegisterValidation() {
         message: `Last name cannot exceed ${userFieldRequirements.lastName.maxLength || 100} characters`,
       },
       validate: {
-        noWhitespace: (value: string) =>
+        noWhitespace: (value: string, _formValues: RegisterFormData) =>
           value.trim().length > 0 || 'Last name cannot be only whitespace',
       },
     },
@@ -68,7 +72,7 @@ export function useRegisterValidation() {
         message: `Username cannot exceed ${userFieldRequirements.userName.maxLength || 50} characters`,
       },
       validate: {
-        noWhitespace: (value: string) =>
+        noWhitespace: (value: string, _formValues: RegisterFormData) =>
           value.trim().length > 0 || 'Username cannot be only whitespace',
       },
     },
@@ -90,7 +94,7 @@ export function useRegisterValidation() {
     password: {
       required: 'Password is required',
       validate: {
-        dynamicValidation: (value: string) => {
+        dynamicValidation: (value: string, _formValues: RegisterFormData) => {
           const result = validatePassword(value)
           if (result.isValid) return true
 
@@ -124,7 +128,8 @@ export function useRegisterValidation() {
 
     acceptTerms: {
       validate: {
-        mustAccept: (value: boolean) => value === true || 'You must accept the terms and conditions',
+        mustAccept: (value: boolean, _formValues: RegisterFormData) =>
+          value === true || 'You must accept the terms and conditions',
       },
     },
   }

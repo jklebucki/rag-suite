@@ -4,7 +4,7 @@ import { apiClient } from '@/services/api'
 import { useToastContext } from '@/contexts/ToastContext'
 import { useI18n } from '@/contexts/I18nContext'
 import { logger } from '@/utils/logger'
-import type { MultilingualSearchQuery, SearchResponse } from '@/types'
+import type { MultilingualSearchQuery } from '@/types'
 
 export function useMultilingualSearch() {
   const [query, setQuery] = useState('')

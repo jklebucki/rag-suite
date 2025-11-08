@@ -2,13 +2,14 @@ import { useEffect, useCallback } from 'react'
 import { authService } from '@/services/auth'
 import { logger } from '@/utils/logger'
 import { STORAGE_KEYS } from '@/constants/config'
+import type { User } from '@/types/auth'
 
 /**
  * Custom hook for handling authentication storage synchronization
  * and cross-tab communication
  */
 export const useAuthStorage = (
-  onLogin: (token: string, refreshToken: string | null, user: any) => void,
+  onLogin: (token: string, refreshToken: string | null, user: User) => void,
   onLogout: () => void
 ) => {
   // Handle storage events for cross-tab synchronization
@@ -60,12 +61,16 @@ export const useAuthStorage = (
   }, [handleStorageChange, handleVisibilityChange])
 
   // Function to safely store auth data
-  const storeAuthData = useCallback((token: string, refreshToken: string, user: any) => {
+  const storeAuthData = useCallback((token: string, refreshToken: string | null, user: User) => {
     logger.debug('storeAuthData called with:', { hasToken: !!token, hasRefreshToken: !!refreshToken, hasUser: !!user })
     
     try {
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token)
-      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
+      if (refreshToken) {
+        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+      }
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user))
       
       logger.debug('Data stored in localStorage successfully')

@@ -21,7 +21,7 @@ export interface MultilingualSearchQuery {
   resultLanguage?: string
   maxResults?: number
   enableCrossLanguageSearch?: boolean
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 }
 
 export interface SearchFilters {
@@ -70,7 +70,7 @@ export interface SearchResultMetadata {
   source_file?: string
   file_extension?: string
   document_id?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface SearchResponse {
@@ -109,7 +109,7 @@ export interface ChatMessage {
   content: string
   timestamp: Date
   sources?: SearchResult[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface ChatSession {
@@ -137,7 +137,7 @@ export interface MultilingualChatRequest {
   responseLanguage?: string
   enableTranslation?: boolean
   useDocumentSearch?: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface MultilingualChatResponse {
@@ -149,7 +149,7 @@ export interface MultilingualChatResponse {
   translationConfidence?: number
   sources?: string[]
   processingTimeMs: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 // Plugin Types
@@ -248,7 +248,7 @@ export interface ServiceStatus {
   name: string
   status: 'healthy' | 'warning' | 'error' | string
   message?: string
-  details?: any
+  details?: unknown
 }
 
 export interface SystemHealthResponse {

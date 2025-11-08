@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { User, Shield } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useI18n } from '@/contexts/I18nContext'
 import { authService } from '@/services/auth'
 import type { User as UserType } from '@/types/auth'
 import { useUserFilters, useToast } from '@/hooks'
@@ -12,7 +11,6 @@ import { UserTableRow } from './UserTableRow'
 import { SetPasswordModal } from './SetPasswordModal'
 
 export function UserSettings() {
-  const { t } = useI18n()
   const { showSuccess, showError } = useToast()
   const queryClient = useQueryClient()
   

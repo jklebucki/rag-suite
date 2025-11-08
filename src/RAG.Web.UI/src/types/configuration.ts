@@ -56,4 +56,5 @@ export interface ConfigurationState {
 export interface ConfigurationContextType extends ConfigurationState {
   fetchConfiguration: () => Promise<void>
   refreshConfiguration: () => Promise<void>
+  clearError: () => void
 }

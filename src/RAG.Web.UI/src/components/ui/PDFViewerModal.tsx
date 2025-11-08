@@ -72,23 +72,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
     }
   }, [numPages, optimalScale])
 
-  React.useEffect(() => {
-    if (isOpen && filePath) {
-      loadPDF()
-    } else {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl)
-      }
-      setPdfUrl(null)
-      setPdfBlob(null)
-      setError(null)
-      setPageNumber(1)
-      setScale(1.0)
-      setRotation(0)
-    }
-  }, [isOpen, filePath])
-
-  const loadPDF = async () => {
+  const loadPDF = React.useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -107,7 +91,31 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
     } finally {
       setLoading(false)
     }
-  }
+  }, [filePath])
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setPdfUrl(null)
+      setPdfBlob(null)
+      setError(null)
+      setPageNumber(1)
+      setScale(1.0)
+      setRotation(0)
+      return
+    }
+
+    if (filePath) {
+      void loadPDF()
+    }
+  }, [filePath, isOpen, loadPDF])
+
+  React.useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl)
+      }
+    }
+  }, [pdfUrl])
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)

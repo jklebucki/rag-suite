@@ -97,6 +97,7 @@ export function ConfigurationProvider({ children }: ConfigurationProviderProps) 
     ...state,
     fetchConfiguration,
     refreshConfiguration,
+    clearError,
   }
 
   return (

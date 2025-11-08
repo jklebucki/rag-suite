@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useI18n } from '@/contexts/I18nContext'
 import { useQuizzes } from '@/hooks'
 import { useToast } from '@/contexts/ToastContext'
 import type { CreateQuizRequest, CreateQuizQuestionDto, CreateQuizOptionDto } from '@/types'
 import { fileToDataUri, validateImageSize } from '@/types/cyberpanel'
 import cyberPanelService from '@/services/cyberPanelService'
+import { logger } from '@/utils/logger'
 
 interface UseQuizBuilderProps {
   editQuizId?: string | null
@@ -23,14 +24,7 @@ export function useQuizBuilder({ editQuizId, onSave }: UseQuizBuilderProps) {
   const [questions, setQuestions] = useState<CreateQuizQuestionDto[]>([])
   const [validationErrors, setValidationErrors] = useState<string[]>([])
 
-  // Load quiz for editing
-  useEffect(() => {
-    if (editQuizId) {
-      loadQuizForEdit(editQuizId)
-    }
-  }, [editQuizId])
-
-  const loadQuizForEdit = async (quizId: string) => {
+  const loadQuizForEdit = useCallback(async (quizId: string) => {
     try {
       const exportedQuiz = await cyberPanelService.exportQuiz(quizId)
       if (exportedQuiz) {
@@ -54,9 +48,17 @@ export function useQuizBuilder({ editQuizId, onSave }: UseQuizBuilderProps) {
         )
       }
     } catch (error) {
+      logger.error('Failed to load quiz for editing', error)
       showError(t('cyberpanel.errorLoading'))
     }
-  }
+  }, [language, showError, t])
+
+  // Load quiz for editing
+  useEffect(() => {
+    if (editQuizId) {
+      void loadQuizForEdit(editQuizId)
+    }
+  }, [editQuizId, loadQuizForEdit])
 
   // Question operations
   const addQuestion = () => {
@@ -88,10 +90,10 @@ export function useQuizBuilder({ editQuizId, onSave }: UseQuizBuilderProps) {
     setQuestions(newQuestions)
   }
 
-  const updateQuestion = (
+  const updateQuestion = <K extends keyof CreateQuizQuestionDto>(
     questionIndex: number,
-    field: keyof CreateQuizQuestionDto,
-    value: any
+    field: K,
+    value: CreateQuizQuestionDto[K]
   ) => {
     const newQuestions = [...questions]
     newQuestions[questionIndex] = { ...newQuestions[questionIndex], [field]: value }
@@ -128,11 +130,11 @@ export function useQuizBuilder({ editQuizId, onSave }: UseQuizBuilderProps) {
     setQuestions(newQuestions)
   }
 
-  const updateOption = (
+  const updateOption = <K extends keyof CreateQuizOptionDto>(
     questionIndex: number,
     optionIndex: number,
-    field: keyof CreateQuizOptionDto,
-    value: any
+    field: K,
+    value: CreateQuizOptionDto[K]
   ) => {
     const newQuestions = [...questions]
     newQuestions[questionIndex].options[optionIndex] = {
@@ -204,6 +206,7 @@ export function useQuizBuilder({ editQuizId, onSave }: UseQuizBuilderProps) {
         }
       }
     } catch (error) {
+      logger.error('Failed to save quiz', error)
       showError(editQuizId ? t('cyberpanel.errorUpdating') : t('cyberpanel.errorCreating'))
     }
   }

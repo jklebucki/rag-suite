@@ -35,6 +35,18 @@ export function useQuizzes(): UseQuizzesReturn {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const extractErrorTitle = useCallback((err: unknown, fallback: string): string => {
+    if (typeof err === 'object' && err !== null) {
+      const apiError = err as {
+        response?: { data?: { title?: string; message?: string } }
+        message?: string
+      }
+      return apiError.response?.data?.title ?? apiError.message ?? fallback
+    }
+
+    return fallback
+  }, [])
+
   const fetchQuizzes = useCallback(async (language?: string) => {
     setLoading(true)
     setError(null)
@@ -57,15 +69,14 @@ export function useQuizzes(): UseQuizzesReturn {
       await fetchQuizzes() // Refresh list
       return result
     } catch (err: unknown) {
-      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
-        (err instanceof Error ? err.message : 'Failed to create quiz')
+      const errorMessage = extractErrorTitle(err, err instanceof Error ? err.message : 'Failed to create quiz')
       setError(errorMessage)
       logger.error('Error creating quiz:', err)
       return null
     } finally {
       setLoading(false)
     }
-  }, [fetchQuizzes])
+  }, [extractErrorTitle, fetchQuizzes])
 
   const updateQuiz = useCallback(async (quizId: string, quiz: CreateQuizRequest): Promise<CreateQuizResponse | null> => {
     setLoading(true)
@@ -75,15 +86,14 @@ export function useQuizzes(): UseQuizzesReturn {
       await fetchQuizzes() // Refresh list
       return result
     } catch (err: unknown) {
-      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
-        (err instanceof Error ? err.message : 'Failed to update quiz')
+      const errorMessage = extractErrorTitle(err, err instanceof Error ? err.message : 'Failed to update quiz')
       setError(errorMessage)
       logger.error('Error updating quiz:', err)
       return null
     } finally {
       setLoading(false)
     }
-  }, [fetchQuizzes])
+  }, [extractErrorTitle, fetchQuizzes])
 
   const deleteQuiz = useCallback(async (quizId: string): Promise<boolean> => {
     setLoading(true)
@@ -107,14 +117,15 @@ export function useQuizzes(): UseQuizzesReturn {
     try {
       const result = await cyberPanelService.exportQuiz(quizId)
       return result
-    } catch (err: any) {
-      setError(err.message || 'Failed to export quiz')
+    } catch (err) {
+      const errorMessage = extractErrorTitle(err, err instanceof Error ? err.message : 'Failed to export quiz')
+      setError(errorMessage)
       logger.error('Error exporting quiz:', err)
       return null
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [extractErrorTitle])
 
   const importQuiz = useCallback(async (request: ImportQuizRequest): Promise<ImportQuizResponse | null> => {
     setLoading(true)
@@ -124,15 +135,14 @@ export function useQuizzes(): UseQuizzesReturn {
       await fetchQuizzes() // Refresh list
       return result
     } catch (err: unknown) {
-      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
-        (err instanceof Error ? err.message : 'Failed to import quiz')
+      const errorMessage = extractErrorTitle(err, err instanceof Error ? err.message : 'Failed to import quiz')
       setError(errorMessage)
       logger.error('Error importing quiz:', err)
       return null
     } finally {
       setLoading(false)
     }
-  }, [fetchQuizzes])
+  }, [extractErrorTitle, fetchQuizzes])
 
   const importFromFile = useCallback(async (file: File): Promise<ImportQuizResponse | null> => {
     setLoading(true)
@@ -142,15 +152,14 @@ export function useQuizzes(): UseQuizzesReturn {
       await fetchQuizzes() // Refresh list
       return result
     } catch (err: unknown) {
-      const errorMessage = (err as { response?: { data?: { title?: string } }; message?: string })?.response?.data?.title || 
-        (err instanceof Error ? err.message : 'Failed to import quiz from file')
+      const errorMessage = extractErrorTitle(err, err instanceof Error ? err.message : 'Failed to import quiz from file')
       setError(errorMessage)
       logger.error('Error importing quiz from file:', err)
       return null
     } finally {
       setLoading(false)
     }
-  }, [fetchQuizzes])
+  }, [extractErrorTitle, fetchQuizzes])
 
   const cloneQuiz = useCallback(async (quizId: string, newTitle: string): Promise<ImportQuizResponse | null> => {
     setLoading(true)

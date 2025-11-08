@@ -4,7 +4,7 @@ import { CheckCircle, AlertCircle, XCircle, Info, X } from 'lucide-react'
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 interface ToastProps {
-  id: string
+  id?: string
   type: ToastType
   title: string
   message?: string
@@ -15,7 +15,7 @@ interface ToastProps {
 }
 
 export function Toast({ 
-  id, 
+  id: _id,
   type, 
   title, 
   message, 
