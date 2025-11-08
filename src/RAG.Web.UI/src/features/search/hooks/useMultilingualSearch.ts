@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { apiClient } from '@/shared/services/api'
+import searchApi from '@/features/search/services/searchApi'
 import { useToastContext } from '@/shared/contexts/ToastContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { logger } from '@/utils/logger'
@@ -48,7 +48,7 @@ export function useMultilingualSearch() {
           } : undefined
         }
 
-        const result = await apiClient.searchMultilingual(searchQuery)
+        const result = await searchApi.searchMultilingual(searchQuery)
         logger.debug('Multilingual search results:', result)
 
         // Show language detection info if available

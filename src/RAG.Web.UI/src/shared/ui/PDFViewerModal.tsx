@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, X } from 'lucide-react'
 import { Modal } from './Modal'
-import { apiClient } from '@/shared/services/api'
+import fileService from '@/shared/services/fileService'
 import { logger } from '@/utils/logger'
 
 // Configure PDF.js worker
@@ -77,7 +77,7 @@ export function PDFViewerModal({ isOpen, onClose, filePath, title }: PDFViewerMo
     setError(null)
     try {
       // Use the convert endpoint to get PDF
-      const response = await apiClient.downloadFileWithConversion(filePath, false)
+      const response = await fileService.downloadFileWithConversion(filePath, false)
       if (response.data) {
         // Store the blob for download functionality
         setPdfBlob(response.data)

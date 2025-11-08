@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { apiClient } from '@/shared/services/api'
+import analyticsApi from '@/features/dashboard/services/analyticsApi'
 import { useToastContext } from '@/shared/contexts/ToastContext'
 import { REFETCH_INTERVALS } from '@/constants/config'
 import type { DashboardData, SystemHealth, ElasticsearchStats, UsageStats, PluginInfo } from '@/types'
@@ -15,7 +15,7 @@ export function useDashboard() {
     error: dashboardError
   } = useQuery<DashboardData>({
     queryKey: ['dashboard'],
-    queryFn: () => apiClient.getDashboardData(true), // Include detailed stats
+    queryFn: () => analyticsApi.getDashboardData(true), // Include detailed stats
     refetchInterval: REFETCH_INTERVALS.DASHBOARD,
   })
 
@@ -26,7 +26,7 @@ export function useDashboard() {
     error: analyticsHealthError
   } = useQuery<SystemHealth>({
     queryKey: ['analytics-health'],
-    queryFn: () => apiClient.getAnalyticsHealth(),
+    queryFn: () => analyticsApi.getAnalyticsHealth(),
     refetchInterval: REFETCH_INTERVALS.ANALYTICS_HEALTH,
   })
 
@@ -37,7 +37,7 @@ export function useDashboard() {
     error: clusterStatsError
   } = useQuery<ElasticsearchStats>({
     queryKey: ['elasticsearch-cluster'],
-    queryFn: () => apiClient.getElasticsearchClusterStats(),
+    queryFn: () => analyticsApi.getElasticsearchClusterStats(),
     refetchInterval: REFETCH_INTERVALS.CLUSTER_STATS,
   })
 
@@ -48,7 +48,7 @@ export function useDashboard() {
     error: statsError
   } = useQuery<UsageStats>({
     queryKey: ['usage-stats'],
-    queryFn: () => apiClient.getUsageStats(),
+    queryFn: () => analyticsApi.getUsageStats(),
     refetchInterval: REFETCH_INTERVALS.USAGE_STATS,
     enabled: !dashboardData, // Only fetch if dashboard data is not available
   })
@@ -60,7 +60,7 @@ export function useDashboard() {
     error: pluginsError
   } = useQuery<PluginInfo[]>({
     queryKey: ['plugins'],
-    queryFn: () => apiClient.getPlugins(),
+    queryFn: () => analyticsApi.getPlugins(),
     refetchInterval: REFETCH_INTERVALS.PLUGINS,
   })
 
@@ -71,7 +71,7 @@ export function useDashboard() {
     error: healthError
   } = useQuery({
     queryKey: ['system-health'],
-    queryFn: () => apiClient.getSystemHealth(),
+    queryFn: () => analyticsApi.getSystemHealth(),
     refetchInterval: REFETCH_INTERVALS.SYSTEM_HEALTH,
     enabled: !analyticsHealth, // Only fetch if analytics health is not available
   })

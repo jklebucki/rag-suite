@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
-import apiClient from '@/shared/services/api'
+import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Trophy, Calendar, CheckCircle, XCircle, ArrowRight, Trash2 } from 'lucide-react'
@@ -39,7 +39,7 @@ export function QuizResults() {
     setLoading(true)
     setError(null)
     try {
-      const response = await apiClient.listQuizAttempts()
+      const response = await cyberPanelService.listQuizAttempts()
       setAttempts(response.attempts)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load quiz results')
@@ -66,7 +66,7 @@ export function QuizResults() {
 
     setDeleting(true)
     try {
-      await apiClient.deleteAttempt(deleteModal.attemptId)
+      await cyberPanelService.deleteAttempt(deleteModal.attemptId)
       setAttempts(attempts.filter((a) => a.id !== deleteModal.attemptId))
       setDeleteModal({ isOpen: false, attemptId: null, quizTitle: '', userName: '' })
     } catch (err: unknown) {

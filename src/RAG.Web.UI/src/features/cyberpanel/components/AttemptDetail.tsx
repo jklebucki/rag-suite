@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import apiClient from '@/shared/services/api'
+import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, User, Calendar, Trophy } from 'lucide-react'
@@ -25,7 +25,7 @@ export function AttemptDetail() {
     setLoading(true)
     setError(null)
     try {
-      const response = await apiClient.getAttemptById(attemptId)
+      const response = await cyberPanelService.getAttemptById(attemptId)
       setAttempt(response.attempt)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load attempt details')

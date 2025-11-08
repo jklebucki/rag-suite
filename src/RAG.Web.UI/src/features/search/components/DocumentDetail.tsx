@@ -2,7 +2,7 @@ import React from 'react'
 import { Database, Tag, File, Download } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
-import { apiClient } from '@/shared/services/api'
+import fileService from '@/shared/services/fileService'
 import type { DocumentDetailResponse } from '@/types'
 import { logger } from '@/utils/logger'
 
@@ -17,7 +17,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
     const filePath = document.filePath || document.metadata?.file_path || document.metadata?.source_file
     if (filePath) {
       try {
-        await apiClient.downloadFile(filePath)
+        await fileService.downloadFile(filePath)
       } catch (error) {
         logger.error('Download failed:', error)
         // TODO: Show error toast

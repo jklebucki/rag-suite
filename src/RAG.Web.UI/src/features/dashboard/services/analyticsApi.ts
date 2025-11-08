@@ -1,0 +1,121 @@
+import type {
+  ApiResponse,
+  PluginInfo,
+  UsageStats,
+  PerformanceMetrics,
+  SystemHealthResponse,
+  ElasticsearchStats,
+  IndexStats,
+  NodeStats,
+  SearchStatistics,
+  SystemHealth,
+  DashboardData,
+} from '@/types'
+import { apiHttpClient, healthHttpClient } from '@/shared/services/api/httpClients'
+
+export async function getPlugins(): Promise<PluginInfo[]> {
+  const response = await apiHttpClient.get<ApiResponse<PluginInfo[]>>('/plugins')
+  return response.data.data
+}
+
+export async function getPlugin(pluginId: string): Promise<PluginInfo> {
+  const response = await apiHttpClient.get<ApiResponse<PluginInfo>>(`/plugins/${pluginId}`)
+  return response.data.data
+}
+
+export async function togglePlugin(pluginId: string, enabled: boolean): Promise<void> {
+  const endpoint = enabled ? `/plugins/${pluginId}/enable` : `/plugins/${pluginId}/disable`
+  await apiHttpClient.post(endpoint)
+}
+
+export async function getUsageStats(filters?: {
+  startDate?: Date
+  endDate?: Date
+  endpoint?: string
+}): Promise<UsageStats> {
+  const params = new URLSearchParams()
+  if (filters?.startDate) params.append('startDate', filters.startDate.toISOString())
+  if (filters?.endDate) params.append('endDate', filters.endDate.toISOString())
+  if (filters?.endpoint) params.append('endpoint', filters.endpoint)
+
+  const response = await apiHttpClient.get<ApiResponse<UsageStats>>(`/analytics/usage?${params}`)
+  return response.data.data
+}
+
+export async function getPerformanceMetrics(filters?: {
+  startDate?: Date
+  endDate?: Date
+  endpoint?: string
+}): Promise<PerformanceMetrics[]> {
+  const params = new URLSearchParams()
+  if (filters?.startDate) params.append('startDate', filters.startDate.toISOString())
+  if (filters?.endDate) params.append('endDate', filters.endDate.toISOString())
+  if (filters?.endpoint) params.append('endpoint', filters.endpoint)
+
+  const response = await apiHttpClient.get<ApiResponse<PerformanceMetrics[]>>(`/analytics/performance?${params}`)
+  return response.data.data
+}
+
+export async function getElasticsearchClusterStats(): Promise<ElasticsearchStats> {
+  const response = await apiHttpClient.get<ApiResponse<ElasticsearchStats>>('/analytics/elasticsearch/cluster')
+  return response.data.data
+}
+
+export async function getElasticsearchIndices(indexName?: string): Promise<IndexStats[]> {
+  const url = indexName ? `/analytics/elasticsearch/indices/${indexName}` : '/analytics/elasticsearch/indices'
+  const response = await apiHttpClient.get<ApiResponse<IndexStats[]>>(url)
+  return response.data.data
+}
+
+export async function getElasticsearchNodes(): Promise<NodeStats[]> {
+  const response = await apiHttpClient.get<ApiResponse<NodeStats[]>>('/analytics/elasticsearch/nodes')
+  return response.data.data
+}
+
+export async function getSearchStatistics(): Promise<SearchStatistics> {
+  const response = await apiHttpClient.get<ApiResponse<SearchStatistics>>('/analytics/search')
+  return response.data.data
+}
+
+export async function getAnalyticsHealth(): Promise<SystemHealth> {
+  const response = await apiHttpClient.get<ApiResponse<SystemHealth>>('/analytics/health')
+  return response.data.data
+}
+
+export async function getDashboardData(includeDetailedStats = false): Promise<DashboardData> {
+  const params = new URLSearchParams()
+  if (includeDetailedStats) params.append('includeDetailedStats', 'true')
+
+  const response = await apiHttpClient.get<ApiResponse<DashboardData>>(`/analytics/dashboard?${params}`)
+  return response.data.data
+}
+
+export async function getAnalyticsStatus(): Promise<{ status: string; services: Record<string, boolean> }> {
+  const response = await apiHttpClient.get<ApiResponse<{ status: string; services: Record<string, boolean> }>>(
+    '/analytics/status'
+  )
+  return response.data.data
+}
+
+export async function getSystemHealth(): Promise<SystemHealthResponse> {
+  const response = await healthHttpClient.get<ApiResponse<SystemHealthResponse>>('/healthz/system')
+  return response.data.data
+}
+
+const analyticsApi = {
+  getPlugins,
+  getPlugin,
+  togglePlugin,
+  getUsageStats,
+  getPerformanceMetrics,
+  getElasticsearchClusterStats,
+  getElasticsearchIndices,
+  getElasticsearchNodes,
+  getSearchStatistics,
+  getAnalyticsHealth,
+  getDashboardData,
+  getAnalyticsStatus,
+  getSystemHealth,
+}
+
+export default analyticsApi

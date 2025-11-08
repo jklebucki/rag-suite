@@ -1,127 +1,117 @@
-// AddressBook API Service
-// Handles all API calls to RAG.AddressBook backend
-// Delegates to centralized ApiClient in api.ts
-
-import apiClient from '@/shared/services/api'
+import { apiHttpClient } from '@/shared/services/api/httpClients'
 import { logger } from '@/utils/logger'
 import type {
-  ListContactsRequest,
-  ListContactsResponse,
+  Contact,
+  ContactChangeProposal,
   CreateContactRequest,
   CreateContactResponse,
-  UpdateContactRequest,
-  UpdateContactResponse,
-  SearchContactsRequest,
-  SearchContactsResponse,
-  Contact,
-  ProposeChangeRequest,
-  ProposeChangeResponse,
+  ImportContactsRequest,
+  ImportContactsResponse,
+  ListContactsRequest,
+  ListContactsResponse,
   ListProposalsRequest,
   ListProposalsResponse,
-  ContactChangeProposal,
+  ProposeChangeRequest,
+  ProposeChangeResponse,
   ReviewProposalRequest,
   ReviewProposalResponse,
-  ImportContactsRequest,
-  ImportContactsResponse
+  SearchContactsRequest,
+  SearchContactsResponse,
+  UpdateContactRequest,
+  UpdateContactResponse,
 } from '@/features/address-book/types/addressbook'
 
-/**
- * AddressBook Service
- * Provides methods for managing contacts, proposals, and imports
- * All methods delegate to centralized ApiClient
- */
 class AddressBookService {
-  /**
-   * List contacts with pagination and filtering
-   */
   async listContacts(request?: ListContactsRequest): Promise<ListContactsResponse> {
-    return apiClient.listContacts(request)
+    const params = new URLSearchParams()
+    params.append('includeInactive', request?.includeInactive ? 'true' : 'false')
+    if (request?.department) params.append('department', request.department)
+    if (request?.location) params.append('location', request.location)
+
+    const url = params.toString() ? `/addressbook?${params}` : '/addressbook'
+    const response = await apiHttpClient.get<ListContactsResponse>(url)
+    return response.data
   }
 
-  /**
-   * Get a specific contact by ID
-   */
   async getContact(contactId: string): Promise<Contact> {
-    return apiClient.getContact(contactId)
+    const response = await apiHttpClient.get<Contact>(`/addressbook/${contactId}`)
+    return response.data
   }
 
-  /**
-   * Search contacts by query
-   */
   async searchContacts(request?: SearchContactsRequest): Promise<SearchContactsResponse> {
-    return apiClient.searchContacts(request?.query, request?.includeInactive)
+    const params = new URLSearchParams()
+    if (request?.query) params.append('query', request.query)
+    if (request?.includeInactive) params.append('includeInactive', 'true')
+
+    const url = params.toString() ? `/addressbook/search?${params}` : '/addressbook/search'
+    const response = await apiHttpClient.get<SearchContactsResponse>(url)
+    return response.data
   }
 
-  /**
-   * Create a new contact
-   */
   async createContact(request: CreateContactRequest): Promise<CreateContactResponse> {
-    return apiClient.createContact(request)
+    const response = await apiHttpClient.post<CreateContactResponse>('/addressbook', request)
+    return response.data
   }
 
-  /**
-   * Update an existing contact
-   */
   async updateContact(contactId: string, request: UpdateContactRequest): Promise<UpdateContactResponse> {
-    return apiClient.updateContact(contactId, request)
+    const response = await apiHttpClient.put<UpdateContactResponse>(`/addressbook/${contactId}`, request)
+    return response.data
   }
 
-  /**
-   * Delete a contact
-   */
   async deleteContact(contactId: string): Promise<void> {
-    return apiClient.deleteContact(contactId)
+    await apiHttpClient.delete(`/addressbook/${contactId}`)
   }
 
-  /**
-   * Propose a change to a contact (for non-admin users)
-   */
   async proposeChange(request: ProposeChangeRequest): Promise<ProposeChangeResponse> {
-    return apiClient.proposeChange(request)
+    const response = await apiHttpClient.post<ProposeChangeResponse>('/addressbook/proposals', request)
+    return response.data
   }
 
-  /**
-   * List all proposals with filtering
-   */
   async listProposals(request?: ListProposalsRequest): Promise<ListProposalsResponse> {
-    return apiClient.listProposals(request)
+    const params = new URLSearchParams()
+    if (request?.status !== undefined && request.status !== null) {
+      params.append('status', request.status.toString())
+    }
+    if (request?.proposalType !== undefined && request.proposalType !== null) {
+      params.append('proposalType', request.proposalType.toString())
+    }
+    if (request?.proposedByUserId) {
+      params.append('proposedByUserId', request.proposedByUserId)
+    }
+
+    const url = params.toString() ? `/addressbook/proposals?${params}` : '/addressbook/proposals'
+    const response = await apiHttpClient.get<ListProposalsResponse>(url)
+    return response.data
   }
 
-  /**
-   * Get a specific proposal by ID
-   */
   async getProposal(proposalId: string): Promise<ContactChangeProposal> {
-    return apiClient.getProposal(proposalId)
+    const response = await apiHttpClient.get<ContactChangeProposal>(`/addressbook/proposals/${proposalId}`)
+    return response.data
   }
 
-  /**
-   * Review (approve/reject) a proposal
-   */
   async reviewProposal(proposalId: string, request: ReviewProposalRequest): Promise<ReviewProposalResponse> {
-    return apiClient.reviewProposal(proposalId, request)
+    const response = await apiHttpClient.post<ReviewProposalResponse>(`/addressbook/proposals/${proposalId}/review`, request)
+    return response.data
   }
 
-  /**
-   * Import contacts from structured data
-   */
   async importContacts(request: ImportContactsRequest): Promise<ImportContactsResponse> {
-    return apiClient.importContacts(request)
+    const response = await apiHttpClient.post<ImportContactsResponse>('/addressbook/import', request)
+    return response.data
   }
 
-  /**
-   * Import contacts from CSV file
-   */
-  async importContactsFromFile(file: File, skipDuplicates: boolean = true, encoding: string = 'UTF-8'): Promise<ImportContactsResponse> {
+  async importContactsFromFile(
+    file: File,
+    skipDuplicates: boolean = true,
+    encoding: string = 'UTF-8'
+  ): Promise<ImportContactsResponse> {
     try {
-      // Read file with specified encoding
       const arrayBuffer = await file.arrayBuffer()
       const decoder = new TextDecoder(encoding)
       const csvContent = decoder.decode(arrayBuffer)
-      
-      // Send as JSON via apiClient
+
       return await this.importContacts({
         csvContent,
-        skipDuplicates
+        skipDuplicates,
       })
     } catch (error) {
       logger.error('File import failed:', error)

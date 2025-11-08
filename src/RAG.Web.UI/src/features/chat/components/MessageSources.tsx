@@ -2,7 +2,7 @@ import React from 'react'
 import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
-import { apiClient } from '@/shared/services/api'
+import fileService from '@/shared/services/fileService'
 import { Modal } from '@/shared/ui/Modal'
 import { DocumentDetail } from '@/features/search/components/DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
@@ -34,7 +34,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
 
   const handleDownload = async (filePath: string) => {
     try {
-      await apiClient.downloadFile(filePath)
+      await fileService.downloadFile(filePath)
     } catch (error) {
       logger.error('Download failed:', error)
       // TODO: Show error toast

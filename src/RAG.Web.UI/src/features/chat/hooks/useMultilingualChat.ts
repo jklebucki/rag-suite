@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/shared/services/api'
+import chatApi from '@/features/chat/services/chatApi'
 import { useToastContext } from '@/shared/contexts/ToastContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { logger } from '@/utils/logger'
@@ -23,13 +23,13 @@ export function useMultilingualChat() {
   // Get chat sessions (reuse existing endpoint)
   const { data: sessions = [] } = useQuery({
     queryKey: ['chat-sessions'],
-    queryFn: () => apiClient.getChatSessions(),
+    queryFn: () => chatApi.getChatSessions(),
   })
 
   // Get current session messages
   const { data: currentSession } = useQuery({
     queryKey: ['chat-session', currentSessionId],
-    queryFn: () => currentSessionId ? apiClient.getChatSession(currentSessionId) : null,
+    queryFn: () => (currentSessionId ? chatApi.getChatSession(currentSessionId) : null),
     enabled: !!currentSessionId,
   })
 
@@ -37,7 +37,7 @@ export function useMultilingualChat() {
   const sendMultilingualMessageMutation = useMutation({
     mutationFn: ({ sessionId, request }: { sessionId: string; request: MultilingualChatRequest }) => {
       logger.debug('Calling sendMultilingualMessage API with:', { sessionId, request })
-      return apiClient.sendMultilingualMessage(sessionId, request)
+      return chatApi.sendMultilingualMessage(sessionId, request)
     },
     retry: false, // 🆕 No retry to prevent double sending
     onSuccess: (response) => {
@@ -74,7 +74,7 @@ export function useMultilingualChat() {
 
   // Create new session mutation (reuse existing endpoint)
   const createSessionMutation = useMutation({
-    mutationFn: ({ title, language }: { title?: string; language?: string }) => apiClient.createChatSession(title, language),
+    mutationFn: ({ title, language }: { title?: string; language?: string }) => chatApi.createChatSession(title, language),
     onSuccess: (newSession) => {
       logger.debug('Session created:', newSession)
       // Immediately add the new session to the cache for instant UI update
@@ -91,7 +91,7 @@ export function useMultilingualChat() {
 
   // Delete session mutation (reuse existing endpoint)
   const deleteSessionMutation = useMutation({
-    mutationFn: (sessionId: string) => apiClient.deleteChatSession(sessionId),
+    mutationFn: (sessionId: string) => chatApi.deleteChatSession(sessionId),
     onSuccess: (_, deletedSessionId) => {
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
       setSessionToDelete(null)

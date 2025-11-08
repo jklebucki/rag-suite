@@ -5,7 +5,7 @@ import { Modal } from '@/shared/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
-import { apiClient } from '@/shared/services/api'
+import fileService from '@/shared/services/fileService'
 import type { SearchResult } from '@/types'
 import { logger } from '@/utils/logger'
 
@@ -197,7 +197,7 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
   const handleDownload = async () => {
     if (result.filePath) {
       try {
-        await apiClient.downloadFile(result.filePath)
+        await fileService.downloadFile(result.filePath)
       } catch (error) {
         logger.error('Download failed:', error)
         // TODO: Show error toast

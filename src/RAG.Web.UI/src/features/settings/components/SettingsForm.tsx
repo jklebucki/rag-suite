@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
 import { useToast } from '@/shared/contexts'
-import apiClient from '@/shared/services/api'
+import llmService from '@/features/settings/services/llmService'
 import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/types'
 import { validateLlmSettings } from '@/utils/llmValidation'
 import { LlmFormField, ModelSelectField } from './LlmFormFields'
@@ -37,7 +37,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await apiClient.getLlmSettings()
+      const data = await llmService.getLlmSettings()
       setSettings(data)
       onSettingsChange?.(data)
     } catch (error) {
@@ -57,7 +57,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
     try {
       setLoadingModels(true)
-      const data: AvailableModelsResponse = await apiClient.getAvailableLlmModelsFromUrl(
+      const data: AvailableModelsResponse = await llmService.getAvailableLlmModelsFromUrl(
         settings.url,
         settings.isOllama
       )
@@ -130,7 +130,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
         generateEndpoint: settings.generateEndpoint
       }
 
-      await apiClient.updateLlmSettings(request)
+      await llmService.updateLlmSettings(request)
       addToast({
         type: 'success',
         title: 'Success',
