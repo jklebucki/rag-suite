@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
-import { ErrorBoundary } from '@/components/common/ErrorBoundary'
+import { ErrorBoundary } from '@/shared/components/common/ErrorBoundary'
 import { AppRoutes } from '@/routes'
-import { ToastProvider } from '@/contexts/ToastContext'
-import { I18nProvider } from '@/contexts/I18nContext'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ConfigurationProvider } from '@/contexts/ConfigurationContext'
+import { ToastProvider } from '@/shared/contexts/ToastContext'
+import { I18nProvider } from '@/shared/contexts/I18nContext'
+import { AuthProvider } from '@/shared/contexts/AuthContext'
+import { ConfigurationProvider } from '@/shared/contexts/ConfigurationContext'
 
 function App() {
   return (

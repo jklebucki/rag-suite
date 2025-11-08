@@ -1,4 +1,4 @@
-import { LanguageCode } from '@/types/i18n'
+import { LanguageCode } from '@/shared/types/i18n'
 
 /**
  * Format date with time based on language preference

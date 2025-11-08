@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { formatDateTime, formatDate, formatRelativeTime } from './date'
-import type { LanguageCode } from '@/types/i18n'
+import type { LanguageCode } from '@/shared/types/i18n'
 
 describe('date utilities', () => {
   beforeEach(() => {

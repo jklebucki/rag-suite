@@ -1,4 +1,4 @@
-import { TranslationKeys } from '@/types/i18n';
+import { TranslationKeys } from '@/shared/types/i18n';
 
 export const ro: TranslationKeys = {
   // Navigation

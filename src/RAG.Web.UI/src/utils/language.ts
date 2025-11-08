@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, LanguageCode } from '@/types/i18n';
+import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, LanguageCode } from '@/shared/types/i18n';
 
 const LANGUAGE_STORAGE_KEY = 'rag-suite-language';
 

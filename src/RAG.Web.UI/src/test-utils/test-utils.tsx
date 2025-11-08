@@ -2,11 +2,11 @@ import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
-import { I18nProvider } from '@/contexts/I18nContext'
-import { ToastProvider } from '@/contexts/ToastContext'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ConfigurationProvider } from '@/contexts/ConfigurationContext'
-import type { User } from '@/types/auth'
+import { I18nProvider } from '@/shared/contexts/I18nContext'
+import { ToastProvider } from '@/shared/contexts/ToastContext'
+import { AuthProvider } from '@/shared/contexts/AuthContext'
+import { ConfigurationProvider } from '@/shared/contexts/ConfigurationContext'
+import type { User } from '@/features/auth/types/auth'
 
 // Create a test query client
 const createTestQueryClient = () =>
