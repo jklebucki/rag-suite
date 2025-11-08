@@ -11,7 +11,7 @@ import type {
   ImportQuizResponse,
   SubmitAttemptRequest,
   SubmitAttemptResponse
-} from '@/types'
+} from '@/features/cyberpanel/types/quiz'
 
 interface UseQuizzesReturn {
   quizzes: ListQuizzesResponse | null

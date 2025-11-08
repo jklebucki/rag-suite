@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useQuizBuilder } from '@/features/cyberpanel/hooks/useQuizBuilder'
-import { Button, Input, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/shared/ui'
+import { Button, Input, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui'
 import { Plus, Save, Eye, X, Download } from 'lucide-react'
 import { QuestionEditor } from './QuizBuilder/QuestionEditor'
 

@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios'
-import { createHttpClient } from '@/utils/httpClient'
+import { createHttpClient } from '@/shared/services/api/httpClient'
 import { logger } from '@/utils/logger'
-import { API_TIMEOUTS, API_ENDPOINTS, STORAGE_KEYS } from '@/constants/config'
+import { API_TIMEOUTS, API_ENDPOINTS, STORAGE_KEYS } from '@/app/config/appConfig'
 import type {
   LoginRequest,
   RegisterRequest,

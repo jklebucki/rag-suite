@@ -1,9 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import analyticsApi from '@/features/dashboard/services/analyticsApi'
+import analyticsService from '@/features/dashboard/services/analytics.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
-import { REFETCH_INTERVALS } from '@/constants/config'
-import type { DashboardData, SystemHealth, ElasticsearchStats, UsageStats, PluginInfo } from '@/types'
+import { REFETCH_INTERVALS } from '@/app/config/appConfig'
+import type {
+  DashboardData,
+  SystemHealth,
+  ElasticsearchStats,
+  UsageStats,
+  PluginInfo,
+} from '@/features/dashboard/types/analytics'
 
 export function useDashboard() {
   const { showError } = useToastContext()
@@ -15,7 +21,7 @@ export function useDashboard() {
     error: dashboardError
   } = useQuery<DashboardData>({
     queryKey: ['dashboard'],
-    queryFn: () => analyticsApi.getDashboardData(true), // Include detailed stats
+    queryFn: () => analyticsService.getDashboardData(true), // Include detailed stats
     refetchInterval: REFETCH_INTERVALS.DASHBOARD,
   })
 
@@ -26,7 +32,7 @@ export function useDashboard() {
     error: analyticsHealthError
   } = useQuery<SystemHealth>({
     queryKey: ['analytics-health'],
-    queryFn: () => analyticsApi.getAnalyticsHealth(),
+    queryFn: () => analyticsService.getAnalyticsHealth(),
     refetchInterval: REFETCH_INTERVALS.ANALYTICS_HEALTH,
   })
 
@@ -37,7 +43,7 @@ export function useDashboard() {
     error: clusterStatsError
   } = useQuery<ElasticsearchStats>({
     queryKey: ['elasticsearch-cluster'],
-    queryFn: () => analyticsApi.getElasticsearchClusterStats(),
+    queryFn: () => analyticsService.getElasticsearchClusterStats(),
     refetchInterval: REFETCH_INTERVALS.CLUSTER_STATS,
   })
 
@@ -48,7 +54,7 @@ export function useDashboard() {
     error: statsError
   } = useQuery<UsageStats>({
     queryKey: ['usage-stats'],
-    queryFn: () => analyticsApi.getUsageStats(),
+    queryFn: () => analyticsService.getUsageStats(),
     refetchInterval: REFETCH_INTERVALS.USAGE_STATS,
     enabled: !dashboardData, // Only fetch if dashboard data is not available
   })
@@ -60,7 +66,7 @@ export function useDashboard() {
     error: pluginsError
   } = useQuery<PluginInfo[]>({
     queryKey: ['plugins'],
-    queryFn: () => analyticsApi.getPlugins(),
+    queryFn: () => analyticsService.getPlugins(),
     refetchInterval: REFETCH_INTERVALS.PLUGINS,
   })
 
@@ -71,7 +77,7 @@ export function useDashboard() {
     error: healthError
   } = useQuery({
     queryKey: ['system-health'],
-    queryFn: () => analyticsApi.getSystemHealth(),
+    queryFn: () => analyticsService.getSystemHealth(),
     refetchInterval: REFETCH_INTERVALS.SYSTEM_HEALTH,
     enabled: !analyticsHealth, // Only fetch if analytics health is not available
   })

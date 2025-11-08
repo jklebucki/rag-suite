@@ -2,10 +2,10 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useQuizzes } from '@/features/cyberpanel/hooks/useQuizzes'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Play, FileText, Calendar } from 'lucide-react'
-import type { QuizListItem } from '@/types'
+import type { QuizListItem } from '@/features/cyberpanel/types/quiz'
 
 export function Quizzes() {
   const { t, language } = useI18n()

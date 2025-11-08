@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { ToastNotification } from '@/shared/ui/ToastContainer'
-import type { ToastType } from '@/shared/ui/Toast'
+import type { ToastNotification } from '@/shared/components/ui/ToastContainer'
+import type { ToastType } from '@/shared/components/ui/Toast'
 
 export function useToast() {
   const [toasts, setToasts] = useState<ToastNotification[]>([])

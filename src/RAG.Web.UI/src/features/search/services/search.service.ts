@@ -1,10 +1,10 @@
+import type { ApiResponse } from '@/shared/types/api'
 import type {
-  ApiResponse,
   SearchQuery,
   SearchResponse,
   MultilingualSearchQuery,
   DocumentDetailResponse,
-} from '@/types'
+} from '@/features/search/types/search'
 import { apiHttpClient } from '@/shared/services/api/httpClients'
 
 export async function search(query: SearchQuery): Promise<SearchResponse> {
@@ -36,10 +36,10 @@ export async function getDocumentDetails(documentId: string): Promise<DocumentDe
   return response.data.data
 }
 
-const searchApi = {
+const searchService = {
   search,
   searchMultilingual,
   getDocumentDetails,
 }
 
-export default searchApi
+export default searchService

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Plus, Trash2, Menu } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
-import type { ChatSession } from '@/types'
+import type { ChatSession } from '@/features/chat/types/chat'
 
 interface ChatSidebarProps {
   sessions: ChatSession[]

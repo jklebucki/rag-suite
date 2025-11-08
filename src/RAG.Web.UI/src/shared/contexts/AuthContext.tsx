@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer, ReactNode, useCallback, useRef } from 'react'
-import { authService } from '@/features/auth/services/auth'
+import { authService } from '@/features/auth/services/auth.service'
 import { useTokenRefresh } from '@/features/auth/hooks/useTokenRefresh'
 import { useAuthStorage } from '@/features/auth/hooks/useAuthStorage'
 import { queryClient } from '@/main'

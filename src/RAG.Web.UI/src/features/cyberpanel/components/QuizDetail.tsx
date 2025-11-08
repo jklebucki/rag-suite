@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useToast } from '@/shared/contexts'
 import { useQuizTaking } from '@/features/cyberpanel/hooks/useQuizzes'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import type { SubmitAttemptResponse } from '@/types'
+import type { SubmitAttemptResponse } from '@/features/cyberpanel/types/quiz'
 
 export function QuizDetail() {
   const { id } = useParams<{ id: string }>()

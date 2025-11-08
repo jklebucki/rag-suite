@@ -1,16 +1,18 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { Download, Search, Eye } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import { Modal } from '@/shared/ui/Modal'
+import { Modal } from '@/shared/components/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
 import fileService from '@/shared/services/fileService'
-import type { SearchResult } from '@/types'
+import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
 
 // Lazy load PDFViewerModal
-const PDFViewerModal = React.lazy(() => import('@/shared/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
+const PDFViewerModal = React.lazy(() =>
+  import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
+)
 
 interface SearchResultsProps {
   searchResults?: {

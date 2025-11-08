@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { ArrowLeft, CheckCircle, XCircle, User, Calendar, Trophy } from 'lucide-react'
-import type { AttemptDetailDto } from '@/types'
+import type { AttemptDetailDto } from '@/features/cyberpanel/types/quiz'
 
 export function AttemptDetail() {
   const { id } = useParams<{ id: string }>()

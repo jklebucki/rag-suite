@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
-import { authService } from '@/features/auth/services/auth'
+import { authService } from '@/features/auth/services/auth.service'
 import { logger } from '@/utils/logger'
-import { STORAGE_KEYS } from '@/constants/config'
+import { STORAGE_KEYS } from '@/app/config/appConfig'
 import type { User } from '@/features/auth/types/auth'
 
 /**

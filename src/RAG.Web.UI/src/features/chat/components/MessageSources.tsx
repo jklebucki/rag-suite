@@ -3,14 +3,16 @@ import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'luci
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import fileService from '@/shared/services/fileService'
-import { Modal } from '@/shared/ui/Modal'
+import { Modal } from '@/shared/components/ui/Modal'
 import { DocumentDetail } from '@/features/search/components/DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
-import type { SearchResult } from '@/shared/types/api'
+import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
 
 // Lazy load PDFViewerModal
-const PDFViewerModal = React.lazy(() => import('@/shared/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal })))
+const PDFViewerModal = React.lazy(() =>
+  import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
+)
 
 interface MessageSourcesProps {
   sources: SearchResult[]

@@ -1,6 +1,6 @@
 import { Trash2, ImageIcon, X } from 'lucide-react'
-import { Button, Input } from '@/shared/ui'
-import type { CreateQuizOptionDto } from '@/types'
+import { Button, Input } from '@/shared/components/ui'
+import type { CreateQuizOptionDto } from '@/features/cyberpanel/types/quiz'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface AnswerEditorProps {

@@ -1,7 +1,7 @@
 // CyberPanel Quiz Helper Functions
 // Utility functions for working with quiz images and validation
 
-import type { CreateQuizRequest, GetQuizResponse } from '@/shared/types/api'
+import type { CreateQuizRequest, GetQuizResponse } from '@/features/cyberpanel/types/quiz'
 
 /**
  * Helper type for image handling (URL or base64)

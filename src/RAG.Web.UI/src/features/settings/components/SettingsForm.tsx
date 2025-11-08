@@ -4,10 +4,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
 import { useToast } from '@/shared/contexts'
 import llmService from '@/features/settings/services/llmService'
-import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/types'
+import type { LlmSettings, LlmSettingsRequest, AvailableModelsResponse } from '@/features/settings/types/llm'
 import { validateLlmSettings } from '@/utils/llmValidation'
 import { LlmFormField, ModelSelectField } from './LlmFormFields'
-import type { LlmFormErrors } from '@/types'
+import type { LlmFormErrors } from '@/features/settings/types/settings'
 import { logger } from '@/utils/logger'
 
 interface SettingsFormProps {

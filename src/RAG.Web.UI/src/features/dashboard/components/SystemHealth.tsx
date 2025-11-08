@@ -1,6 +1,12 @@
 import React from 'react'
 import { Activity, Brain, Database, Server, Clock } from 'lucide-react'
-import type { SystemHealthResponse, SystemHealth as AnalyticsSystemHealth, ElasticsearchStats, IndexStats, NodeStats } from '@/types'
+import type {
+  SystemHealthResponse,
+  SystemHealth as AnalyticsSystemHealth,
+  ElasticsearchStats,
+  IndexStats,
+  NodeStats,
+} from '@/features/dashboard/types/analytics'
 
 interface HealthMetricProps {
   label: string

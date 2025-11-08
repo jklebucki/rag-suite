@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Trophy, Calendar, CheckCircle, XCircle, ArrowRight, Trash2 } from 'lucide-react'
 import { DeleteConfirmationModal } from '@/shared/components/common/DeleteConfirmationModal'
-import type { QuizAttemptDto } from '@/types'
+import type { QuizAttemptDto } from '@/features/cyberpanel/types/quiz'
 
 export function QuizResults() {
   const { t } = useI18n()

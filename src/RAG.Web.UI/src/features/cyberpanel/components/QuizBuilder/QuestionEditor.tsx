@@ -1,6 +1,6 @@
 import { Trash2, Plus, ImageIcon, X, ChevronUp, ChevronDown } from 'lucide-react'
-import { Button, Input, Textarea, Card, CardContent } from '@/shared/ui'
-import type { CreateQuizQuestionDto, CreateQuizOptionDto } from '@/types'
+import { Button, Input, Textarea, Card, CardContent } from '@/shared/components/ui'
+import type { CreateQuizQuestionDto, CreateQuizOptionDto } from '@/features/cyberpanel/types/quiz'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { AnswerEditor } from './AnswerEditor'
 

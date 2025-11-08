@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Eye, EyeOff, Lock, CheckCircle, XCircle } from 'lucide-react'
-import type { PasswordStrength } from '@/types'
+import type { PasswordStrength } from '@/features/settings/types/settings'
 
 interface PasswordInputProps {
   value: string

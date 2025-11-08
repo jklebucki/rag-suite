@@ -1,5 +1,5 @@
+import type { ApiResponse } from '@/shared/types/api'
 import type {
-  ApiResponse,
   PluginInfo,
   UsageStats,
   PerformanceMetrics,
@@ -10,7 +10,7 @@ import type {
   SearchStatistics,
   SystemHealth,
   DashboardData,
-} from '@/types'
+} from '@/features/dashboard/types/analytics'
 import { apiHttpClient, healthHttpClient } from '@/shared/services/api/httpClients'
 
 export async function getPlugins(): Promise<PluginInfo[]> {
@@ -102,7 +102,7 @@ export async function getSystemHealth(): Promise<SystemHealthResponse> {
   return response.data.data
 }
 
-const analyticsApi = {
+const analyticsService = {
   getPlugins,
   getPlugin,
   togglePlugin,
@@ -118,4 +118,4 @@ const analyticsApi = {
   getSystemHealth,
 }
 
-export default analyticsApi
+export default analyticsService

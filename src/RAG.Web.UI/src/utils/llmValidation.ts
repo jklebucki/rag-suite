@@ -1,6 +1,7 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import type { LlmSettings, LlmFormErrors } from '@/types'
+import type { LlmSettings } from '@/features/settings/types/llm'
+import type { LlmFormErrors } from '@/features/settings/types/settings'
 
 /**
  * Validate LLM settings form

@@ -1,13 +1,13 @@
 import { logger } from '@/utils/logger'
 import { apiHttpClient } from '@/shared/services/api/httpClients'
+import type { ApiResponse } from '@/shared/types/api'
 import type {
-  ApiResponse,
   ChatRequest,
   ChatMessage,
   MultilingualChatRequest,
   MultilingualChatResponse,
   ChatSession,
-} from '@/types'
+} from '@/features/chat/types/chat'
 
 export async function sendMessage(sessionId: string, request: ChatRequest): Promise<ChatMessage> {
   const response = await apiHttpClient.post<ApiResponse<ChatMessage>>(
@@ -54,7 +54,7 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
   await apiHttpClient.delete(`/user-chat/sessions/${sessionId}`)
 }
 
-const chatApi = {
+const chatService = {
   sendMessage,
   sendMultilingualMessage,
   getChatSessions,
@@ -63,4 +63,4 @@ const chatApi = {
   deleteChatSession,
 }
 
-export default chatApi
+export default chatService

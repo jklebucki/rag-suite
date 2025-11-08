@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { User, Key } from 'lucide-react'
-import { Modal } from '@/shared/ui/Modal'
+import { Modal } from '@/shared/components/ui/Modal'
 import { PasswordInput } from './PasswordInput'
 import { getPasswordStrength } from '@/utils/passwordValidation'
 import type { User as UserType } from '@/features/auth/types/auth'

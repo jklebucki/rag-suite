@@ -1,22 +1,17 @@
-import { Suspense } from 'react'
+import type { PropsWithChildren } from 'react'
 import { ErrorBoundary } from '@/shared/components/common/ErrorBoundary'
-import { AppRoutes } from '@/routes'
 import { ToastProvider } from '@/shared/contexts/ToastContext'
 import { I18nProvider } from '@/shared/contexts/I18nContext'
 import { AuthProvider } from '@/shared/contexts/AuthContext'
 import { ConfigurationProvider } from '@/shared/contexts/ConfigurationContext'
 
-function App() {
+export function AppProviders({ children }: PropsWithChildren) {
   return (
     <ErrorBoundary>
       <I18nProvider>
         <ToastProvider>
           <ConfigurationProvider>
-            <AuthProvider>
-              <Suspense fallback={<div>Loading...</div>}>
-                <AppRoutes />
-              </Suspense>
-            </AuthProvider>
+            <AuthProvider>{children}</AuthProvider>
           </ConfigurationProvider>
         </ToastProvider>
       </I18nProvider>
@@ -24,4 +19,3 @@ function App() {
   )
 }
 
-export default App

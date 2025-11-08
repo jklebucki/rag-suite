@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useToast } from '@/shared/hooks/useToast'
-import { ToastContainer } from '@/shared/ui/ToastContainer'
-import type { ToastType } from '@/shared/ui/Toast'
+import { ToastContainer } from '@/shared/components/ui/ToastContainer'
+import type { ToastType } from '@/shared/components/ui/Toast'
 
 interface ToastContextType {
   addToast: (options: { type: ToastType; title: string; message?: string }) => string

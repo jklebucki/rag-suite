@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react'
-import { authService } from '@/features/auth/services/auth'
+import { authService } from '@/features/auth/services/auth.service'
 import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus'
 import { logger } from '@/utils/logger'
 

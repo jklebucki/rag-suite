@@ -1,5 +1,5 @@
-import { createHttpClient, createPublicHttpClient } from '@/utils/httpClient'
-import { API_ENDPOINTS, API_TIMEOUTS } from '@/constants/config'
+import { createHttpClient, createPublicHttpClient } from './httpClient'
+import { API_ENDPOINTS, API_TIMEOUTS } from '@/app/config/appConfig'
 
 export const apiHttpClient = createHttpClient({
   baseURL: API_ENDPOINTS.BASE,

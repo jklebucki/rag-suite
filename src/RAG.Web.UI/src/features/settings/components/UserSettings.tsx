@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { User, Shield } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { authService } from '@/features/auth/services/auth'
+import { authService } from '@/features/auth/services/auth.service'
 import type { User as UserType } from '@/features/auth/types/auth'
 import { useUserFilters } from '@/features/settings/hooks/useUserFilters'
 import { useToast } from '@/shared/hooks/useToast'

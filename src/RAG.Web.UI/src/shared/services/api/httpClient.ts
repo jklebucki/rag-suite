@@ -4,8 +4,8 @@
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios'
-import { API_TIMEOUTS, STORAGE_KEYS } from '@/constants/config'
-import { logger } from './logger'
+import { API_TIMEOUTS, STORAGE_KEYS } from '@/app/config/appConfig'
+import { logger } from '@/utils/logger'
 
 export interface HttpClientConfig extends AxiosRequestConfig {
   baseURL: string

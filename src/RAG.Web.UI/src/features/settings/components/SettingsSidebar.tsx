@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
-import type { SettingsTab } from '@/types'
+import type { SettingsTab } from '@/features/settings/types/settings'
 
 export function SettingsSidebar({
   activeTab,

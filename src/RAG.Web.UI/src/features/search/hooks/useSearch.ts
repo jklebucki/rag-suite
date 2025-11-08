@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import searchApi from '@/features/search/services/searchApi'
+import searchService from '@/features/search/services/search.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { logger } from '@/utils/logger'
@@ -29,7 +29,7 @@ export function useSearch() {
     queryFn: async () => {
       logger.debug('Searching for:', query)
       try {
-        const result = await searchApi.search({
+        const result = await searchService.search({
           query,
           limit: 20,
         })

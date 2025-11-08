@@ -4,12 +4,12 @@ import { useI18n } from '@/shared/contexts/I18nContext'
 import { useToast } from '@/shared/contexts'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useQuizzes } from '@/features/cyberpanel/hooks/useQuizzes'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { DeleteConfirmationModal } from '@/shared/components/common/DeleteConfirmationModal'
 import { QuizBuilder } from './QuizBuilder'
 import { Plus, Edit, Trash2, Eye, EyeOff, Calendar, FileText, Upload } from 'lucide-react'
-import type { QuizListItem } from '@/types'
+import type { QuizListItem } from '@/features/cyberpanel/types/quiz'
 
 export function QuizManager() {
   const { t } = useI18n()

@@ -6,9 +6,9 @@ import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { MessageSources } from './MessageSources'
 import { MarkdownMessage } from './MarkdownMessage'
-import { ConfirmModal } from '@/shared/ui/ConfirmModal'
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
-import type { ChatMessage } from '@/types'
+import type { ChatMessage } from '@/features/chat/types/chat'
 
 export function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()

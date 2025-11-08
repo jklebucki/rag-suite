@@ -11,7 +11,7 @@ import type {
   ListQuizzesResponse,
   SubmitAttemptRequest,
   SubmitAttemptResponse,
-} from '@/types'
+} from '@/features/cyberpanel/types/quiz'
 import { downloadQuizJson, readQuizJsonFile } from '@/features/cyberpanel/types/cyberpanel'
 
 class CyberPanelService {

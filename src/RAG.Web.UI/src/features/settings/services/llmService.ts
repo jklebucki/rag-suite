@@ -1,4 +1,4 @@
-import type { LlmSettingsRequest, LlmSettingsResponse, AvailableModelsResponse } from '@/types'
+import type { LlmSettingsRequest, LlmSettingsResponse, AvailableModelsResponse } from '@/features/settings/types/llm'
 import { apiHttpClient } from '@/shared/services/api/httpClients'
 
 export async function getLlmSettings(): Promise<LlmSettingsResponse> {

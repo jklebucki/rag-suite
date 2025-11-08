@@ -1,6 +1,6 @@
 import React from 'react'
 import { BarChart3, TrendingUp } from 'lucide-react'
-import type { SearchStatistics } from '@/types'
+import type { SearchStatistics } from '@/features/dashboard/types/analytics'
 
 interface TopQueriesProps {
   queries?: string[]

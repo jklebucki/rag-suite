@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { SettingsForm } from './SettingsForm'
 import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
-import type { SettingsTab } from '@/types'
+import type { SettingsTab } from '@/features/settings/types/settings'
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('llm')

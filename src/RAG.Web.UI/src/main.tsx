@@ -2,10 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App'
+import { App } from '@/app'
 import './index.css'
 import './utils/debug' // Import debug utilities
-import { CACHE_TIMES, QUERY_RETRY } from './constants/config'
+import { CACHE_TIMES, QUERY_RETRY } from '@/app/config/appConfig'
 
 export const queryClient = new QueryClient({
   defaultOptions: {

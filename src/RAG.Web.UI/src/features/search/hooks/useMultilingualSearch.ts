@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import searchApi from '@/features/search/services/searchApi'
+import searchService from '@/features/search/services/search.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { logger } from '@/utils/logger'
-import type { MultilingualSearchQuery } from '@/types'
+import type { MultilingualSearchQuery } from '@/features/search/types/search'
 
 export function useMultilingualSearch() {
   const [query, setQuery] = useState('')
@@ -48,7 +48,7 @@ export function useMultilingualSearch() {
           } : undefined
         }
 
-        const result = await searchApi.searchMultilingual(searchQuery)
+        const result = await searchService.searchMultilingual(searchQuery)
         logger.debug('Multilingual search results:', result)
 
         // Show language detection info if available

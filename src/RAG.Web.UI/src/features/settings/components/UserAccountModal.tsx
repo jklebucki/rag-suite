@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
-import { ConfirmModal } from '@/shared/ui/ConfirmModal'
+import { ConfirmModal } from '@/shared/components/ui/ConfirmModal'
 import { logger } from '@/utils/logger'
 
 interface UserAccountModalProps {

@@ -2,7 +2,7 @@
 
 //import React from 'react'
 //import { User, Shield } from 'lucide-react'
-import type { UserFilters } from '@/types'
+import type { UserFilters } from '@/features/settings/types/settings'
 
 interface UserFiltersProps {
   filters: UserFilters

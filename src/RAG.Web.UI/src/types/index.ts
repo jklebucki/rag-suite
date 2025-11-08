@@ -1,7 +1,0 @@
-export * from '@/shared/types/api'
-export * from '@/shared/types/i18n'
-export * from '@/features/auth/types/auth'
-export * from '@/features/settings/types/settings'
-export * from '@/features/settings/types/configuration'
-export * from '@/features/cyberpanel/types/cyberpanel'
-export * from '@/features/address-book/types/addressbook'
