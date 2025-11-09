@@ -57,7 +57,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   }
 
   return (
-    <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-30 h-16 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 flex items-center justify-between px-6 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 supports-[backdrop-filter]:dark:bg-gray-900/80">
       <div className="flex items-center gap-4">
         {/* Hamburger first so it is not overlapped by the logo on small screens */}
         <button
