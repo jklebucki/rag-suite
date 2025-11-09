@@ -54,6 +54,16 @@ export function createHttpClient(config: HttpClientConfig): AxiosInstance {
   client.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
+      if (axios.isCancel(error) || error.code === AxiosError.ERR_CANCELED) {
+        if (import.meta.env.DEV) {
+          logger.debug('HTTP request cancelled:', {
+            url: error.config?.url,
+            method: error.config?.method,
+          })
+        }
+        return Promise.reject(error)
+      }
+
       // Handle 401 Unauthorized
       if (error.response?.status === 401) {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)

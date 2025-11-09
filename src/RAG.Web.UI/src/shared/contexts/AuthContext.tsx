@@ -233,6 +233,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return
     }
 
+    const token = authService.getToken()
+    const needsImmediateRefresh = !token || authService.isTokenExpiringSoon()
+
+    if (!needsImmediateRefresh) {
+      initialRefreshRequestedRef.current = true
+      return
+    }
+
     initialRefreshRequestedRef.current = true
 
     const refreshPromise = performTokenRefresh()
