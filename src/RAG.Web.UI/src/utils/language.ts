@@ -1,4 +1,6 @@
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, LanguageCode } from '@/shared/types/i18n';
+import { createScopedLogger } from '@/utils/logger';
+const log = createScopedLogger('language');
 
 const LANGUAGE_STORAGE_KEY = 'rag-suite-language';
 
@@ -32,7 +34,7 @@ export function getSavedLanguage(): LanguageCode {
       return saved as LanguageCode;
     }
   } catch (error) {
-    console.warn('Failed to read language from localStorage:', error);
+    log.warn('Failed to read language from localStorage:', error);
   }
   
   // Fallback to browser language
@@ -46,7 +48,7 @@ export function saveLanguage(languageCode: LanguageCode): void {
   try {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, languageCode);
   } catch (error) {
-    console.warn('Failed to save language to localStorage:', error);
+    log.warn('Failed to save language to localStorage:', error);
   }
 }
 
@@ -57,7 +59,7 @@ export function clearSavedLanguage(): void {
   try {
     localStorage.removeItem(LANGUAGE_STORAGE_KEY);
   } catch (error) {
-    console.warn('Failed to clear language from localStorage:', error);
+    log.warn('Failed to clear language from localStorage:', error);
   }
 }
 

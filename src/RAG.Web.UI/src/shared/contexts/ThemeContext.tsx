@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createScopedLogger } from '@/utils/logger'
 
 type Theme = 'light' | 'dark'
 
@@ -12,6 +13,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 const THEME_STORAGE_KEY = 'rag-suite-theme'
 
+const log = createScopedLogger('ThemeContext')
+
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') {
     return 'light'
@@ -23,7 +26,7 @@ function getInitialTheme(): Theme {
       return storedTheme
     }
   } catch (error) {
-    console.warn('Failed to read theme from localStorage:', error)
+    log.warn('Failed to read theme from localStorage:', error)
   }
 
   const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')
@@ -54,7 +57,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme)
     } catch (error) {
-      console.warn('Failed to persist theme preference:', error)
+      log.warn('Failed to persist theme preference:', error)
     }
   }, [theme])
 

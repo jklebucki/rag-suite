@@ -4,6 +4,7 @@ import { useTokenRefresh } from '@/features/auth/hooks/useTokenRefresh'
 import { useAuthStorage } from '@/features/auth/hooks/useAuthStorage'
 import { queryClient } from '@/main'
 import type { AuthState, User, LoginRequest, RegisterRequest } from '@/features/auth/types/auth'
+import { createScopedLogger } from '@/utils/logger'
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<boolean>
@@ -56,8 +57,10 @@ const initialState: AuthState = {
   refreshError: false,
 }
 
+const log = createScopedLogger('AuthContext')
+
 function authReducer(state: AuthState, action: AuthAction): AuthState {
-  console.debug('🔄 Auth reducer action:', action.type, 'payload' in action ? action.payload : 'no payload')
+  log.debug('🔄 Auth reducer action:', action.type, 'payload' in action ? action.payload : 'no payload')
 
   switch (action.type) {
     case 'SET_LOADING':
@@ -69,7 +72,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isAuthenticated: !!action.payload,
         loading: false
       }
-      console.debug('🔄 SET_USER new state:', { isAuthenticated: newState.isAuthenticated, loading: newState.loading })
+      log.debug('🔄 SET_USER new state:', { isAuthenticated: newState.isAuthenticated, loading: newState.loading })
       return newState
     case 'SET_TOKEN':
       return { ...state, token: action.payload }
@@ -80,7 +83,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
     case 'SET_REFRESH_ERROR':
       return { ...state, refreshError: action.payload }
     case 'LOGOUT':
-      console.debug('🔄 LOGOUT action')
+      log.debug('🔄 LOGOUT action')
       return {
         ...initialState,
         loading: false
@@ -109,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [])
 
   const handleStorageLogout = useCallback(() => {
-    console.debug('🔐 Storage logout - clearing React Query cache')
+    log.debug('🔐 Storage logout - clearing React Query cache')
     queryClient.clear()
     dispatch({ type: 'LOGOUT' })
   }, [])
@@ -121,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [])
 
   const handleLogout = useCallback(() => {
-    console.debug('🔐 Token refresh logout - clearing React Query cache')
+    log.debug('🔐 Token refresh logout - clearing React Query cache')
     queryClient.clear()
     dispatch({ type: 'LOGOUT' })
   }, [])
@@ -137,12 +140,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialize auth state - simplified and more reliable approach
   useEffect(() => {
     if (isInitializedRef.current) {
-      console.debug('🔐 Auth already initialized, skipping')
+      log.debug('🔐 Auth already initialized, skipping')
       return
     }
 
     const initializeAuth = () => {
-      console.debug('🔐 Auth initialization started (synchronous)')
+      log.debug('🔐 Auth initialization started (synchronous)')
       isInitializedRef.current = true
 
       try {
@@ -154,7 +157,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const refreshToken = authService.getRefreshToken()
           const userData = authService.getUser()
 
-          console.debug('🔐 Valid auth found, setting state immediately')
+          log.debug('🔐 Valid auth found, setting state immediately')
 
           // Set state immediately - this should prevent login redirect
           dispatch({ type: 'SET_TOKEN', payload: token })
@@ -168,18 +171,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }, 1000) // Increase delay to avoid conflicts
 
         } else {
-          console.debug('🔐 No valid auth found')
+          log.debug('🔐 No valid auth found')
           dispatch({ type: 'LOGOUT' })
         }
       } catch (error) {
-        console.error('🔐 Auth initialization failed:', error)
+        log.error('🔐 Auth initialization failed:', error)
         dispatch({ type: 'LOGOUT' })
       }
     }
 
     const verifyAuthInBackground = async () => {
       if (isVerifyingRef.current) {
-        console.debug('🔐 Background verification already in progress, skipping')
+        log.debug('🔐 Background verification already in progress, skipping')
         return
       }
 
@@ -187,28 +190,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       try {
         if (ongoingRefreshRef.current) {
-          console.debug('🔐 Waiting for ongoing refresh before verification')
+          log.debug('🔐 Waiting for ongoing refresh before verification')
           try {
             await ongoingRefreshRef.current
           } catch (refreshError) {
-            console.warn('🔐 Ongoing refresh failed before verification:', refreshError)
+            log.warn('🔐 Ongoing refresh failed before verification:', refreshError)
           }
         }
 
-        console.debug('🔐 Background auth verification started')
+        log.debug('🔐 Background auth verification started')
         const user = await authService.getCurrentUser()
         if (user) {
-          console.debug('🔐 Background verification successful')
+          log.debug('🔐 Background verification successful')
           dispatch({ type: 'SET_USER', payload: user })
         } else {
-          console.warn('🔐 Background verification failed - server rejected token')
+          log.warn('🔐 Background verification failed - server rejected token')
           // Clear React Query cache and auth data
           queryClient.clear()
           clearAuthData()
           dispatch({ type: 'LOGOUT' })
         }
       } catch (error) {
-        console.warn('🔐 Background verification error:', error)
+        log.warn('🔐 Background verification error:', error)
         // Clear React Query cache and auth data
         queryClient.clear()
         clearAuthData()
@@ -248,9 +251,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     refreshPromise
       .catch(error => {
-      console.warn('🔐 Initial token refresh failed:', error)
-      initialRefreshRequestedRef.current = false
-    })
+        log.warn('🔐 Initial token refresh failed:', error)
+        initialRefreshRequestedRef.current = false
+      })
       .finally(() => {
         ongoingRefreshRef.current = null
       })
@@ -259,7 +262,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Handle refresh error events from auth service
   useEffect(() => {
     const handleRefreshError = (event: CustomEvent) => {
-      console.debug('🔄 Refresh error event received:', event.detail)
+      log.debug('🔄 Refresh error event received:', event.detail)
       dispatch({ type: 'SET_REFRESH_ERROR', payload: true })
     }
 
@@ -276,7 +279,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       // Clear React Query cache before login to ensure fresh state for new user
-      console.debug('🔐 Clearing React Query cache before login')
+      log.debug('🔐 Clearing React Query cache before login')
       queryClient.clear()
 
       const loginData = await authService.login(credentials)
@@ -350,10 +353,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.logout()
     } catch (error) {
-      console.error('Logout error:', error)
+      log.error('Logout error:', error)
     } finally {
       // Clear React Query cache to remove all user-specific data
-      console.debug('🔐 Clearing React Query cache on logout')
+      log.debug('🔐 Clearing React Query cache on logout')
       queryClient.clear()
       
       // Clear storage and update state
@@ -371,7 +374,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'SET_REFRESH_TOKEN', payload: authService.getRefreshToken() })
       }
     } catch (error) {
-      console.error('Auth refresh failed:', error)
+      log.error('Auth refresh failed:', error)
     }
   }
 
@@ -385,10 +388,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.logoutAllDevices()
     } catch (error) {
-      console.error('Logout from all devices error:', error)
+      log.error('Logout from all devices error:', error)
     } finally {
       // Clear React Query cache to remove all user-specific data
-      console.debug('🔐 Clearing React Query cache on logout from all devices')
+      log.debug('🔐 Clearing React Query cache on logout from all devices')
       queryClient.clear()
       
       // Clear storage and update state

@@ -1,29 +1,31 @@
+import { createScopedLogger } from '@/utils/logger'
+
+const log = createScopedLogger('debugAuth')
+
 // Utility function to test localStorage and auth data
 export const debugAuth = () => {
-  console.group('🔍 Auth Debug Information')
+  log.info('🔍 Auth Debug Information')
   
   try {
-    console.log('LocalStorage available:', typeof Storage !== 'undefined')
-    console.log('auth_token:', localStorage.getItem('auth_token'))
-    console.log('refresh_token:', localStorage.getItem('refresh_token'))
-    console.log('user_data:', localStorage.getItem('user_data'))
+    log.info('LocalStorage available:', typeof Storage !== 'undefined')
+    log.info('auth_token:', localStorage.getItem('auth_token'))
+    log.info('refresh_token:', localStorage.getItem('refresh_token'))
+    log.info('user_data:', localStorage.getItem('user_data'))
     
     const token = localStorage.getItem('auth_token')
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]))
-        console.log('Token payload:', payload)
-        console.log('Token expires:', new Date(payload.exp * 1000))
-        console.log('Token valid:', payload.exp * 1000 > Date.now())
+        log.info('Token payload:', payload)
+        log.info('Token expires:', new Date(payload.exp * 1000))
+        log.info('Token valid:', payload.exp * 1000 > Date.now())
       } catch (e) {
-        console.log('Token parse error:', e)
+        log.warn('Token parse error:', e)
       }
     }
   } catch (error) {
-    console.error('Debug error:', error)
+    log.error('Debug error:', error)
   }
-  
-  console.groupEnd()
 }
 
 // Add to window object for easy access in browser console

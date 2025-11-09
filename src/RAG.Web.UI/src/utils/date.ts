@@ -1,4 +1,7 @@
 import { LanguageCode } from '@/shared/types/i18n'
+import { createScopedLogger } from '@/utils/logger'
+
+const log = createScopedLogger('date')
 
 /**
  * Format date with time based on language preference
@@ -8,7 +11,7 @@ export function formatDateTime(date: Date | string, _language: LanguageCode): st
   
   // Check if date is valid
   if (isNaN(dateObj.getTime())) {
-    console.warn('Invalid date provided to formatDateTime')
+    log.warn('Invalid date provided to formatDateTime')
     // Return a fallback format for invalid dates
     return new Date().toISOString().replace('T', ' ').substring(0, 19)
   }
@@ -24,7 +27,7 @@ export function formatDateTime(date: Date | string, _language: LanguageCode): st
     
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
   } catch (error) {
-    console.warn('Failed to format date, using fallback:', error)
+    log.warn('Failed to format date, using fallback:', error)
     // Fallback to ISO format
     return dateObj.toISOString().replace('T', ' ').substring(0, 19)
   }
@@ -38,7 +41,7 @@ export function formatDate(date: Date | string, language: LanguageCode): string 
   
   // Check if date is valid
   if (isNaN(dateObj.getTime())) {
-    console.warn('Invalid date provided to formatDate')
+    log.warn('Invalid date provided to formatDate')
     // Return a fallback format for invalid dates
     return new Date().toISOString().substring(0, 10)
   }
@@ -60,7 +63,7 @@ export function formatDate(date: Date | string, language: LanguageCode): string 
       day: '2-digit'
     })
   } catch (error) {
-    console.warn('Failed to format date with locale, using fallback:', error)
+    log.warn('Failed to format date with locale, using fallback:', error)
     return dateObj.toISOString().substring(0, 10)
   }
 }

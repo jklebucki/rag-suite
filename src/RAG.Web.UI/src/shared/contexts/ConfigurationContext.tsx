@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
 import { ConfigurationState, ConfigurationContextType, RegistrationConfiguration } from '@/features/settings/types/configuration'
 import configurationService from '@/features/settings/services/configuration.service'
+import { createScopedLogger } from '@/utils/logger'
+const log = createScopedLogger('ConfigurationContext')
+
 
 // Actions
 type ConfigurationAction =
@@ -68,7 +71,7 @@ export function ConfigurationProvider({ children }: ConfigurationProviderProps) 
       const configuration = await configurationService.getRegistrationConfiguration()
       dispatch({ type: 'FETCH_SUCCESS', payload: configuration })
     } catch (error) {
-      console.error('Failed to fetch configuration:', error)
+      log.error('Failed to fetch configuration:', error)
 
       // Use default configuration as fallback
       const defaultConfig = configurationService.getDefaultConfiguration()
