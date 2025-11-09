@@ -226,6 +226,7 @@ public class JwtService : IJwtService
 
         var expiresAt = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
         tokenStore[refreshToken] = expiresAt;
+        _refreshTokens[userId] = tokenStore;
         _logger.LogInformation("Saved refresh token for user {UserId} expiring at {Expiry}", userId, expiresAt);
 
         return Task.CompletedTask;
