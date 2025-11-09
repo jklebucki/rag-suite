@@ -6,6 +6,7 @@ import { Modal } from '@/shared/components/ui/Modal'
 import { PasswordInput } from './PasswordInput'
 import { getPasswordStrength } from '@/utils/passwordValidation'
 import type { User as UserType } from '@/features/auth/types/auth'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface SetPasswordModalProps {
   isOpen: boolean
@@ -22,6 +23,7 @@ export function SetPasswordModal({
   onSetPassword,
   isLoading
 }: SetPasswordModalProps) {
+  const { t } = useI18n()
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -61,9 +63,14 @@ export function SetPasswordModal({
             <Key className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Set New Password</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {t('settings.user.password.modal.title')}
+            </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              for {user.firstName} {user.lastName}
+              {t('settings.user.password.modal.subtitle', {
+                firstName: user.firstName ?? '',
+                lastName: user.lastName ?? ''
+              })}
             </p>
           </div>
         </div>
@@ -94,8 +101,8 @@ export function SetPasswordModal({
               onChange={setNewPassword}
               showPassword={showPassword}
               onToggleShow={() => setShowPassword(!showPassword)}
-              placeholder="Enter a strong password"
-              label="New Password"
+              placeholder={t('settings.user.password.modal.placeholder_new')}
+              label={t('settings.user.password.modal.label_new')}
               strength={passwordStrength}
             />
 
@@ -105,8 +112,8 @@ export function SetPasswordModal({
               onChange={setConfirmPassword}
               showPassword={showConfirmPassword}
               onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
-              placeholder="Confirm your password"
-              label="Confirm Password"
+              placeholder={t('settings.user.password.modal.placeholder_confirm')}
+              label={t('settings.user.password.modal.label_confirm')}
               matchStatus={getMatchStatus()}
             />
 
@@ -116,7 +123,7 @@ export function SetPasswordModal({
                 onClick={handleClose}
                 className="btn-secondary text-sm font-medium transition-colors disabled:opacity-50"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -126,10 +133,10 @@ export function SetPasswordModal({
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                    <span>Setting Password...</span>
+                    <span>{t('settings.user.password.modal.setting')}</span>
                   </div>
                 ) : (
-                  'Set Password'
+                  t('settings.user.password.modal.submit')
                 )}
               </button>
             </div>

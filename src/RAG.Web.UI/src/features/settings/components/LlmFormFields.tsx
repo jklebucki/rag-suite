@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { RefreshCw } from 'lucide-react'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface LlmFormFieldProps {
   id: string
@@ -93,10 +94,12 @@ export function ModelSelectField({
   disabled,
   error
 }: ModelSelectFieldProps) {
+  const { t } = useI18n()
+
   return (
     <div>
       <label htmlFor="model" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-        Model
+        {t('settings.llm.fields.model.label')}
       </label>
       <div className="flex gap-2">
         <select
@@ -107,7 +110,7 @@ export function ModelSelectField({
           className={`form-select flex-1 ${error ? 'form-input-error' : ''}`}
           disabled={disabled}
         >
-          <option value="">Select a model...</option>
+          <option value="">{t('settings.llm.fields.model.placeholder')}</option>
           {availableModels.map(model => (
             <option key={model} value={model}>{model}</option>
           ))}
@@ -117,14 +120,17 @@ export function ModelSelectField({
           onClick={onRefresh}
           disabled={isLoading || disabled}
           className="btn-secondary px-3 py-2 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Refresh available models"
+          title={t('settings.llm.fields.model.refresh_title')}
+          aria-label={t('settings.llm.fields.model.refresh_title')}
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
       </div>
       {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {availableModels.length === 0 && !isLoading && !disabled && (
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">No models available. Check the URL and try refreshing.</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {t('settings.llm.fields.model.none')}
+        </p>
       )}
     </div>
   )

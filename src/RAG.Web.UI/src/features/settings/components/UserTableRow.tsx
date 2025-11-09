@@ -3,6 +3,7 @@
 import React from 'react'
 import { User, Plus, Minus, Key } from 'lucide-react'
 import type { User as UserType } from '@/features/auth/types/auth'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface UserTableRowProps {
   user: UserType
@@ -23,6 +24,7 @@ export function UserTableRow({
   isAssigningRole,
   isRemovingRole
 }: UserTableRowProps) {
+  const { t } = useI18n()
   const userRoles = user.roles || []
   const availableToAssign = availableRoles.filter(role => !userRoles.includes(role))
 
@@ -58,7 +60,7 @@ export function UserTableRow({
                 onClick={() => onRemoveRole(user.id, role)}
                 className="ml-1 text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
                 disabled={isRemovingRole}
-                aria-label={`Remove ${role} role`}
+                aria-label={t('settings.user.table.remove_role_aria', { role })}
               >
                 <Minus className="h-3 w-3" />
               </button>
@@ -88,7 +90,7 @@ export function UserTableRow({
           className="text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 flex items-center gap-1"
         >
           <Key className="h-4 w-4" />
-          Set Password
+          {t('settings.user.actions.set_password')}
         </button>
       </td>
     </tr>

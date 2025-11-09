@@ -9,6 +9,7 @@ import { validateLlmSettings } from '@/utils/llmValidation'
 import { LlmFormField, ModelSelectField } from './LlmFormFields'
 import type { LlmFormErrors } from '@/features/settings/types/settings'
 import { logger } from '@/utils/logger'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface SettingsFormProps {
   onSettingsChange?: (settings: LlmSettings) => void
@@ -16,6 +17,7 @@ interface SettingsFormProps {
 
 export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   const { addToast } = useToast()
+  const { t } = useI18n()
 
   const [settings, setSettings] = useState<LlmSettings>({
     url: '',
@@ -44,13 +46,13 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       logger.error('Failed to load LLM settings:', error)
       addToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to load LLM settings'
+        title: t('common.error'),
+        message: t('settings.llm.messages.load_error')
       })
     } finally {
       setLoading(false)
     }
-  }, [addToast, onSettingsChange])
+  }, [addToast, onSettingsChange, t])
 
   const loadAvailableModels = useCallback(async () => {
     if (!settings.url.trim()) return
@@ -106,7 +108,17 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
   const validateForm = (): boolean => {
     const { isValid, errors } = validateLlmSettings(settings)
-    setValidationErrors(errors)
+    if (!isValid) {
+      const translatedErrors = Object.entries(errors).reduce<LlmFormErrors>((acc, [key, value]) => {
+        if (value) {
+          acc[key as keyof LlmFormErrors] = t(value)
+        }
+        return acc
+      }, {})
+      setValidationErrors(translatedErrors)
+    } else {
+      setValidationErrors({})
+    }
     return isValid
   }
 
@@ -133,16 +145,16 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       await llmService.updateLlmSettings(request)
       addToast({
         type: 'success',
-        title: 'Success',
-        message: 'LLM settings updated successfully'
+        title: t('common.success'),
+        message: t('settings.llm.messages.update_success')
       })
       onSettingsChange?.(settings)
     } catch (error) {
       logger.error('Failed to update LLM settings:', error)
       addToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to update LLM settings'
+        title: t('common.error'),
+        message: t('settings.llm.messages.update_error')
       })
     } finally {
       setSaving(false)
@@ -157,7 +169,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     return (
       <div className="surface flex items-center justify-center gap-3 p-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
-        <span className="text-gray-600 dark:text-gray-300">Loading settings...</span>
+        <span className="text-gray-600 dark:text-gray-300">{t('settings.llm.loading')}</span>
       </div>
     )
   }
@@ -170,8 +182,8 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <SettingsIcon className="h-6 w-6 text-primary-600 dark:text-primary-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">LLM Settings</h1>
-          <p className="text-gray-600 dark:text-gray-300">Configure your Large Language Model settings</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('settings.llm.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-300">{t('settings.llm.subtitle')}</p>
         </div>
       </div>
 
@@ -179,19 +191,23 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       <div className="surface-muted border border-amber-200 dark:border-amber-800/40 rounded-xl p-4">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Admin Access Required</span>
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            {t('settings.llm.admin_notice_title')}
+          </span>
         </div>
         <p className="mt-1 text-sm text-amber-700 dark:text-amber-200">
-          These settings control the behavior of the LLM service. Changes may affect system performance and functionality.
+          {t('settings.llm.admin_notice_description')}
         </p>
       </div>
 
       {/* Settings Form */}
       <div className="surface p-6">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Model Configuration</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {t('settings.llm.section.model_configuration')}
+          </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Configure the connection to your LLM service and set generation parameters.
+            {t('settings.llm.section.model_configuration_description')}
           </p>
         </div>
 
@@ -199,12 +215,12 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="url"
             name="url"
-            label="LLM Service URL"
+            label={t('settings.llm.fields.url.label')}
             type="url"
             value={settings.url}
             onChange={handleChange}
             error={validationErrors.url}
-            placeholder="https://api.example.com"
+            placeholder={t('settings.llm.fields.url.placeholder')}
           />
 
           <ModelSelectField
@@ -220,7 +236,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="maxTokens"
             name="maxTokens"
-            label="Max Tokens"
+            label={t('settings.llm.fields.max_tokens.label')}
             type="number"
             value={settings.maxTokens}
             onChange={handleChange}
@@ -232,7 +248,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="temperature"
             name="temperature"
-            label="Temperature (0.0 - 2.0)"
+            label={t('settings.llm.fields.temperature.label')}
             type="number"
             value={settings.temperature}
             onChange={handleChange}
@@ -245,7 +261,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="isOllama"
             name="isOllama"
-            label="Is Ollama Service"
+            label={t('settings.llm.fields.is_ollama.label')}
             type="checkbox"
             value={settings.isOllama}
             onChange={handleChange}
@@ -254,7 +270,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="timeoutMinutes"
             name="timeoutMinutes"
-            label="Timeout Minutes"
+            label={t('settings.llm.fields.timeout_minutes.label')}
             type="number"
             value={settings.timeoutMinutes}
             onChange={handleChange}
@@ -266,21 +282,21 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           <LlmFormField
             id="chatEndpoint"
             name="chatEndpoint"
-            label="Chat Endpoint"
+            label={t('settings.llm.fields.chat_endpoint.label')}
             type="text"
             value={settings.chatEndpoint}
             onChange={handleChange}
-            placeholder="/api/chat"
+            placeholder={t('settings.llm.fields.chat_endpoint.placeholder')}
           />
 
           <LlmFormField
             id="generateEndpoint"
             name="generateEndpoint"
-            label="Generate Endpoint"
+            label={t('settings.llm.fields.generate_endpoint.label')}
             type="text"
             value={settings.generateEndpoint}
             onChange={handleChange}
-            placeholder="/api/generate"
+            placeholder={t('settings.llm.fields.generate_endpoint.placeholder')}
           />
 
           {/* Submit Button */}
@@ -293,12 +309,12 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Saving...</span>
+                  <span>{t('settings.llm.actions.saving')}</span>
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4" />
-                  <span>Save Settings</span>
+                  <span>{t('settings.llm.actions.save')}</span>
                 </>
               )}
             </button>

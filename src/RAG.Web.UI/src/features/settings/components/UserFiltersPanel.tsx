@@ -1,7 +1,6 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-//import React from 'react'
-//import { User, Shield } from 'lucide-react'
+import { useI18n } from '@/shared/contexts/I18nContext'
 import type { UserFilters } from '@/features/settings/types/settings'
 
 interface UserFiltersProps {
@@ -19,6 +18,8 @@ export function UserFiltersPanel({
   onClear,
   onApplyDatePreset
 }: UserFiltersProps) {
+  const { t } = useI18n()
+
   const updateFilter = (key: keyof UserFilters, value: string | string[] | Date | null) => {
     onFiltersChange({ ...filters, [key]: value })
   }
@@ -36,7 +37,7 @@ export function UserFiltersPanel({
         {/* Role Filter */}
         <div>
           <p className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" id="roles-heading">
-            Roles
+            {t('settings.user.filters.roles')}
           </p>
           <div className="space-y-2 max-h-32 overflow-y-auto pr-1">
             {availableRoles.map((role) => (
@@ -56,13 +57,13 @@ export function UserFiltersPanel({
         {/* Active Status Filter */}
         <div>
           <p className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2" id="status-heading">
-            Status
+            {t('settings.user.filters.status')}
           </p>
           <div className="space-y-2">
             {[
-              { value: 'all', label: 'All Users' },
-              { value: 'active', label: 'Active Only' },
-              { value: 'inactive', label: 'Inactive Only' }
+              { value: 'all', label: t('settings.user.filters.status_all') },
+              { value: 'active', label: t('settings.user.filters.status_active') },
+              { value: 'inactive', label: t('settings.user.filters.status_inactive') }
             ].map((option) => (
               <label key={option.value} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                 <input
@@ -81,7 +82,7 @@ export function UserFiltersPanel({
 
         {/* Created Date Filter */}
         <DateFilter
-          label="Created Date"
+          label={t('settings.user.filters.created')}
           fromValue={filters.createdDateFrom}
           toValue={filters.createdDateTo}
           onFromChange={(value) => updateFilter('createdDateFrom', value)}
@@ -91,7 +92,7 @@ export function UserFiltersPanel({
 
         {/* Last Login Filter */}
         <DateFilter
-          label="Last Login"
+          label={t('settings.user.filters.last_login')}
           fromValue={filters.lastLoginFrom}
           toValue={filters.lastLoginTo}
           onFromChange={(value) => updateFilter('lastLoginFrom', value)}
@@ -106,7 +107,7 @@ export function UserFiltersPanel({
           onClick={onClear}
           className="btn-secondary text-sm font-medium"
         >
-          Clear Filters
+          {t('settings.user.filters.clear')}
         </button>
       </div>
     </div>
@@ -123,6 +124,8 @@ interface DateFilterProps {
 }
 
 function DateFilter({ label, fromValue, toValue, onFromChange, onToChange, onPreset }: DateFilterProps) {
+  const { t } = useI18n()
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
@@ -134,14 +137,14 @@ function DateFilter({ label, fromValue, toValue, onFromChange, onToChange, onPre
           value={fromValue}
           onChange={(e) => onFromChange(e.target.value)}
           className="form-input text-sm"
-          placeholder="From"
+          placeholder={t('settings.user.filters.from')}
         />
         <input
           type="date"
           value={toValue}
           onChange={(e) => onToChange(e.target.value)}
           className="form-input text-sm"
-          placeholder="To"
+          placeholder={t('settings.user.filters.to')}
         />
         <div className="flex gap-2 flex-wrap">
           {[7, 30, 90].map((days) => (
@@ -150,7 +153,7 @@ function DateFilter({ label, fromValue, toValue, onFromChange, onToChange, onPre
               onClick={() => onPreset(days)}
               className="btn-secondary px-3 py-1 text-xs"
             >
-              {days} days
+              {t('settings.user.filters.days', { days: days.toString() })}
             </button>
           ))}
         </div>

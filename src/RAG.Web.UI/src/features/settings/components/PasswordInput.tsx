@@ -3,6 +3,7 @@
 import React from 'react'
 import { Eye, EyeOff, Lock, CheckCircle, XCircle } from 'lucide-react'
 import type { PasswordStrength } from '@/features/settings/types/settings'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface PasswordInputProps {
   value: string
@@ -36,6 +37,14 @@ export function PasswordInput({
   }
 
   const inputId = `password-input-${label.toLowerCase().replace(/\s+/g, '-')}`
+  const { t } = useI18n()
+
+  const strengthLabels: Record<PasswordStrength['label'], string> = {
+    Weak: t('settings.user.password.strength.weak'),
+    Fair: t('settings.user.password.strength.fair'),
+    Good: t('settings.user.password.strength.good'),
+    Strong: t('settings.user.password.strength.strong')
+  }
   
   return (
     <div className="space-y-2">
@@ -67,13 +76,13 @@ export function PasswordInput({
       {strength && value && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-300">Password strength:</span>
+            <span className="text-gray-600 dark:text-gray-300">{t('settings.user.password.strength.label')}</span>
             <span className={`font-medium ${
               strength.score <= 2 ? 'text-red-600' :
               strength.score <= 3 ? 'text-yellow-600' :
               strength.score <= 4 ? 'text-blue-600' : 'text-green-500'
             }`}>
-              {strength.label}
+              {strengthLabels[strength.label]}
             </span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2 relative overflow-hidden">
@@ -88,11 +97,11 @@ export function PasswordInput({
 
           {/* Password Requirements */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <PasswordRequirement met={strength.checks.length} label="8+ characters" />
-            <PasswordRequirement met={strength.checks.uppercase} label="Uppercase" />
-            <PasswordRequirement met={strength.checks.lowercase} label="Lowercase" />
-            <PasswordRequirement met={strength.checks.number} label="Number" />
-            <PasswordRequirement met={strength.checks.special} label="Special char" />
+            <PasswordRequirement met={strength.checks.length} label={t('settings.user.password.requirements.length')} />
+            <PasswordRequirement met={strength.checks.uppercase} label={t('settings.user.password.requirements.uppercase')} />
+            <PasswordRequirement met={strength.checks.lowercase} label={t('settings.user.password.requirements.lowercase')} />
+            <PasswordRequirement met={strength.checks.number} label={t('settings.user.password.requirements.number')} />
+            <PasswordRequirement met={strength.checks.special} label={t('settings.user.password.requirements.special')} />
           </div>
         </div>
       )}
@@ -103,12 +112,12 @@ export function PasswordInput({
           {matchStatus === 'match' ? (
             <>
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-green-600">Passwords match</span>
+              <span className="text-green-600">{t('settings.user.password.match')}</span>
             </>
           ) : (
             <>
               <XCircle className="h-4 w-4 text-red-600" />
-              <span className="text-red-600">Passwords do not match</span>
+              <span className="text-red-600">{t('settings.user.password.mismatch')}</span>
             </>
           )}
         </div>

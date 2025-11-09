@@ -13,25 +13,25 @@ export function validateLlmSettings(settings: LlmSettings): {
   const errors: LlmFormErrors = {}
 
   if (!settings.url.trim()) {
-    errors.url = 'URL is required'
+    errors.url = 'settings.llm.validation.url_required'
   } else if (!settings.url.startsWith('http://') && !settings.url.startsWith('https://')) {
-    errors.url = 'URL must start with http:// or https://'
+    errors.url = 'settings.llm.validation.url_protocol'
   }
 
   if (settings.maxTokens <= 0) {
-    errors.maxTokens = 'Max tokens must be greater than 0'
+    errors.maxTokens = 'settings.llm.validation.max_tokens'
   }
 
   if (settings.temperature < 0 || settings.temperature > 2) {
-    errors.temperature = 'Temperature must be between 0 and 2'
+    errors.temperature = 'settings.llm.validation.temperature'
   }
 
   if (!settings.model.trim()) {
-    errors.model = 'Model is required'
+    errors.model = 'settings.llm.validation.model_required'
   }
 
   if (settings.timeoutMinutes <= 0) {
-    errors.timeoutMinutes = 'Timeout must be greater than 0'
+    errors.timeoutMinutes = 'settings.llm.validation.timeout'
   }
 
   return {

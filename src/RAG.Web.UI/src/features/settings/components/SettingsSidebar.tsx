@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
 import type { SettingsTab } from '@/features/settings/types/settings'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 export function SettingsSidebar({
   activeTab,
@@ -11,6 +12,7 @@ export function SettingsSidebar({
   activeTab: SettingsTab
   setActiveTab: (tab: SettingsTab) => void
 }) {
+  const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const toggleRef = useRef<HTMLButtonElement | null>(null)
@@ -72,8 +74,8 @@ export function SettingsSidebar({
               aria-expanded={isMenuOpen}
               aria-controls="settings-sidebar"
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 transition-colors"
-              aria-label="Settings menu"
-              title="Settings menu"
+              aria-label={t('settings.sidebar.toggle_label')}
+              title={t('settings.sidebar.toggle_label')}
             >
               <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
             </button>
@@ -82,8 +84,8 @@ export function SettingsSidebar({
               <div className="absolute right-0 top-full mt-1 w-64 surface border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg z-50">
                 <div className="p-2">
                   <nav className="space-y-2">
-                    {navButton('llm', 'LLM Settings', <SettingsIcon className="h-5 w-5" />)}
-                    {navButton('user', 'User Settings', <User className="h-5 w-5" />)}
+                    {navButton('llm', t('settings.sidebar.tabs.llm'), <SettingsIcon className="h-5 w-5" />)}
+                    {navButton('user', t('settings.sidebar.tabs.user'), <User className="h-5 w-5" />)}
                   </nav>
                 </div>
               </div>
@@ -94,10 +96,12 @@ export function SettingsSidebar({
 
       {/* Desktop sidebar */}
       <aside id="settings-sidebar" className="hidden md:block w-64 surface p-6 sticky top-6 h-full self-start">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Settings</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          {t('settings.sidebar.title')}
+        </h2>
         <nav className="space-y-2" aria-label="Settings navigation">
-          {navButton('llm', 'LLM Settings', <SettingsIcon className="h-5 w-5" />)}
-          {navButton('user', 'User Settings', <User className="h-5 w-5" />)}
+          {navButton('llm', t('settings.sidebar.tabs.llm'), <SettingsIcon className="h-5 w-5" />)}
+          {navButton('user', t('settings.sidebar.tabs.user'), <User className="h-5 w-5" />)}
         </nav>
       </aside>
 

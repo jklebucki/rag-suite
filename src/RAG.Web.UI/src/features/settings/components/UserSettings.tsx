@@ -10,10 +10,12 @@ import { useToast } from '@/shared/hooks/useToast'
 import { UserFiltersPanel } from './UserFiltersPanel'
 import { UserTableRow } from './UserTableRow'
 import { SetPasswordModal } from './SetPasswordModal'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 export function UserSettings() {
   const { showSuccess, showError } = useToast()
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [isSetPasswordModalOpen, setIsSetPasswordModalOpen] = useState(false)
@@ -48,10 +50,10 @@ export function UserSettings() {
       authService.assignRole(userId, roleName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      showSuccess('Role assigned successfully')
+      showSuccess(t('settings.user.toasts.role_assigned'))
     },
     onError: () => {
-      showError('Failed to assign role')
+      showError(t('settings.user.toasts.role_assign_error'))
     }
   })
 
@@ -61,10 +63,10 @@ export function UserSettings() {
       authService.removeRole(userId, roleName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      showSuccess('Role removed successfully')
+      showSuccess(t('settings.user.toasts.role_removed'))
     },
     onError: () => {
-      showError('Failed to remove role')
+      showError(t('settings.user.toasts.role_remove_error'))
     }
   })
 
@@ -75,10 +77,10 @@ export function UserSettings() {
     onSuccess: () => {
       setIsSetPasswordModalOpen(false)
       setSelectedUser(null)
-      showSuccess('Password set successfully')
+      showSuccess(t('settings.user.toasts.password_set'))
     },
     onError: () => {
-      showError('Failed to set password')
+      showError(t('settings.user.toasts.password_set_error'))
     }
   })
 
@@ -108,8 +110,12 @@ export function UserSettings() {
             <Shield className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Access Denied</h1>
-            <p className="text-gray-600 dark:text-gray-300">You need Admin role to access user management</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {t('settings.user.access_denied.title')}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              {t('settings.user.access_denied.description')}
+            </p>
           </div>
         </div>
       </div>
@@ -124,8 +130,10 @@ export function UserSettings() {
           <User className="h-6 w-6 text-green-600 dark:text-green-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h1>
-          <p className="text-gray-600 dark:text-gray-300">Manage users, roles, and permissions</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {t('settings.user.title')}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">{t('settings.user.subtitle')}</p>
         </div>
       </div>
 
@@ -143,7 +151,7 @@ export function UserSettings() {
                 value={filters.searchText}
                 onChange={(e) => setFilters(prev => ({ ...prev, searchText: e.target.value }))}
                 className="form-input w-full pl-10 sm:text-sm"
-                placeholder="Search users by name, username, or email..."
+              placeholder={t('settings.user.search_placeholder')}
               />
             </div>
             <button
@@ -151,7 +159,7 @@ export function UserSettings() {
               className="ml-4 inline-flex items-center gap-2 btn-secondary text-sm"
             >
               <Shield className="h-4 w-4" />
-              {isFiltersExpanded ? 'Hide Filters' : 'More Filters'}
+            {isFiltersExpanded ? t('settings.user.filters.hide') : t('settings.user.filters.show')}
             </button>
           </div>
         </div>
@@ -170,18 +178,21 @@ export function UserSettings() {
         {/* Results Summary */}
         <div className="px-6 py-3 surface-muted border-b border-gray-200 dark:border-slate-700">
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            Showing {filteredUsers.length} of {users.length} users
+            {t('settings.user.summary', {
+              current: filteredUsers.length.toString(),
+              total: users.length.toString()
+            })}
           </p>
         </div>
 
         {isLoading ? (
           <div className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">Loading users...</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">{t('settings.user.loading')}</p>
           </div>
         ) : fetchError ? (
           <div className="p-6 text-center">
-            <p className="text-red-600 dark:text-red-400">Failed to load users</p>
+            <p className="text-red-600 dark:text-red-400">{t('settings.user.error.loading')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -189,19 +200,19 @@ export function UserSettings() {
               <thead className="bg-gray-50 dark:bg-slate-800/70">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    User
+                    {t('settings.user.table.user')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Email
+                    {t('settings.user.table.email')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Roles
+                    {t('settings.user.table.roles')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Created
+                    {t('settings.user.table.created')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Actions
+                    {t('settings.user.table.actions')}
                   </th>
                 </tr>
               </thead>
