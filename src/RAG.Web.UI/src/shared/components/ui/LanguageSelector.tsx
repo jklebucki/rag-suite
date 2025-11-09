@@ -34,7 +34,7 @@ export function LanguageSelector() {
               <button
           data-language-selector-toggle
           onClick={() => setIsOpen(!isOpen)}
-          className="hidden md:inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="hidden md:inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
         >
           {currentLanguage && (
             <ReactCountryFlag
@@ -51,11 +51,11 @@ export function LanguageSelector() {
         </button>
 
       {isOpen && (
-        <div className="fixed right-0 top-16 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 md:absolute md:right-0 md:top-auto md:mt-2">
-          <div className="px-3 py-2 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">{t('language.selector.title')}</p>
+        <div className="fixed right-0 top-16 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 md:absolute md:right-0 md:top-auto md:mt-2 dark:bg-gray-800 dark:border-gray-700">
+          <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('language.selector.title')}</p>
             {isAutoDetected && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {t('language.auto_detected')}
               </p>
             )}
@@ -67,7 +67,7 @@ export function LanguageSelector() {
                 key={lang.code}
                 type="button"
                 onClick={() => handleLanguageSelect(lang)}
-                className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <ReactCountryFlag
@@ -79,12 +79,12 @@ export function LanguageSelector() {
                     }}
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{lang.nativeName}</p>
-                    <p className="text-xs text-gray-500">{lang.name}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{lang.nativeName}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{lang.name}</p>
                   </div>
                 </div>
                 {language === lang.code && (
-                  <Check className="h-4 w-4 text-blue-600" />
+                  <Check className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 )}
               </button>
             ))}

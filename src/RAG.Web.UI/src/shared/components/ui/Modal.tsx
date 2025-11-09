@@ -42,29 +42,29 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
       {/* Backdrop */}
       <button 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 transition-opacity"
         onClick={onClose}
         aria-label="Close modal"
         tabIndex={-1}
       />
       
       {/* Modal */}
-      <div className={`relative bg-white w-full overflow-hidden ${
+      <div className={`relative bg-white dark:bg-gray-800 w-full overflow-hidden ${
         fullscreen 
           ? 'h-full rounded-none' 
           : `rounded-lg shadow-xl ${sizeClasses[size]} max-h-[90vh] sm:max-h-[85vh]`
       }`}>
         {/* Header - ukryty w fullscreen */}
         {!fullscreen && (
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate pr-2">{title}</h2>
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 truncate pr-2">{title}</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
               aria-label="Close modal"
               title="Close modal"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
         )}

@@ -47,6 +47,7 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const password = watch('password')
+  const baseInputClasses = 'form-input'
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -79,23 +80,23 @@ export function RegisterForm() {
 
   if (!validationRules) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading configuration...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-gray-600 dark:text-gray-300">Loading configuration...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 text-gray-900 dark:text-gray-100">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <User className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             {t('auth.register.title')}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             {t('auth.register.subtitle')}
           </p>
         </div>
@@ -109,20 +110,18 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="firstName"
                   type="text"
                   {...register('firstName', validationRules.firstName)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
-                    errors.firstName ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-3 ${errors.firstName ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.first_name')}
                 />
               </div>
               {errors.firstName && (
-                <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
               )}
             </div>
 
@@ -133,20 +132,18 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="lastName"
                   type="text"
                   {...register('lastName', validationRules.lastName)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
-                    errors.lastName ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-3 ${errors.lastName ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.last_name')}
                 />
               </div>
               {errors.lastName && (
-                <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
               )}
             </div>
 
@@ -157,20 +154,18 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="userName"
                   type="text"
                   {...register('userName', validationRules.userName)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
-                    errors.userName ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-3 ${errors.userName ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.username')}
                 />
               </div>
               {errors.userName && (
-                <p className="mt-1 text-sm text-red-600">{errors.userName.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.userName.message}</p>
               )}
             </div>
 
@@ -181,21 +176,19 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   autoComplete="email"
                   {...register('email', validationRules.email)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-2 border ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-3 ${errors.email ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.email')}
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
               )}
             </div>
 
@@ -206,36 +199,34 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   {...register('password', validationRules.password)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-10 py-2 border ${
-                    errors.password ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-10 ${errors.password ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.password')}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
               )}
               {password && passwordRequirements.length > 0 && (
-                <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                  <p className="font-medium mb-1">Password must contain:</p>
+                <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800/80 rounded text-xs text-gray-600 dark:text-gray-300">
+                  <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">Password must contain:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {passwordRequirements.map((req, index) => (
                       <li key={index}>{req}</li>
@@ -252,32 +243,30 @@ export function RegisterForm() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   {...register('confirmPassword', validationRules.confirmPassword)}
-                  className={`appearance-none rounded-md relative block w-full pl-10 pr-10 py-2 border ${
-                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                  className={`${baseInputClasses} pl-10 pr-10 ${errors.confirmPassword ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.confirm_password')}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -287,16 +276,14 @@ export function RegisterForm() {
                 id="acceptTerms"
                 type="checkbox"
                 {...register('acceptTerms', validationRules.acceptTerms)}
-                className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${
-                  errors.acceptTerms ? 'border-red-300' : ''
-                }`}
+                className={`form-checkbox ${errors.acceptTerms ? 'border-red-300 dark:border-red-600' : ''}`}
               />
-              <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                 {t('auth.register.accept_terms')}
               </label>
             </div>
             {errors.acceptTerms && (
-              <p className="text-sm text-red-600">{errors.acceptTerms.message}</p>
+              <p className="text-sm text-red-600 dark:text-red-400">{errors.acceptTerms.message}</p>
             )}
           </div>
 
@@ -304,7 +291,7 @@ export function RegisterForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? (
                 <div className="flex items-center">
@@ -321,11 +308,11 @@ export function RegisterForm() {
           </div>
 
           <div className="text-center">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               {t('auth.register.have_account')}{' '}
               <Link
                 to="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 {t('auth.register.sign_in')}
               </Link>

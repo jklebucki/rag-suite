@@ -32,6 +32,8 @@ export function ResetPasswordConfirmForm() {
   const [loading, setLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [token, setToken] = useState<string>('')
+  const baseInputClasses =
+    'appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 focus:z-10 sm:text-sm'
 
   useEffect(() => {
     const tokenParam = searchParams.get('token')
@@ -125,25 +127,25 @@ export function ResetPasswordConfirmForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 text-gray-900 dark:text-gray-100">
           <div className="text-center">
-            <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
               {t('auth.reset_confirm.success_title')}
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
               {t('auth.reset_confirm.success_message')}
             </p>
-            <p className="mt-4 text-center text-sm text-gray-500">
+            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
               {t('auth.reset_confirm.redirect_message')}
             </p>
             <div className="mt-6">
               <Link
                 to="/login"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t('auth.reset_confirm.back_to_login')}
@@ -156,16 +158,16 @@ export function ResetPasswordConfirmForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 text-gray-900 dark:text-gray-100">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <Lock className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <Lock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             {t('auth.reset_confirm.title')}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             {t('auth.reset_confirm.subtitle')}
           </p>
         </div>
@@ -177,7 +179,7 @@ export function ResetPasswordConfirmForm() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="newPassword"
@@ -187,14 +189,12 @@ export function ResetPasswordConfirmForm() {
                 required
                 value={formData.newPassword}
                 onChange={handleInputChange}
-                className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border ${
-                  errors.newPassword ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`${baseInputClasses} pl-10 pr-3 ${errors.newPassword ? 'form-input-error' : ''}`}
                 placeholder={t('auth.placeholders.new_password')}
               />
             </div>
             {errors.newPassword && (
-              <p className="mt-1 text-sm text-red-600">{errors.newPassword}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.newPassword}</p>
             )}
           </div>
 
@@ -204,7 +204,7 @@ export function ResetPasswordConfirmForm() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="confirmPassword"
@@ -214,14 +214,12 @@ export function ResetPasswordConfirmForm() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border ${
-                  errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`${baseInputClasses} pl-10 pr-3 ${errors.confirmPassword ? 'form-input-error' : ''}`}
                 placeholder={t('auth.placeholders.confirm_password')}
               />
             </div>
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>
             )}
           </div>
 
@@ -229,7 +227,7 @@ export function ResetPasswordConfirmForm() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -248,7 +246,7 @@ export function ResetPasswordConfirmForm() {
           <div className="text-center">
             <Link
               to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500 text-sm"
+              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
             >
               <ArrowLeft className="h-4 w-4 inline mr-1" />
               {t('auth.reset_confirm.back_to_login')}

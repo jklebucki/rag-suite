@@ -73,31 +73,31 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default fallback UI
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-          <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+          <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <div className="flex items-center justify-center mb-6">
-              <div className="bg-red-100 rounded-full p-4">
-                <AlertTriangle className="h-12 w-12 text-red-600" />
+              <div className="bg-red-100 dark:bg-red-900/30 rounded-full p-4">
+                <AlertTriangle className="h-12 w-12 text-red-600 dark:text-red-400" />
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 text-center mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
               Oops! Something went wrong
             </h1>
 
-            <p className="text-gray-600 text-center mb-6">
+            <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
               We&apos;re sorry, but something unexpected happened. The error has been logged
               and we&apos;ll look into it.
             </p>
 
             {import.meta.env.DEV && this.state.error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <h3 className="font-semibold text-red-800 mb-2">Error Details (Development Only):</h3>
-                <p className="text-sm text-red-700 font-mono mb-2">
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <h3 className="font-semibold text-red-800 dark:text-red-400 mb-2">Error Details (Development Only):</h3>
+                <p className="text-sm text-red-700 dark:text-red-300 font-mono mb-2">
                   {this.state.error.toString()}
                 </p>
                 {this.state.errorInfo && (
-                  <details className="text-sm text-red-600">
+                  <details className="text-sm text-red-600 dark:text-red-400">
                     <summary className="cursor-pointer font-semibold mb-1">
                       Component Stack
                     </summary>
@@ -112,14 +112,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <div className="flex gap-4 justify-center">
               <button
                 onClick={this.handleReset}
-                className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 transition-colors"
               >
                 <RefreshCw className="h-5 w-5" />
                 Try Again
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 <Home className="h-5 w-5" />
                 Go Home

@@ -28,14 +28,14 @@ export function SessionExpiredModal({
       <div className="p-6">
         {/* Warning Icon */}
         <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full">
-            <AlertTriangle className="w-8 h-8 text-orange-600" />
+          <div className="flex items-center justify-center w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+            <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
           </div>
         </div>
 
         {/* Message */}
         <div className="text-center mb-8">
-          <p className="text-gray-600 text-lg leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
             {t('session.expired.message')}
           </p>
         </div>
@@ -44,7 +44,7 @@ export function SessionExpiredModal({
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onTryAgain}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors font-medium"
           >
             <RefreshCw className="w-5 h-5" />
             {t('session.expired.try_again')}
@@ -52,7 +52,7 @@ export function SessionExpiredModal({
 
           <button
             onClick={onLogout}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition-colors font-medium"
           >
             <LogOut className="w-5 h-5" />
             {t('session.expired.logout')}
@@ -61,7 +61,7 @@ export function SessionExpiredModal({
 
         {/* Footer Note */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Możesz również zamknąć to okno i spróbować ponownie później.
           </p>
         </div>

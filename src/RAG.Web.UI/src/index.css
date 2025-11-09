@@ -6,20 +6,64 @@
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  /* Smooth color transitions for theme changes */
+  html {
+    @apply transition-colors duration-200;
+  }
 }
 
 @layer components {
   .btn-primary {
     @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply dark:bg-primary-600 dark:hover:bg-primary-700;
   }
 
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100;
   }
 
   /* Search result highlights */
   .search-highlights em {
     @apply bg-yellow-200 text-yellow-900 font-semibold px-1 rounded;
+    @apply dark:bg-yellow-900/50 dark:text-yellow-200;
+  }
+
+  .form-input {
+    @apply block w-full rounded-xl border border-primary-100 bg-primary-50 px-4 py-3 text-gray-900 placeholder:text-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm;
+    @apply dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-slate-400 dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-inner;
+  }
+
+  .form-input-error {
+    @apply border-red-300 bg-red-50 text-red-900 focus:ring-red-500 focus:border-red-500;
+    @apply dark:border-red-600 dark:bg-red-900/30 dark:text-red-200 dark:focus:ring-red-500 dark:focus:border-red-500;
+  }
+
+  .form-checkbox {
+    @apply h-4 w-4 rounded-md border border-primary-200 bg-white text-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-0 transition-colors accent-primary-500;
+    @apply dark:border-gray-600 dark:bg-gray-800 dark:text-primary-400 dark:focus:ring-primary-500 dark:accent-primary-400;
+  }
+
+  .form-input:-webkit-autofill,
+  .form-input:-webkit-autofill:hover,
+  .form-input:-webkit-autofill:focus,
+  .form-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #111827;
+    caret-color: #111827;
+    box-shadow: 0 0 0 1000px #eef2ff inset;
+    border-color: #c7d2fe;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .dark .form-input:-webkit-autofill,
+  .dark .form-input:-webkit-autofill:hover,
+  .dark .form-input:-webkit-autofill:focus,
+  .dark .form-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #f9fafb;
+    caret-color: #f9fafb;
+    box-shadow: 0 0 0 1000px #1e293b inset;
+    border-color: #334155;
   }
 
   /* Hide scrollbar but keep scrolling functionality */

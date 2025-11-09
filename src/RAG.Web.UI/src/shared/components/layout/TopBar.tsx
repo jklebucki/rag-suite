@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/shared/components/ui/LanguageSelector'
+import { ThemeToggle } from '@/shared/components/ui/ThemeToggle'
 import { UserAccountModal } from '@/features/settings/components/UserAccountModal'
 import { SessionExpiredModal } from '@/shared/components/ui/SessionExpiredModal'
 import { useI18n } from '@/shared/contexts/I18nContext'
@@ -56,16 +57,16 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   }
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         {/* Hamburger first so it is not overlapped by the logo on small screens */}
         <button
           onClick={onToggleSidebar}
-          className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden"
           aria-label={t('common.toggle_menu')}
           title={t('common.toggle_menu')}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
         </button>
 
         {/* Mobile: show citronex svg instead of the full logo to avoid overlap with hamburger */}
@@ -80,6 +81,9 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Theme toggle */}
+        <ThemeToggle />
+
         {/* Language selector: render always so dropdown can be opened from mobile globe button; the selector's own toggle is hidden on mobile */}
         <LanguageSelector />
 
@@ -91,23 +95,23 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
             const el = document.querySelector('[data-language-selector-toggle]') as HTMLElement | null
             if (el) el.click()
           }}
-          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 md:hidden"
+          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden"
           title={t('common.toggle_menu')}
           aria-label={t('common.toggle_menu')}
         >
-          <Globe className="h-5 w-5" />
-          <span className="text-sm font-medium text-gray-700 uppercase">{language}</span>
+          <Globe className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase">{language}</span>
         </button>
         
         {!user && (
           <Link
             to="/login"
-            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
+            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             title={t('auth.login.sign_in')}
             aria-label={t('auth.login.sign_in')}
           >
-            <LogIn className="h-5 w-5" />
-            <span className="text-sm font-medium text-gray-700 hidden sm:inline">{t('auth.login.sign_in')}</span>
+            <LogIn className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">{t('auth.login.sign_in')}</span>
           </Link>
         )}
         
@@ -115,28 +119,28 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               title={t('common.user_menu')}
               aria-label={t('common.user_menu')}
             >
-              <User className="h-5 w-5" />
-              <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+              <User className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
                 {user.fullName || user.email}
               </span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-4 w-4 text-gray-700 dark:text-gray-300 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">{user.userName}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              <div className="absolute right-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user.userName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                   {user.roles && user.roles.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                       {user.roles.map((role) => (
                         <span
                           key={role}
-                          className="px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded"
+                          className="px-1.5 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
                         >
                           {role}
                         </span>
@@ -148,7 +152,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                 <div className="py-1">
                   <button
                     onClick={handleAccountClick}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-50"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <Settings className="h-4 w-4" />
                     {t('account.manage_account')}
@@ -156,7 +160,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                   
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-50"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <LogOut className="h-4 w-4" />
                     {t('auth.logout')}
