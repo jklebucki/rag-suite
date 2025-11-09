@@ -98,17 +98,17 @@ export function About() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Info className="h-6 w-6 text-blue-600" />
+        <div className="surface flex items-center gap-3 p-4">
+          <div className="p-2 bg-primary-100 rounded-lg dark:bg-primary-900/30">
+            <Info className="h-6 w-6 text-primary-600 dark:text-primary-300" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">App Info</h1>
-            <p className="text-gray-600">Loading application information...</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">App Info</h1>
+            <p className="text-gray-600 dark:text-gray-300">Loading application information...</p>
           </div>
         </div>
-        <div className="flex items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        <div className="surface flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
         </div>
       </div>
     )
@@ -117,17 +117,17 @@ export function About() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Info className="h-6 w-6 text-red-600" />
+        <div className="surface flex items-center gap-3 p-4">
+          <div className="p-2 bg-red-100 rounded-lg dark:bg-red-900/30">
+            <Info className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">App Info</h1>
-            <p className="text-gray-600">Application information</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">App Info</h1>
+            <p className="text-gray-600 dark:text-gray-300">Application information</p>
           </div>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{error}</p>
+        <div className="surface border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 rounded-xl p-4">
+          <p>{error}</p>
         </div>
       </div>
     )
@@ -136,15 +136,15 @@ export function About() {
   return (
     <div className="space-y-6">
       {/* HERO */}
-      <div className="bg-white shadow rounded-xl p-6">
+      <div className="surface rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-2 text-sm">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary-200 dark:border-primary-800 bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
             <Info className="h-4 w-4" />
             <span>{getSubtitleById(content, 'subtitle-hero-badge') || 'Twój inteligentny asystent AI Jan'}</span>
           </span>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mt-4">{top.h1}</h1>
-        {top.tagline && <p className="text-gray-700 mt-2">{top.tagline}</p>}
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-4">{top.h1}</h1>
+        {top.tagline && <p className="text-gray-700 dark:text-gray-300 mt-2">{top.tagline}</p>}
       </div>
 
       {/* O APLIKACJI / O PROJEKCIE */}
@@ -161,12 +161,12 @@ export function About() {
       <Card title={sections.keyFeatures.title} subtitle={sections.keyFeatures.subtitle}>
         <div className="grid md:grid-cols-3 gap-4">
           {featureCards.map((f, i) => (
-            <div key={f.id || i} className="border rounded-xl p-5">
-              <div className="flex items-center justify-center gap-2 mb-3">
+            <div key={f.id || i} className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-3 text-primary-600 dark:text-primary-300">
                 {(f.id === 'chat' || i === 0) && <Brain className="h-5 w-5" />}
                 {(f.id === 'search' || i === 1) && <Search className="h-5 w-5" />}
                 {(f.id === 'analytics' || i === 2) && <BarChart3 className="h-5 w-5" />}
-                <h3 className="font-semibold text-center">{f.title}</h3>
+                <h3 className="font-semibold text-center text-gray-900 dark:text-gray-100">{f.title}</h3>
               </div>
               <Markdown small>{f.body}</Markdown>
             </div>
@@ -178,12 +178,12 @@ export function About() {
       <Card title={sections.roadmap.title} subtitle={sections.roadmap.subtitle}>
         <div className="grid md:grid-cols-3 gap-4">
           {roadmapCols.map((col, idx) => (
-            <div key={col.id || idx} className="border rounded-xl p-5">
-              <div className="flex items-center justify-center gap-2 mb-3">
+            <div key={col.id || idx} className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center justify-center gap-2 mb-3 text-primary-600 dark:text-primary-300">
                 {(col.id === 'done' || idx === 0) && <CheckCircle2 className="h-5 w-5" />}
                 {(col.id === 'inprogress' || idx === 1) && <Rocket className="h-5 w-5" />}
                 {(col.id === 'plan' || idx === 2) && <Star className="h-5 w-5" />}
-                <h3 className="font-semibold text-center">{col.title}</h3>
+                <h3 className="font-semibold text-center text-gray-900 dark:text-gray-100">{col.title}</h3>
               </div>
               <Markdown small>{col.body}</Markdown>
             </div>
@@ -212,10 +212,10 @@ function Card({
   title, subtitle, children,
 }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="bg-white shadow rounded-xl p-6">
+    <section className="surface rounded-2xl p-6 shadow-sm">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-        {subtitle && <p className="text-gray-600 text-sm mt-1">{subtitle}</p>}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{title}</h2>
+        {subtitle && <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">{subtitle}</p>}
       </div>
       {children}
     </section>
@@ -223,28 +223,31 @@ function Card({
 }
 
 function Markdown({ children, small }: { children: string; small?: boolean }) {
+  const baseProse = small ? 'prose prose-sm' : 'prose'
   return (
-    <div className={small ? 'prose prose-sm max-w-none' : 'prose max-w-none'}>
+    <div
+      className={`${baseProse} max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-a:text-primary-600 dark:prose-invert dark:prose-headings:text-gray-100 dark:prose-p:text-gray-300 dark:prose-li:text-gray-300 dark:prose-strong:text-gray-100 dark:prose-a:text-primary-300`}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 mb-4">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-xl font-semibold text-gray-900 mt-6 mb-3">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-lg font-medium text-gray-900 mt-4 mb-2 text-center">{children}</h3>,
-          p: ({ children }) => <p className="text-gray-700 mb-3 leading-relaxed">{children}</p>,
-          ul: ({ children }) => <ul className="list-disc list-inside text-gray-700 space-y-1">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal list-inside text-gray-700 space-y-1">{children}</ol>,
+          h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mt-6 mb-3">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4 mb-2 text-center">{children}</h3>,
+          p: ({ children }) => <p className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">{children}</p>,
+          ul: ({ children }) => <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">{children}</ol>,
           a: ({ href, children }) => (
-            <a href={href as string} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+            <a href={href as string} target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-300 underline">
               {children}
             </a>
           ),
-          code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm">{children}</code>,
-          pre: ({ children }) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto text-sm mb-3">{children}</pre>,
-          blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-300 pl-3 italic text-gray-600 mb-3">{children}</blockquote>,
+          code: ({ children }) => <code className="bg-gray-100 dark:bg-slate-900 px-1.5 py-0.5 rounded text-sm">{children}</code>,
+          pre: ({ children }) => <pre className="bg-gray-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto text-sm mb-3">{children}</pre>,
+          blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-300 dark:border-slate-600 pl-3 italic text-gray-600 dark:text-gray-300 mb-3">{children}</blockquote>,
           table: ({ children }) => <div className="overflow-x-auto"><table className="w-full text-left border-collapse">{children}</table></div>,
-          th: ({ children }) => <th className="border-b py-2 pr-4 font-semibold">{children}</th>,
-          td: ({ children }) => <td className="border-b py-2 pr-4">{children}</td>,
+          th: ({ children }) => <th className="border-b border-gray-200 dark:border-slate-700 py-2 pr-4 font-semibold text-gray-900 dark:text-gray-100">{children}</th>,
+          td: ({ children }) => <td className="border-b border-gray-200 dark:border-slate-700 py-2 pr-4 text-gray-700 dark:text-gray-300">{children}</td>,
         }}
       >
         {children}
@@ -265,12 +268,12 @@ function BenefitsList({ md }: { md: string }) {
   return (
     <>
       {items.map((it, i) => (
-        <div key={i} className="border rounded-xl p-5">
-          <div className="flex items-center justify-center gap-2 mb-2">
+        <div key={i} className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+          <div className="flex items-center justify-center gap-2 mb-2 text-primary-600 dark:text-primary-300">
             <Activity className="h-5 w-5" />
-            <h3 className="font-semibold text-center">{it.title}</h3>
+            <h3 className="font-semibold text-center text-gray-900 dark:text-gray-100">{it.title}</h3>
           </div>
-          <p className="text-gray-700">{it.desc}</p>
+          <p className="text-gray-700 dark:text-gray-300">{it.desc}</p>
         </div>
       ))}
     </>
@@ -289,16 +292,16 @@ function AuthorsList({ md }: { md: string }) {
   return (
     <div className="grid md:grid-cols-3 gap-4">
       {people.map((p, i) => (
-        <div key={i} className="border rounded-xl p-5 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold">
+        <div key={i} className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-5 flex items-center gap-3 shadow-sm">
+          <div className="h-10 w-10 rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 flex items-center justify-center font-semibold">
             {initials(p.name)}
           </div>
           <div>
-            <div className="font-semibold flex items-center gap-2">
-              <Users className="h-4 w-4" />
+            <div className="font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+              <Users className="h-4 w-4 text-primary-600 dark:text-primary-300" />
               {p.name}
             </div>
-            <div className="text-gray-600 text-sm">{p.role}</div>
+            <div className="text-gray-600 dark:text-gray-300 text-sm">{p.role}</div>
           </div>
         </div>
       ))}
