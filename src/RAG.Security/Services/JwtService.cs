@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using RAG.Security.DTOs;
 using RAG.Security.Models;
@@ -13,6 +14,7 @@ namespace RAG.Security.Services;
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<JwtService> _logger;
     private readonly string _secretKey;
     private readonly string _issuer;
     private readonly string _audience;
@@ -20,9 +22,10 @@ public class JwtService : IJwtService
     private readonly int _refreshTokenExpiryDays;
     private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, DateTime>> _refreshTokens = new();
 
-    public JwtService(IConfiguration configuration)
+    public JwtService(IConfiguration configuration, ILogger<JwtService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
         _secretKey = configuration["Jwt:SecretKey"] ?? "your-super-secret-key-that-is-at-least-256-bits-long-for-security";
         _issuer = configuration["Jwt:Issuer"] ?? "RAG.Suite";
         _audience = configuration["Jwt:Audience"] ?? "RAG.Suite.Client";
@@ -162,6 +165,7 @@ public class JwtService : IJwtService
     {
         if (!_refreshTokens.TryGetValue(userId, out var tokens))
         {
+            _logger.LogWarning("Refresh token validation failed: no tokens for user {UserId}", userId);
             return Task.FromResult(false);
         }
 
@@ -171,11 +175,17 @@ public class JwtService : IJwtService
         {
             if (expiresAt > DateTime.UtcNow)
             {
+                _logger.LogInformation("Refresh token valid for user {UserId}", userId);
                 return Task.FromResult(true);
             }
 
             tokens.TryRemove(refreshToken, out _);
+            _logger.LogWarning("Refresh token expired for user {UserId}", userId);
             CleanupUserEntryIfEmpty(userId, tokens);
+        }
+        else
+        {
+            _logger.LogWarning("Refresh token validation failed: token not found for user {UserId}", userId);
         }
 
         return Task.FromResult(false);
@@ -194,14 +204,17 @@ public class JwtService : IJwtService
             {
                 if (tokens.TryGetValue(refreshToken, out var expiresAt) && expiresAt > DateTime.UtcNow)
                 {
+                    _logger.LogInformation("Found user {UserId} for refresh token", userId);
                     return Task.FromResult<string?>(userId);
                 }
 
                 tokens.TryRemove(refreshToken, out _);
+                _logger.LogWarning("Found expired refresh token for user {UserId}", userId);
                 CleanupUserEntryIfEmpty(userId, tokens);
             }
         }
 
+        _logger.LogWarning("Refresh token lookup failed: token not found");
         return Task.FromResult<string?>(null);
     }
 
@@ -213,6 +226,7 @@ public class JwtService : IJwtService
 
         var expiresAt = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
         tokenStore[refreshToken] = expiresAt;
+        _logger.LogInformation("Saved refresh token for user {UserId} expiring at {Expiry}", userId, expiresAt);
 
         return Task.CompletedTask;
     }
@@ -222,6 +236,7 @@ public class JwtService : IJwtService
         if (_refreshTokens.TryGetValue(userId, out var tokens))
         {
             tokens.TryRemove(refreshToken, out _);
+            _logger.LogInformation("Revoked refresh token for user {UserId}", userId);
             CleanupUserEntryIfEmpty(userId, tokens);
         }
 
@@ -231,6 +246,7 @@ public class JwtService : IJwtService
     public Task RevokeAllRefreshTokensAsync(string userId)
     {
         _refreshTokens.TryRemove(userId, out _);
+        _logger.LogInformation("Revoked all refresh tokens for user {UserId}", userId);
         return Task.CompletedTask;
     }
 
@@ -243,6 +259,7 @@ public class JwtService : IJwtService
             if (token.Value <= now)
             {
                 tokens.TryRemove(token.Key, out _);
+                _logger.LogInformation("Removed expired refresh token for user {UserId}", userId);
             }
         }
 
@@ -254,6 +271,7 @@ public class JwtService : IJwtService
         if (tokens.IsEmpty)
         {
             _refreshTokens.TryRemove(userId, out _);
+            _logger.LogInformation("Removed refresh token store for user {UserId} after cleanup", userId);
         }
     }
 }
