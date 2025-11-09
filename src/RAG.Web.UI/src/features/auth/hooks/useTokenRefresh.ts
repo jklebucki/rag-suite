@@ -3,6 +3,8 @@ import { authService } from '@/features/auth/services/auth.service'
 import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus'
 import { logger } from '@/utils/logger'
 
+let refreshInFlight: Promise<void> | null = null
+
 /**
  * Custom hook for automatic token refresh management
  */
@@ -45,50 +47,64 @@ export const useTokenRefresh = (
 
   // Perform token refresh
   const performTokenRefresh = useCallback(async () => {
+    if (refreshInFlight) {
+      logger.debug('Token refresh already in progress, joining existing promise')
+      await refreshInFlight
+      return
+    }
+
     const now = Date.now()
-    
-    // Check if enough time has passed since last attempt
+
+    if (!isOnline) {
+      logger.debug('Token refresh skipped (offline)')
+      return
+    }
+
     if (now - lastRefreshAttemptRef.current < MIN_REFRESH_INTERVAL) {
       logger.debug('Token refresh skipped (too soon since last attempt)')
       return
     }
-    
-    if (isRefreshingRef.current || !isOnline) {
-      logger.debug('Token refresh skipped (already refreshing or offline)')
-      return
-    }
-    
-    isRefreshingRef.current = true
+
     lastRefreshAttemptRef.current = now
     logger.debug('Starting token refresh...')
-    
-    try {
-      const success = await authService.refreshToken()
-      if (success) {
-        const newToken = authService.getToken()
-        const newRefreshToken = authService.getRefreshToken()
-        
-        if (newToken && newRefreshToken) {
-          onTokenRefresh(newToken, newRefreshToken)
-          logger.debug('Token refreshed successfully')
+
+    const refreshPromise = (async () => {
+      isRefreshingRef.current = true
+
+      try {
+        const success = await authService.refreshToken()
+        if (success) {
+          const newToken = authService.getToken()
+          const newRefreshToken = authService.getRefreshToken()
+
+          if (newToken && newRefreshToken) {
+            onTokenRefresh(newToken, newRefreshToken)
+            logger.debug('Token refreshed successfully')
+          } else {
+            logger.warn('Token refresh succeeded but tokens are missing')
+            onRefreshError?.()
+            onLogout()
+          }
         } else {
-          logger.warn('Token refresh succeeded but tokens are missing')
+          logger.warn('Token refresh failed, logging out')
           onRefreshError?.()
           onLogout()
         }
-      } else {
-        logger.warn('Token refresh failed, logging out')
+      } catch (error) {
+        logger.error('Token refresh error:', error)
         onRefreshError?.()
         onLogout()
+      } finally {
+        isRefreshingRef.current = false
+        logger.debug('Token refresh process completed')
       }
-    } catch (error) {
-      logger.error('Token refresh error:', error)
-      onRefreshError?.()
-      onLogout()
-    } finally {
-      isRefreshingRef.current = false
-      logger.debug('Token refresh process completed')
-    }
+    })()
+
+    refreshInFlight = refreshPromise.finally(() => {
+      refreshInFlight = null
+    })
+
+    await refreshInFlight
   }, [onTokenRefresh, onLogout, onRefreshError, isOnline, MIN_REFRESH_INTERVAL])
 
   // Schedule next token refresh

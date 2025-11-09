@@ -180,13 +180,21 @@ class AuthService {
       return true
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; statusText?: string; data?: unknown }; message?: string }
+      const status = axiosError.response?.status
+
       logger.error('Token refresh failed:', {
-        status: axiosError.response?.status,
+        status,
         statusText: axiosError.response?.statusText,
         data: axiosError.response?.data,
         message: axiosError.message
       })
-      this.clearStorage()
+
+      if (status === 401) {
+        this.clearStorage()
+      } else {
+        logger.warn('Token refresh failed without explicit invalidation – keeping stored tokens for retry')
+      }
+
       return false
     }
   }

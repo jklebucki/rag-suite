@@ -98,6 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState)
   const isInitializedRef = useRef(false)
   const isVerifyingRef = useRef(false)
+  const initialRefreshRequestedRef = useRef(false)
 
   // Callbacks for auth storage hook
   const handleStorageLogin = useCallback((token: string, refreshToken: string | null, user: User) => {
@@ -165,7 +166,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             verifyAuthInBackground()
           }, 1000) // Increase delay to avoid conflicts
 
-          void performTokenRefresh()
         } else {
           console.debug('🔐 No valid auth found')
           dispatch({ type: 'LOGOUT' })
@@ -211,6 +211,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Run initialization immediately (synchronously)
     initializeAuth()
   }, [clearAuthData, performTokenRefresh])
+
+  useEffect(() => {
+    if (!state.isAuthenticated) {
+      initialRefreshRequestedRef.current = false
+      return
+    }
+
+    if (initialRefreshRequestedRef.current) {
+      return
+    }
+
+    initialRefreshRequestedRef.current = true
+
+    void performTokenRefresh().catch(error => {
+      console.warn('🔐 Initial token refresh failed:', error)
+      initialRefreshRequestedRef.current = false
+    })
+  }, [state.isAuthenticated, performTokenRefresh])
 
   // Handle refresh error events from auth service
   useEffect(() => {

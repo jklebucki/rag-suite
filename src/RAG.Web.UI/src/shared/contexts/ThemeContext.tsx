@@ -13,14 +13,21 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 const THEME_STORAGE_KEY = 'rag-suite-theme'
 
 function getInitialTheme(): Theme {
-  // Check localStorage first
-  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
-  if (storedTheme === 'light' || storedTheme === 'dark') {
-    return storedTheme
+  if (typeof window === 'undefined') {
+    return 'light'
   }
 
-  // Check system preference
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  try {
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      return storedTheme
+    }
+  } catch (error) {
+    console.warn('Failed to read theme from localStorage:', error)
+  }
+
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')
+  if (prefersDark?.matches) {
     return 'dark'
   }
 
@@ -35,25 +42,39 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme)
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
     const root = window.document.documentElement
-    
-    // Remove previous theme classes
+
     root.classList.remove('light', 'dark')
-    
-    // Add current theme class
     root.classList.add(theme)
-    
-    // Store in localStorage
-    localStorage.setItem(THEME_STORAGE_KEY, theme)
+
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch (error) {
+      console.warn('Failed to persist theme preference:', error)
+    }
   }, [theme])
 
   // Listen for system theme changes
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return
+    }
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     
     const handleChange = (e: MediaQueryListEvent) => {
       // Only update if user hasn't explicitly set a theme
-      const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+      const storedTheme = (() => {
+        try {
+          return window.localStorage.getItem(THEME_STORAGE_KEY)
+        } catch {
+          return null
+        }
+      })()
       if (!storedTheme) {
         setThemeState(e.matches ? 'dark' : 'light')
       }
