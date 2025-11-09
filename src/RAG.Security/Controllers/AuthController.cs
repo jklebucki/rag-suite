@@ -4,6 +4,8 @@ using RAG.Security.DTOs;
 using RAG.Security.Requests;
 using RAG.Security.Services;
 using System.Security.Claims;
+using RAG.Security.Models;
+using System;
 
 namespace RAG.Security.Controllers;
 
@@ -257,5 +259,30 @@ public class AuthController : ControllerBase
     {
         var users = await _authService.GetAllUsersAsync();
         return Ok(users);
+    }
+
+    [HttpDelete("users/{userId}")]
+    [Authorize]
+    public async Task<ActionResult> DeleteUser(string userId)
+    {
+        var requesterId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(requesterId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(UserRoles.Admin);
+        if (!isAdmin && !string.Equals(requesterId, userId, StringComparison.Ordinal))
+        {
+            return Forbid();
+        }
+
+        var deleted = await _authService.DeleteUserAsync(userId);
+        if (!deleted)
+        {
+            return NotFound(new { message = "User not found" });
+        }
+
+        return NoContent();
     }
 }

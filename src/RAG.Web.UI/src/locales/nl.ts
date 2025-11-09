@@ -356,6 +356,7 @@ export const nl: TranslationKeys = {
   'account.logout_all_devices': 'Uitloggen op alle apparaten',
   'account.logout_all_devices_description': 'Dit logt je uit van alle apparaten waar je momenteel bent ingelogd.',
   'account.logout_all_devices_confirm': 'Weet je zeker dat je wilt uitloggen op alle apparaten?',
+  'account.delete_confirm_message': 'Het verwijderen van je account verwijdert alle gekoppelde gegevens. Deze actie kan niet ongedaan worden gemaakt.',
 
   // Settings
   'settings.sidebar.title': 'Instellingen',
@@ -424,12 +425,17 @@ export const nl: TranslationKeys = {
   'settings.user.table.actions': 'Acties',
   'settings.user.table.remove_role_aria': 'Rol {role} verwijderen',
   'settings.user.actions.set_password': 'Wachtwoord instellen',
+  'settings.user.actions.delete_user': 'Gebruiker verwijderen',
+  'settings.user.actions.delete_confirm_title': 'Gebruikersaccount verwijderen',
+  'settings.user.actions.delete_confirm_message': 'Weet je zeker dat je {name} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
   'settings.user.toasts.role_assigned': 'Rol succesvol toegewezen',
   'settings.user.toasts.role_assign_error': 'Rol kon niet worden toegewezen',
   'settings.user.toasts.role_removed': 'Rol succesvol verwijderd',
   'settings.user.toasts.role_remove_error': 'Rol kon niet worden verwijderd',
   'settings.user.toasts.password_set': 'Wachtwoord succesvol ingesteld',
   'settings.user.toasts.password_set_error': 'Wachtwoord kon niet worden ingesteld',
+  'settings.user.toasts.user_deleted': 'Gebruiker succesvol verwijderd',
+  'settings.user.toasts.user_delete_error': 'Gebruiker kon niet worden verwijderd',
   'settings.user.password.modal.title': 'Nieuw wachtwoord instellen',
   'settings.user.password.modal.subtitle': 'voor {firstName} {lastName}',
   'settings.user.password.modal.placeholder_new': 'Voer een sterk wachtwoord in',
@@ -450,6 +456,9 @@ export const nl: TranslationKeys = {
   'settings.user.password.requirements.special': 'Speciaal teken',
   'settings.user.password.match': 'Wachtwoorden komen overeen',
   'settings.user.password.mismatch': 'Wachtwoorden komen niet overeen',
+  'settings.user.account.delete_confirm_title': 'Mijn account verwijderen',
+  'settings.user.account.delete_success': 'Je account is verwijderd. Je wordt nu afgemeld.',
+  'settings.user.account.delete_error': 'Je account kon niet worden verwijderd',
 
   // Address Book
 

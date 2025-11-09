@@ -10,6 +10,7 @@ import { useToast } from '@/shared/hooks/useToast'
 import { UserFiltersPanel } from './UserFiltersPanel'
 import { UserTableRow } from './UserTableRow'
 import { SetPasswordModal } from './SetPasswordModal'
+import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
 export function UserSettings() {
@@ -20,6 +21,8 @@ export function UserSettings() {
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [isSetPasswordModalOpen, setIsSetPasswordModalOpen] = useState(false)
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<UserType | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   // Fetch users
   const { data: users = [], isLoading, error: fetchError } = useQuery({
@@ -84,6 +87,19 @@ export function UserSettings() {
     }
   })
 
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId: string) => authService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      showSuccess(t('settings.user.toasts.user_deleted'))
+      setIsDeleteModalOpen(false)
+      setUserToDelete(null)
+    },
+    onError: () => {
+      showError(t('settings.user.toasts.user_delete_error'))
+    }
+  })
+
   const handleAssignRole = (userId: string, roleName: string) => {
     assignRoleMutation.mutate({ userId, roleName })
   }
@@ -100,6 +116,22 @@ export function UserSettings() {
   const openSetPasswordModal = (user: UserType) => {
     setSelectedUser(user)
     setIsSetPasswordModalOpen(true)
+  }
+
+  const openDeleteUserModal = (user: UserType) => {
+    setUserToDelete(user)
+    setIsDeleteModalOpen(true)
+  }
+
+  const closeDeleteUserModal = () => {
+    if (deleteUserMutation.isPending) return
+    setIsDeleteModalOpen(false)
+    setUserToDelete(null)
+  }
+
+  const handleDeleteUser = () => {
+    if (!userToDelete) return
+    deleteUserMutation.mutate(userToDelete.id)
   }
 
   if (!authService.hasRole('Admin')) {
@@ -227,6 +259,9 @@ export function UserSettings() {
                     onSetPassword={openSetPasswordModal}
                     isAssigningRole={assignRoleMutation.isPending}
                     isRemovingRole={removeRoleMutation.isPending}
+                    onDeleteUser={openDeleteUserModal}
+                    isDeletingUser={deleteUserMutation.isPending && userToDelete?.id === user.id}
+                    disableDelete={deleteUserMutation.isPending && userToDelete?.id !== user.id}
                   />
                 ))}
               </tbody>
@@ -245,6 +280,21 @@ export function UserSettings() {
         user={selectedUser}
         onSetPassword={handleSetPassword}
         isLoading={setPasswordMutation.isPending}
+      />
+
+      <ActionModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteUserModal}
+        onConfirm={handleDeleteUser}
+        title={t('settings.user.actions.delete_confirm_title')}
+        message={t('settings.user.actions.delete_confirm_message', {
+          name: userToDelete ? `${userToDelete.firstName ?? ''} ${userToDelete.lastName ?? ''}`.trim() || userToDelete.email || userToDelete.userName : ''
+        })}
+        confirmText={deleteUserMutation.isPending ? t('common.deleting') : t('settings.user.actions.delete_user')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+        isLoading={deleteUserMutation.isPending}
+        closeOnConfirm={false}
       />
     </div>
   )

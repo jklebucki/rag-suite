@@ -271,6 +271,7 @@ export interface TranslationKeys {
   'account.logout_all_devices': string;
   'account.logout_all_devices_description': string;
   'account.logout_all_devices_confirm': string;
+  'account.delete_confirm_message': string;
 
   // Settings
   'settings.sidebar.title': string;
@@ -339,12 +340,17 @@ export interface TranslationKeys {
   'settings.user.table.actions': string;
   'settings.user.table.remove_role_aria': string;
   'settings.user.actions.set_password': string;
+  'settings.user.actions.delete_user': string;
+  'settings.user.actions.delete_confirm_title': string;
+  'settings.user.actions.delete_confirm_message': string;
   'settings.user.toasts.role_assigned': string;
   'settings.user.toasts.role_assign_error': string;
   'settings.user.toasts.role_removed': string;
   'settings.user.toasts.role_remove_error': string;
   'settings.user.toasts.password_set': string;
   'settings.user.toasts.password_set_error': string;
+  'settings.user.toasts.user_deleted': string;
+  'settings.user.toasts.user_delete_error': string;
   'settings.user.password.modal.title': string;
   'settings.user.password.modal.subtitle': string;
   'settings.user.password.modal.placeholder_new': string;
@@ -365,6 +371,9 @@ export interface TranslationKeys {
   'settings.user.password.requirements.special': string;
   'settings.user.password.match': string;
   'settings.user.password.mismatch': string;
+  'settings.user.account.delete_confirm_title': string;
+  'settings.user.account.delete_success': string;
+  'settings.user.account.delete_error': string;
 
   // Cyber Panel
   'cyberpanel.quizzes': string;

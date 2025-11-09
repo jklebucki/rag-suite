@@ -259,6 +259,10 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
   }
 
+  async deleteUser(userId: string): Promise<void> {
+    await this.client.delete(`/users/${userId}`)
+  }
+
   async getRoles(options: { signal?: AbortSignal } = {}): Promise<string[]> {
     const response = await this.client.get<string[]>('/roles', {
       signal: options.signal,

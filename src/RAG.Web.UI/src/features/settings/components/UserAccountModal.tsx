@@ -4,6 +4,8 @@ import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { logger } from '@/utils/logger'
+import { authService } from '@/features/auth/services/auth.service'
+import { useToast } from '@/shared/hooks/useToast'
 
 interface UserAccountModalProps {
   isOpen: boolean
@@ -12,10 +14,13 @@ interface UserAccountModalProps {
 
 export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const { t } = useI18n()
-  const { user, logoutAllDevices } = useAuth()
+  const { user, logoutAllDevices, logout } = useAuth()
+  const { showSuccess, showError } = useToast()
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false)
 
   if (!isOpen || !user) return null
 
@@ -32,11 +37,6 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
   const handleUpdateProfile = () => {
     // TODO: Implement profile update functionality
     logger.debug('Update profile clicked')
-  }
-
-  const handleDeleteAccount = () => {
-    // TODO: Implement account deletion functionality
-    logger.debug('Delete account clicked')
   }
 
   const handleLogoutAllDevices = () => {
@@ -58,6 +58,26 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
 
   const handleCancelLogout = () => {
     setShowLogoutConfirm(false)
+  }
+
+  const handleConfirmDeleteAccount = async () => {
+    setIsDeletingAccount(true)
+    try {
+      await authService.deleteUser(user.id)
+      showSuccess(t('settings.user.account.delete_success'))
+      setShowDeleteConfirm(false)
+      await logout()
+    } catch (error) {
+      logger.error('Failed to delete account:', error)
+      showError(t('settings.user.account.delete_error'))
+    } finally {
+      setIsDeletingAccount(false)
+    }
+  }
+
+  const handleCancelDeleteAccount = () => {
+    if (isDeletingAccount) return
+    setShowDeleteConfirm(false)
   }
 
   return (
@@ -233,7 +253,7 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
                   {t('account.delete_warning')}
                 </p>
                 <button
-                  onClick={handleDeleteAccount}
+                  onClick={() => setShowDeleteConfirm(true)}
                   className="btn-primary inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -256,6 +276,19 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
         cancelText={t('common.cancel')}
         variant="warning"
         isLoading={isLoggingOut}
+        closeOnConfirm={false}
+      />
+
+      <ActionModal
+        isOpen={showDeleteConfirm}
+        onClose={handleCancelDeleteAccount}
+        onConfirm={handleConfirmDeleteAccount}
+        title={t('settings.user.account.delete_confirm_title')}
+        message={t('account.delete_confirm_message')}
+        confirmText={isDeletingAccount ? t('common.deleting') : t('account.delete_account')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+        isLoading={isDeletingAccount}
         closeOnConfirm={false}
       />
     </div>

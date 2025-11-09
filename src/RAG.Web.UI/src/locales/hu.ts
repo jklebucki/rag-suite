@@ -356,6 +356,7 @@ export const hu: TranslationKeys = {
   'account.logout_all_devices': 'Kijelentkezés minden eszközről',
   'account.logout_all_devices_description': 'Ez kijelentkezteti Önt az összes eszközről, ahol jelenleg be van jelentkezve.',
   'account.logout_all_devices_confirm': 'Biztosan ki szeretne jelentkezni minden eszközről?',
+  'account.delete_confirm_message': 'A fiók törlése az összes kapcsolódó adat végleges eltávolítását eredményezi. A művelet nem visszavonható.',
 
   // Settings
   'settings.sidebar.title': 'Beállítások',
@@ -424,12 +425,17 @@ export const hu: TranslationKeys = {
   'settings.user.table.actions': 'Műveletek',
   'settings.user.table.remove_role_aria': '{role} szerep eltávolítása',
   'settings.user.actions.set_password': 'Jelszó beállítása',
+  'settings.user.actions.delete_user': 'Felhasználó törlése',
+  'settings.user.actions.delete_confirm_title': 'Felhasználói fiók törlése',
+  'settings.user.actions.delete_confirm_message': 'Biztosan törli {name} felhasználót? A művelet nem visszavonható.',
   'settings.user.toasts.role_assigned': 'A szerepkör hozzárendelése sikerült',
   'settings.user.toasts.role_assign_error': 'A szerepkör hozzárendelése sikertelen',
   'settings.user.toasts.role_removed': 'A szerepkör eltávolítása sikerült',
   'settings.user.toasts.role_remove_error': 'A szerepkör eltávolítása sikertelen',
   'settings.user.toasts.password_set': 'A jelszó beállítása sikerült',
   'settings.user.toasts.password_set_error': 'A jelszó beállítása sikertelen',
+  'settings.user.toasts.user_deleted': 'A felhasználó törlése sikerült',
+  'settings.user.toasts.user_delete_error': 'A felhasználó törlése nem sikerült',
   'settings.user.password.modal.title': 'Új jelszó beállítása',
   'settings.user.password.modal.subtitle': '{firstName} {lastName} számára',
   'settings.user.password.modal.placeholder_new': 'Adj meg egy erős jelszót',
@@ -450,6 +456,9 @@ export const hu: TranslationKeys = {
   'settings.user.password.requirements.special': 'Speciális karakter',
   'settings.user.password.match': 'A jelszavak megegyeznek',
   'settings.user.password.mismatch': 'A jelszavak nem egyeznek',
+  'settings.user.account.delete_confirm_title': 'Saját fiók törlése',
+  'settings.user.account.delete_success': 'A fiókját töröltük. Hamarosan kijelentkezik.',
+  'settings.user.account.delete_error': 'Nem sikerült törölni a fiókját',
 
   // Address Book
   'addressBook.title': 'Címjegyzék',

@@ -357,6 +357,7 @@ export const ro: TranslationKeys = {
   'account.logout_all_devices': 'Deconectare de pe toate dispozitivele',
   'account.logout_all_devices_description': 'Aceasta vă va deconecta de pe toate dispozitivele pe care sunteți conectat în prezent.',
   'account.logout_all_devices_confirm': 'Sigur doriți să vă deconectați de pe toate dispozitivele?',
+  'account.delete_confirm_message': 'Ștergerea contului va elimina toate datele asociate. Această acțiune nu poate fi anulată.',
 
   // Settings
   'settings.sidebar.title': 'Setări',
@@ -425,12 +426,17 @@ export const ro: TranslationKeys = {
   'settings.user.table.actions': 'Acțiuni',
   'settings.user.table.remove_role_aria': 'Elimină rolul {role}',
   'settings.user.actions.set_password': 'Setează parola',
+  'settings.user.actions.delete_user': 'Șterge utilizator',
+  'settings.user.actions.delete_confirm_title': 'Ștergere cont utilizator',
+  'settings.user.actions.delete_confirm_message': 'Ești sigur că vrei să ștergi {name}? Această acțiune nu poate fi anulată.',
   'settings.user.toasts.role_assigned': 'Rolul a fost atribuit cu succes',
   'settings.user.toasts.role_assign_error': 'Nu s-a putut atribui rolul',
   'settings.user.toasts.role_removed': 'Rolul a fost eliminat cu succes',
   'settings.user.toasts.role_remove_error': 'Nu s-a putut elimina rolul',
   'settings.user.toasts.password_set': 'Parola a fost setată cu succes',
   'settings.user.toasts.password_set_error': 'Nu s-a putut seta parola',
+  'settings.user.toasts.user_deleted': 'Utilizatorul a fost șters',
+  'settings.user.toasts.user_delete_error': 'Ștergerea utilizatorului a eșuat',
   'settings.user.password.modal.title': 'Setează parolă nouă',
   'settings.user.password.modal.subtitle': 'pentru {firstName} {lastName}',
   'settings.user.password.modal.placeholder_new': 'Introdu o parolă puternică',
@@ -451,6 +457,9 @@ export const ro: TranslationKeys = {
   'settings.user.password.requirements.special': 'Caracter special',
   'settings.user.password.match': 'Parolele coincid',
   'settings.user.password.mismatch': 'Parolele nu coincid',
+  'settings.user.account.delete_confirm_title': 'Șterge contul meu',
+  'settings.user.account.delete_success': 'Contul tău a fost șters. Vei fi deconectat.',
+  'settings.user.account.delete_error': 'Nu s-a putut șterge contul tău',
 
   // Address Book
 

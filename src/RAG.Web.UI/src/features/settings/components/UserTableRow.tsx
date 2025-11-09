@@ -1,7 +1,7 @@
 // All code comments must be written in English, regardless of the conversation language.
 
 import React from 'react'
-import { User, Plus, Minus, Key } from 'lucide-react'
+import { User, Plus, Minus, Key, Trash2 } from 'lucide-react'
 import type { User as UserType } from '@/features/auth/types/auth'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
@@ -13,6 +13,9 @@ interface UserTableRowProps {
   onSetPassword: (user: UserType) => void
   isAssigningRole: boolean
   isRemovingRole: boolean
+  onDeleteUser: (user: UserType) => void
+  isDeletingUser: boolean
+  disableDelete?: boolean
 }
 
 export function UserTableRow({
@@ -22,7 +25,10 @@ export function UserTableRow({
   onRemoveRole,
   onSetPassword,
   isAssigningRole,
-  isRemovingRole
+  isRemovingRole,
+  onDeleteUser,
+  isDeletingUser,
+  disableDelete = false
 }: UserTableRowProps) {
   const { t } = useI18n()
   const userRoles = user.roles || []
@@ -91,6 +97,14 @@ export function UserTableRow({
         >
           <Key className="h-4 w-4" />
           {t('settings.user.actions.set_password')}
+        </button>
+        <button
+          onClick={() => onDeleteUser(user)}
+          className="mt-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isDeletingUser || disableDelete}
+        >
+          <Trash2 className={`h-4 w-4 ${isDeletingUser ? 'animate-spin' : ''}`} />
+          {isDeletingUser ? t('common.deleting') : t('settings.user.actions.delete_user')}
         </button>
       </td>
     </tr>

@@ -20,4 +20,5 @@ public interface IAuthService
     Task<bool> SetPasswordAsync(string userId, string newPassword);
     Task<List<UserInfo>> GetAllUsersAsync();
     Task<List<string>> GetAllRolesAsync();
+    Task<bool> DeleteUserAsync(string userId);
 }

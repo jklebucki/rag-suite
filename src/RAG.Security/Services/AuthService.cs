@@ -361,6 +361,20 @@ public class AuthService : IAuthService
         return userInfos;
     }
 
+    public async Task<bool> DeleteUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        await _jwtService.RevokeAllRefreshTokensAsync(userId);
+
+        var result = await _userManager.DeleteAsync(user);
+        return result.Succeeded;
+    }
+
     public async Task<List<string>> GetAllRolesAsync()
     {
         var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
