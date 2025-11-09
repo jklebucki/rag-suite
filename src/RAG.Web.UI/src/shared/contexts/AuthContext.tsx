@@ -99,6 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isInitializedRef = useRef(false)
   const isVerifyingRef = useRef(false)
   const initialRefreshRequestedRef = useRef(false)
+  const ongoingRefreshRef = useRef<Promise<void> | null>(null)
 
   // Callbacks for auth storage hook
   const handleStorageLogin = useCallback((token: string, refreshToken: string | null, user: User) => {
@@ -163,7 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
           // Schedule background verification (don't block initial render)
           setTimeout(() => {
-            verifyAuthInBackground()
+            void verifyAuthInBackground()
           }, 1000) // Increase delay to avoid conflicts
 
         } else {
@@ -185,6 +186,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isVerifyingRef.current = true
 
       try {
+        if (ongoingRefreshRef.current) {
+          console.debug('🔐 Waiting for ongoing refresh before verification')
+          try {
+            await ongoingRefreshRef.current
+          } catch (refreshError) {
+            console.warn('🔐 Ongoing refresh failed before verification:', refreshError)
+          }
+        }
+
         console.debug('🔐 Background auth verification started')
         const user = await authService.getCurrentUser()
         if (user) {
@@ -215,6 +225,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!state.isAuthenticated) {
       initialRefreshRequestedRef.current = false
+      ongoingRefreshRef.current = null
       return
     }
 
@@ -224,10 +235,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initialRefreshRequestedRef.current = true
 
-    void performTokenRefresh().catch(error => {
+    const refreshPromise = performTokenRefresh()
+    ongoingRefreshRef.current = refreshPromise
+
+    refreshPromise
+      .catch(error => {
       console.warn('🔐 Initial token refresh failed:', error)
       initialRefreshRequestedRef.current = false
     })
+      .finally(() => {
+        ongoingRefreshRef.current = null
+      })
   }, [state.isAuthenticated, performTokenRefresh])
 
   // Handle refresh error events from auth service
