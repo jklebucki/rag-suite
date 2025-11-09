@@ -142,6 +142,9 @@ export const ro: TranslationKeys = {
   'common.user_menu': 'Meniu utilizator',
   'common.toggle_menu': 'Comută meniu',
   'common.confirm': 'Confirmă',
+  'common.processing': 'Se procesează...',
+  'common.deleting': 'Se șterge...',
+  'common.irreversibleAction': 'Această acțiune nu poate fi anulată',
   'common.view_details': 'Vezi detalii',
   'common.export': 'Exportă',
   'common.settings': 'Setări',
@@ -286,6 +289,7 @@ export const ro: TranslationKeys = {
   'session.expired.message': 'Sesiunea ta a expirat. Încearcă să te autentifici din nou sau deconectează-te complet.',
   'session.expired.try_again': 'Încearcă Din Nou',
   'session.expired.logout': 'Deconectează-te',
+  'session.expired.note': 'Poți închide această fereastră și să încerci din nou mai târziu.',
 
   'auth.change_password.title': 'Schimbă Parola',
   'auth.change_password.subtitle': 'Actualizează parola pentru securitate.',

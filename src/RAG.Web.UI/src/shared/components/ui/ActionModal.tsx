@@ -4,6 +4,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import { Modal } from './Modal'
 import { Button } from './Button'
 import { cn } from '@/utils/cn'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 export type ActionModalVariant = 'info' | 'success' | 'warning' | 'danger' | 'error'
 
@@ -72,25 +73,32 @@ const variantConfig: Record<
   }
 }
 
-export function ActionModal({
-  isOpen,
-  onClose,
-  title,
-  message,
-  children,
-  confirmText = 'Confirm',
-  cancelText,
-  onConfirm,
-  onCancel,
-  isLoading = false,
-  loadingText = 'Processing...',
-  variant = 'info',
-  size = 'md',
-  hideCancel = false,
-  closeOnConfirm = true
-}: ActionModalProps) {
+export function ActionModal(props: ActionModalProps) {
+  const {
+    isOpen,
+    onClose,
+    title,
+    message,
+    children,
+    confirmText,
+    cancelText,
+    onConfirm,
+    onCancel,
+    isLoading = false,
+    loadingText,
+    variant = 'info',
+    size = 'md',
+    hideCancel = false,
+    closeOnConfirm = true
+  } = props
+
+  const { t } = useI18n()
   const config = variantConfig[variant]
   const Icon = config.icon
+
+  const confirmLabel = confirmText ?? t('common.confirm')
+  const cancelLabel = cancelText ?? t('common.cancel')
+  const loadingLabel = loadingText ?? t('common.processing')
 
   const handleConfirm = () => {
     onConfirm?.()
@@ -104,7 +112,7 @@ export function ActionModal({
     onClose()
   }
 
-  const showCancelButton = !hideCancel && !!cancelText
+  const showCancelButton = !hideCancel
 
   return (
     <Modal
@@ -121,12 +129,12 @@ export function ActionModal({
       }
     >
       <div className="p-6 space-y-6">
-        {children ??
-          (message
-            ? typeof message === 'string'
-              ? <p className="text-gray-600 dark:text-gray-300">{message}</p>
-              : message
-            : null)}
+          {children ??
+            (message
+              ? typeof message === 'string'
+                ? <p className="text-gray-600 dark:text-gray-300">{message}</p>
+                : message
+              : null)}
 
         <div className={cn('flex justify-end gap-3', showCancelButton ? '' : '')}>
           {showCancelButton && (
@@ -135,7 +143,7 @@ export function ActionModal({
               disabled={isLoading}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
             >
-              {cancelText}
+              {cancelLabel}
             </button>
           )}
           <Button
@@ -151,10 +159,10 @@ export function ActionModal({
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {loadingText}
+                {loadingLabel}
               </>
             ) : (
-              confirmText
+              confirmLabel
             )}
           </Button>
         </div>

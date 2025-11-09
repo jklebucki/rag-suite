@@ -37,6 +37,9 @@ export const nl: TranslationKeys = {
   'common.user_menu': 'Gebruikersmenu',
   'common.toggle_menu': 'Menu wisselen',
   'common.confirm': 'Bevestigen',
+  'common.processing': 'Bezig...',
+  'common.deleting': 'Bezig met verwijderen...',
+  'common.irreversibleAction': 'Deze actie kan niet ongedaan worden gemaakt',
   'common.view_details': 'Details bekijken',
   'common.export': 'Exporteren',
   'common.settings': 'Instellingen',
@@ -285,6 +288,7 @@ export const nl: TranslationKeys = {
   'session.expired.message': 'Je sessie is verlopen. Probeer opnieuw in te loggen of log volledig uit.',
   'session.expired.try_again': 'Probeer Opnieuw',
   'session.expired.logout': 'Uitloggen',
+  'session.expired.note': 'Je kunt dit venster ook sluiten en het later opnieuw proberen.',
 
   'auth.change_password.title': 'Wachtwoord Wijzigen',
   'auth.change_password.subtitle': 'Update je wachtwoord voor veiligheid.',

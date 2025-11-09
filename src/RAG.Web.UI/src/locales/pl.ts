@@ -130,6 +130,9 @@ export const pl: TranslationKeys = {
   'common.user_menu': 'Menu użytkownika',
   'common.toggle_menu': 'Przełącz menu',
   'common.confirm': 'Potwierdź',
+  'common.processing': 'Przetwarzanie...',
+  'common.deleting': 'Usuwanie...',
+  'common.irreversibleAction': 'Tej operacji nie można cofnąć',
   'common.view_details': 'Zobacz szczegóły',
   'common.export': 'Eksportuj',
   'common.settings': 'Ustawienia',
@@ -181,6 +184,7 @@ export const pl: TranslationKeys = {
   'session.expired.message': 'Twoja sesja wygasła. Spróbuj się ponownie zalogować lub wyloguj się całkowicie.',
   'session.expired.try_again': 'Spróbuj ponownie',
   'session.expired.logout': 'Wyloguj się',
+  'session.expired.note': 'Możesz również zamknąć to okno i spróbować ponownie później.',
 
   'auth.change_password.title': 'Zmień hasło',
   'auth.change_password.subtitle': 'Zaktualizuj swoje hasło dla bezpieczeństwa.',

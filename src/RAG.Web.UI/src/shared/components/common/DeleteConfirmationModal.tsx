@@ -1,5 +1,6 @@
 import React from 'react'
 import { X, AlertTriangle } from 'lucide-react'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean
@@ -28,11 +29,18 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   itemName,
   details,
   isLoading = false,
-  confirmText = 'Delete',
-  cancelText = 'Cancel',
-  deletingText = 'Deleting...',
-  warningText = 'This action cannot be undone',
+  confirmText,
+  cancelText,
+  deletingText,
+  warningText
 }) => {
+  const { t } = useI18n()
+  const confirmLabel = confirmText ?? t('common.delete')
+  const cancelLabel = cancelText ?? t('common.cancel')
+  const deletingLabel = deletingText ?? t('common.deleting')
+  const warningLabel = warningText ?? t('common.irreversibleAction')
+  const closeLabel = t('common.close')
+
   if (!isOpen) return null
 
   return (
@@ -49,7 +57,8 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           <button
             onClick={onClose}
             disabled={isLoading}
-            title="Close"
+            title={closeLabel}
+            aria-label={closeLabel}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
           >
             <X className="w-5 h-5" />
@@ -74,7 +83,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             )}
           </div>
 
-          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{warningText}</p>
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{warningLabel}</p>
         </div>
 
         {/* Footer */}
@@ -84,7 +93,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             disabled={isLoading}
             className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
           >
-            {cancelText}
+            {cancelLabel}
           </button>
           <button
             onClick={onConfirm}
@@ -94,10 +103,10 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {deletingText}
+                {deletingLabel}
               </>
             ) : (
-              confirmText
+              confirmLabel
             )}
           </button>
         </div>

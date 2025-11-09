@@ -62,7 +62,7 @@ export function SessionExpiredModal({
         {/* Footer Note */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Możesz również zamknąć to okno i spróbować ponownie później.
+            {t('session.expired.note')}
           </p>
         </div>
       </div>

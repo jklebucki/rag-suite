@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface ModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscreen = false }: ModalProps) {
+  const { t } = useI18n()
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -38,13 +40,15 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
     xl: 'max-w-6xl'
   }
 
+  const closeLabel = t('common.close')
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
       {/* Backdrop */}
       <button 
         className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 transition-opacity"
         onClick={onClose}
-        aria-label="Close modal"
+        aria-label={closeLabel}
         tabIndex={-1}
       />
       
@@ -61,8 +65,8 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
-              aria-label="Close modal"
-              title="Close modal"
+              aria-label={closeLabel}
+              title={closeLabel}
             >
               <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
             </button>

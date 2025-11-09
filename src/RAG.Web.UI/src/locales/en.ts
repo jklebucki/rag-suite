@@ -37,6 +37,9 @@ export const en: TranslationKeys = {
   'common.user_menu': 'User menu',
   'common.toggle_menu': 'Toggle menu',
   'common.confirm': 'Confirm',
+  'common.processing': 'Processing...',
+  'common.deleting': 'Deleting...',
+  'common.irreversibleAction': 'This action cannot be undone',
   'common.view_details': 'View Details',
   'common.export': 'Export',
   'common.settings': 'Settings',
@@ -181,6 +184,7 @@ export const en: TranslationKeys = {
   'session.expired.message': 'Your session has expired. Try logging in again or sign out completely.',
   'session.expired.try_again': 'Try Again',
   'session.expired.logout': 'Sign Out',
+  'session.expired.note': 'You can also close this window and try again later.',
 
   'auth.change_password.title': 'Change Password',
   'auth.change_password.subtitle': 'Update your password for security.',

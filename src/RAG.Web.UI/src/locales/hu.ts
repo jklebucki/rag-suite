@@ -37,6 +37,9 @@ export const hu: TranslationKeys = {
   'common.user_menu': 'Felhasználói menü',
   'common.toggle_menu': 'Menü váltása',
   'common.confirm': 'Megerősítés',
+  'common.processing': 'Feldolgozás...',
+  'common.deleting': 'Törlés...',
+  'common.irreversibleAction': 'Ez a művelet nem vonható vissza',
   'common.view_details': 'Részletek megtekintése',
   'common.export': 'Exportálás',
   'common.settings': 'Beállítások',
@@ -285,6 +288,7 @@ export const hu: TranslationKeys = {
   'session.expired.message': 'A munkameneted lejárt. Próbálj újra bejelentkezni vagy jelentkezz ki teljesen.',
   'session.expired.try_again': 'Próbáld Újra',
   'session.expired.logout': 'Kijelentkezés',
+  'session.expired.note': 'Az ablak bezárásával később is megpróbálhatod újra.',
 
   'auth.change_password.title': 'Jelszó Módosítása',
   'auth.change_password.subtitle': 'Frissítsd a jelszavad a biztonság érdekében.',

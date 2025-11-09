@@ -54,6 +54,9 @@ export interface TranslationKeys {
   'common.user_menu': string;
   'common.toggle_menu': string;
   'common.confirm': string;
+  'common.processing': string;
+  'common.deleting': string;
+  'common.irreversibleAction': string;
   'common.view_details': string;
   'common.export': string;
   'common.settings': string;
@@ -247,6 +250,7 @@ export interface TranslationKeys {
   'session.expired.message': string;
   'session.expired.try_again': string;
   'session.expired.logout': string;
+  'session.expired.note': string;
 
   // Account Management
   'account.title': string;

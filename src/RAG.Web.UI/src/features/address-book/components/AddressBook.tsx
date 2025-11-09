@@ -389,7 +389,6 @@ export function AddressBook() {
           title={alertState.title}
           message={alertState.message}
           confirmText={t('common.close')}
-          cancelText={undefined}
           hideCancel
           variant={alertState.variant}
           size="sm"
