@@ -1,4 +1,4 @@
-import { StrictMode, startTransition } from 'react'
+import { StrictMode, Fragment, startTransition } from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { App } from '@/app'
@@ -27,12 +27,14 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement)
 
+const RootWrapper = import.meta.env.DEV ? StrictMode : Fragment
+
 const app = (
-  <StrictMode>
+  <RootWrapper>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </StrictMode>
+  </RootWrapper>
 )
 
 startTransition(() => {
