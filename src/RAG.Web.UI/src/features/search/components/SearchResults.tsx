@@ -47,8 +47,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   const renderError = (err: unknown) => {
     if (!err) return null
     return (
-      <div className="p-6 bg-red-50 border border-red-200 rounded-lg m-6">
-        <p className="text-red-700">{t('search.error')}</p>
+      <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl m-6">
+        <p className="text-red-700 dark:text-red-300">{t('search.error')}</p>
       </div>
     )
   }
@@ -56,9 +56,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   // Spinner jak przy pierwszym wyszukiwaniu - przy każdym wyszukiwaniu gdy isLoading i hasSearched
   if (isLoading && hasSearched) {
     return (
-      <div className="text-center py-8 px-4">
+      <div className="text-center py-8 px-4 text-gray-600 dark:text-gray-300">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600 text-sm sm:text-base">{t('search.loading')}</p>
+        <p className="mt-4 text-sm sm:text-base">{t('search.loading')}</p>
       </div>
     )
   }
@@ -66,11 +66,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   if (error && hasSearched) {
     logger.error('Search error in component:', error)
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mx-4 sm:mx-0">
-        <p className="text-red-700 text-sm sm:text-base">{t('search.error')}</p>
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4 mx-4 sm:mx-0">
+        <p className="text-red-700 dark:text-red-300 text-sm sm:text-base">{t('search.error')}</p>
         <details className="mt-2">
-          <summary className="cursor-pointer text-sm">Error details</summary>
-          <pre className="text-xs mt-1 text-red-600 overflow-x-auto">{JSON.stringify(error, null, 2)}</pre>
+          <summary className="cursor-pointer text-sm dark:text-red-200">Error details</summary>
+          <pre className="text-xs mt-1 text-red-600 dark:text-red-300 overflow-x-auto">{JSON.stringify(error, null, 2)}</pre>
         </details>
       </div>
     )
@@ -78,10 +78,10 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
 
   if (!hasSearched || (hasSearched && !searchResults && !isLoading)) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-6 sm:p-8">
-        <div className="text-center text-gray-500">
-          <Search className="h-12 sm:h-16 w-12 sm:w-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">{t('search.title')}</h3>
+      <div className="surface p-6 sm:p-8">
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          <Search className="h-12 sm:h-16 w-12 sm:w-16 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('search.title')}</h3>
           <p className="text-sm sm:text-base">{t('search.subtitle')}</p>
         </div>
       </div>
@@ -96,17 +96,17 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border relative">
+    <div className="surface relative">
       {/* Dodaj overlay z spinnerem jeśli isLoading, hasSearched i są wyniki (np. przy zmianie inputu po wyszukaniu) */}
       {isLoading && hasSearched && searchResults && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-white dark:bg-slate-900 bg-opacity-75 dark:bg-opacity-80 flex items-center justify-center z-10 rounded-2xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
       )}
-      <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">{t('search.results')}</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('search.results')}</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('search.results')} {resultsToShow.total} {t('search.results')} in {resultsToShow.took}ms
           </p>
         </div>
@@ -116,7 +116,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
         </button>
       </div>
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-gray-200 dark:divide-slate-800">
         {resultsToShow.results.map((result) => (
           <SearchResultItem
             key={result.id}
@@ -129,8 +129,8 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
       </div>
 
       {resultsToShow.results.length === 0 && (
-        <div className="p-6 sm:p-8 text-center text-gray-500">
-          <Search className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 text-gray-300" />
+        <div className="p-6 sm:p-8 text-center text-gray-500 dark:text-gray-400">
+          <Search className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
           <p className="text-sm sm:text-base">{t('search.no_results')}</p>
         </div>
       )}
@@ -143,9 +143,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
         size="xl"
       >
         {isLoadingDetail && (
-          <div className="p-6 sm:p-8 text-center">
+          <div className="p-6 sm:p-8 text-center text-gray-600 dark:text-gray-300">
             <div className="animate-spin rounded-full h-10 sm:h-12 w-10 sm:w-12 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading document details...</p>
+            <p className="mt-4 text-sm sm:text-base">Loading document details...</p>
           </div>
         )}
 
@@ -163,9 +163,9 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
           onClose={() => setPdfViewerFilePath(null)}
           title="Loading PDF Viewer..."
         >
-          <div className="flex items-center justify-center p-8">
+          <div className="flex items-center justify-center p-8 text-gray-600 dark:text-gray-300">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-            <span className="ml-2 text-gray-600">Loading PDF viewer...</span>
+            <span className="ml-2">Loading PDF viewer...</span>
           </div>
         </Modal>
       }>
@@ -208,25 +208,25 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
   }
 
   return (
-    <div className="p-4 sm:p-6 hover:bg-gray-50">
+    <div className="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-        <h3 className="text-base sm:text-lg font-medium text-gray-900 line-clamp-2 flex-1">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 line-clamp-2 flex-1">
           {result.title}
         </h3>
         <div className="flex items-center gap-2 flex-shrink-0">
           {isReconstructed && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full whitespace-nowrap">
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 text-xs font-medium rounded-full whitespace-nowrap">
               Reconstructed
             </span>
           )}
-          <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full whitespace-nowrap">
+          <span className="px-2 py-1 bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 text-xs font-medium rounded-full whitespace-nowrap">
             {formatScore(result.score)}% match
           </span>
         </div>
       </div>
 
       {/* Show highlights if available, otherwise show content */}
-      <div className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-3 search-highlights">
+      <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 line-clamp-3 search-highlights">
         {result.metadata?.highlights ? (
           <div dangerouslySetInnerHTML={{ __html: result.metadata.highlights }} />
         ) : (
@@ -235,14 +235,14 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
       </div>
 
       {/* Metadata and actions - stack on mobile */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="px-2 py-1 bg-gray-100 rounded text-xs whitespace-nowrap">
+          <span className="px-2 py-1 bg-gray-100 dark:bg-slate-800 rounded text-xs whitespace-nowrap">
             {result.documentType}
           </span>
           <span className="text-xs sm:text-sm truncate">{result.source}</span>
           {chunksInfo && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded whitespace-nowrap">
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 text-xs rounded whitespace-nowrap">
               {chunksInfo}
             </span>
           )}
@@ -253,14 +253,14 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
             <>
               <button
                 onClick={() => onViewPDF?.(result.filePath!)}
-                className="text-primary-600 hover:text-primary-700 p-1 rounded"
+                className="text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 p-1 rounded"
                 title="View PDF"
               >
                 <Eye className="h-4 w-4" />
               </button>
               <button
                 onClick={handleDownload}
-                className="text-primary-600 hover:text-primary-700 p-1 rounded"
+                className="text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 p-1 rounded"
                 title="Download file"
               >
                 <Download className="h-4 w-4" />
@@ -269,7 +269,7 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
           )}
           <button
             onClick={onViewDetails}
-            className="text-primary-600 hover:text-primary-700 font-medium text-sm whitespace-nowrap"
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 font-medium text-sm whitespace-nowrap"
           >
             View Details
           </button>
