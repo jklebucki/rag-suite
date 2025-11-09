@@ -155,9 +155,9 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-        <span className="ml-2 text-gray-600">Loading settings...</span>
+      <div className="surface flex items-center justify-center gap-3 p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+        <span className="text-gray-600 dark:text-gray-300">Loading settings...</span>
       </div>
     )
   }
@@ -165,32 +165,32 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <SettingsIcon className="h-6 w-6 text-blue-600" />
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-primary-100 rounded-lg dark:bg-primary-900/30">
+          <SettingsIcon className="h-6 w-6 text-primary-600 dark:text-primary-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">LLM Settings</h1>
-          <p className="text-gray-600">Configure your Large Language Model settings</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">LLM Settings</h1>
+          <p className="text-gray-600 dark:text-gray-300">Configure your Large Language Model settings</p>
         </div>
       </div>
 
       {/* Admin Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <div className="flex items-center space-x-2">
-          <Shield className="h-5 w-5 text-amber-600" />
-          <span className="text-sm font-medium text-amber-800">Admin Access Required</span>
+      <div className="surface-muted border border-amber-200 dark:border-amber-800/40 rounded-xl p-4">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Admin Access Required</span>
         </div>
-        <p className="mt-1 text-sm text-amber-700">
+        <p className="mt-1 text-sm text-amber-700 dark:text-amber-200">
           These settings control the behavior of the LLM service. Changes may affect system performance and functionality.
         </p>
       </div>
 
       {/* Settings Form */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="surface p-6">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Model Configuration</h2>
-          <p className="text-gray-600">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Model Configuration</h2>
+          <p className="text-gray-600 dark:text-gray-300">
             Configure the connection to your LLM service and set generation parameters.
           </p>
         </div>
@@ -288,14 +288,19 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
               ) : (
-                <Save className="h-4 w-4 mr-2" />
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Save Settings</span>
+                </>
               )}
-              {saving ? 'Saving...' : 'Save Settings'}
             </button>
           </div>
         </form>

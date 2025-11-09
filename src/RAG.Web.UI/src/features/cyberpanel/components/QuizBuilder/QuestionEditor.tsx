@@ -43,7 +43,7 @@ export function QuestionEditor({
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 text-gray-900 dark:text-gray-100">
           <h3 className="text-lg font-semibold">
             {t('cyberpanel.question')} {questionIndex + 1}
           </h3>
@@ -92,12 +92,12 @@ export function QuestionEditor({
               <img
                 src={question.imageUrl}
                 alt="Question"
-                className="max-w-full h-auto rounded border"
+                className="max-w-full h-auto rounded border border-gray-200 dark:border-slate-700"
               />
               <button
                 type="button"
                 onClick={() => onUpdate('imageUrl', null)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500"
                 title="Remove image"
                 aria-label="Remove image"
               >
@@ -120,7 +120,7 @@ export function QuestionEditor({
               </Button>
             </label>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <label className="text-sm font-medium">{t('cyberpanel.points')}:</label>
               <Input
                 type="number"
@@ -133,7 +133,7 @@ export function QuestionEditor({
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center text-gray-700 dark:text-gray-300">
               <label className="text-sm font-medium">{t('cyberpanel.options')}:</label>
               <Button
                 type="button"

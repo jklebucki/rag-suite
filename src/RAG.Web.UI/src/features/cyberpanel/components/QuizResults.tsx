@@ -81,22 +81,22 @@ export function QuizResults() {
   }
 
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-600'
-    if (percentage >= 60) return 'text-yellow-600'
-    return 'text-red-600'
+    if (percentage >= 80) return 'text-green-600 dark:text-green-300'
+    if (percentage >= 60) return 'text-yellow-600 dark:text-yellow-300'
+    return 'text-red-600 dark:text-red-300'
   }
 
   const getScoreBgColor = (percentage: number) => {
-    if (percentage >= 80) return 'bg-green-50 border-green-200'
-    if (percentage >= 60) return 'bg-yellow-50 border-yellow-200'
-    return 'bg-red-50 border-red-200'
+    if (percentage >= 80) return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-500/50'
+    if (percentage >= 60) return 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-500/50'
+    return 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-600/60'
   }
 
   if (loading) {
     return (
-      <div className="max-w-6xl">
+      <div className="max-w-6xl text-gray-900 dark:text-gray-100">
         <div className="text-center py-8">
-          <p className="text-gray-600">{t('common.loading')}</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -104,16 +104,16 @@ export function QuizResults() {
 
   if (error) {
     return (
-      <div className="max-w-6xl">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-800">{error}</p>
+      <div className="max-w-6xl text-gray-900 dark:text-gray-100">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4 mb-4">
+          <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl md:text-2xl font-bold">{t('cyberpanel.results')}</h3>
       </div>
@@ -121,9 +121,9 @@ export function QuizResults() {
       {attempts.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg mb-2">{t('cyberpanel.noResultsYet')}</p>
-            <p className="text-gray-500 text-sm mb-6">{t('cyberpanel.takeFirstQuiz')}</p>
+            <Trophy className="w-16 h-16 text-gray-400 dark:text-slate-600 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">{t('cyberpanel.noResultsYet')}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{t('cyberpanel.takeFirstQuiz')}</p>
             <Button onClick={() => navigate('/cyberpanel/quizzes')} variant="primary">
               {t('cyberpanel.browseQuizzes')}
             </Button>
@@ -143,11 +143,11 @@ export function QuizResults() {
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
                       <CardTitle className="text-lg mb-2">{attempt.quizTitle}</CardTitle>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
+                          <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                           <span>{submittedDate.toLocaleDateString()}</span>
-                          <span className="text-gray-400">
+                          <span className="text-gray-400 dark:text-gray-500">
                             {submittedDate.toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
@@ -176,7 +176,7 @@ export function QuizResults() {
                           variant="outline"
                           size="sm"
                           title="Delete attempt"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -190,32 +190,32 @@ export function QuizResults() {
                       <p className={`text-2xl font-bold ${getScoreColor(percentage)}`}>
                         {percentage.toFixed(1)}%
                       </p>
-                      <p className="text-sm text-gray-600">{t('cyberpanel.score')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.score')}</p>
                     </div>
 
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-gray-700">
+                    <div className="text-center p-4 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
+                      <p className="text-2xl font-bold text-gray-700 dark:text-gray-200">
                         {attempt.score}/{attempt.maxScore}
                       </p>
-                      <p className="text-sm text-gray-600">{t('cyberpanel.points')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.points')}</p>
                     </div>
 
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-500/50">
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                        <p className="text-2xl font-bold text-green-600">{attempt.correctAnswers}</p>
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-300">{attempt.correctAnswers}</p>
                       </div>
-                      <p className="text-sm text-gray-600">{t('cyberpanel.correct')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.correct')}</p>
                     </div>
 
-                    <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-600/60">
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <XCircle className="w-5 h-5 text-red-600" />
-                        <p className="text-2xl font-bold text-red-600">
+                        <XCircle className="w-5 h-5 text-red-600 dark:text-red-300" />
+                        <p className="text-2xl font-bold text-red-600 dark:text-red-300">
                           {attempt.questionCount - attempt.correctAnswers}
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600">{t('cyberpanel.incorrect')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.incorrect')}</p>
                     </div>
                   </div>
                 </CardContent>

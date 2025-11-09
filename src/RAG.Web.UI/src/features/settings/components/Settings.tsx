@@ -11,11 +11,11 @@ export function Settings() {
 
   return (
     // On mobile we want the sidebar topbar above content (column). On md+ use row with sidebar left.
-    <div className="flex flex-col md:flex-row h-full">
+    <div className="flex flex-col md:flex-row gap-6 lg:gap-10 min-h-full">
       <SettingsSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 space-y-6 p-6 md:p-8">
         {activeTab === 'llm' && <SettingsForm />}
         {activeTab === 'user' && <UserSettings />}
       </div>

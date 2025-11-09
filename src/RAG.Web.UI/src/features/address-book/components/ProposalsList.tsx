@@ -39,13 +39,13 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   const getProposalTypeBadge = (type: ChangeProposalType): string => {
     switch (type) {
       case ChangeProposalType.Create:
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
       case ChangeProposalType.Update:
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200'
       case ChangeProposalType.Delete:
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-200'
     }
   }
 
@@ -67,15 +67,15 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   const getStatusBadge = (status: ProposalStatus): string => {
     switch (status) {
       case ProposalStatus.Pending:
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-amber-900/40 dark:text-amber-200'
       case ProposalStatus.Approved:
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
       case ProposalStatus.Rejected:
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
       case ProposalStatus.Applied:
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-200'
     }
   }
 
@@ -97,16 +97,16 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t('addressBook.proposals.loading')}</div>
+      <div className="surface flex items-center justify-center py-12">
+        <div className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.loading')}</div>
       </div>
     )
   }
 
   if (proposals.length === 0) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-600">{t('addressBook.proposals.noProposalsFound')}</p>
+      <div className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-8 text-center">
+        <p className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.noProposalsFound')}</p>
       </div>
     )
   }
@@ -116,7 +116,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       {proposals.map((proposal) => (
         <div
           key={proposal.id}
-          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+          className="surface rounded-2xl p-4 hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
@@ -136,21 +136,21 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                   {getStatusLabel(proposal.status)}
                 </span>
               </div>
-              <h3 className="font-medium text-gray-900">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 {proposal.contactName || t('addressBook.proposals.newContact')}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                 {t('addressBook.proposals.proposedBy')} <span className="font-medium">{proposal.proposedByUserName || proposal.proposedByUserId}</span>
                 {' • '}
                 {new Date(proposal.proposedAt).toLocaleString()}
               </p>
               {proposal.reason && (
-                <p className="text-sm text-gray-700 mt-2 italic">
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 italic">
                   {t('addressBook.proposals.reason')}: {proposal.reason}
                 </p>
               )}
               {proposal.reviewedByUserName && proposal.reviewedAt && (
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                   {t('addressBook.proposals.reviewedBy')} <span className="font-medium">{proposal.reviewedByUserName}</span>
                   {' • '}
                   {new Date(proposal.reviewedAt).toLocaleString()}
@@ -161,11 +161,11 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
 
           {/* Review Actions (only for Pending proposals if user can review) */}
           {canReview && proposal.status === ProposalStatus.Pending && (
-            <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700">
               {reviewingId === proposal.id ? (
                 <div className="space-y-3">
                   <div>
-                    <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                       {t('addressBook.proposals.comment')}
                     </label>
                     <textarea
@@ -174,21 +174,21 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                       onChange={(e) => setReviewComment(e.target.value)}
                       rows={2}
                       placeholder={t('addressBook.proposals.commentPlaceholder')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className="form-input min-h-[80px] text-sm"
                     />
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleReview(proposal.id, true)}
                       disabled={isSubmitting}
-                      className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium"
+                      className="btn-primary bg-green-600 hover:bg-green-700 focus-visible:ring-green-500 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 text-sm font-medium"
                     >
                       {isSubmitting ? t('addressBook.proposals.processing') : t('addressBook.proposals.approveAndApply')}
                     </button>
                     <button
                       onClick={() => handleReview(proposal.id, false)}
                       disabled={isSubmitting}
-                      className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium"
+                      className="btn-primary bg-red-600 hover:bg-red-700 focus-visible:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 text-sm font-medium"
                     >
                       {isSubmitting ? t('addressBook.proposals.processing') : t('addressBook.proposals.reject')}
                     </button>
@@ -198,7 +198,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
                         setReviewComment('')
                       }}
                       disabled={isSubmitting}
-                      className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 text-sm"
+                      className="btn-secondary disabled:opacity-50 text-sm"
                     >
                       {t('addressBook.proposals.cancel')}
                     </button>
@@ -207,7 +207,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
               ) : (
                 <button
                   onClick={() => setReviewingId(proposal.id)}
-                  className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                  className="text-primary-600 dark:text-primary-300 hover:text-primary-700 dark:hover:text-primary-200 font-medium text-sm"
                 >
                   {t('addressBook.proposals.reviewProposal')}
                 </button>

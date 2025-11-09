@@ -34,26 +34,26 @@ export function LlmFormField({
 }: LlmFormFieldProps) {
   if (type === 'checkbox') {
     return (
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          id={id}
-          name={name}
-          checked={value as boolean}
-          onChange={onChange}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
-        <label htmlFor={id} className="ml-2 block text-sm text-gray-700">
+      <div className="space-y-1">
+        <label htmlFor={id} className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+          <input
+            type="checkbox"
+            id={id}
+            name={name}
+            checked={value as boolean}
+            onChange={onChange}
+            className="form-checkbox"
+          />
           {label}
         </label>
-        {description && <p className="ml-2 text-sm text-gray-500">{description}</p>}
+        {description && <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>}
       </div>
     )
   }
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
         {label}
       </label>
       <input
@@ -65,13 +65,11 @@ export function LlmFormField({
         min={min}
         max={max}
         step={step}
-        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`form-input ${error ? 'form-input-error' : ''}`}
         placeholder={placeholder}
       />
-      {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
+      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   )
 }
@@ -97,18 +95,17 @@ export function ModelSelectField({
 }: ModelSelectFieldProps) {
   return (
     <div>
-      <label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor="model" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
         Model
       </label>
-      <div className="flex space-x-2">
+      <div className="flex gap-2">
         <select
           id="model"
           name="model"
           value={value}
           onChange={onChange}
-          className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            error ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className={`form-select flex-1 ${error ? 'form-input-error' : ''}`}
+          disabled={disabled}
         >
           <option value="">Select a model...</option>
           {availableModels.map(model => (
@@ -119,15 +116,15 @@ export function ModelSelectField({
           type="button"
           onClick={onRefresh}
           disabled={isLoading || disabled}
-          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md flex items-center"
+          className="btn-secondary px-3 py-2 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
           title="Refresh available models"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
       </div>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {availableModels.length === 0 && !isLoading && !disabled && (
-        <p className="mt-1 text-sm text-gray-500">No models available. Check the URL and try refreshing.</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">No models available. Check the URL and try refreshing.</p>
       )}
     </div>
   )

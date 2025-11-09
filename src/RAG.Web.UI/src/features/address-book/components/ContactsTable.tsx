@@ -111,13 +111,13 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         cell: ({ row }) => (
           <button
             onClick={() => row.toggleExpanded()}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded transition-colors"
             aria-label={t('addressBook.table.details')}
           >
             {row.getIsExpanded() ? (
-              <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              <ChevronDownIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             ) : (
-              <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+              <ChevronRightIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             )}
           </button>
         )
@@ -125,14 +125,14 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
       columnHelper.accessor('firstName', {
         header: t('addressBook.table.firstName'),
         cell: (info) => (
-          <span className="font-medium text-gray-900">{info.getValue()}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{info.getValue()}</span>
         ),
         filterFn: diacriticsInsensitiveFilter
       }),
       columnHelper.accessor('lastName', {
         header: t('addressBook.table.lastName'),
         cell: (info) => (
-          <span className="font-medium text-gray-900">{info.getValue()}</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{info.getValue()}</span>
         ),
         filterFn: diacriticsInsensitiveFilter
       }),
@@ -142,12 +142,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           info.getValue() ? (
             <a
               href={`mailto:${info.getValue()}`}
-              className="text-blue-600 hover:underline truncate block max-w-xs"
+              className="text-primary-600 dark:text-primary-300 hover:underline truncate block max-w-xs"
             >
               {info.getValue()}
             </a>
           ) : (
-            <span className="text-gray-400">-</span>
+            <span className="text-gray-400 dark:text-gray-500">-</span>
           )
         ),
         filterFn: diacriticsInsensitiveFilter
@@ -158,12 +158,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           info.getValue() ? (
             <a
               href={`tel:${info.getValue()}`}
-              className="text-blue-600 hover:underline whitespace-nowrap"
+              className="text-primary-600 dark:text-primary-300 hover:underline whitespace-nowrap"
             >
               {info.getValue()}
             </a>
           ) : (
-            <span className="text-gray-400">-</span>
+            <span className="text-gray-400 dark:text-gray-500">-</span>
           )
         ),
         filterFn: diacriticsInsensitiveFilter
@@ -171,14 +171,14 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
       columnHelper.accessor('department', {
         header: t('addressBook.table.department'),
         cell: (info) => (
-          <span className="text-gray-700">{info.getValue() || '-'}</span>
+          <span className="text-gray-700 dark:text-gray-200">{info.getValue() || '-'}</span>
         ),
         filterFn: diacriticsInsensitiveFilter
       }),
       columnHelper.accessor('position', {
         header: t('addressBook.table.position'),
         cell: (info) => (
-          <span className="text-gray-700">{info.getValue() || '-'}</span>
+          <span className="text-gray-700 dark:text-gray-200">{info.getValue() || '-'}</span>
         ),
         filterFn: diacriticsInsensitiveFilter
       }),
@@ -192,7 +192,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
               <>
                 <button
                   onClick={() => onEdit?.(row.original)}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  className="p-2 text-primary-600 dark:text-primary-300 hover:bg-blue-50 dark:hover:bg-slate-700 rounded transition-colors"
                   title={t('addressBook.actions.edit')}
                   aria-label={t('addressBook.actions.edit')}
                 >
@@ -204,7 +204,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                       onDelete?.(row.original)
                     }
                   }}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                   title={t('addressBook.actions.delete')}
                   aria-label={t('addressBook.actions.delete')}
                 >
@@ -215,7 +215,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
               isAuthenticated && (
                 <button
                   onClick={() => onProposeChange?.(row.original)}
-                  className="p-2 text-green-600 hover:bg-green-50 rounded transition-colors"
+                  className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded transition-colors"
                   title={t('addressBook.actions.propose')}
                   aria-label={t('addressBook.actions.propose')}
                 >
@@ -260,37 +260,37 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        <span className="ml-3 text-gray-600">{t('addressBook.loading')}</span>
+      <div className="surface flex items-center justify-center gap-3 py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <span className="text-gray-600 dark:text-gray-300">{t('addressBook.loading')}</span>
       </div>
     )
   }
 
   return (
     <div className="space-y-4 flex flex-col">
-      <div className="flex items-center gap-4 flex-shrink-0">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4 flex-shrink-0">
         <input
           type="text"
           value={globalFilter ?? ''}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder={t('addressBook.search')}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="form-input lg:flex-1"
         />
         <div className="relative">
           <button
             onClick={() => setShowColumnConfig(!showColumnConfig)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="surface inline-flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
             title={t('addressBook.table.configureColumns')}
           >
-            <AdjustmentsHorizontalIcon className="w-5 h-5 text-gray-600" />
+            <AdjustmentsHorizontalIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <span className="hidden sm:inline">{t('addressBook.table.configureColumns')}</span>
           </button>
           {showColumnConfig && (
-            <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-10 p-4">
+            <div className="absolute right-0 mt-2 w-64 surface shadow-lg border border-gray-200 dark:border-slate-700 z-10 p-4">
               <div className="space-y-2">
                 {['firstName', 'lastName', 'email', 'mobilePhone', 'department', 'position'].map((columnId) => (
-                  <label key={columnId} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                  <label key={columnId} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 p-2 rounded-lg">
                     <input
                       type="checkbox"
                       checked={columnVisibility[columnId] !== false}
@@ -300,9 +300,9 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                           [columnId]: e.target.checked
                         }))
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="form-checkbox h-5 w-9"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-gray-200">
                       {t(`addressBook.table.${columnId}` as keyof typeof t)}
                     </span>
                   </label>
@@ -313,9 +313,9 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow address-book-table flex-1">
-        <table className="min-w-full divide-y divide-gray-200 h-full">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto surface rounded-2xl shadow-sm address-book-table flex-1">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 h-full">
+          <thead className="bg-gray-50 dark:bg-slate-800/80">
             {table.getHeaderGroups().map((headerGroup) => (
               <React.Fragment key={headerGroup.id}>
                 <tr>
@@ -323,12 +323,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className={`px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${header.column.getCanSort() ? 'cursor-pointer select-none hover:bg-gray-100' : ''} ${header.id === 'expand' ? 'w-12' : ''} ${header.id === 'actions' ? 'w-32' : ''}`}
+                      className={`px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors ${header.column.getCanSort() ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-slate-700/60' : ''} ${header.id === 'expand' ? 'w-12' : ''} ${header.id === 'actions' ? 'w-32' : ''}`}
                     >
                       <div className="flex items-center gap-2">
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
-                          <span className="text-gray-400">
+                          <span className="text-gray-400 dark:text-gray-500">
                             {{
                               asc: ' ↑',
                               desc: ' ↓'
@@ -341,14 +341,14 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                 </tr>
                 <tr>
                   {headerGroup.headers.map((header) => (
-                    <th key={`filter-${header.id}`} className="px-3 py-2 bg-gray-100">
+                    <th key={`filter-${header.id}`} className="px-3 py-2 bg-gray-100 dark:bg-slate-800/60">
                       {header.column.getCanFilter() ? (
                         <input
                           type="text"
                           value={(header.column.getFilterValue() ?? '') as string}
                           onChange={(e) => header.column.setFilterValue(e.target.value)}
                           placeholder={`${t('addressBook.table.searchIn')} ${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header.toLowerCase() : ''}...`}
-                          className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="form-input w-full py-1 text-xs"
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : null}
@@ -358,50 +358,56 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
               </React.Fragment>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-800">
             {table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
                   {globalFilter ? t('addressBook.table.noResults') : t('addressBook.noContacts')}
                 </td>
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
-                  <tr className="hover:bg-gray-50 transition-colors">
+                  <tr className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-3 py-3 whitespace-nowrap text-sm">
+                      <td key={cell.id} className="px-3 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
                   {row.getIsExpanded() && (
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-slate-800/60">
                       <td colSpan={columns.length} className="px-6 py-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700 dark:text-gray-300">
                           {row.original.displayName && (
                             <div>
-                              <span className="font-medium text-gray-700">{t('addressBook.table.displayName')}:</span>
-                              <span className="ml-2 text-gray-900">{row.original.displayName}</span>
+                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.displayName')}:</span>
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">{row.original.displayName}</span>
                             </div>
                           )}
                           {row.original.mobilePhone && (
                             <div>
-                              <span className="font-medium text-gray-700">{t('addressBook.table.mobile')}:</span>
-                              <a href={`tel:${row.original.mobilePhone}`} className="ml-2 text-blue-600 hover:underline">
+                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.mobile')}:</span>
+                              <a href={`tel:${row.original.mobilePhone}`} className="ml-2 text-primary-600 dark:text-primary-300 hover:underline">
                                 {row.original.mobilePhone}
                               </a>
                             </div>
                           )}
                           {row.original.location && (
                             <div>
-                              <span className="font-medium text-gray-700">{t('addressBook.table.location')}:</span>
-                              <span className="ml-2 text-gray-900">{row.original.location}</span>
+                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.location')}:</span>
+                              <span className="ml-2 text-gray-900 dark:text-gray-100">{row.original.location}</span>
                             </div>
                           )}
                           <div>
-                            <span className="font-medium text-gray-700">{t('addressBook.table.status')}:</span>
-                            <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${row.original.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.status')}:</span>
+                            <span
+                              className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
+                                row.original.isActive
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                                  : 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-200'
+                              }`}
+                            >
                               {row.original.isActive ? t('addressBook.table.active') : t('addressBook.table.inactive')}
                             </span>
                           </div>
@@ -417,12 +423,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 flex-shrink-0">
-        <div className="flex items-center gap-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
           <span>{t('addressBook.table.rowsPerPage')}:</span>
           <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
-            className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="form-select h-10 w-32 py-1 text-sm"
             aria-label={t('addressBook.table.rowsPerPage')}
           >
             {[10, 20, 50, 100].map((pageSize) => (
@@ -435,37 +441,37 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<'}
           </button>
-          <span className="px-3 py-1 text-sm text-gray-700">
+          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-200">
             {table.getState().pagination.pageIndex + 1} {t('addressBook.table.of')} {table.getPageCount()}
           </span>
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>'}
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>>'}
           </button>
         </div>
 
-        <div className="text-sm text-gray-700">
+        <div className="text-sm text-gray-700 dark:text-gray-200">
           {table.getFilteredRowModel().rows.length} {t('addressBook.table.totalContacts')}
         </div>
       </div>

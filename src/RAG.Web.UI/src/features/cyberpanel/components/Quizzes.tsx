@@ -30,32 +30,32 @@ export function Quizzes() {
 
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl text-gray-900 dark:text-gray-100">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h3 className="text-xl md:text-2xl font-bold">{t('cyberpanel.quizzes')}</h3>
-          <p className="text-sm text-gray-600 mt-1">Take published quizzes</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Take published quizzes</p>
         </div>
       </div>
 
       {loading && !quizzes && (
         <div className="text-center py-8">
-          <p className="text-gray-600">{t('common.loading')}</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-800">{error}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4 mb-4">
+          <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {publishedQuizzes.length === 0 && !loading && (
         <Card>
           <CardContent className="py-12 text-center">
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg mb-2">No quizzes available</p>
-            <p className="text-gray-500 text-sm">Check back later for new quizzes</p>
+            <FileText className="w-16 h-16 text-gray-400 dark:text-slate-600 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">No quizzes available</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Check back later for new quizzes</p>
           </CardContent>
         </Card>
       )}
@@ -72,11 +72,11 @@ export function Quizzes() {
                     <div className="flex-1">
                       <CardTitle className="text-lg mb-2">{quiz.title}</CardTitle>
                       {quiz.description && (
-                        <p className="text-sm text-gray-600 mb-3">{quiz.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{quiz.description}</p>
                       )}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
+                          <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                           <span>{createdDate.toLocaleDateString()}</span>
                         </div>
                         <span>•</span>

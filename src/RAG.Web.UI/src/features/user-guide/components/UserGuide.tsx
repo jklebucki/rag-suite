@@ -9,29 +9,29 @@ export function UserGuide() {
   const pdfUrl = `/assets/guides/user-guide-${language}.pdf`
 
   return (
-    <div className="h-full w-full">
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold text-gray-900">
+    <div className="h-full w-full space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           {t('nav.user_guide')}
         </h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
           {t('userguide.description')}
         </p>
       </div>
 
       {/* PDF viewer - using native browser PDF rendering via iframe */}
-      <div className="relative w-full h-[calc(100vh-220px)] min-h-[600px]">
+      <div className="surface relative w-full h-[calc(100vh-220px)] min-h-[600px] overflow-hidden p-0">
         <iframe
           src={pdfUrl}
-          className="w-full h-full border border-gray-300 rounded-lg shadow-sm"
+          className="w-full h-full rounded-2xl border-0"
           title={t('nav.user_guide')}
         >
-          <p className="p-4 text-gray-600">
+          <p className="p-4 text-gray-600 dark:text-gray-300">
             {t('userguide.browser_not_supported')}
             <a
               href={pdfUrl}
               download
-              className="text-blue-600 hover:underline ml-2"
+              className="text-primary-600 dark:text-primary-300 hover:underline ml-2"
             >
               {t('userguide.download_pdf')}
             </a>
@@ -44,10 +44,10 @@ export function UserGuide() {
         <a
           href={pdfUrl}
           download
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="btn-primary inline-flex items-center gap-2"
         >
           <svg
-            className="mr-2 h-4 w-4"
+            className="h-4 w-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

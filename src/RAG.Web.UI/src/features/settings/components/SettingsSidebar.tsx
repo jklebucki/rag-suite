@@ -47,10 +47,10 @@ export function SettingsSidebar({
         setActiveTab(tab)
         setIsMenuOpen(false)
       }}
-      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors ${
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 ${
         activeTab === tab
-          ? 'bg-blue-100 text-blue-700 border border-blue-200'
-          : 'text-gray-700 hover:bg-gray-100'
+          ? 'bg-primary-50 text-primary-700 border border-primary-200 shadow-sm dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-700'
+          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800'
       }`}
     >
       {icon}
@@ -62,8 +62,8 @@ export function SettingsSidebar({
     <>
       {/* Mobile toggle */}
       {/* Mobile topbar: hamburger menu */}
-      <div className="md:hidden bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between p-3">
+      <div className="md:hidden surface border border-transparent rounded-xl shadow-sm mb-4">
+        <div className="flex items-center justify-between">
           <div />
           <div className="relative" ref={menuRef}>
             <button
@@ -71,15 +71,15 @@ export function SettingsSidebar({
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
               aria-controls="settings-sidebar"
-              className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 transition-colors"
               aria-label="Settings menu"
               title="Settings menu"
             >
-              <Menu className="h-5 w-5 text-gray-700" />
+              <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <div className="absolute right-0 top-full mt-1 w-64 surface border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg z-50">
                 <div className="p-2">
                   <nav className="space-y-2">
                     {navButton('llm', 'LLM Settings', <SettingsIcon className="h-5 w-5" />)}
@@ -93,8 +93,8 @@ export function SettingsSidebar({
       </div>
 
       {/* Desktop sidebar */}
-      <aside id="settings-sidebar" className="hidden md:block w-64 bg-gray-50 border-r border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
+      <aside id="settings-sidebar" className="hidden md:block w-64 surface p-6 sticky top-6 h-full self-start">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Settings</h2>
         <nav className="space-y-2" aria-label="Settings navigation">
           {navButton('llm', 'LLM Settings', <SettingsIcon className="h-5 w-5" />)}
           {navButton('user', 'User Settings', <User className="h-5 w-5" />)}

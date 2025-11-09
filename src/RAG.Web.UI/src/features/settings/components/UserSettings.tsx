@@ -102,14 +102,14 @@ export function UserSettings() {
 
   if (!authService.hasRole('Admin')) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Shield className="h-6 w-6 text-red-600" />
+      <div className="surface p-6 space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-red-100 rounded-lg dark:bg-red-900/30">
+            <Shield className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-            <p className="text-gray-600">You need Admin role to access user management</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Access Denied</h1>
+            <p className="text-gray-600 dark:text-gray-300">You need Admin role to access user management</p>
           </div>
         </div>
       </div>
@@ -119,40 +119,38 @@ export function UserSettings() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-green-100 rounded-lg">
-          <User className="h-6 w-6 text-green-600" />
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-green-100 rounded-lg dark:bg-green-900/30">
+          <User className="h-6 w-6 text-green-600 dark:text-green-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage users, roles, and permissions</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h1>
+          <p className="text-gray-600 dark:text-gray-300">Manage users, roles, and permissions</p>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="surface rounded-2xl overflow-hidden">
         {/* Search Bar */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center justify-between">
-            <div className="flex-1 max-w-lg">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={filters.searchText}
-                  onChange={(e) => setFilters(prev => ({ ...prev, searchText: e.target.value }))}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Search users by name, username, or email..."
-                />
+            <div className="flex-1 max-w-lg relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
+              <input
+                type="text"
+                value={filters.searchText}
+                onChange={(e) => setFilters(prev => ({ ...prev, searchText: e.target.value }))}
+                className="form-input w-full pl-10 sm:text-sm"
+                placeholder="Search users by name, username, or email..."
+              />
             </div>
             <button
               onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
-              className="ml-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="ml-4 inline-flex items-center gap-2 btn-secondary text-sm"
             >
-              <Shield className="h-4 w-4 mr-2" />
+              <Shield className="h-4 w-4" />
               {isFiltersExpanded ? 'Hide Filters' : 'More Filters'}
             </button>
           </div>
@@ -170,8 +168,8 @@ export function UserSettings() {
         )}
 
         {/* Results Summary */}
-        <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
-          <p className="text-sm text-gray-700">
+        <div className="px-6 py-3 surface-muted border-b border-gray-200 dark:border-slate-700">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Showing {filteredUsers.length} of {users.length} users
           </p>
         </div>
@@ -179,35 +177,35 @@ export function UserSettings() {
         {isLoading ? (
           <div className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading users...</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">Loading users...</p>
           </div>
         ) : fetchError ? (
           <div className="p-6 text-center">
-            <p className="text-red-600">Failed to load users</p>
+            <p className="text-red-600 dark:text-red-400">Failed to load users</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-800/70">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Roles
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-800">
                 {filteredUsers.map((user) => (
                   <UserTableRow
                     key={user.id || user.email || Math.random()}

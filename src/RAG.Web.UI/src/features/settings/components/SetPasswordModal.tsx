@@ -56,13 +56,13 @@ export function SetPasswordModal({
       isOpen={isOpen}
       onClose={handleClose}
       title={
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-indigo-100 rounded-full">
-            <Key className="h-5 w-5 text-indigo-600" />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-100 rounded-full dark:bg-indigo-900/40">
+            <Key className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Set New Password</h3>
-            <p className="text-sm text-gray-600">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Set New Password</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               for {user.firstName} {user.lastName}
             </p>
           </div>
@@ -71,19 +71,19 @@ export function SetPasswordModal({
       size="md"
     >
       <div className="p-6">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 min-h-[500px] flex flex-col">
+        <div className="surface rounded-2xl border border-gray-200 dark:border-slate-700 min-h-[500px] flex flex-col">
           <div className="p-6 space-y-6 flex-1">
             {/* User Info Card */}
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-100">
-              <div className="flex items-center space-x-3">
-                <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <User className="h-6 w-6 text-indigo-600" />
+            <div className="surface-muted border border-indigo-200 dark:border-indigo-800/40 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center dark:bg-indigo-900/40">
+                  <User className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 text-lg">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
                     {user.firstName} {user.lastName}
                   </p>
-                  <p className="text-sm text-indigo-600 font-medium">@{user.userName}</p>
+                  <p className="text-sm text-indigo-600 dark:text-indigo-300 font-medium">@{user.userName}</p>
                 </div>
               </div>
             </div>
@@ -111,21 +111,21 @@ export function SetPasswordModal({
             />
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                className="btn-secondary text-sm font-medium transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isLoading || !newPassword || !confirmPassword || passwordsMismatch || passwordStrength.score < 3}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="btn-primary text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                     <span>Setting Password...</span>
                   </div>
                 ) : (

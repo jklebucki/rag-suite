@@ -27,7 +27,7 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64 text-gray-600 dark:text-gray-400">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -35,17 +35,17 @@ export function Dashboard() {
 
   if (hasError) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">{t('common.error')}</p>
+      <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+        <p>{t('common.error')}</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-gray-900 dark:text-gray-100">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
           {t('dashboard.subtitle')}
         </p>
       </div>

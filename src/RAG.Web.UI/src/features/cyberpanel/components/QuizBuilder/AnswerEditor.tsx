@@ -31,12 +31,12 @@ export function AnswerEditor({
   }
 
   return (
-    <div className="flex gap-2 items-start p-3 bg-gray-50 rounded">
+    <div className="flex gap-2 items-start p-3 bg-gray-50 dark:bg-slate-900 rounded border border-gray-200 dark:border-slate-800">
       <input
         type="checkbox"
         checked={option.isCorrect}
         onChange={(e) => onUpdate('isCorrect', e.target.checked)}
-        className="mt-2"
+        className="form-checkbox mt-2"
         title={t('cyberpanel.correctAnswer')}
         aria-label={t('cyberpanel.correctAnswer')}
       />
@@ -51,12 +51,12 @@ export function AnswerEditor({
             <img
               src={option.imageUrl}
               alt="Option"
-              className="max-w-xs h-auto rounded border"
+              className="max-w-xs h-auto rounded border border-gray-200 dark:border-slate-700"
             />
             <button
               type="button"
               onClick={() => onUpdate('imageUrl', null)}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500"
               title="Remove image"
               aria-label="Remove image"
             >

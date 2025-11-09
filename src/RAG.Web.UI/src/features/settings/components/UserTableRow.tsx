@@ -27,36 +27,36 @@ export function UserTableRow({
   const availableToAssign = availableRoles.filter(role => !userRoles.includes(role))
 
   return (
-    <tr>
+    <tr className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-              <User className="h-6 w-6 text-gray-600" />
+            <div className="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300">
+              <User className="h-6 w-6" />
             </div>
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {user.firstName || ''} {user.lastName || ''}
             </div>
-            <div className="text-sm text-gray-500">@{user.userName || ''}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">@{user.userName || ''}</div>
           </div>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{user.email || ''}</div>
+        <div className="text-sm text-gray-900 dark:text-gray-100">{user.email || ''}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex flex-wrap gap-1">
           {userRoles.map((role) => (
             <span
               key={role}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
             >
               {role}
               <button
                 onClick={() => onRemoveRole(user.id, role)}
-                className="ml-1 text-blue-600 hover:text-blue-800"
+                className="ml-1 text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
                 disabled={isRemovingRole}
                 aria-label={`Remove ${role} role`}
               >
@@ -69,7 +69,7 @@ export function UserTableRow({
               <button
                 key={role}
                 onClick={() => onAssignRole(user.id, role)}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
                 disabled={isAssigningRole}
               >
                 <Plus className="h-3 w-3 mr-1" />
@@ -79,15 +79,15 @@ export function UserTableRow({
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
         {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
         <button
           onClick={() => onSetPassword(user)}
-          className="text-indigo-600 hover:text-indigo-900 flex items-center"
+          className="text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 flex items-center gap-1"
         >
-          <Key className="h-4 w-4 mr-1" />
+          <Key className="h-4 w-4" />
           Set Password
         </button>
       </td>

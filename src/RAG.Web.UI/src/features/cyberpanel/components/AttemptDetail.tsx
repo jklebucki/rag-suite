@@ -55,8 +55,8 @@ export function AttemptDetail() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('cyberpanel.backToResults')}
         </Button>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{error || t('common.error')}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4">
+          <p className="text-red-800 dark:text-red-300">{error || t('common.error')}</p>
         </div>
       </div>
     )
@@ -78,7 +78,7 @@ export function AttemptDetail() {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-4xl text-gray-900 dark:text-gray-100">
       <Button onClick={handleBack} variant="outline" className="mb-4">
         <ArrowLeft className="w-4 h-4 mr-2" />
         {t('cyberpanel.backToResults')}
@@ -91,32 +91,32 @@ export function AttemptDetail() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="flex items-center gap-2 text-gray-600">
-              <User className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <User className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <div>
                 <p className="text-sm font-medium">{t('cyberpanel.userName')}</p>
                 <p className="text-sm">{attempt.userName}</p>
-                {attempt.userEmail && <p className="text-xs text-gray-500">{attempt.userEmail}</p>}
+                {attempt.userEmail && <p className="text-xs text-gray-500 dark:text-gray-400">{attempt.userEmail}</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Calendar className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <div>
                 <p className="text-sm font-medium">{t('cyberpanel.submittedAt')}</p>
                 <p className="text-sm">{submittedDate.toLocaleDateString()}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {submittedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Trophy className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <Trophy className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <div>
                 <p className="text-sm font-medium">{t('cyberpanel.score')}</p>
                 <p className={`text-xl font-bold ${getScoreColor(percentage)}`}>
                   {percentage.toFixed(1)}%
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {attempt.score}/{attempt.maxScore} {t('cyberpanel.points')}
                 </p>
               </div>
@@ -129,23 +129,23 @@ export function AttemptDetail() {
               <p className={`text-2xl font-bold ${getScoreColor(percentage)}`}>
                 {percentage.toFixed(1)}%
               </p>
-              <p className="text-sm text-gray-600">{t('cyberpanel.percentage')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.percentage')}</p>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-500/50">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <p className="text-2xl font-bold text-green-600">{attempt.correctAnswers}</p>
+                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
+                <p className="text-2xl font-bold text-green-600 dark:text-green-300">{attempt.correctAnswers}</p>
               </div>
-              <p className="text-sm text-gray-600">{t('cyberpanel.correct')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.correct')}</p>
             </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+            <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-600/60">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <XCircle className="w-5 h-5 text-red-600" />
-                <p className="text-2xl font-bold text-red-600">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-300" />
+                <p className="text-2xl font-bold text-red-600 dark:text-red-300">
                   {attempt.questionCount - attempt.correctAnswers}
                 </p>
               </div>
-              <p className="text-sm text-gray-600">{t('cyberpanel.incorrect')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('cyberpanel.incorrect')}</p>
             </div>
           </div>
         </CardContent>
@@ -155,17 +155,20 @@ export function AttemptDetail() {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold mb-2">{t('cyberpanel.answerDetails')}</h3>
         {attempt.questions.map((question, index) => (
-          <Card key={question.questionId} className={question.isCorrect ? 'border-green-200' : 'border-red-200'}>
-            <CardHeader className={question.isCorrect ? 'bg-green-50' : 'bg-red-50'}>
+          <Card
+            key={question.questionId}
+            className={question.isCorrect ? 'border-green-200 dark:border-green-500/50' : 'border-red-200 dark:border-red-600/60'}
+          >
+            <CardHeader className={question.isCorrect ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     {question.isCorrect ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
                     ) : (
-                      <XCircle className="w-5 h-5 text-red-600" />
+                      <XCircle className="w-5 h-5 text-red-600 dark:text-red-300" />
                     )}
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {t('cyberpanel.question')} {index + 1}/{attempt.questionCount}
                     </span>
                   </div>
@@ -179,7 +182,7 @@ export function AttemptDetail() {
                   )}
                 </div>
                 <div className="text-right ml-4">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     {question.pointsAwarded}/{question.points} {t('cyberpanel.points')}
                   </p>
                 </div>
@@ -192,32 +195,32 @@ export function AttemptDetail() {
                   const isCorrectOption = option.isCorrect
 
                   let borderColor = 'border-gray-200'
-                  let bgColor = 'bg-white'
+                  let bgColor = 'bg-white dark:bg-slate-900'
                   let icon = null
                   let label = null
 
                   if (isSelected && isCorrectOption) {
                     // User selected correct answer
-                    borderColor = 'border-green-300'
-                    bgColor = 'bg-green-50'
-                    icon = <CheckCircle className="w-5 h-5 text-green-600" />
-                    label = <p className="text-xs text-green-600 mt-1 font-medium">{t('cyberpanel.yourCorrectAnswer')}</p>
+                    borderColor = 'border-green-300 dark:border-green-500/50'
+                    bgColor = 'bg-green-50 dark:bg-green-900/20'
+                    icon = <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
+                    label = <p className="text-xs text-green-600 dark:text-green-300 mt-1 font-medium">{t('cyberpanel.yourCorrectAnswer')}</p>
                   } else if (isSelected && !isCorrectOption) {
                     // User selected wrong answer
-                    borderColor = 'border-red-300'
-                    bgColor = 'bg-red-50'
-                    icon = <XCircle className="w-5 h-5 text-red-600" />
-                    label = <p className="text-xs text-red-600 mt-1 font-medium">{t('cyberpanel.yourAnswer')}</p>
+                    borderColor = 'border-red-300 dark:border-red-600/60'
+                    bgColor = 'bg-red-50 dark:bg-red-900/20'
+                    icon = <XCircle className="w-5 h-5 text-red-600 dark:text-red-300" />
+                    label = <p className="text-xs text-red-600 dark:text-red-300 mt-1 font-medium">{t('cyberpanel.yourAnswer')}</p>
                   } else if (!isSelected && isCorrectOption) {
                     // Correct answer not selected by user
-                    borderColor = 'border-green-200'
-                    bgColor = 'bg-green-50/50'
-                    icon = <CheckCircle className="w-5 h-5 text-green-500" />
-                    label = <p className="text-xs text-green-600 mt-1">{t('cyberpanel.correctAnswerWas')}</p>
+                    borderColor = 'border-green-200 dark:border-green-500/50'
+                    bgColor = 'bg-green-50/50 dark:bg-green-900/10'
+                    icon = <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-300" />
+                    label = <p className="text-xs text-green-600 dark:text-green-300 mt-1">{t('cyberpanel.correctAnswerWas')}</p>
                   } else {
                     // Neutral option (not selected, not correct)
-                    borderColor = 'border-gray-200'
-                    bgColor = 'bg-gray-50'
+                    borderColor = 'border-gray-200 dark:border-slate-700'
+                    bgColor = 'bg-gray-50 dark:bg-slate-900'
                     icon = null
                   }
 

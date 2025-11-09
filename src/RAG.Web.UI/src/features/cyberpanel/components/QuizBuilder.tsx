@@ -42,7 +42,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
 
   if (preview) {
     return (
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto text-gray-900 dark:text-gray-100">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">{t('cyberpanel.preview')}</h2>
           <Button onClick={() => setPreview(false)} variant="outline">
@@ -54,7 +54,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>{title || 'Untitled Quiz'}</CardTitle>
-            {description && <p className="text-gray-600 mt-2">{description}</p>}
+            {description && <p className="text-gray-600 dark:text-gray-400 mt-2">{description}</p>}
           </CardHeader>
         </Card>
 
@@ -65,7 +65,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
                 <h3 className="text-lg font-semibold">
                   {qIdx + 1}. {question.text || 'No question text'}
                 </h3>
-                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                <span className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded">
                   {question.points} {t('cyberpanel.points')}
                 </span>
               </div>
@@ -82,8 +82,10 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
                 {question.options.map((option, oIdx) => (
                   <div
                     key={oIdx}
-                    className={`p-3 rounded border ${
-                      option.isCorrect ? 'border-green-500 bg-green-50' : 'border-gray-300'
+                    className={`p-3 rounded border transition-colors ${
+                      option.isCorrect
+                        ? 'border-green-500 bg-green-50 dark:border-green-500/50 dark:bg-green-900/20'
+                        : 'border-gray-300 dark:border-slate-700'
                     }`}
                   >
                     {option.imageUrl && (
@@ -95,7 +97,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
                     )}
                     <p>{option.text}</p>
                     {option.isCorrect && (
-                      <span className="text-xs text-green-600 font-semibold">
+                      <span className="text-xs text-green-600 dark:text-green-300 font-semibold">
                         ✓ {t('cyberpanel.correctAnswer')}
                       </span>
                     )}
@@ -110,7 +112,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">
           {editQuizId ? t('cyberpanel.editQuiz') : t('cyberpanel.createQuiz')}
@@ -139,10 +141,10 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
       </div>
 
       {validationErrors.length > 0 && (
-        <Card className="mb-6 border-red-500">
+        <Card className="mb-6 border-red-500 dark:border-red-600/60">
           <CardContent className="pt-6">
-            <h3 className="text-red-600 font-semibold mb-2">Validation Errors</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm text-red-600">
+            <h3 className="text-red-600 dark:text-red-300 font-semibold mb-2">Validation Errors</h3>
+            <ul className="list-disc list-inside space-y-1 text-sm text-red-600 dark:text-red-300">
               {validationErrors.map((error, idx) => (
                 <li key={idx}>{error}</li>
               ))}
@@ -176,7 +178,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
               maxLength={1000}
               rows={3}
             />
-            <p className="text-xs text-gray-500 mt-1">{description.length}/1000</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description.length}/1000</p>
           </div>
 
           <div>
@@ -185,7 +187,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
               id="quizLanguage"
               value={quizLanguage}
               onChange={(e) => setQuizLanguage(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-select"
               title="Language"
             >
               <option value="en">English</option>
@@ -194,7 +196,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
               <option value="hu">Magyar</option>
               <option value="nl">Nederlands</option>
             </select>
-            <p className="text-xs text-gray-500 mt-1">Select the language for this quiz</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Select the language for this quiz</p>
           </div>
 
           <div className="flex items-center">
@@ -203,7 +205,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
               id="isPublished"
               checked={isPublished}
               onChange={(e) => setIsPublished(e.target.checked)}
-              className="mr-2"
+              className="form-checkbox mr-2"
               aria-label="Publish quiz"
             />
             <label htmlFor="isPublished" className="text-sm font-medium">
@@ -224,7 +226,7 @@ export function QuizBuilder({ editQuizId, onSave, onCancel }: QuizBuilderProps) 
 
         {questions.length === 0 && (
           <Card>
-            <CardContent className="pt-6 text-center text-gray-500">
+            <CardContent className="pt-6 text-center text-gray-500 dark:text-gray-400">
               No questions added yet. Click &quot;Add Question&quot; to get started.
             </CardContent>
           </Card>

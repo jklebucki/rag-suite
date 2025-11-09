@@ -21,15 +21,15 @@ function HealthMetric({ label, status, value, subtext }: HealthMetricProps) {
     switch (status) {
       case 'healthy':
       case 'green':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
       case 'warning':
       case 'yellow':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
       case 'error':
       case 'red':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-200'
     }
   }
 
@@ -38,9 +38,9 @@ function HealthMetric({ label, status, value, subtext }: HealthMetricProps) {
       <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(status)}`}>
         {status}
       </div>
-      <p className="text-lg font-semibold text-gray-900 mt-2">{label}</p>
-      <p className="text-sm text-gray-600">{value}</p>
-      {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
+      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">{label}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{value}</p>
+      {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtext}</p>}
     </div>
   )
 }
@@ -57,10 +57,10 @@ function ElasticsearchHealth({ elasticsearchStats, indices, nodes }: Elasticsear
   const totalDocuments = indices?.reduce((sum, idx) => sum + idx.documentCount, 0) || 0
 
   return (
-    <div className="mt-6 border-t pt-6">
+    <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-6">
       <div className="flex items-center gap-2 mb-4">
         <Database className="h-5 w-5 text-blue-500" />
-        <h3 className="text-lg font-semibold text-gray-700">Elasticsearch Cluster</h3>
+        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Elasticsearch Cluster</h3>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -88,12 +88,12 @@ function ElasticsearchHealth({ elasticsearchStats, indices, nodes }: Elasticsear
       {nodes && nodes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {nodes.slice(0, 3).map((node) => (
-            <div key={node.nodeId} className="bg-gray-50 rounded-lg p-3">
+            <div key={node.nodeId} className="surface-muted p-3">
               <div className="flex items-center gap-2 mb-2">
-                <Server className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 truncate">{node.nodeName}</span>
+                <Server className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{node.nodeName}</span>
               </div>
-              <div className="text-xs text-gray-600 space-y-1">
+              <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
                 <div>JVM Memory: {node.jvmMemoryPercent.toFixed(1)}%</div>
                 <div>Documents: {node.documentCount.toLocaleString()}</div>
                 <div>Roles: {node.roles.join(', ')}</div>
@@ -127,10 +127,10 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
   const searchStats = effectiveAnalyticsHealth?.searchStats
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="surface p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">System Health</h2>
-        <Activity className="h-5 w-5 text-gray-400" />
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">System Health</h2>
+        <Activity className="h-5 w-5 text-gray-400 dark:text-gray-500" />
       </div>
 
       {/* Main Service Health */}
@@ -160,28 +160,28 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
 
       {/* Search Performance Stats */}
       {searchStats && (
-        <div className="mt-6 border-t pt-6">
+        <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-5 w-5 text-green-500" />
-            <h3 className="text-lg font-semibold text-gray-700">Search Performance</h3>
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Search Performance</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{searchStats.totalSearches.toLocaleString()}</p>
-              <p className="text-sm text-gray-600">Total Searches</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{searchStats.totalSearches.toLocaleString()}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Searches</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{searchStats.averageSearchTime.toFixed(2)}ms</p>
-              <p className="text-sm text-gray-600">Avg Response Time</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{searchStats.averageSearchTime.toFixed(2)}ms</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Response Time</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{searchStats.searchesLast24h.toLocaleString()}</p>
-              <p className="text-sm text-gray-600">Last 24h</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{searchStats.searchesLast24h.toLocaleString()}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Last 24h</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 truncate">{searchStats.mostActiveIndex}</p>
-              <p className="text-sm text-gray-600">Most Active Index</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">{searchStats.mostActiveIndex}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Most Active Index</p>
             </div>
           </div>
         </div>
@@ -189,18 +189,22 @@ export function SystemHealth({ systemHealth, analyticsHealth, clusterStats }: Sy
 
       {/* LLM Models */}
       {models.length > 0 && (
-        <div className="mt-6 border-t pt-6">
+        <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-6">
           <div className="flex items-center gap-2 mb-2">
-            <Brain className="h-4 w-4 text-gray-500" />
-            <h3 className="text-sm font-semibold text-gray-700">Available Models</h3>
+            <Brain className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Available Models</h3>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${llm?.status === 'healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+              llm?.status === 'healthy'
+                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+            }`}>
               {llm?.status || 'unknown'}
             </div>
-            <div className="text-xs text-gray-600 flex flex-wrap gap-2">
+            <div className="text-xs text-gray-600 dark:text-gray-300 flex flex-wrap gap-2">
               {models.map(m => (
-                <span key={m} className="px-2 py-0.5 bg-gray-100 rounded border text-gray-700">{m}</span>
+                <span key={m} className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200">{m}</span>
               ))}
             </div>
           </div>
