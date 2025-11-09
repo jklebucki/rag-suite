@@ -16,7 +16,16 @@ export function AdminProtectedRoute({ children, redirectTo = '/' }: AdminProtect
   const isAdmin = useMemo(() => user?.roles?.includes('Admin') ?? false, [user?.roles])
 
   const redirectToLogin = useEffectEvent(() => {
-    navigate('/login', { replace: true, state: { from: location } })
+    navigate('/login', {
+      replace: true,
+      state: {
+        from: {
+          pathname: location.pathname,
+          search: location.search,
+          hash: location.hash,
+        },
+      },
+    })
   })
 
   const redirectAway = useEffectEvent((path: string) => {

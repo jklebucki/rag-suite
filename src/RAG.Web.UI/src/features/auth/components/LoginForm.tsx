@@ -85,8 +85,13 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       onSuccess?.()
 
       // Navigate back to the page that required auth, if provided
-      const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/'
-      navigate(from, { replace: true })
+      const redirectState = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from
+      if (redirectState?.pathname) {
+        const { pathname, search = '', hash = '' } = redirectState
+        navigate(`${pathname}${search}${hash}`, { replace: true })
+      } else {
+        navigate('/', { replace: true })
+      }
     }
   }
 

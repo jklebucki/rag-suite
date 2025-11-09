@@ -15,7 +15,15 @@ export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRou
   const navigate = useNavigate()
 
   const handleNavigate = useEffectEvent((path: string) => {
-    navigate(path, { replace: true, state: { from: location } })
+    const redirectState = {
+      from: {
+        pathname: location.pathname,
+        search: location.search,
+        hash: location.hash,
+      },
+    }
+
+    navigate(path, { replace: true, state: redirectState })
   })
 
   useEffect(() => {

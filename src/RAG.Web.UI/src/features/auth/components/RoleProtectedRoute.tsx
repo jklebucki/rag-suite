@@ -17,7 +17,16 @@ export function RoleProtectedRoute({ children, allowedRoles, redirectTo = '/' }:
   const hasRole = useMemo(() => allowedRoles.some(r => user?.roles?.includes(r)), [allowedRoles, user?.roles])
 
   const redirectToLogin = useEffectEvent(() => {
-    navigate('/login', { replace: true, state: { from: location } })
+    navigate('/login', {
+      replace: true,
+      state: {
+        from: {
+          pathname: location.pathname,
+          search: location.search,
+          hash: location.hash,
+        },
+      },
+    })
   })
 
   const redirectAway = useEffectEvent((path: string) => {
