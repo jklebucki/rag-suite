@@ -199,11 +199,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                   <PencilIcon className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => {
-                    if (confirm(t('addressBook.deleteConfirm'))) {
-                      onDelete?.(row.original)
-                    }
-                  }}
+                  onClick={() => onDelete?.(row.original)}
                   className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                   title={t('addressBook.actions.delete')}
                   aria-label={t('addressBook.actions.delete')}

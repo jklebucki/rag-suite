@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { X, User, Mail, Calendar, Shield, Edit, Trash2, LogOut } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
-import { ConfirmModal } from '@/shared/components/ui/ConfirmModal'
+import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { logger } from '@/utils/logger'
 
 interface UserAccountModalProps {
@@ -246,7 +246,7 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
       </div>
 
       {/* Logout Confirmation Modal */}
-      <ConfirmModal
+      <ActionModal
         isOpen={showLogoutConfirm}
         onClose={handleCancelLogout}
         onConfirm={handleConfirmLogout}
@@ -256,6 +256,7 @@ export function UserAccountModal({ isOpen, onClose }: UserAccountModalProps) {
         cancelText={t('common.cancel')}
         variant="warning"
         isLoading={isLoggingOut}
+        closeOnConfirm={false}
       />
     </div>
   )

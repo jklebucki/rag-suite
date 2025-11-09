@@ -6,7 +6,7 @@ import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { MessageSources } from './MessageSources'
 import { MarkdownMessage } from './MarkdownMessage'
-import { ConfirmModal } from '@/shared/components/ui/ConfirmModal'
+import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
 import type { ChatMessage } from '@/features/chat/types/chat'
 
@@ -199,7 +199,7 @@ export function ChatInterface() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <ConfirmModal
+      <ActionModal
         isOpen={!!sessionToDelete}
         onClose={cancelDeleteSession}
         onConfirm={confirmDeleteSession}
@@ -209,6 +209,7 @@ export function ChatInterface() {
         cancelText={t('common.cancel')}
         variant="danger"
         isLoading={deleteSessionMutation.isPending}
+        closeOnConfirm={false}
       />
     </div>
   )

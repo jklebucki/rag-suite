@@ -15,8 +15,16 @@ import type {
 } from '@/features/address-book/types/addressbook'
 import { ChangeProposalType, ProposalStatus } from '@/features/address-book/types/addressbook'
 import { logger } from '@/utils/logger'
+import { ActionModal, ActionModalVariant } from '@/shared/components/ui/ActionModal'
+import { DeleteConfirmationModal } from '@/shared/components/common/DeleteConfirmationModal'
 
 type TabType = 'contacts' | 'import' | 'proposals'
+
+interface AlertState {
+  title: React.ReactNode
+  message: React.ReactNode
+  variant?: ActionModalVariant
+}
 
 export function AddressBook() {
   const { user, isAuthenticated } = useAuth()
@@ -32,6 +40,12 @@ export function AddressBook() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<ContactListItem | null>(null)
   const [proposingContact, setProposingContact] = useState<ContactListItem | null>(null)
+  const [alertState, setAlertState] = useState<AlertState | null>(null)
+  const [contactToDelete, setContactToDelete] = useState<ContactListItem | null>(null)
+  const [isDeleteProcessing, setIsDeleteProcessing] = useState(false)
+
+  const showAlert = (state: AlertState) => setAlertState(state)
+  const closeAlert = () => setAlertState(null)
 
   // Check if user can modify directly (Admin/PowerUser)
   const canModify = !!(isAuthenticated && (user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')))
@@ -86,7 +100,11 @@ export function AddressBook() {
         proposedData: data,
         reason: 'New contact proposal'
       })
-      alert('Your proposal has been submitted for review')
+      showAlert({
+        title: t('common.success'),
+        message: t('addressBook.messages.proposalSubmitted'),
+        variant: 'success'
+      })
     }
     setIsFormOpen(false)
   }
@@ -105,34 +123,56 @@ export function AddressBook() {
         proposedData: data,
         reason: 'Contact update proposal'
       })
-      alert('Your proposal has been submitted for review')
+      showAlert({
+        title: t('common.success'),
+        message: t('addressBook.messages.proposalSubmitted'),
+        variant: 'success'
+      })
     }
     setIsFormOpen(false)
     setEditingContact(null)
   }
 
-  const handleDeleteContact = async (contact: ContactListItem) => {
-    if (!confirm(`Delete contact ${contact.firstName} ${contact.lastName}?`)) return
+  const handleDeleteContact = (contact: ContactListItem) => {
+    setContactToDelete(contact)
+  }
 
+  const confirmDeleteContact = async () => {
+    if (!contactToDelete) return
+
+    setIsDeleteProcessing(true)
     try {
       if (canModify) {
-        await addressBookService.deleteContact(contact.id)
+        await addressBookService.deleteContact(contactToDelete.id)
         await loadContacts()
+        setContactToDelete(null)
       } else {
         // Propose deletion
         await addressBookService.proposeChange({
-          contactId: contact.id,
+          contactId: contactToDelete.id,
           proposalType: ChangeProposalType.Delete,
           proposedData: {
-            firstName: contact.firstName,
-            lastName: contact.lastName
+            firstName: contactToDelete.firstName,
+            lastName: contactToDelete.lastName
           },
           reason: 'Contact deletion proposal'
         })
-        alert('Your deletion proposal has been submitted for review')
+        setContactToDelete(null)
+        showAlert({
+          title: t('common.success'),
+          message: t('addressBook.messages.deletionProposalSubmitted'),
+          variant: 'success'
+        })
       }
     } catch (err) {
-      alert('Failed to delete contact: ' + (err instanceof Error ? err.message : 'Unknown error'))
+      const errorMessage = err instanceof Error ? err.message : t('addressBook.messages.unknownError')
+      showAlert({
+        title: t('common.error'),
+        message: `${t('addressBook.messages.failedToDelete')}: ${errorMessage}`,
+        variant: 'error'
+      })
+    } finally {
+      setIsDeleteProcessing(false)
     }
   }
 
@@ -176,6 +216,20 @@ export function AddressBook() {
   }
 
   const pendingProposalsCount = proposals.filter((p) => p.status === ProposalStatus.Pending).length
+  const deleteModalDetails =
+    contactToDelete
+      ? [
+          contactToDelete.email
+            ? { label: t('addressBook.table.email'), value: contactToDelete.email }
+            : null,
+          contactToDelete.mobilePhone
+            ? { label: t('addressBook.table.mobilePhone'), value: contactToDelete.mobilePhone }
+            : null,
+          contactToDelete.location
+            ? { label: t('addressBook.table.location'), value: contactToDelete.location }
+            : null
+        ].filter((detail): detail is { label: string; value: string } => Boolean(detail))
+      : []
 
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -305,6 +359,40 @@ export function AddressBook() {
               ? `Propose Change for ${proposingContact.firstName} ${proposingContact.lastName}`
               : undefined
           }
+        />
+      )}
+
+      <DeleteConfirmationModal
+        isOpen={!!contactToDelete}
+        onClose={() => {
+          if (isDeleteProcessing) return
+          setContactToDelete(null)
+        }}
+        onConfirm={confirmDeleteContact}
+        isLoading={isDeleteProcessing}
+        title={t('addressBook.messages.deleteConfirmTitle')}
+        message={t('addressBook.deleteConfirm')}
+        itemName={
+          contactToDelete
+            ? `${contactToDelete.firstName} ${contactToDelete.lastName}`.trim()
+            : ''
+        }
+        details={deleteModalDetails.length ? deleteModalDetails : undefined}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+      />
+
+      {alertState && (
+        <ActionModal
+          isOpen
+          onClose={closeAlert}
+          title={alertState.title}
+          message={alertState.message}
+          confirmText={t('common.close')}
+          cancelText={undefined}
+          hideCancel
+          variant={alertState.variant}
+          size="sm"
         />
       )}
     </div>

@@ -4,12 +4,19 @@ import type { ProposalListItem } from '@/features/address-book/types/addressbook
 import { ChangeProposalType, ProposalStatus } from '@/features/address-book/types/addressbook'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { logger } from '@/utils/logger'
+import { ActionModal, ActionModalVariant } from '@/shared/components/ui/ActionModal'
 
 interface ProposalsListProps {
   proposals: ProposalListItem[]
   onReview?: (proposalId: string, approved: boolean, comment?: string) => Promise<void>
   canReview: boolean // Admin/PowerUser can review
   loading?: boolean
+}
+
+interface AlertState {
+  title: React.ReactNode
+  message: React.ReactNode
+  variant?: ActionModalVariant
 }
 
 export const ProposalsList: React.FC<ProposalsListProps> = ({
@@ -22,6 +29,21 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
   const [reviewingId, setReviewingId] = useState<string | null>(null)
   const [reviewComment, setReviewComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [alertState, setAlertState] = useState<AlertState | null>(null)
+
+  const closeAlert = () => setAlertState(null)
+  const alertModal = alertState ? (
+    <ActionModal
+      isOpen
+      onClose={closeAlert}
+      title={alertState.title}
+      message={alertState.message}
+      confirmText={t('common.close')}
+      hideCancel
+      variant={alertState.variant}
+      size="sm"
+    />
+  ) : null
 
   const getProposalTypeLabel = (type: ChangeProposalType): string => {
     switch (type) {
@@ -89,7 +111,12 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       setReviewComment('')
     } catch (err) {
       logger.error('Review failed:', err)
-      alert(t('addressBook.proposals.failedToReview') + ': ' + (err instanceof Error ? err.message : 'Unknown error'))
+      const errorMessage = err instanceof Error ? err.message : t('addressBook.messages.unknownError')
+      setAlertState({
+        title: t('common.error'),
+        message: `${t('addressBook.proposals.failedToReview')}: ${errorMessage}`,
+        variant: 'error'
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -97,22 +124,29 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
 
   if (loading) {
     return (
-      <div className="surface flex items-center justify-center py-12">
-        <div className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.loading')}</div>
-      </div>
+      <>
+        <div className="surface flex items-center justify-center py-12">
+          <div className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.loading')}</div>
+        </div>
+        {alertModal}
+      </>
     )
   }
 
   if (proposals.length === 0) {
     return (
-      <div className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-8 text-center">
-        <p className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.noProposalsFound')}</p>
-      </div>
+      <>
+        <div className="surface-muted border border-gray-200 dark:border-slate-700 rounded-xl p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-300">{t('addressBook.proposals.noProposalsFound')}</p>
+        </div>
+        {alertModal}
+      </>
     )
   }
 
   return (
-    <div className="space-y-4">
+    <>
+      <div className="space-y-4">
       {proposals.map((proposal) => (
         <div
           key={proposal.id}
@@ -216,6 +250,8 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
           )}
         </div>
       ))}
-    </div>
+      </div>
+      {alertModal}
+    </>
   )
 }

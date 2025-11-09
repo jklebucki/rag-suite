@@ -1,5 +1,5 @@
 export { Modal } from './Modal'
-export { ConfirmModal } from './ConfirmModal'
+export { ActionModal } from './ActionModal'
 export { ConnectionStatus } from './ConnectionStatus'
 export { LanguageSelector } from './LanguageSelector'
 export { SessionExpiredModal } from './SessionExpiredModal'
