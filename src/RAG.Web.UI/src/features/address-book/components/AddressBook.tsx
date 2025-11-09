@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import addressBookService from '@/features/address-book/services/addressBookService'
+import addressBookService from '@/features/address-book/services/addressBook.service'
 import { ContactsTable } from './ContactsTable'
 import { ContactForm } from './ContactForm'
 import { ContactImport } from './ContactImport'

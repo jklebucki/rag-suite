@@ -5,7 +5,7 @@ import { Modal } from '@/shared/components/ui/Modal'
 import { DocumentDetail } from './DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
 import { formatDate } from '@/utils/date'
-import fileService from '@/shared/services/fileService'
+import fileService from '@/shared/services/file.service'
 import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
 

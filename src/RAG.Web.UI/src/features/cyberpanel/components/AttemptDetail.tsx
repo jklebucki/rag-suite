@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
+import cyberPanelService from '@/features/cyberpanel/services/cyberPanel.service'
 import { Button } from '@/shared/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/Card'
 import { ArrowLeft, CheckCircle, XCircle, User, Calendar, Trophy } from 'lucide-react'

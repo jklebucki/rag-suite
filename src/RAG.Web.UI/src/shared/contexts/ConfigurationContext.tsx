@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
 import { ConfigurationState, ConfigurationContextType, RegistrationConfiguration } from '@/features/settings/types/configuration'
-import configurationService from '@/features/settings/services/configurationService'
+import configurationService from '@/features/settings/services/configuration.service'
 
 // Actions
 type ConfigurationAction =

@@ -4,7 +4,7 @@ import { useQuizzes } from '@/features/cyberpanel/hooks/useQuizzes'
 import { useToast } from '@/shared/contexts/ToastContext'
 import type { CreateQuizRequest, CreateQuizQuestionDto, CreateQuizOptionDto } from '@/features/cyberpanel/types/quiz'
 import { fileToDataUri, validateImageSize } from '@/features/cyberpanel/types/cyberpanel'
-import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
+import cyberPanelService from '@/features/cyberpanel/services/cyberPanel.service'
 import { logger } from '@/utils/logger'
 
 interface UseQuizBuilderProps {

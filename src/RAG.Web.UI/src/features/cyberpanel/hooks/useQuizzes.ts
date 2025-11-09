@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import cyberPanelService from '@/features/cyberpanel/services/cyberPanelService'
+import cyberPanelService from '@/features/cyberpanel/services/cyberPanel.service'
 import { logger } from '@/utils/logger'
 import type {
   ListQuizzesResponse,

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, X } from 'lucide-react'
 import { Modal } from './Modal'
-import fileService from '@/shared/services/fileService'
+import fileService from '@/shared/services/file.service'
 import { logger } from '@/utils/logger'
 
 // Configure PDF.js worker

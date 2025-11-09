@@ -2,7 +2,7 @@ import React from 'react'
 import { Database, Tag, File, Download } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime } from '@/utils/date'
-import fileService from '@/shared/services/fileService'
+import fileService from '@/shared/services/file.service'
 import type { DocumentDetailResponse } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
 
