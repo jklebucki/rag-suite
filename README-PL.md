@@ -18,12 +18,10 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 |--------|---------------------------|
 | `src/RAG.Web.UI` | Nowoczesny frontend React TypeScript z interfejsem chat i dashboard |
 | `src/RAG.Orchestrator.Api` | Główne API — Minimal API .NET, orkiestruje agenty i zapytania RAG |
-| `src/RAG.Ingestion.Worker` | Worker do ekstrakcji metadata z Oracle i dokumentów SOP/BPMN |
 | `src/RAG.Collector` | Serwis zbierania i przetwarzania dokumentów do ingestii różnych typów treści |
 | `src/RAG.Shared` | Wspólne biblioteki, typy DTO, modele, helpery |
 | `src/RAG.Plugins/…` | Pluginy-agent: `OracleSqlPlugin`, `IfsSopPlugin`, `BizProcessPlugin` |
-| `src/RAG.VectorStores` | Abstrakcje oraz adaptery dla wektorowego store (np. Elasticsearch) |
-| `src/RAG.Connectors/…` | Klienci/integracje: `Elastic`, `Oracle`, `Files` |
+| `src/RAG.Connectors/…` | Klienci/integracje i adaptery wektorowe: `Elastic`, `Oracle`, `Files` |
 | `src/RAG.Security` | Autoryzacja, polityki, JWT/OIDC, dostęp do korpusów |
 | `src/RAG.Telemetry` | Logowanie, metryki (Serilog + OpenTelemetry) |
 | `src/RAG.Tests` | Testy jednostkowe i integracyjne (xUnit) |

@@ -99,9 +99,9 @@ mkdir data\documents
 mkdir -p data/documents
 ```
 
-#### 4. Run Ingestion Worker
+#### 4. Run Collector Service
 ```bash
-cd src/RAG.Ingestion.Worker
+cd src/RAG.Collector
 dotnet run
 ```
 

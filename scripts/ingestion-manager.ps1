@@ -10,7 +10,7 @@ param(
 # Get script directory and project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptDir
-$IngestionProject = Join-Path $ProjectRoot "src\RAG.Ingestion.Worker"
+$IngestionProject = Join-Path $ProjectRoot "src\RAG.Collector"
 $DocumentsPath = Join-Path $ProjectRoot "data\documents"
 
 # Colors for output (if supported)
@@ -36,8 +36,8 @@ function Show-Help {
     Write-Host "Usage: .\ingestion-manager.ps1 -Command <command>"
     Write-Host ""
     Write-Host "Commands:"
-    Write-Host "  build         - Build the ingestion worker"
-    Write-Host "  run           - Run the ingestion worker"
+    Write-Host "  build         - Build the collector service"
+    Write-Host "  run           - Run the collector service"
     Write-Host "  test          - Test Elasticsearch connection"
     Write-Host "  add-documents - Add sample documents to process"
     Write-Host "  check-es      - Check Elasticsearch status"
@@ -46,7 +46,7 @@ function Show-Help {
 }
 
 function Build-Project {
-    Write-ColoredOutput "🔨 Building RAG.Ingestion.Worker..." "Yellow"
+    Write-ColoredOutput "🔨 Building RAG.Collector..." "Yellow"
     
     Push-Location $IngestionProject
     try {
@@ -63,7 +63,7 @@ function Build-Project {
 }
 
 function Run-Worker {
-    Write-ColoredOutput "🚀 Starting RAG Ingestion Worker..." "Yellow"
+    Write-ColoredOutput "🚀 Starting RAG Collector service..." "Yellow"
     
     Push-Location $IngestionProject
     try {

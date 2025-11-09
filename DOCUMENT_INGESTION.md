@@ -24,7 +24,7 @@ Dodaj pliki do folderu:
 
 ### 3. Automatyczne przetwarzanie
 
-Po dodaniu plików uruchom ingestion worker:
+Po dodaniu plików uruchom serwis kolektora dokumentów:
 
 ```bash
 # Na Linux/macOS:
@@ -34,7 +34,7 @@ Po dodaniu plików uruchom ingestion worker:
 .\scripts\ingestion-manager.ps1 -Command run
 
 # Albo manualnie:
-cd src/RAG.Ingestion.Worker
+cd src/RAG.Collector
 dotnet run
 ```
 

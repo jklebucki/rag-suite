@@ -21,12 +21,10 @@
 |----|----|
 | `src/RAG.Web.UI` | Modern React TypeScript frontend with chat interface and dashboard |
 | `src/RAG.Orchestrator.Api` | Main API (Minimal API .NET) orchestrating agents and RAG workflows |
-| `src/RAG.Ingestion.Worker` | Worker service for extracting metadata from Oracle and SOP/BPMN docs |
 | `src/RAG.Collector` | Document collection and processing service for ingesting various content types |
 | `src/RAG.Shared` | Shared libraries: DTOs, models, utilities |
 | `src/RAG.Plugins/…` | Agent plugins: `OracleSqlPlugin`, `IfsSopPlugin`, `BizProcessPlugin` |
-| `src/RAG.VectorStores` | Abstractions and adapters for vector stores (e.g. Elasticsearch) |
-| `src/RAG.Connectors/…` | Integration clients: `Elastic`, `Oracle`, `Files` |
+| `src/RAG.Connectors/…` | Integration clients and vector store adapters: `Elastic`, `Oracle`, `Files` |
 | `src/RAG.Security` | Authorization, policies, JWT/OIDC, corpus-level access control |
 | `src/RAG.Telemetry` | Logging & metrics (Serilog + OpenTelemetry) |
 | `src/RAG.Tests` | Unit and integration tests (xUnit) |

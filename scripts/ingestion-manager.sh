@@ -5,7 +5,7 @@
 # Get script directory and project root in a cross-platform way
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-INGESTION_PROJECT="$PROJECT_ROOT/src/RAG.Ingestion.Worker"
+INGESTION_PROJECT="$PROJECT_ROOT/src/RAG.Collector"
 DOCUMENTS_PATH="$PROJECT_ROOT/data/documents"
 
 # Colors for output
@@ -21,8 +21,8 @@ show_help() {
     echo "Usage: $0 {build|run|test|add-documents|check-es|clean}"
     echo ""
     echo "Commands:"
-    echo "  build         - Build the ingestion worker"
-    echo "  run           - Run the ingestion worker"
+    echo "  build         - Build the collector service"
+    echo "  run           - Run the collector service"
     echo "  test          - Test Elasticsearch connection"
     echo "  add-documents - Add sample documents to process"
     echo "  check-es      - Check Elasticsearch status"
@@ -30,7 +30,7 @@ show_help() {
 }
 
 build_project() {
-    echo -e "${YELLOW}🔨 Building RAG.Ingestion.Worker...${NC}"
+    echo -e "${YELLOW}🔨 Building RAG.Collector...${NC}"
     cd "$INGESTION_PROJECT"
     dotnet build
     if [ $? -eq 0 ]; then
@@ -42,7 +42,7 @@ build_project() {
 }
 
 run_worker() {
-    echo -e "${YELLOW}🚀 Starting RAG Ingestion Worker...${NC}"
+    echo -e "${YELLOW}🚀 Starting RAG Collector service...${NC}"
     cd "$INGESTION_PROJECT"
     dotnet run
 }
