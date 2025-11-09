@@ -28,8 +28,8 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
   const renderError = (err: unknown) => {
     if (!err) return null
     return (
-      <div className="p-6 bg-red-50 border border-red-200 rounded-lg m-6">
-        <p className="text-red-700">{t('search.error')}</p>
+      <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg m-6">
+        <p className="text-red-700 dark:text-red-300">{t('search.error')}</p>
       </div>
     )
   }
@@ -48,17 +48,17 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
   }
 
   return (
-    <div className={`mt-3 p-3 rounded-lg border ${
+    <div className={`mt-3 p-3 rounded-xl border transition-colors ${
       messageRole === 'user'
-        ? 'bg-blue-50 border-blue-200'
-        : 'bg-gray-50 border-gray-200'
+        ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-500/50'
+        : 'bg-gray-50 border-gray-200 dark:bg-slate-900 dark:border-slate-800'
     }`}>
       <div className="flex items-center gap-2 mb-2">
         <FileText className={`h-4 w-4 ${
-          messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+          messageRole === 'user' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-slate-300'
         }`} />
         <span className={`text-sm font-medium ${
-          messageRole === 'user' ? 'text-blue-800' : 'text-gray-700'
+          messageRole === 'user' ? 'text-blue-800 dark:text-blue-200' : 'text-gray-700 dark:text-gray-200'
         }`}>
           {t('chat.sources.title', [sources.length.toString()])}
         </span>
@@ -68,17 +68,17 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
         {sources.map((source, index) => (
           <div
             key={`${source.id}-${index}`}
-            className={`flex items-start gap-3 p-2 rounded border ${
+            className={`flex items-start gap-3 p-2 rounded-lg border transition-colors duration-200 cursor-pointer group ${
               messageRole === 'user'
-                ? 'bg-white border-blue-100 hover:border-blue-300'
-                : 'bg-white border-gray-100 hover:border-gray-300'
-            } transition-colors duration-200 cursor-pointer group`}
+                ? 'bg-white dark:bg-slate-950 border-blue-100 dark:border-blue-900/40 hover:border-blue-300 dark:hover:border-blue-500/60'
+                : 'bg-white dark:bg-slate-950 border-gray-100 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-600'
+            }`}
           >
             {/* Source Index */}
             <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
               messageRole === 'user'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-gray-100 text-gray-700'
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200'
+                : 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-200'
             }`}>
               {index + 1}
             </div>
@@ -89,15 +89,15 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
-                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                    <FileText className="h-3.5 w-3.5 text-gray-400 dark:text-slate-400 flex-shrink-0" />
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {source.fileName || source.title || `Document ${source.title}`}
                     </h4>
                   </div>
                   {source.filePath && source.filePath !== source.fileName && (
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <Folder className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                      <p className="text-xs text-gray-500 truncate">
+                      <Folder className="h-3 w-3 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         {source.filePath.replace(/\/[^/]*$/, '') || source.filePath}
                       </p>
                     </div>
@@ -105,14 +105,14 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                 </div>
                 <div className="flex items-center gap-1 ml-2 flex-shrink-0">
                   <Star className="h-3 w-3 text-yellow-500" />
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     {Math.round(source.score)}%
                   </span>
                 </div>
               </div>
 
               {/* Content Preview */}
-              <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+              <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
                 {source.content.length > 120
                   ? `${source.content.substring(0, 120)}...`
                   : source.content
@@ -120,13 +120,13 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
               </p>
 
               {/* Metadata */}
-              <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2 flex-wrap">
                   {source.documentType && (
                     <span className={`px-2 py-1 rounded-full ${
                       messageRole === 'user'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-700'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
+                        : 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-200'
                     }`}>
                       {source.documentType}
                     </span>
@@ -140,7 +140,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                 </div>
 
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="h-3 w-3 text-gray-400 dark:text-slate-500" />
                   <span title={formatDateTime(source.createdAt, currentLanguage)}>
                     {formatRelativeTime(source.createdAt, currentLanguage)}
                   </span>
@@ -155,7 +155,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                   <button
                     onClick={() => setPdfViewerFilePath(source.filePath!)}
                     className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
-                      messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                      messageRole === 'user' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
                     }`}
                     title="View PDF"
                   >
@@ -164,7 +164,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
                   <button
                     onClick={() => handleDownload(source.filePath!)}
                     className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-600 ${
-                      messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                      messageRole === 'user' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
                     }`}
                     title="Download file"
                   >
@@ -175,7 +175,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
               <button
                 onClick={() => setSelectedDocumentId(source.id)}
                 className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-primary-600 ${
-                  messageRole === 'user' ? 'text-blue-600' : 'text-gray-600'
+                  messageRole === 'user' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
                 }`}
                 title="View Details"
               >
@@ -189,7 +189,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
       {/* Summary */}
       {sources.length > 3 && (
         <div className={`mt-2 text-xs text-center ${
-          messageRole === 'user' ? 'text-blue-600' : 'text-gray-500'
+          messageRole === 'user' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'
         }`}>
           {t('chat.sources.summary', [sources.length.toString()])}
         </div>
@@ -203,9 +203,9 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
         size="xl"
       >
         {isLoadingDetail && (
-          <div className="p-8 text-center">
+          <div className="p-8 text-center text-gray-600 dark:text-gray-300">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading document details...</p>
+            <p className="mt-4">Loading document details...</p>
           </div>
         )}
 
@@ -219,10 +219,10 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
       {/* PDF Viewer Modal */}
       <React.Suspense fallback={
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-xl p-8">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl p-8">
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-              <span className="ml-2 text-gray-600">Loading PDF viewer...</span>
+              <span className="ml-2 text-gray-600 dark:text-gray-300">Loading PDF viewer...</span>
             </div>
           </div>
         </div>

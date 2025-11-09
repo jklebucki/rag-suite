@@ -46,7 +46,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
           className={`px-1.5 py-0.5 rounded text-xs md:text-sm font-mono ${
             isUserMessage
               ? 'bg-blue-600/30 text-blue-100'
-              : 'bg-gray-200 text-blue-600'
+              : 'bg-gray-200 text-blue-600 dark:bg-slate-800 dark:text-blue-300'
           }`}
           {...props}
         >
@@ -57,7 +57,9 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
           {language && (
             <div
               className={`text-xs px-3 py-1.5 font-medium flex items-center justify-between ${
-                isUserMessage ? 'bg-blue-600/40 text-blue-100' : 'bg-gray-700 text-gray-300'
+                isUserMessage
+                  ? 'bg-blue-600/40 text-blue-100'
+                  : 'bg-gray-700 text-gray-300 dark:bg-slate-800 dark:text-slate-200'
               }`}
             >
               <span>{language.toUpperCase()}</span>
@@ -100,7 +102,9 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     // Links
     a: ({ node: _node, children, ...props }) => (
       <a
-        className={`underline hover:no-underline ${isUserMessage ? 'text-blue-100' : 'text-blue-600'}`}
+                className={`underline hover:no-underline ${
+                  isUserMessage ? 'text-blue-100' : 'text-blue-600 dark:text-blue-300'
+                }`}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
@@ -113,7 +117,9 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     blockquote: ({ node: _node, ...props }) => (
       <blockquote
         className={`border-l-4 pl-4 py-1 my-2 italic ${
-          isUserMessage ? 'border-blue-300 text-blue-100' : 'border-gray-300 text-gray-600'
+          isUserMessage
+            ? 'border-blue-300 text-blue-100'
+            : 'border-gray-300 text-gray-600 dark:border-slate-700 dark:text-slate-300'
         }`}
         {...props}
       />
@@ -122,18 +128,18 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     // Tables
     table: ({ node: _node, ...props }) => (
       <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-gray-300" {...props} />
+        <table className="min-w-full border-collapse border border-gray-300 dark:border-slate-700" {...props} />
       </div>
     ),
     th: ({ node: _node, ...props }) => (
       <th
-        className={`border border-gray-300 px-3 py-2 text-left font-semibold ${
-          isUserMessage ? 'bg-blue-600/20' : 'bg-gray-100'
+        className={`border border-gray-300 dark:border-slate-700 px-3 py-2 text-left font-semibold ${
+          isUserMessage ? 'bg-blue-600/20' : 'bg-gray-100 dark:bg-slate-800'
         }`}
         {...props}
       />
     ),
-    td: ({ node: _node, ...props }) => <td className="border border-gray-300 px-3 py-2" {...props} />,
+    td: ({ node: _node, ...props }) => <td className="border border-gray-300 dark:border-slate-800 px-3 py-2" {...props} />,
 
     // Horizontal rule
     hr: ({ node: _node, ...props }) => (
@@ -149,10 +155,10 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 
   return (
     <div
-      className={`prose prose-sm md:prose-base max-w-none ${
+      className={`prose prose-sm md:prose-base max-w-none transition-colors ${
         isUserMessage
           ? 'prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-blue-100 prose-pre:bg-blue-600/20'
-          : 'prose-headings:text-gray-900 prose-p:text-gray-700 prose-code:text-blue-600 prose-pre:bg-gray-800'
+          : 'prose-headings:text-gray-900 prose-p:text-gray-700 prose-code:text-blue-600 prose-pre:bg-gray-800 dark:prose-invert dark:prose-headings:text-gray-100 dark:prose-p:text-gray-200 dark:prose-code:text-blue-300 dark:prose-pre:bg-slate-900'
       }`}
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>

@@ -43,15 +43,15 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
   }
 
   return (
-    <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
+    <div className="border-t border-gray-200 dark:border-slate-800 p-3 md:p-4 bg-white dark:bg-slate-900 transition-colors">
       {/* Document Search Toggle */}
       <div className="mb-2 md:mb-3 flex items-center gap-2">
-        <label className="flex items-center gap-2 text-xs md:text-sm text-gray-600 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-300 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={useDocumentSearch}
             onChange={(e) => onUseDocumentSearchChange(e.target.checked)}
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 h-4 w-4"
+            className="form-checkbox"
             disabled={isSending}
           />
           <FileSearch className="h-4 w-4 shrink-0" />
@@ -66,7 +66,7 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
           onChange={(e) => onMessageChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('chat.input.placeholder')}
-          className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow resize-none overflow-y-auto"
+          className="form-input flex-1 min-w-0 resize-none overflow-y-auto text-sm md:text-base py-2 md:py-3"
           disabled={isSending}
           rows={1}
         />

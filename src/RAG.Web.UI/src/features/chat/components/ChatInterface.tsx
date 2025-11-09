@@ -57,7 +57,7 @@ export function ChatInterface() {
   }, [isNewSession, setIsNewSession])
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] w-[95%] mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)] w-[95%] mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden transition-colors">
       {/* Sidebar - Chat Sessions */}
       <ChatSidebar
         sessions={sessions}
@@ -69,21 +69,27 @@ export function ChatInterface() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 bg-gray-50 dark:bg-slate-950 transition-colors">
         {currentSession ? (
           <>
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 scrollbar-hide">
               {currentSession.messages.map((msg: ChatMessage) => (
                 <div key={msg.id} className={`flex items-start gap-2 md:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`p-1.5 md:p-2 rounded-full shrink-0 ${msg.role === 'user' ? 'bg-blue-100' : 'bg-primary-100'}`}>
+                  <div className={`p-1.5 md:p-2 rounded-full shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
                     {msg.role === 'user' ? (
-                      <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                      <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-300" />
                     ) : (
-                      <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600" />
+                      <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600 dark:text-primary-300" />
                     )}
                   </div>
-                  <div className={`max-w-[85%] md:max-w-5xl ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'} rounded-lg p-3 md:p-4`}>
+                  <div
+                    className={`max-w-[85%] md:max-w-5xl rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${
+                      msg.role === 'user'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-gray-100'
+                    }`}
+                  >
                     <MarkdownMessage content={msg.content} isUserMessage={msg.role === 'user'} />
 
                     {/* Sources for assistant messages */}
@@ -93,7 +99,9 @@ export function ChatInterface() {
 
                     {/* Timestamp */}
                     <div
-                      className={`mt-2 text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'} cursor-help`}
+                      className={`mt-2 text-xs cursor-help ${
+                        msg.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-slate-400'
+                      }`}
                       title={`Sent at ${formatDateTime(msg.timestamp, currentLanguage)}`}
                     >
                       <span className="font-medium">{formatRelativeTime(msg.timestamp, currentLanguage)}</span>
@@ -104,12 +112,12 @@ export function ChatInterface() {
                     {lastMessageLanguage && msg.id === currentSession.messages[currentSession.messages.length - 1]?.id && (
                       <div className="mt-1 text-xs opacity-75">
                         {lastMessageLanguage !== currentLanguage && (
-                          <span className={msg.role === 'user' ? 'text-blue-200' : 'text-blue-600'}>
+                          <span className={msg.role === 'user' ? 'text-blue-200' : 'text-blue-600 dark:text-blue-300'}>
                             Detected: {lastMessageLanguage} • Response: {currentLanguage}
                           </span>
                         )}
                         {translationStatus === 'translated' && (
-                          <span className={`ml-2 ${msg.role === 'user' ? 'text-green-200' : 'text-green-600'}`}>
+                          <span className={`ml-2 ${msg.role === 'user' ? 'text-green-200' : 'text-green-600 dark:text-green-400'}`}>
                             ✓ Translated
                           </span>
                         )}
@@ -120,15 +128,15 @@ export function ChatInterface() {
               ))}
               {isTyping && (
                 <div className="flex items-start gap-2 md:gap-3">
-                  <div className="p-1.5 md:p-2 rounded-full bg-primary-100 shrink-0">
-                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600" />
+                  <div className="p-1.5 md:p-2 rounded-full bg-primary-100 dark:bg-primary-900/30 shrink-0">
+                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600 dark:text-primary-300" />
                   </div>
-                  <div className="bg-gray-100 rounded-lg p-3 md:p-4 min-w-[100px]">
+                  <div className="bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-3 md:p-4 min-w-[100px] text-gray-700 dark:text-gray-100">
                     <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-primary-600" />
-                      <span className="text-xs md:text-sm text-gray-600">Assistant is typing...</span>
+                      <Loader2 className="h-4 w-4 animate-spin text-primary-600 dark:text-primary-300" />
+                      <span className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Assistant is typing...</span>
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">
+                    <div className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                       <span className="font-medium">now</span>
                       <span className="ml-1 md:ml-2 opacity-75 text-[10px] md:text-xs">{formatDateTime(new Date(), currentLanguage)}</span>
                     </div>
@@ -138,17 +146,17 @@ export function ChatInterface() {
 
               {/* Documents unavailable notice */}
               {!documentsAvailable && currentSession && currentSession.messages.length > 0 && (
-                <div className="flex items-start gap-2 md:gap-3 opacity-90">
-                  <div className="p-1.5 md:p-2 rounded-full bg-orange-100 shrink-0">
-                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
+                <div className="flex items-start gap-2 md:gap-3 opacity-95">
+                  <div className="p-1.5 md:p-2 rounded-full bg-orange-100 dark:bg-orange-900/30 shrink-0">
+                    <Bot className="h-4 w-4 md:h-5 md:w-5 text-orange-600 dark:text-orange-300" />
                   </div>
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 md:p-4 max-w-[85%] md:max-w-3xl">
+                  <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-500/50 rounded-2xl p-3 md:p-4 max-w-[85%] md:max-w-3xl text-orange-800 dark:text-orange-100">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs md:text-sm font-medium text-orange-800">
+                      <span className="text-xs md:text-sm font-medium">
                         {t('chat.documents_unavailable')}
                       </span>
                     </div>
-                    <p className="text-xs md:text-sm text-orange-700">
+                    <p className="text-xs md:text-sm opacity-90">
                       {t('chat.documents_unavailable_message')}
                     </p>
                   </div>
@@ -171,12 +179,12 @@ export function ChatInterface() {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center p-4">
-            <div className="text-center max-w-md">
-              <Bot className="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-              <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
+            <div className="text-center max-w-md text-gray-900 dark:text-gray-100">
+              <Bot className="h-12 w-12 md:h-16 md:w-16 text-gray-300 dark:text-slate-600 mx-auto mb-3 md:mb-4" />
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 {t('chat.title')}
               </h3>
-              <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6 px-2">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4 md:mb-6 px-2">
                 {t('chat.subtitle')}
               </p>
               <button
