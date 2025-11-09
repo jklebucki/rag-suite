@@ -1,28 +1,36 @@
-import React, { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { type ReactNode, Suspense, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffectEvent } from 'react'
+import { useAuth } from '@/shared/contexts/AuthContext'
+import { LoadingScreen } from '@/shared/components/ui/LoadingScreen'
 
 interface ProtectedRouteProps {
-  children: ReactNode;
-  redirectTo?: string;
+  children: ReactNode
+  redirectTo?: string
 }
 
 export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRouteProps) {
-  const { isAuthenticated, loading } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated, loading } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleNavigate = useEffectEvent((path: string) => {
+    navigate(path, { replace: true, state: { from: location } })
+  })
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      handleNavigate(redirectTo)
+    }
+  }, [loading, isAuthenticated, redirectTo, handleNavigate])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingScreen label="Checking access..." />
   }
 
   if (!isAuthenticated) {
-    // preserve the current location so we can return after login
-    return <Navigate to={redirectTo} replace state={{ from: location }} />;
+    return null
   }
 
-  return <>{children}</>;
+  return <Suspense fallback={<LoadingScreen label="Loading..." />}>{children}</Suspense>
 }

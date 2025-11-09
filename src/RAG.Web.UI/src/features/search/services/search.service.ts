@@ -7,12 +7,21 @@ import type {
 } from '@/features/search/types/search'
 import { apiHttpClient } from '@/shared/services/api/httpClients'
 
-export async function search(query: SearchQuery): Promise<SearchResponse> {
-  const response = await apiHttpClient.post<ApiResponse<SearchResponse>>('/search', query)
+type RequestOptions = {
+  signal?: AbortSignal
+}
+
+export async function search(query: SearchQuery, options: RequestOptions = {}): Promise<SearchResponse> {
+  const response = await apiHttpClient.post<ApiResponse<SearchResponse>>('/search', query, {
+    signal: options.signal,
+  })
   return response.data.data
 }
 
-export async function searchMultilingual(query: MultilingualSearchQuery): Promise<SearchResponse> {
+export async function searchMultilingual(
+  query: MultilingualSearchQuery,
+  options: RequestOptions = {},
+): Promise<SearchResponse> {
   const searchQuery: SearchQuery = {
     query: query.query,
     limit: query.maxResults || 10,
@@ -27,12 +36,20 @@ export async function searchMultilingual(query: MultilingualSearchQuery): Promis
     headers['X-Response-Language'] = query.resultLanguage
   }
 
-  const response = await apiHttpClient.post<ApiResponse<SearchResponse>>('/search', searchQuery, { headers })
+  const response = await apiHttpClient.post<ApiResponse<SearchResponse>>('/search', searchQuery, {
+    headers,
+    signal: options.signal,
+  })
   return response.data.data
 }
 
-export async function getDocumentDetails(documentId: string): Promise<DocumentDetailResponse> {
-  const response = await apiHttpClient.get<ApiResponse<DocumentDetailResponse>>(`/search/documents/${documentId}`)
+export async function getDocumentDetails(
+  documentId: string,
+  options: RequestOptions = {},
+): Promise<DocumentDetailResponse> {
+  const response = await apiHttpClient.get<ApiResponse<DocumentDetailResponse>>(`/search/documents/${documentId}`, {
+    signal: options.signal,
+  })
   return response.data.data
 }
 

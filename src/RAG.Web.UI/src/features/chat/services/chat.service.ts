@@ -9,23 +9,38 @@ import type {
   ChatSession,
 } from '@/features/chat/types/chat'
 
-export async function sendMessage(sessionId: string, request: ChatRequest): Promise<ChatMessage> {
+type RequestOptions = {
+  signal?: AbortSignal
+}
+
+export async function sendMessage(
+  sessionId: string,
+  request: ChatRequest,
+  options: RequestOptions = {},
+): Promise<ChatMessage> {
   const response = await apiHttpClient.post<ApiResponse<ChatMessage>>(
     `/user-chat/sessions/${sessionId}/messages`,
-    request
+    request,
+    {
+      signal: options.signal,
+    },
   )
   return response.data.data
 }
 
 export async function sendMultilingualMessage(
   sessionId: string,
-  request: MultilingualChatRequest
+  request: MultilingualChatRequest,
+  options: RequestOptions = {},
 ): Promise<MultilingualChatResponse> {
   logger.debug(`Calling API: POST /api/user-chat/sessions/${sessionId}/messages/multilingual`, request)
   try {
     const response = await apiHttpClient.post<ApiResponse<MultilingualChatResponse>>(
       `/user-chat/sessions/${sessionId}/messages/multilingual`,
-      request
+      request,
+      {
+        signal: options.signal,
+      },
     )
     logger.debug('API response received:', response.data)
     return response.data.data
@@ -35,13 +50,17 @@ export async function sendMultilingualMessage(
   }
 }
 
-export async function getChatSessions(): Promise<ChatSession[]> {
-  const response = await apiHttpClient.get<ApiResponse<ChatSession[]>>('/user-chat/sessions')
+export async function getChatSessions(options: RequestOptions = {}): Promise<ChatSession[]> {
+  const response = await apiHttpClient.get<ApiResponse<ChatSession[]>>('/user-chat/sessions', {
+    signal: options.signal,
+  })
   return response.data.data
 }
 
-export async function getChatSession(sessionId: string): Promise<ChatSession> {
-  const response = await apiHttpClient.get<ApiResponse<ChatSession>>(`/user-chat/sessions/${sessionId}`)
+export async function getChatSession(sessionId: string, options: RequestOptions = {}): Promise<ChatSession> {
+  const response = await apiHttpClient.get<ApiResponse<ChatSession>>(`/user-chat/sessions/${sessionId}`, {
+    signal: options.signal,
+  })
   return response.data.data
 }
 

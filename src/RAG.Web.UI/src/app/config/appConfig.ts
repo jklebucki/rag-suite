@@ -18,7 +18,7 @@ export const API_TIMEOUTS = {
  */
 export const CACHE_TIMES = {
   STALE_TIME: 1000 * 60 * 5, // 5 minutes
-  CACHE_TIME: 1000 * 60 * 10, // 10 minutes
+  GC_TIME: 1000 * 60 * 10, // 10 minutes
 } as const
 
 /**
@@ -94,7 +94,7 @@ export const REFETCH_INTERVALS = {
 export const CACHE_CONFIG = {
   DOCUMENT_DETAIL: {
     STALE_TIME: 1000 * 60 * 5,   // 5 minutes
-    CACHE_TIME: 1000 * 60 * 30,  // 30 minutes
+    GC_TIME: 1000 * 60 * 30,  // 30 minutes
   },
 } as const
 

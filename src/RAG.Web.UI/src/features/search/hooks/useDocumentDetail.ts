@@ -6,12 +6,12 @@ import type { DocumentDetailResponse } from '@/features/search/types/search'
 export function useDocumentDetail(documentId: string | null) {
   return useQuery<DocumentDetailResponse>({
     queryKey: ['document', documentId],
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       if (!documentId) throw new Error('Document ID is required')
-      return searchService.getDocumentDetails(documentId)
+      return searchService.getDocumentDetails(documentId, { signal })
     },
     enabled: !!documentId,
     staleTime: CACHE_CONFIG.DOCUMENT_DETAIL.STALE_TIME,
-    cacheTime: CACHE_CONFIG.DOCUMENT_DETAIL.CACHE_TIME,
+    gcTime: CACHE_CONFIG.DOCUMENT_DETAIL.GC_TIME,
   })
 }

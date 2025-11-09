@@ -22,15 +22,15 @@ export function UserSettings() {
   // Fetch users
   const { data: users = [], isLoading, error: fetchError } = useQuery({
     queryKey: ['users'],
-    queryFn: () => authService.getUsers(),
-    enabled: authService.hasRole('Admin')
+    queryFn: ({ signal }) => authService.getUsers({ signal }),
+    enabled: authService.hasRole('Admin'),
   })
 
   // Fetch roles
   const { data: availableRoles = [] } = useQuery({
     queryKey: ['roles'],
-    queryFn: () => authService.getRoles(),
-    enabled: authService.hasRole('Admin')
+    queryFn: ({ signal }) => authService.getRoles({ signal }),
+    enabled: authService.hasRole('Admin'),
   })
 
   // Use filters hook

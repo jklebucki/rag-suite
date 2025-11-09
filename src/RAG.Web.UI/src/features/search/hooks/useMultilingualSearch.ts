@@ -32,7 +32,7 @@ export function useMultilingualSearch() {
     refetch,
   } = useQuery({
     queryKey: ['multilingual-search', query, filters, currentLanguage],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       logger.debug('Multilingual searching for:', query, 'in language:', currentLanguage)
       try {
         const searchQuery: MultilingualSearchQuery = {
@@ -48,7 +48,7 @@ export function useMultilingualSearch() {
           } : undefined
         }
 
-        const result = await searchService.searchMultilingual(searchQuery)
+        const result = await searchService.searchMultilingual(searchQuery, { signal })
         logger.debug('Multilingual search results:', result)
 
         // Show language detection info if available

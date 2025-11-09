@@ -7,7 +7,7 @@ import type {
   RegisterRequest,
   ChangePasswordRequest,
   LoginResponse,
-  User
+  User,
 } from '@/features/auth/types/auth'
 import type { ApiResponse } from '@/shared/types/api'
 
@@ -232,8 +232,10 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/change-password', request)
   }
 
-  async getUsers(): Promise<User[]> {
-    const response = await this.client.get<User[]>('/users')
+  async getUsers(options: { signal?: AbortSignal } = {}): Promise<User[]> {
+    const response = await this.client.get<User[]>('/users', {
+      signal: options.signal,
+    })
     return response.data
   }
 
@@ -249,8 +251,10 @@ class AuthService {
     await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
   }
 
-  async getRoles(): Promise<string[]> {
-    const response = await this.client.get<string[]>('/roles')
+  async getRoles(options: { signal?: AbortSignal } = {}): Promise<string[]> {
+    const response = await this.client.get<string[]>('/roles', {
+      signal: options.signal,
+    })
     return response.data
   }
 

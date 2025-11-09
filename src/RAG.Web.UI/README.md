@@ -4,7 +4,7 @@ Modern React TypeScript frontend for RAG Suite.
 
 ## Features
 
-* 🚀 **Modern Stack**: React 18 + TypeScript + Vite
+* 🚀 **Modern Stack**: React 19 + TypeScript + Vite 7
 * 🎨 **Tailwind CSS**: Utility-first CSS framework
 * 🔍 **Advanced Search**: Full-text search with filters and semantic search
 * 💬 **Chat Interface**: Interactive chat with RAG-powered responses
@@ -16,8 +16,8 @@ Modern React TypeScript frontend for RAG Suite.
 
 ### Prerequisites
 
-* Node.js 18+
-* npm or yarn
+* Node.js 20.10+
+* npm 10+
 
 ### Installation
 
@@ -103,6 +103,7 @@ VITE_APP_NAME=RAG Suite
 * `npm run preview` - Preview production build
 * `npm run lint` - Run ESLint
 * `npm run type-check` - Run TypeScript type checking
+* `npm run test:run` - Run Vitest unit tests
 
 ## Architecture
 

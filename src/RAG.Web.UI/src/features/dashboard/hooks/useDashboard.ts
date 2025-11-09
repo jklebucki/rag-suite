@@ -18,10 +18,10 @@ export function useDashboard() {
   const {
     data: dashboardData,
     isLoading: isDashboardLoading,
-    error: dashboardError
+    error: dashboardError,
   } = useQuery<DashboardData>({
     queryKey: ['dashboard'],
-    queryFn: () => analyticsService.getDashboardData(true), // Include detailed stats
+    queryFn: ({ signal }) => analyticsService.getDashboardData(true, { signal }), // Include detailed stats
     refetchInterval: REFETCH_INTERVALS.DASHBOARD,
   })
 
@@ -29,10 +29,10 @@ export function useDashboard() {
   const {
     data: analyticsHealth,
     isLoading: isAnalyticsHealthLoading,
-    error: analyticsHealthError
+    error: analyticsHealthError,
   } = useQuery<SystemHealth>({
     queryKey: ['analytics-health'],
-    queryFn: () => analyticsService.getAnalyticsHealth(),
+    queryFn: ({ signal }) => analyticsService.getAnalyticsHealth({ signal }),
     refetchInterval: REFETCH_INTERVALS.ANALYTICS_HEALTH,
   })
 
@@ -40,10 +40,10 @@ export function useDashboard() {
   const {
     data: clusterStats,
     isLoading: isClusterStatsLoading,
-    error: clusterStatsError
+    error: clusterStatsError,
   } = useQuery<ElasticsearchStats>({
     queryKey: ['elasticsearch-cluster'],
-    queryFn: () => analyticsService.getElasticsearchClusterStats(),
+    queryFn: ({ signal }) => analyticsService.getElasticsearchClusterStats({ signal }),
     refetchInterval: REFETCH_INTERVALS.CLUSTER_STATS,
   })
 
@@ -51,10 +51,10 @@ export function useDashboard() {
   const {
     data: usageStats,
     isLoading: isStatsLoading,
-    error: statsError
+    error: statsError,
   } = useQuery<UsageStats>({
     queryKey: ['usage-stats'],
-    queryFn: () => analyticsService.getUsageStats(),
+    queryFn: ({ signal }) => analyticsService.getUsageStats(undefined, { signal }),
     refetchInterval: REFETCH_INTERVALS.USAGE_STATS,
     enabled: !dashboardData, // Only fetch if dashboard data is not available
   })
@@ -63,10 +63,10 @@ export function useDashboard() {
   const {
     data: plugins,
     isLoading: isPluginsLoading,
-    error: pluginsError
+    error: pluginsError,
   } = useQuery<PluginInfo[]>({
     queryKey: ['plugins'],
-    queryFn: () => analyticsService.getPlugins(),
+    queryFn: ({ signal }) => analyticsService.getPlugins({ signal }),
     refetchInterval: REFETCH_INTERVALS.PLUGINS,
   })
 
@@ -74,10 +74,10 @@ export function useDashboard() {
   const {
     data: systemHealth,
     isLoading: isHealthLoading,
-    error: healthError
+    error: healthError,
   } = useQuery({
     queryKey: ['system-health'],
-    queryFn: () => analyticsService.getSystemHealth(),
+    queryFn: ({ signal }) => analyticsService.getSystemHealth({ signal }),
     refetchInterval: REFETCH_INTERVALS.SYSTEM_HEALTH,
     enabled: !analyticsHealth, // Only fetch if analytics health is not available
   })

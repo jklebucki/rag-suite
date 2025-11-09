@@ -1,6 +1,8 @@
-import React, { ReactNode } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { type ReactNode, Suspense, useEffect, useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffectEvent } from 'react'
 import { useAuth } from '@/shared/contexts/AuthContext'
+import { LoadingScreen } from '@/shared/components/ui/LoadingScreen'
 
 interface RoleProtectedRouteProps {
   children: ReactNode
@@ -11,20 +13,40 @@ interface RoleProtectedRouteProps {
 export function RoleProtectedRoute({ children, allowedRoles, redirectTo = '/' }: RoleProtectedRouteProps) {
   const { isAuthenticated, user, loading } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+  const hasRole = useMemo(() => allowedRoles.some(r => user?.roles?.includes(r)), [allowedRoles, user?.roles])
+
+  const redirectToLogin = useEffectEvent(() => {
+    navigate('/login', { replace: true, state: { from: location } })
+  })
+
+  const redirectAway = useEffectEvent((path: string) => {
+    navigate(path, { replace: true })
+  })
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      redirectToLogin()
+    }
+  }, [loading, isAuthenticated, redirectToLogin])
+
+  useEffect(() => {
+    if (!loading && isAuthenticated && !hasRole) {
+      redirectAway(redirectTo)
+    }
+  }, [loading, isAuthenticated, hasRole, redirectTo, redirectAway])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
+    return <LoadingScreen label="Checking permissions..." />
   }
 
-  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location }} />
+  if (!isAuthenticated) {
+    return null
+  }
 
-  const hasRole = allowedRoles.some(r => user?.roles?.includes(r))
+  if (!hasRole) {
+    return null
+  }
 
-  if (!hasRole) return <Navigate to={redirectTo} replace />
-
-  return <>{children}</>
+  return <Suspense fallback={<LoadingScreen label="Loading..." />}>{children}</Suspense>
 }

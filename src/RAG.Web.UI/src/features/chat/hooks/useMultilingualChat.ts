@@ -28,13 +28,13 @@ export function useMultilingualChat() {
   // Get chat sessions (reuse existing endpoint)
   const { data: sessions = [] } = useQuery({
     queryKey: ['chat-sessions'],
-    queryFn: () => chatService.getChatSessions(),
+    queryFn: ({ signal }) => chatService.getChatSessions({ signal }),
   })
 
   // Get current session messages
   const { data: currentSession } = useQuery({
     queryKey: ['chat-session', currentSessionId],
-    queryFn: () => (currentSessionId ? chatService.getChatSession(currentSessionId) : null),
+    queryFn: ({ signal }) => (currentSessionId ? chatService.getChatSession(currentSessionId, { signal }) : null),
     enabled: !!currentSessionId,
   })
 

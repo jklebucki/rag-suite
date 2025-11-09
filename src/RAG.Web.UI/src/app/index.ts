@@ -1,4 +1,4 @@
 export { App } from './App'
 export { AppProviders } from './AppProviders'
-export { AppRoutes } from './AppRoutes'
+export { createAppRouter, AppRouterProvider } from './AppRoutes'
 

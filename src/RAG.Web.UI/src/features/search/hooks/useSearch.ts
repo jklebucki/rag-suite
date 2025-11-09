@@ -26,13 +26,13 @@ export function useSearch() {
     refetch,
   } = useQuery({
     queryKey: ['search', query, filters],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       logger.debug('Searching for:', query)
       try {
         const result = await searchService.search({
           query,
           limit: 20,
-        })
+        }, { signal })
         logger.debug('Search results:', result)
         // Ensure we always return a valid SearchResponse object
         return result || {

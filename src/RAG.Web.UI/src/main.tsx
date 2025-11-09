@@ -1,7 +1,6 @@
-import React from 'react'
+import { StrictMode, startTransition } from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
 import { App } from '@/app'
 import './index.css'
 import './utils/debug' // Import debug utilities
@@ -11,7 +10,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: CACHE_TIMES.STALE_TIME,
-      cacheTime: CACHE_TIMES.CACHE_TIME,
+      gcTime: CACHE_TIMES.GC_TIME,
       retry: QUERY_RETRY.QUERIES,
     },
     mutations: {
@@ -20,11 +19,23 @@ export const queryClient = new QueryClient({
   },
 })
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
+const rootElement = document.getElementById('root')
+
+if (!rootElement) {
+  throw new Error('Root element with id "root" was not found in the document.')
+}
+
+const root = ReactDOM.createRoot(rootElement)
+
+const app = (
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
       <App />
-    </BrowserRouter>
-  </QueryClientProvider>,
+    </QueryClientProvider>
+  </StrictMode>
 )
+
+startTransition(() => {
+  root.render(app)
+})
 

@@ -1,13 +1,10 @@
-import { Suspense } from 'react'
 import { AppProviders } from './AppProviders'
-import { AppRoutes } from './AppRoutes'
+import { AppRouterProvider } from './AppRoutes'
 
 export function App() {
   return (
     <AppProviders>
-      <Suspense fallback={<div>Loading...</div>}>
-        <AppRoutes />
-      </Suspense>
+      <AppRouterProvider />
     </AppProviders>
   )
 }

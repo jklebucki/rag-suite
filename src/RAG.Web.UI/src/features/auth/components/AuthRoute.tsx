@@ -1,26 +1,35 @@
-import React, { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/shared/contexts/AuthContext';
+import { type ReactNode, Suspense, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/shared/contexts/AuthContext'
+import { useEffectEvent } from 'react'
+import { LoadingScreen } from '@/shared/components/ui/LoadingScreen'
 
 interface AuthRouteProps {
-  children: ReactNode;
-  redirectTo?: string;
+  children: ReactNode
+  redirectTo?: string
 }
 
 export function AuthRoute({ children, redirectTo = '/' }: AuthRouteProps) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth()
+  const navigate = useNavigate()
+
+  const handleRedirect = useEffectEvent((path: string) => {
+    navigate(path, { replace: true })
+  })
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      handleRedirect(redirectTo)
+    }
+  }, [loading, isAuthenticated, redirectTo, handleRedirect])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingScreen label="Loading..." />
   }
 
   if (isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+    return null
   }
 
-  return <>{children}</>;
+  return <Suspense fallback={<LoadingScreen label="Loading..." />}>{children}</Suspense>
 }

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, act } from '@testing-library/react'
@@ -131,17 +129,21 @@ import { MemoryRouter } from 'react-router-dom'
 import { useAuth } from '@/shared/contexts/AuthContext'
 
 const renderLoginForm = async () => {
-  let utils: ReturnType<typeof render>
+  let utils: ReturnType<typeof render> | null = null
+
   await act(async () => {
     utils = render(
       <MemoryRouter>
         <LoginForm />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
-  // TypeScript can't guarantee assignment inside act, but in practice it's set.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return utils!
+
+  if (!utils) {
+    throw new Error('LoginForm failed to render during tests.')
+  }
+
+  return utils
 }
 
 describe('LoginForm', () => {
