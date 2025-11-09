@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
             .AddPolicy("RequireAdmin", policy => policy.RequireRole(Models.UserRoles.Admin));
 
         // Add custom services
-        services.AddScoped<IJwtService, JwtService>();
+        services.AddSingleton<IJwtService, JwtService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IUserContextService, UserContextService>();

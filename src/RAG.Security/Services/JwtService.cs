@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RAG.Security.DTOs;
@@ -17,7 +18,7 @@ public class JwtService : IJwtService
     private readonly string _audience;
     private readonly int _accessTokenExpiryMinutes;
     private readonly int _refreshTokenExpiryDays;
-    private readonly Dictionary<string, List<string>> _refreshTokens = new();
+    private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, DateTime>> _refreshTokens = new();
 
     public JwtService(IConfiguration configuration)
     {
@@ -159,35 +160,60 @@ public class JwtService : IJwtService
 
     public Task<bool> ValidateRefreshTokenAsync(string userId, string refreshToken)
     {
-        if (_refreshTokens.TryGetValue(userId, out var tokens))
+        if (!_refreshTokens.TryGetValue(userId, out var tokens))
         {
-            return Task.FromResult(tokens.Contains(refreshToken));
+            return Task.FromResult(false);
         }
+
+        CleanupExpiredTokens(userId, tokens);
+
+        if (tokens.TryGetValue(refreshToken, out var expiresAt))
+        {
+            if (expiresAt > DateTime.UtcNow)
+            {
+                return Task.FromResult(true);
+            }
+
+            tokens.TryRemove(refreshToken, out _);
+            CleanupUserEntryIfEmpty(userId, tokens);
+        }
+
         return Task.FromResult(false);
     }
 
     public Task<string?> FindUserIdByRefreshTokenAsync(string refreshToken)
     {
-        // Iterate through all stored refresh tokens to find matching userId
-        // This is a fallback mechanism when access token is not provided
         foreach (var kvp in _refreshTokens)
         {
-            if (kvp.Value.Contains(refreshToken))
+            var userId = kvp.Key;
+            var tokens = kvp.Value;
+
+            CleanupExpiredTokens(userId, tokens);
+
+            if (tokens.ContainsKey(refreshToken))
             {
-                return Task.FromResult<string?>(kvp.Key);
+                if (tokens.TryGetValue(refreshToken, out var expiresAt) && expiresAt > DateTime.UtcNow)
+                {
+                    return Task.FromResult<string?>(userId);
+                }
+
+                tokens.TryRemove(refreshToken, out _);
+                CleanupUserEntryIfEmpty(userId, tokens);
             }
         }
+
         return Task.FromResult<string?>(null);
     }
 
     public Task SaveRefreshTokenAsync(string userId, string refreshToken)
     {
-        if (!_refreshTokens.ContainsKey(userId))
-        {
-            _refreshTokens[userId] = new List<string>();
-        }
+        var tokenStore = _refreshTokens.GetOrAdd(userId, _ => new ConcurrentDictionary<string, DateTime>());
 
-        _refreshTokens[userId].Add(refreshToken);
+        CleanupExpiredTokens(userId, tokenStore);
+
+        var expiresAt = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
+        tokenStore[refreshToken] = expiresAt;
+
         return Task.CompletedTask;
     }
 
@@ -195,18 +221,39 @@ public class JwtService : IJwtService
     {
         if (_refreshTokens.TryGetValue(userId, out var tokens))
         {
-            tokens.Remove(refreshToken);
-            if (tokens.Count == 0)
-            {
-                _refreshTokens.Remove(userId);
-            }
+            tokens.TryRemove(refreshToken, out _);
+            CleanupUserEntryIfEmpty(userId, tokens);
         }
+
         return Task.CompletedTask;
     }
 
     public Task RevokeAllRefreshTokensAsync(string userId)
     {
-        _refreshTokens.Remove(userId);
+        _refreshTokens.TryRemove(userId, out _);
         return Task.CompletedTask;
+    }
+
+    private void CleanupExpiredTokens(string userId, ConcurrentDictionary<string, DateTime> tokens)
+    {
+        var now = DateTime.UtcNow;
+
+        foreach (var token in tokens)
+        {
+            if (token.Value <= now)
+            {
+                tokens.TryRemove(token.Key, out _);
+            }
+        }
+
+        CleanupUserEntryIfEmpty(userId, tokens);
+    }
+
+    private void CleanupUserEntryIfEmpty(string userId, ConcurrentDictionary<string, DateTime> tokens)
+    {
+        if (tokens.IsEmpty)
+        {
+            _refreshTokens.TryRemove(userId, out _);
+        }
     }
 }
