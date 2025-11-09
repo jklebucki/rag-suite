@@ -1,5 +1,7 @@
 using Xunit;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using RAG.Security.Services;
 using RAG.Security.Models;
 using System;
@@ -26,7 +28,7 @@ public class JwtServiceTests
             })
             .Build();
 
-        _jwtService = new JwtService(configuration);
+        _jwtService = new JwtService(configuration, NullLogger<JwtService>.Instance);
     }
 
     [Fact]
