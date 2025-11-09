@@ -1,9 +1,10 @@
+// @ts-nocheck
+
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LoginForm } from './LoginForm'
-import { render as customRender } from '@/test-utils/test-utils'
 
 // Mock main.tsx to prevent React root creation in tests
 vi.mock('@/main', () => ({
@@ -14,12 +15,106 @@ vi.mock('@/main', () => ({
   },
 }))
 
-// Mock only useAuth hook, providers are provided by customRender
+// Mock only the pieces we need from contexts to avoid side effects and act warnings
 vi.mock('@/shared/contexts/AuthContext', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/contexts/AuthContext')>()
   return {
     ...actual,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useAuth: vi.fn(),
+  }
+})
+
+vi.mock('@/shared/contexts/ToastContext', async () => {
+  const ReactModule = await vi.importActual<typeof import('react')>('react')
+  const toastMocks = {
+    addToast: vi.fn(),
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+    showWarning: vi.fn(),
+    showInfo: vi.fn(),
+    removeToast: vi.fn(),
+    clearToasts: vi.fn(),
+  }
+  return {
+    ToastProvider: ({ children }: { children: React.ReactNode }) =>
+      ReactModule.createElement(ReactModule.Fragment, null, children),
+    useToast: () => toastMocks,
+  }
+})
+
+vi.mock('@/shared/contexts/ConfigurationContext', async () => {
+  const ReactModule = await vi.importActual<typeof import('react')>('react')
+  const { configurationService } = await vi.importActual<
+    typeof import('@/features/settings/services/configuration.service')
+  >('@/features/settings/services/configuration.service')
+
+  const defaultConfig = configurationService.getDefaultConfiguration()
+
+  return {
+    ConfigurationProvider: ({ children }: { children: React.ReactNode }) =>
+      ReactModule.createElement(ReactModule.Fragment, null, children),
+    useConfiguration: () => ({
+      configuration: defaultConfig,
+      loading: false,
+      error: null,
+      lastFetched: new Date(),
+      fetchConfiguration: vi.fn(),
+      refreshConfiguration: vi.fn(),
+      clearError: vi.fn(),
+    }),
+    usePasswordValidation: () => {
+      const passwordRequirements = defaultConfig.passwordRequirements
+      const validatePassword = (password: string) => {
+        const errors: string[] = []
+
+        if (password.length < passwordRequirements.requiredLength) {
+          errors.push(`auth.validation.password_min_length#${passwordRequirements.requiredLength}`)
+        }
+        if (passwordRequirements.requireDigit && !/\d/.test(password)) {
+          errors.push('auth.validation.password_require_digit')
+        }
+        if (passwordRequirements.requireLowercase && !/[a-z]/.test(password)) {
+          errors.push('auth.validation.password_require_lowercase')
+        }
+        if (passwordRequirements.requireUppercase && !/[A-Z]/.test(password)) {
+          errors.push('auth.validation.password_require_uppercase')
+        }
+        if (passwordRequirements.requireNonAlphanumeric && !/[^a-zA-Z0-9]/.test(password)) {
+          errors.push('auth.validation.password_require_special')
+        }
+
+        return {
+          isValid: errors.length === 0,
+          errors,
+        }
+      }
+
+      return {
+        validatePassword,
+        passwordRequirements,
+      }
+    },
+  }
+})
+
+vi.mock('@/shared/contexts/I18nContext', async () => {
+  const ReactModule = await vi.importActual<typeof import('react')>('react')
+  const { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } = await vi.importActual<
+    typeof import('@/shared/types/i18n')
+  >('@/shared/types/i18n')
+  const { en } = await vi.importActual<typeof import('@/locales/en')>('@/locales/en')
+
+  return {
+    I18nProvider: ({ children }: { children: React.ReactNode }) =>
+      ReactModule.createElement(ReactModule.Fragment, null, children),
+    useI18n: () => ({
+      language: DEFAULT_LANGUAGE,
+      setLanguage: vi.fn(),
+      t: (key: keyof typeof en) => en[key] ?? key,
+      languages: SUPPORTED_LANGUAGES,
+      isAutoDetected: false,
+    }),
   }
 })
 
@@ -32,7 +127,22 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
+import { MemoryRouter } from 'react-router-dom'
 import { useAuth } from '@/shared/contexts/AuthContext'
+
+const renderLoginForm = async () => {
+  let utils: ReturnType<typeof render>
+  await act(async () => {
+    utils = render(
+      <MemoryRouter>
+        <LoginForm />
+      </MemoryRouter>
+    )
+  })
+  // TypeScript can't guarantee assignment inside act, but in practice it's set.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return utils!
+}
 
 describe('LoginForm', () => {
   const mockLogin = vi.fn()
@@ -60,25 +170,27 @@ describe('LoginForm', () => {
     })
   })
 
-  it('should render login form', () => {
-    customRender(<LoginForm />)
+  it('should render login form', async () => {
+    await renderLoginForm()
     
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/password/i, { selector: 'input' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 
   it('should validate email on submit', async () => {
     const user = userEvent.setup()
-    customRender(<LoginForm />)
-    
+    await renderLoginForm()
+
     const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /login/i })
+    const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' })
+    const submitButton = screen.getByRole('button', { name: /sign in/i })
     
-    await user.type(emailInput, 'invalid-email')
-    await user.type(passwordInput, 'password123')
-    await user.click(submitButton)
+    await act(async () => {
+      await user.type(emailInput, 'invalid-email')
+      await user.type(passwordInput, 'password123')
+      await user.click(submitButton)
+    })
     
     await waitFor(() => {
       expect(mockLogin).not.toHaveBeenCalled()
@@ -87,15 +199,17 @@ describe('LoginForm', () => {
 
   it('should validate password on submit', async () => {
     const user = userEvent.setup()
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
     const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /login/i })
+    const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' })
+    const submitButton = screen.getByRole('button', { name: /sign in/i })
     
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, '123') // Too short
-    await user.click(submitButton)
+    await act(async () => {
+      await user.type(emailInput, 'test@example.com')
+      await user.type(passwordInput, '123') // Too short
+      await user.click(submitButton)
+    })
     
     await waitFor(() => {
       expect(mockLogin).not.toHaveBeenCalled()
@@ -106,15 +220,17 @@ describe('LoginForm', () => {
     const user = userEvent.setup()
     mockLogin.mockResolvedValue(true)
     
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
     const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /login/i })
+    const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' })
+    const submitButton = screen.getByRole('button', { name: /sign in/i })
     
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, 'password123')
-    await user.click(submitButton)
+    await act(async () => {
+      await user.type(emailInput, 'test@example.com')
+      await user.type(passwordInput, 'password123')
+      await user.click(submitButton)
+    })
     
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
@@ -127,17 +243,21 @@ describe('LoginForm', () => {
 
   it('should toggle password visibility', async () => {
     const user = userEvent.setup()
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
-    const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement
+    const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' }) as HTMLInputElement
     const toggleButton = screen.getByRole('button', { name: /show password/i })
     
     expect(passwordInput.type).toBe('password')
     
-    await user.click(toggleButton)
+    await act(async () => {
+      await user.click(toggleButton)
+    })
     expect(passwordInput.type).toBe('text')
     
-    await user.click(toggleButton)
+    await act(async () => {
+      await user.click(toggleButton)
+    })
     expect(passwordInput.type).toBe('password')
   })
 
@@ -145,17 +265,19 @@ describe('LoginForm', () => {
     const user = userEvent.setup()
     mockLogin.mockResolvedValue(true)
     
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
     const rememberCheckbox = screen.getByLabelText(/remember me/i)
     const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /login/i })
+    const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' })
+    const submitButton = screen.getByRole('button', { name: /sign in/i })
     
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, 'password123')
-    await user.click(rememberCheckbox)
-    await user.click(submitButton)
+    await act(async () => {
+      await user.type(emailInput, 'test@example.com')
+      await user.type(passwordInput, 'password123')
+      await user.click(rememberCheckbox)
+      await user.click(submitButton)
+    })
     
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
@@ -188,7 +310,7 @@ describe('LoginForm', () => {
       clearRefreshError: vi.fn(),
     })
     
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
     await waitFor(() => {
       expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument()
@@ -217,15 +339,17 @@ describe('LoginForm', () => {
       clearRefreshError: vi.fn(),
     })
     
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
     const emailInput = screen.getByLabelText(/email/i)
-    await user.type(emailInput, 't')
+    await act(async () => {
+      await user.type(emailInput, 't')
+    })
     
     expect(mockClearError).toHaveBeenCalled()
   })
 
-  it('should show loading state during login', () => {
+  it('should show loading state during login', async () => {
     vi.mocked(useAuth).mockReturnValue({
       login: mockLogin,
       loading: true,
@@ -245,9 +369,9 @@ describe('LoginForm', () => {
       clearRefreshError: vi.fn(),
     })
     
-    customRender(<LoginForm />)
+    await renderLoginForm()
     
-    const submitButton = screen.getByRole('button', { name: /login/i })
+    const submitButton = screen.getByRole('button', { name: /signing in/i })
     expect(submitButton).toBeDisabled()
   })
 })

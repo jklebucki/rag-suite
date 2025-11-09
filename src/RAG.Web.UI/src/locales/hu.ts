@@ -140,6 +140,8 @@ export const hu: TranslationKeys = {
   'auth.login.sign_in': 'Bejelentkezés',
   'auth.logout': 'Kijelentkezés',
   'auth.login.signing_in': 'Bejelentkezés...',
+  'auth.login.show_password': 'Jelszó megjelenítése',
+  'auth.login.hide_password': 'Jelszó elrejtése',
   'auth.login.remember_me': 'Emlékezz rám',
   'auth.login.forgot_password': 'Elfelejtett jelszó?',
   'auth.login.no_account': 'Nincs fiókod?',

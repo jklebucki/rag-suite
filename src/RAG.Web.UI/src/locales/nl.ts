@@ -140,6 +140,8 @@ export const nl: TranslationKeys = {
   'auth.login.sign_in': 'Inloggen',
   'auth.logout': 'Uitloggen',
   'auth.login.signing_in': 'Inloggen...',
+  'auth.login.show_password': 'Wachtwoord tonen',
+  'auth.login.hide_password': 'Wachtwoord verbergen',
   'auth.login.remember_me': 'Onthoud mij',
   'auth.login.forgot_password': 'Wachtwoord vergeten?',
   'auth.login.no_account': 'Geen account?',

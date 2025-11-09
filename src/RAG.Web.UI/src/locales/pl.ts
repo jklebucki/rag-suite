@@ -140,6 +140,8 @@ export const pl: TranslationKeys = {
   'auth.login.sign_in': 'Zaloguj się',
   'auth.logout': 'Wyloguj się',
   'auth.login.signing_in': 'Logowanie...',
+  'auth.login.show_password': 'Pokaż hasło',
+  'auth.login.hide_password': 'Ukryj hasło',
   'auth.login.remember_me': 'Zapamiętaj mnie',
   'auth.login.forgot_password': 'Zapomniałeś hasła?',
   'auth.login.no_account': 'Nie masz konta?',

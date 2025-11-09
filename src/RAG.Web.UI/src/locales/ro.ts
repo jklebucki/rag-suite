@@ -245,6 +245,8 @@ export const ro: TranslationKeys = {
   'auth.login.sign_in': 'Autentificare',
   'auth.logout': 'Deconectare',
   'auth.login.signing_in': 'Se autentifică...',
+  'auth.login.show_password': 'Arată parola',
+  'auth.login.hide_password': 'Ascunde parola',
   'auth.login.remember_me': 'Ține-mă minte',
   'auth.login.forgot_password': 'Ai uitat parola?',
   'auth.login.no_account': 'Nu ai cont?',

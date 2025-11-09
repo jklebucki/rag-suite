@@ -159,6 +159,8 @@ export interface TranslationKeys {
   'auth.login.sign_in': string;
   'auth.logout': string;
   'auth.login.signing_in': string;
+  'auth.login.show_password': string;
+  'auth.login.hide_password': string;
   'auth.login.remember_me': string;
   'auth.login.forgot_password': string;
   'auth.login.no_account': string;
