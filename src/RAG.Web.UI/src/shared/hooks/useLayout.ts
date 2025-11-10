@@ -9,6 +9,7 @@ import {
   Users,
   BookOpen,
   Home,
+  UsersRound,
 } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
@@ -26,6 +27,7 @@ export function useLayout() {
     { name: t('nav.dashboard'), href: '/dashboard', icon: BarChart3 },
     { name: t('nav.chat'), href: '/chat', icon: MessageSquare },
     { name: t('nav.search'), href: '/search', icon: Search },
+    { name: t('nav.forum'), href: '/forum', icon: UsersRound },
   ]
 
   const addressBookNavigation = [

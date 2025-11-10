@@ -8,6 +8,7 @@ interface NavigationItem {
   name: string
   href: string
   icon: React.ComponentType<{ className?: string }>
+  badgeCount?: number
 }
 
 interface SidebarProps {
@@ -61,14 +62,19 @@ export function Sidebar({ mainNavigation, footerNavigation, isOpen, onClose, isA
                     to={item.href}
                     onClick={onClose} // Close sidebar on mobile when navigating
                     className={cn(
-                      'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                       isActive
                         ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500 dark:bg-primary-900/30 dark:text-primary-400 dark:border-primary-500'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                     )}
                   >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <span className="flex-1 truncate">{item.name}</span>
+                    {typeof item.badgeCount === 'number' && item.badgeCount > 0 && (
+                      <span className="ml-auto rounded-full bg-primary-500 px-2 py-0.5 text-xs font-semibold text-white">
+                        {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
               )

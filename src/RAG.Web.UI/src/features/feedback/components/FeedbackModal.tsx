@@ -68,7 +68,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       queryClient.invalidateQueries({ queryKey: ['my-feedback'] })
       resetForm()
       onClose()
-    } catch (error) {
+    } catch {
       showError(t('feedback.modal.error'))
     } finally {
       setIsSubmitting(false)

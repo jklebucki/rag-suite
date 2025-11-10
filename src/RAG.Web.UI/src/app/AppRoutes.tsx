@@ -63,6 +63,12 @@ const QuizDetail = lazy(() =>
 const AttemptDetail = lazy(() =>
   import('@/features/cyberpanel/components/AttemptDetail').then(module => ({ default: module.AttemptDetail })),
 )
+const ForumPage = lazy(() =>
+  import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage })),
+)
+const ThreadDetailPage = lazy(() =>
+  import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage })),
+)
 
 function RouteSuspense({ children }: { children: ReactNode }) {
   return (
@@ -133,6 +139,26 @@ export function createAppRouter() {
               <RouteSuspense>
                 <ProtectedRoute>
                   <SearchInterface />
+                </ProtectedRoute>
+              </RouteSuspense>
+            ),
+          },
+          {
+            path: 'forum',
+            element: (
+              <RouteSuspense>
+                <ProtectedRoute>
+                  <ForumPage />
+                </ProtectedRoute>
+              </RouteSuspense>
+            ),
+          },
+          {
+            path: 'forum/:threadId',
+            element: (
+              <RouteSuspense>
+                <ProtectedRoute>
+                  <ThreadDetailPage />
                 </ProtectedRoute>
               </RouteSuspense>
             ),

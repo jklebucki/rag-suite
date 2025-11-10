@@ -7,4 +7,10 @@ export const apiHttpClient = createHttpClient({
   requireAuth: true,
 })
 
+export const forumHttpClient = createHttpClient({
+  baseURL: API_ENDPOINTS.FORUM,
+  timeout: API_TIMEOUTS.DEFAULT,
+  requireAuth: true,
+})
+
 export const healthHttpClient = createPublicHttpClient('', API_TIMEOUTS.HEALTH)

@@ -73,6 +73,7 @@ export const API_ENDPOINTS = {
   CHAT: '/api/user-chat',
   DASHBOARD: '/api/dashboard',
   SETTINGS: '/api/settings',
+  FORUM: '/api/forum',
   HEALTH: '/healthz',
 } as const
 

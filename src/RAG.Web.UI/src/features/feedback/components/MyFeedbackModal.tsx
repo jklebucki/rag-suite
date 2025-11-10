@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Loader2, MessageSquare, AlertCircle, ChevronDown, Image as ImageIcon, FileText } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '@/shared/contexts/I18nContext'
@@ -52,7 +52,7 @@ export function MyFeedbackModal({ isOpen, onClose }: MyFeedbackModalProps) {
     }
   })
 
-  const handleToggle = (item: FeedbackItem) => {
+  const handleToggle = useCallback((item: FeedbackItem) => {
     setExpandedIds((prev) => {
       const next = new Set(prev)
       if (next.has(item.id)) {
@@ -65,7 +65,7 @@ export function MyFeedbackModal({ isOpen, onClose }: MyFeedbackModalProps) {
       }
       return next
     })
-  }
+  }, [acknowledgeMutation])
 
   const hasItems = feedback.length > 0
 
@@ -222,7 +222,7 @@ export function MyFeedbackModal({ isOpen, onClose }: MyFeedbackModalProps) {
         })}
       </div>
     )
-  }, [expandedIds, feedback, hasItems, isError, isLoading, t])
+  }, [expandedIds, feedback, handleToggle, hasItems, isError, isLoading, t])
 
   if (!isOpen) {
     return null

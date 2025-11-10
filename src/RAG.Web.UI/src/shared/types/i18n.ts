@@ -32,6 +32,7 @@ export interface TranslationKeys {
   'nav.user_guide': string;
   'nav.app_info': string;
   'nav.cyberpanel': string;
+  'nav.forum': string;
 
   // User Guide
   'userguide.description': string;
@@ -51,10 +52,12 @@ export interface TranslationKeys {
   'common.previous': string;
   'common.close': string;
   'common.open': string;
+  'common.clear': string;
   'common.user_menu': string;
   'common.toggle_menu': string;
   'common.confirm': string;
   'common.processing': string;
+  'common.retry': string;
   'common.deleting': string;
   'common.irreversibleAction': string;
   'common.view_details': string;
@@ -417,6 +420,60 @@ export interface TranslationKeys {
   'feedback.my.download': string;
   'feedback.my.loading': string;
   'feedback.my.error': string;
+
+  // Forum
+  'forum.title': string;
+  'forum.subtitle': string;
+  'forum.search.placeholder': string;
+  'forum.create.button': string;
+  'forum.categories.all': string;
+  'forum.list.error': string;
+  'forum.list.emptyTitle': string;
+  'forum.list.emptyDescription': string;
+  'forum.list.meta': string;
+  'forum.list.badgeNew': string;
+  'forum.pagination.status': string;
+  'forum.pagination.previous': string;
+  'forum.pagination.next': string;
+  'forum.create.modalTitle': string;
+  'forum.create.fields.category': string;
+  'forum.create.fields.categoryPlaceholder': string;
+  'forum.create.fields.title': string;
+  'forum.create.fields.content': string;
+  'forum.create.validation.category': string;
+  'forum.create.validation.title': string;
+  'forum.create.validation.content': string;
+  'forum.create.submit': string;
+  'forum.create.success': string;
+  'forum.create.error': string;
+  'forum.attachments.limit': string;
+  'forum.attachments.tooLarge': string;
+  'forum.attachments.error': string;
+  'forum.attachments.label': string;
+  'forum.attachments.hint': string;
+  'forum.attachments.remove': string;
+  'forum.attachments.threadTitle': string;
+  'forum.attachments.replyTitle': string;
+  'forum.attachments.downloadError': string;
+  'forum.detail.error': string;
+  'forum.detail.author': string;
+  'forum.detail.created': string;
+  'forum.detail.updated': string;
+  'forum.detail.replies': string;
+  'forum.detail.noReplies': string;
+  'forum.detail.postedAt': string;
+  'forum.reply.title': string;
+  'forum.reply.fields.content': string;
+  'forum.reply.validation.content': string;
+  'forum.reply.success': string;
+  'forum.reply.error': string;
+  'forum.reply.subscribeLabel': string;
+  'forum.reply.submit': string;
+  'forum.subscription.subscribe': string;
+  'forum.subscription.unsubscribe': string;
+  'forum.subscription.subscribed': string;
+  'forum.subscription.unsubscribed': string;
+  'forum.subscription.error': string;
   'feedback.my.error_acknowledge': string;
 
   'feedback.admin.title': string;

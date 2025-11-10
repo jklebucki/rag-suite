@@ -28,6 +28,7 @@
     <ProjectReference Include="..\RAG.CyberPanel\RAG.CyberPanel.csproj" />
     <ProjectReference Include="..\RAG.Abstractions\RAG.Abstractions.csproj" />
     <ProjectReference Include="..\RAG.AddressBook\RAG.AddressBook.csproj" />
+    <ProjectReference Include="..\RAG.Forum\RAG.Forum.csproj" />
   </ItemGroup>
 
 </Project>

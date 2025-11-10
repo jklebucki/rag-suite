@@ -21,7 +21,7 @@ export async function getFeedbackList(filters: FeedbackFilters = {}): Promise<Fe
   if (filters.to) params.set('to', filters.to)
   if (filters.subject) params.set('subject', filters.subject)
   if (filters.userId) params.set('userId', filters.userId)
-  if ((filters as any).userEmail) params.set('userEmail', (filters as any).userEmail)
+  if (filters.userEmail) params.set('userEmail', filters.userEmail)
 
   const query = params.toString()
   const response = await apiHttpClient.get<FeedbackItem[]>(query ? `/feedback?${query}` : '/feedback')

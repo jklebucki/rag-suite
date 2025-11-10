@@ -19,7 +19,7 @@
 
 | Folder | Description |
 |----|----|
-| `src/RAG.Web.UI` | Modern React TypeScript frontend with chat interface and dashboard |
+| `src/RAG.Web.UI` | Modern React TypeScript frontend with chat, knowledge exchange forum, and dashboard |
 | `src/RAG.Orchestrator.Api` | Main API (Minimal API .NET) orchestrating agents and RAG workflows |
 | `src/RAG.Collector` | Document collection and processing service for ingesting various content types |
 | `src/RAG.Shared` | Shared libraries: DTOs, models, utilities |
@@ -48,6 +48,7 @@ Modern React TypeScript frontend providing:
 * **🔍 Advanced Search**: Full-text and semantic search with filters
 * **📊 Dashboard**: System metrics, analytics, and usage monitoring
 * **🔌 Plugin Management**: Monitor and manage RAG plugins
+* **🧠 Knowledge Exchange Forum**: Authenticated discussions with attachments, unread badges, and email notifications
 * **👤 User Authentication**: JWT-based login with role-based access
 * **📱 Responsive Design**: Works seamlessly on desktop and mobile
 

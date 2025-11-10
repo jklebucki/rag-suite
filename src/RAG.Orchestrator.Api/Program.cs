@@ -13,6 +13,8 @@ using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Services;
+using RAG.Forum.Endpoints;
+using RAG.Forum.Extensions;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
 
@@ -36,6 +38,8 @@ builder.Services.AddFeatureServices(builder.Configuration);
 builder.Services.AddCyberPanel(builder.Configuration);
 // Register AddressBook feature
 builder.Services.AddAddressBook(builder.Configuration);
+// Register Forum feature
+builder.Services.AddForum(builder.Configuration);
 
 var app = builder.Build();
 
@@ -61,6 +65,10 @@ try
         // Ensure AddressBook database migrations are applied
         await app.Services.EnsureAddressBookDatabaseCreatedAsync();
         app.Logger.LogInformation("AddressBook database initialization completed successfully");
+
+        // Ensure Forum database migrations are applied
+        await app.Services.EnsureForumDatabaseCreatedAsync();
+        app.Logger.LogInformation("Forum database initialization completed successfully");
     }
     else
     {
@@ -112,5 +120,6 @@ app.MapFeedbackEndpoints();
 app.MapCyberPanelEndpoints();
 
 app.MapAddressBookEndpoints();
+app.MapForumEndpoints();
 
 app.Run();
