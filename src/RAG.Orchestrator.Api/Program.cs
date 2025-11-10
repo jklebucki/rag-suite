@@ -7,6 +7,7 @@ using RAG.Orchestrator.Api.Extensions;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.FileDownload;
+using RAG.Orchestrator.Api.Features.Feedback;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Search;
@@ -106,6 +107,7 @@ app.MapPluginEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapFileDownloadEndpoints();
 app.MapSettingsEndpoints();
+app.MapFeedbackEndpoints();
 
 app.MapCyberPanelEndpoints();
 

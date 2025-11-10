@@ -1,16 +1,20 @@
 // All code comments must be written in English, regardless of the conversation language.
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Settings as SettingsIcon, User, Menu } from 'lucide-react'
+import { Settings as SettingsIcon, User, Menu, MessageSquare } from 'lucide-react'
 import type { SettingsTab } from '@/features/settings/types/settings'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
 export function SettingsSidebar({
   activeTab,
   setActiveTab,
+  canManageUsers,
+  canManageFeedback
 }: {
   activeTab: SettingsTab
   setActiveTab: (tab: SettingsTab) => void
+  canManageUsers: boolean
+  canManageFeedback: boolean
 }) {
   const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -60,6 +64,30 @@ export function SettingsSidebar({
     </button>
   )
 
+  const visibleTabs = React.useMemo<Array<{ tab: SettingsTab; label: string; icon: React.ReactNode }>>(() => {
+    const items: Array<{ tab: SettingsTab; label: string; icon: React.ReactNode }> = [
+      { tab: 'llm', label: t('settings.sidebar.tabs.llm'), icon: <SettingsIcon className="h-5 w-5" /> }
+    ]
+
+    if (canManageUsers) {
+      items.push({
+        tab: 'user',
+        label: t('settings.sidebar.tabs.user'),
+        icon: <User className="h-5 w-5" />
+      })
+    }
+
+    if (canManageFeedback) {
+      items.push({
+        tab: 'feedback',
+        label: t('settings.sidebar.tabs.feedback'),
+        icon: <MessageSquare className="h-5 w-5" />
+      })
+    }
+
+    return items
+  }, [canManageFeedback, canManageUsers, t])
+
   return (
     <>
       {/* Mobile toggle */}
@@ -84,8 +112,7 @@ export function SettingsSidebar({
               <div className="absolute right-0 top-full mt-1 w-64 surface border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg z-50">
                 <div className="p-2">
                   <nav className="space-y-2">
-                    {navButton('llm', t('settings.sidebar.tabs.llm'), <SettingsIcon className="h-5 w-5" />)}
-                    {navButton('user', t('settings.sidebar.tabs.user'), <User className="h-5 w-5" />)}
+                    {visibleTabs.map(item => navButton(item.tab, item.label, item.icon))}
                   </nav>
                 </div>
               </div>
@@ -100,8 +127,7 @@ export function SettingsSidebar({
           {t('settings.sidebar.title')}
         </h2>
         <nav className="space-y-2" aria-label="Settings navigation">
-          {navButton('llm', t('settings.sidebar.tabs.llm'), <SettingsIcon className="h-5 w-5" />)}
-          {navButton('user', t('settings.sidebar.tabs.user'), <User className="h-5 w-5" />)}
+          {visibleTabs.map(item => navButton(item.tab, item.label, item.icon))}
         </nav>
       </aside>
 

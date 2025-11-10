@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn } from 'lucide-react'
+import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/shared/components/ui/LanguageSelector'
 import { ThemeToggle } from '@/shared/components/ui/ThemeToggle'
 import { UserAccountModal } from '@/features/settings/components/UserAccountModal'
 import { SessionExpiredModal } from '@/shared/components/ui/SessionExpiredModal'
+import { FeedbackModal } from '@/features/feedback/components/FeedbackModal'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { logger } from '@/utils/logger'
@@ -18,6 +19,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { user, logout, refreshError, logoutAllDevices, clearRefreshError } = useAuth()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -47,6 +49,11 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
 
   const handleAccountClick = () => {
     setIsAccountModalOpen(true)
+    setIsUserMenuOpen(false)
+  }
+
+  const handleFeedbackClick = () => {
+    setIsFeedbackModalOpen(true)
     setIsUserMenuOpen(false)
   }
 
@@ -151,6 +158,13 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                 
                 <div className="py-1">
                   <button
+                    onClick={handleFeedbackClick}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    {t('feedback.menu.submit')}
+                  </button>
+                  <button
                     onClick={handleAccountClick}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
@@ -176,6 +190,11 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       <UserAccountModal 
         isOpen={isAccountModalOpen} 
         onClose={() => setIsAccountModalOpen(false)} 
+      />
+
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
       />
 
       {/* Session Expired Modal */}

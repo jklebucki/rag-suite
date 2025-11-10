@@ -278,6 +278,7 @@ export interface TranslationKeys {
   'settings.sidebar.toggle_label': string;
   'settings.sidebar.tabs.llm': string;
   'settings.sidebar.tabs.user': string;
+  'settings.sidebar.tabs.feedback': string;
 
   'settings.llm.loading': string;
   'settings.llm.title': string;
@@ -374,6 +375,57 @@ export interface TranslationKeys {
   'settings.user.account.delete_confirm_title': string;
   'settings.user.account.delete_success': string;
   'settings.user.account.delete_error': string;
+
+  'settings.feedback.title': string;
+  'settings.feedback.subtitle': string;
+
+  'feedback.menu.submit': string;
+  'feedback.modal.title': string;
+  'feedback.modal.subtitle': string;
+  'feedback.modal.subject': string;
+  'feedback.modal.subject_placeholder': string;
+  'feedback.modal.subject_hint': string;
+  'feedback.modal.message': string;
+  'feedback.modal.message_placeholder': string;
+  'feedback.modal.message_hint': string;
+  'feedback.modal.characters_left': string;
+  'feedback.modal.submit': string;
+  'feedback.modal.success': string;
+  'feedback.modal.error': string;
+  'feedback.modal.validation_required': string;
+  'feedback.modal.notice': string;
+
+  'feedback.admin.title': string;
+  'feedback.admin.subtitle': string;
+  'feedback.admin.filters.subject': string;
+  'feedback.admin.filters.subject_placeholder': string;
+  'feedback.admin.filters.user': string;
+  'feedback.admin.filters.user_placeholder': string;
+  'feedback.admin.filters.date_from': string;
+  'feedback.admin.filters.date_to': string;
+  'feedback.admin.filters.clear': string;
+  'feedback.admin.loading': string;
+  'feedback.admin.empty.title': string;
+  'feedback.admin.empty.description': string;
+  'feedback.admin.table.subject': string;
+  'feedback.admin.table.user': string;
+  'feedback.admin.table.created_at': string;
+  'feedback.admin.table.response_status': string;
+  'feedback.admin.table.actions': string;
+  'feedback.admin.table.view': string;
+  'feedback.admin.table.responded': string;
+  'feedback.admin.table.pending': string;
+  'feedback.admin.details.title': string;
+  'feedback.admin.details.user': string;
+  'feedback.admin.details.created_at': string;
+  'feedback.admin.details.responded_at': string;
+  'feedback.admin.details.response_author': string;
+  'feedback.admin.details.message_label': string;
+  'feedback.admin.details.response_label': string;
+  'feedback.admin.details.respond_placeholder': string;
+  'feedback.admin.details.save': string;
+  'feedback.admin.details.success': string;
+  'feedback.admin.details.error': string;
 
   // Cyber Panel
   'cyberpanel.quizzes': string;

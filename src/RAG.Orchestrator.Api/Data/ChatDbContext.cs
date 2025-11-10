@@ -12,6 +12,7 @@ public class ChatDbContext : DbContext
     public DbSet<ChatSession> ChatSessions { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<GlobalSetting> GlobalSettings { get; set; }
+    public DbSet<Feedback> FeedbackEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -149,6 +150,52 @@ public class ChatDbContext : DbContext
             entity.HasIndex(e => e.Key)
                 .IsUnique()
                 .HasDatabaseName("ix_global_settings_key");
+        });
+
+        // Feedback configuration
+        modelBuilder.Entity<Feedback>(entity =>
+        {
+            entity.ToTable("feedback");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .IsRequired();
+
+            entity.Property(e => e.UserEmail)
+                .HasMaxLength(320);
+
+            entity.Property(e => e.Subject)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.Message)
+                .HasMaxLength(4000)
+                .IsRequired();
+
+            entity.Property(e => e.Response)
+                .HasMaxLength(4000);
+
+            entity.Property(e => e.ResponseAuthorEmail)
+                .HasMaxLength(320);
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .IsRequired();
+
+            entity.HasIndex(e => e.UserId)
+                .HasDatabaseName("ix_feedback_user_id");
+
+            entity.HasIndex(e => e.Subject)
+                .HasDatabaseName("ix_feedback_subject");
+
+            entity.HasIndex(e => e.CreatedAt)
+                .HasDatabaseName("ix_feedback_created_at");
         });
     }
 }

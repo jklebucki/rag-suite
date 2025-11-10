@@ -9,6 +9,8 @@ using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.FileDownload;
+using RAG.Orchestrator.Api.Features.Feedback;
+using RAG.Orchestrator.Api.Features.Feedback.Validation;
 using RAG.Orchestrator.Api.Features.Health;
 using RAG.Orchestrator.Api.Features.Plugins;
 using RAG.Orchestrator.Api.Features.Reconstruction;
@@ -182,9 +184,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<RAG.Abstractions.Conversion.IGotenbergClient, GotenbergService>();
         services.AddScoped<IGlobalSettingsService, GlobalSettingsService>();
         services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<IFeedbackService, FeedbackService>();
 
         // Register singleton for global settings cache
         services.AddSingleton<IGlobalSettingsCache, GlobalSettingsCache>();
+
+        services.AddScoped<IValidator<CreateFeedbackRequest>, CreateFeedbackRequestValidator>();
+        services.AddScoped<IValidator<RespondFeedbackRequest>, RespondFeedbackRequestValidator>();
 
         return services;
     }
