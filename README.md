@@ -20,11 +20,15 @@
 | Folder | Description |
 |----|----|
 | `src/RAG.Web.UI` | Modern React TypeScript frontend with chat, knowledge exchange forum, and dashboard |
-| `src/RAG.Orchestrator.Api` | Main API (Minimal API .NET) orchestrating agents and RAG workflows |
+| `src/RAG.Orchestrator.Api` | Main API (Minimal API .NET) orchestrating agents, RAG workflows, and feature modules |
 | `src/RAG.Collector` | Document collection and processing service for ingesting various content types |
 | `src/RAG.Shared` | Shared libraries: DTOs, models, utilities |
+| `src/RAG.Abstractions` | Common contracts and interfaces shared across backend modules (search, conversions, etc.) |
 | `src/RAG.Plugins/…` | Agent plugins: `OracleSqlPlugin`, `IfsSopPlugin`, `BizProcessPlugin` |
 | `src/RAG.Connectors/…` | Integration clients and vector store adapters: `Elastic`, `Oracle`, `Files` |
+| `src/RAG.Forum` | Forum backend with threads, attachments, unread badges, and admin tooling |
+| `src/RAG.AddressBook` | Address book microservice with change proposals, CSV import, and role-aware workflows |
+| `src/RAG.CyberPanel` | Cybersecurity quiz engine with media-rich questions and scoring |
 | `src/RAG.Security` | Authorization, policies, JWT/OIDC, corpus-level access control |
 | `src/RAG.Telemetry` | Logging & metrics (Serilog + OpenTelemetry) |
 | `src/RAG.Tests` | Unit and integration tests (xUnit) |
@@ -48,8 +52,9 @@ Modern React TypeScript frontend providing:
 * **🔍 Advanced Search**: Full-text and semantic search with filters
 * **📊 Dashboard**: System metrics, analytics, and usage monitoring
 * **🔌 Plugin Management**: Monitor and manage RAG plugins
-* **🧠 Knowledge Exchange Forum**: Authenticated discussions with attachments, unread badges, and email notifications
-* **⚙️ Forum Administration**: Configure categories, attachment limits, and reply notifications from the Settings panel
+* **🧠 Knowledge Exchange Forum**: Authenticated discussions with attachments, unread badges, configurable refresh cadence, and email notifications
+* **⚙️ Forum Administration**: Manage categories (ordering, archiving), attachment policies, and default subscription behaviour from the Settings panel
+* **🔔 Thread Subscriptions**: Opt-in email alerts per thread with automatic unread badge acknowledgement
 * **👤 User Authentication**: JWT-based login with role-based access
 * **📱 Responsive Design**: Works seamlessly on desktop and mobile
 
@@ -60,7 +65,7 @@ Complete security infrastructure with:
 * **🔐 JWT Authentication**: Secure token-based authentication
 * **👥 User Management**: Registration, login, profile management
 * **🎭 Role-Based Access**: User, PowerUser, Admin roles
-* **📊 SQLite Database**: Local user and role storage
+* **🐘 PostgreSQL Identity Store**: Shared database for users and roles with snake_case schema
 * **🔄 Token Refresh**: Secure token renewal mechanism
 
 ### 🤖 RAG.Orchestrator.Api - Main Backend
@@ -72,7 +77,40 @@ Core API orchestrating the RAG system:
 * **🌍 Multilingual Support**: Auto-detection and translation
 * **🔍 Vector Search**: BGE-M3 embeddings with Elasticsearch
 * **📊 Analytics**: Usage tracking and performance monitoring
+* **🧩 Feature Hosting**: Boots AddressBook, CyberPanel, Forum, and Security modules with automatic PostgreSQL migrations
+* **⚙️ Global Settings**: Centralized configuration for LLMs, forum policies, and feature toggles
 
+### 🧵 RAG.Forum - Knowledge Exchange Backend
+
+* **🗂️ Thread & Post Management**: Minimal API endpoints for listing, viewing, and replying within forum threads
+* **📎 Attachments**: Secure upload/download with configurable limits on count and size
+* **🔔 Notifications**: Thread subscriptions with email preferences and unread reply badges acknowledged per user
+* **📛 Admin Toolkit**: Category CRUD with ordering, slug validation, and archiving workflows
+
+### 📘 RAG.AddressBook - Contacts Service
+
+* **👥 Contact Directory**: CRUD operations with full audit trail and role-aware authorization
+* **📥 CSV Importer**: Bulk ingest from enterprise address book exports with duplicate detection
+* **📝 Change Proposals**: Regular users may submit change requests, reviewed by PowerUser/Admin roles
+* **🔎 Search & Tags**: Flexible filtering plus tagging support for segmentation
+
+### 🛡️ RAG.CyberPanel - Cybersecurity Quiz Engine
+
+* **🧠 Quiz Authoring**: Create and publish multi-question cybersecurity quizzes with images
+* **📝 Attempt Tracking**: Score submissions, track attempts, and return detailed feedback
+* **🏗️ Vertical Slice Architecture**: Feature-based slices with FluentValidation and OpenAPI support
+* **🐘 PostgreSQL-backed**: Uses the shared security database connection with automatic migrations
+
+---
+
+## Forum Settings & Notifications
+
+- **Attachments**: Toggle availability and define `maxAttachmentCount` / `maxAttachmentSizeMb`
+- **Email Alerts**: Control default opt-in for reply notifications when users post
+- **Badge Refresh**: Adjust client polling cadence (`badgeRefreshSeconds`) for unread indicators
+- **Categories**: Admin UI supports ordering, archiving, and validation for unique slugs
+
+Admin users can adjust these options from the Settings panel; values are persisted via the orchestrator’s global settings service.
 
 ---
 
@@ -84,6 +122,8 @@ Core API orchestrating the RAG system:
    ```bash
    cd deploy && docker-compose up -d
    ```
+
+   > Ensure PostgreSQL is running and matches the `SecurityDatabase` connection string (default `Host=localhost:5432;Database=rag-suite;Username=pg-dev;Password=pg-dev`). Update `appsettings.Development.json` if your environment differs.
 2. **Run the API**:
 
    ```bash
@@ -97,7 +137,7 @@ Core API orchestrating the RAG system:
 4. **Access the application**:
    * Frontend: http://localhost:3000
    * API: http://localhost:7107
-   * Default admin credentials: `admin@example.com` / `AdminPassword123!`
+   * Default admin credentials: `admin@citronex.pl` / `Citro@123`
 
 
 ---

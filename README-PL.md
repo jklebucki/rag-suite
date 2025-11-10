@@ -17,11 +17,15 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 | Folder | Zawartość i przeznaczenie |
 |--------|---------------------------|
 | `src/RAG.Web.UI` | Nowoczesny frontend React TypeScript z interfejsem chat i dashboard |
-| `src/RAG.Orchestrator.Api` | Główne API — Minimal API .NET, orkiestruje agenty i zapytania RAG |
+| `src/RAG.Orchestrator.Api` | Główne API — Minimal API .NET, orkiestruje agenty, moduły i zapytania RAG |
 | `src/RAG.Collector` | Serwis zbierania i przetwarzania dokumentów do ingestii różnych typów treści |
 | `src/RAG.Shared` | Wspólne biblioteki, typy DTO, modele, helpery |
+| `src/RAG.Abstractions` | Wspólne kontrakty i interfejsy używane przez moduły backendowe (np. wyszukiwanie, konwersje) |
 | `src/RAG.Plugins/…` | Pluginy-agent: `OracleSqlPlugin`, `IfsSopPlugin`, `BizProcessPlugin` |
 | `src/RAG.Connectors/…` | Klienci/integracje i adaptery wektorowe: `Elastic`, `Oracle`, `Files` |
+| `src/RAG.Forum` | Backend forum z wątkami, załącznikami, badge'ami i narzędziami administratorskimi |
+| `src/RAG.AddressBook` | Mikroserwis książki adresowej z propozycjami zmian, importem CSV i workflow zależnym od ról |
+| `src/RAG.CyberPanel` | Silnik quizów cyberbezpieczeństwa z pytaniami multimedialnymi i punktacją |
 | `src/RAG.Security` | Autoryzacja, polityki, JWT/OIDC, dostęp do korpusów |
 | `src/RAG.Telemetry` | Logowanie, metryki (Serilog + OpenTelemetry) |
 | `src/RAG.Tests` | Testy jednostkowe i integracyjne (xUnit) |
@@ -44,6 +48,9 @@ Nowoczesny frontend React TypeScript oferujący:
 * **🔍 Zaawansowane wyszukiwanie**: Wyszukiwanie full-text i semantyczne z filtrami
 * **📊 Dashboard**: Metryki systemu, analityka i monitoring użycia
 * **🔌 Zarządzanie pluginami**: Monitorowanie i zarządzanie pluginami RAG
+* **🧠 Forum wiedzy**: Uwierzytelnione dyskusje z załącznikami, badge'ami "nieprzeczytane" i konfigurowalnym odświeżaniem
+* **⚙️ Panel ustawień forum**: Zarządzanie kategoriami (kolejność, archiwizacja), limitami załączników i domyślną subskrypcją odpowiedzi
+* **🔔 Subskrypcje wątków**: Użytkownicy mogą zapisywać/wyrejestrowywać się z powiadomień, a odznaki są automatycznie potwierdzane
 * **👤 Autoryzacja użytkowników**: Logowanie JWT z dostępem opartym na rolach
 * **📱 Responsywny design**: Bezproblemowa praca na desktop i mobile
 
@@ -54,7 +61,7 @@ Kompletna infrastruktura bezpieczeństwa z:
 * **🔐 Autoryzacja JWT**: Bezpieczne uwierzytelnienie oparte na tokenach
 * **👥 Zarządzanie użytkownikami**: Rejestracja, logowanie, zarządzanie profilem
 * **🎭 Dostęp oparty na rolach**: Role User, PowerUser, Admin
-* **📊 Baza SQLite**: Lokalne przechowywanie użytkowników i ról
+* **🐘 Baza PostgreSQL**: Wspólny magazyn użytkowników i ról z konwencją snake_case
 * **🔄 Odświeżanie tokenów**: Bezpieczny mechanizm odnowy tokenów
 
 ### 🤖 RAG.Orchestrator.Api - Główny backend
@@ -66,6 +73,40 @@ Główne API orkiestrujące system RAG:
 * **🌍 Obsługa wielojęzyczności**: Auto-detekcja i tłumaczenie
 * **🔍 Wyszukiwanie wektorowe**: Embeddingi BGE-M3 z Elasticsearch
 * **📊 Analityka**: Śledzenie użycia i monitoring wydajności
+* **🧩 Hosting modułów**: Startuje AddressBook, CyberPanel, Forum i Security z automatycznymi migracjami PostgreSQL
+* **⚙️ Ustawienia globalne**: Centralne zarządzanie konfiguracją LLM, politykami forum i flagami funkcji
+
+### 🧵 RAG.Forum - Backend forum wiedzy
+
+* **🗂️ Wątki i posty**: Minimal API do listowania, szczegółów i odpowiedzi w ramach wątków
+* **📎 Załączniki**: Bezpieczne uploady/pobieranie z limitami ilości i rozmiaru
+* **🔔 Powiadomienia**: Subskrypcje wątków z preferencjami e-mail i odznaczaniem nieprzeczytanych odpowiedzi
+* **📛 Panel administratora**: CRUD kategorii z walidacją slugów, kolejnością i archiwizacją
+
+### 📘 RAG.AddressBook - Moduł książki adresowej
+
+* **👥 Katalog kontaktów**: Operacje CRUD z audytem i autoryzacją zależną od roli
+* **📥 Import CSV**: Hurtowy import z plików firmowych z wykrywaniem duplikatów
+* **📝 Propozycje zmian**: Użytkownicy bez uprawnień admina zgłaszają zmiany, które zatwierdzają PowerUser/Admin
+* **🔎 Wyszukiwanie i tagi**: Filtrowanie kontaktów plus tagowanie do segmentacji
+
+### 🛡️ RAG.CyberPanel - Silnik quizów bezpieczeństwa
+
+* **🧠 Tworzenie quizów**: Budowanie quizów wielopytaniowych z obrazami
+* **📝 Ocena prób**: Liczenie punktów, historia prób i szczegółowe feedbacki
+* **🏗️ Architektura Vertical Slice**: Walidacja FluentValidation i kompletna dokumentacja OpenAPI
+* **🐘 PostgreSQL**: Wspólny connection string `SecurityDatabase` z automatycznymi migracjami
+
+---
+
+## Ustawienia forum i powiadomienia
+
+- **Załączniki**: Włączanie/wyłączanie oraz limity `maxAttachmentCount` i `maxAttachmentSizeMb`
+- **Powiadomienia e-mail**: Domyślne subskrypcje odpowiedzi dla nowych postów
+- **Odświeżanie badge'y**: Konfiguracja częstotliwości (`badgeRefreshSeconds`) dla wskaźników nieprzeczytanych
+- **Kategorie**: Panel admina pozwala ustawiać kolejność, archiwizować i pilnować unikalnych slugów
+
+Ustawieniami zarządzają administratorzy w panelu Settings; wartości są zapisywane przez usługę ustawień globalnych w Orchestratorze.
 
 ---
 
@@ -75,6 +116,7 @@ Główne API orkiestrujące system RAG:
    ```bash
    cd deploy && docker-compose up -d
    ```
+   > Aplikacja wymaga PostgreSQL dostępnego pod `ConnectionStrings:SecurityDatabase` (domyślnie `Host=localhost:5432;Database=rag-suite;Username=pg-dev;Password=pg-dev`). Uruchom lokalny serwer lub zaktualizuj `appsettings.Development.json`.
 
 2. **Uruchom API**:
    ```bash
@@ -89,7 +131,7 @@ Główne API orkiestrujące system RAG:
 4. **Dostęp do aplikacji**:
    - Frontend: http://localhost:3000
    - API: http://localhost:7107
-   - Domyślne dane logowania administratora: `admin@example.com` / `AdminPassword123!`
+   - Domyślne dane logowania administratora: `admin@citronex.pl` / `Citro@123`
 
 ---
 
