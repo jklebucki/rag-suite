@@ -27,13 +27,18 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   const [isMyFeedbackModalOpen, setIsMyFeedbackModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
+  const myFeedbackRefetchInterval = 5 * 60 * 1000
+
   const { data: myFeedback = [] } = useQuery({
     queryKey: ['my-feedback'],
     queryFn: feedbackService.getMyFeedback,
     enabled: Boolean(user),
-    staleTime: 60_000,
-    refetchInterval: 60_000,
-    refetchOnWindowFocus: false
+    staleTime: 0,
+    refetchInterval: myFeedbackRefetchInterval,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: 'always',
+    refetchOnReconnect: true
   })
 
   const hasUnreadFeedbackResponses = myFeedback.some(
@@ -201,10 +206,15 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                   </button>
                   <button
                     onClick={handleMyFeedbackClick}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="relative w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <List className="h-4 w-4" />
-                    {t('feedback.menu.my_feedback')}
+                    <span>{t('feedback.menu.my_feedback')}</span>
+                    {hasUnreadFeedbackResponses && (
+                      <span className="ml-auto inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-primary-500 text-white">
+                        {t('feedback.my.status.unread_badge')}
+                      </span>
+                    )}
                   </button>
                   <button
                     onClick={handleAccountClick}
