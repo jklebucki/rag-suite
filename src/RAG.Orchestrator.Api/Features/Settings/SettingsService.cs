@@ -17,8 +17,18 @@ public class SettingsService : ISettingsService
         return await _globalSettingsService.GetLlmSettingsAsync();
     }
 
+    public async Task<ForumSettings?> GetForumSettingsAsync()
+    {
+        return await _globalSettingsService.GetForumSettingsAsync();
+    }
+
     public async Task SetLlmSettingsAsync(LlmSettings settings)
     {
         await _globalSettingsService.SetLlmSettingsAsync(settings);
+    }
+
+    public async Task SetForumSettingsAsync(ForumSettings settings)
+    {
+        await _globalSettingsService.SetForumSettingsAsync(settings);
     }
 }

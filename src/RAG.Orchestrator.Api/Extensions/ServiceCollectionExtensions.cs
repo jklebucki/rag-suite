@@ -21,6 +21,7 @@ using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
 using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
 using RAG.Orchestrator.Api.Features.Search.ResultMapping;
 using RAG.Orchestrator.Api.Features.Settings;
+using RAG.Forum.Services;
 using RAG.Orchestrator.Api.Features.Settings.Validation;
 using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Models.Validation;
@@ -175,6 +176,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<MultilingualChatRequest>, MultilingualChatRequestValidator>();
         services.AddScoped<IValidator<CreateUserSessionRequest>, CreateUserSessionRequestValidator>();
         services.AddScoped<IValidator<LlmSettingsRequest>, LlmSettingsRequestValidator>();
+        services.AddScoped<IValidator<ForumSettingsRequest>, ForumSettingsRequestValidator>();
 
         services.AddScoped<IHealthAggregator, HealthAggregator>();
         services.AddScoped<IPluginService, PluginService>();
@@ -183,6 +185,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFileDownloadService, FileDownloadService>();
         services.AddScoped<RAG.Abstractions.Conversion.IGotenbergClient, GotenbergService>();
         services.AddScoped<IGlobalSettingsService, GlobalSettingsService>();
+        services.AddScoped<IForumSettingsProvider, ForumSettingsProvider>();
         services.AddScoped<ISettingsService, SettingsService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
 

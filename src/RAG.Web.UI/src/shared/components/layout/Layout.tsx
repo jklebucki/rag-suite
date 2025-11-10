@@ -3,7 +3,7 @@ import { useLayout } from '@/shared/hooks/useLayout'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { useAuth } from '@/shared/contexts/AuthContext'
-import { useThreadBadges } from '@/features/forum/hooks/useForumQueries'
+import { useForumSettingsQuery, useThreadBadges } from '@/features/forum/hooks/useForumQueries'
 
 interface LayoutProps {
   children: ReactNode
@@ -19,7 +19,8 @@ export function Layout({ children }: LayoutProps) {
     isActiveRoute,
   } = useLayout()
   const { isAuthenticated } = useAuth()
-  const { data: badgesData } = useThreadBadges(isAuthenticated)
+  const { data: forumSettings } = useForumSettingsQuery({ enabled: isAuthenticated })
+  const { data: badgesData } = useThreadBadges(isAuthenticated, forumSettings?.badgeRefreshSeconds ?? 60)
 
   const forumBadgeCount = badgesData?.badges.filter((badge) => badge.hasUnreadReplies).length ?? 0
 

@@ -9,6 +9,7 @@ import { useToast } from '@/shared/contexts/ToastContext'
 import {
   useAcknowledgeThreadBadge,
   useCreateForumPost,
+  useForumSettingsQuery,
   useForumThread,
   useThreadBadges,
   useSubscribeToThread,
@@ -29,14 +30,26 @@ export function ThreadDetailPage() {
 
   const threadQuery = useForumThread(threadId)
   const createPostMutation = useCreateForumPost(threadId ?? '')
-  const badgesQuery = useThreadBadges(isAuthenticated)
   const acknowledgeBadge = useAcknowledgeThreadBadge()
   const subscribeMutation = useSubscribeToThread(threadId ?? '')
   const unsubscribeMutation = useUnsubscribeFromThread(threadId ?? '')
+  const forumSettingsQuery = useForumSettingsQuery({ enabled: isAuthenticated })
+  const forumSettings = forumSettingsQuery.data
+  const attachmentsEnabled = forumSettings?.enableAttachments ?? true
+  const maxAttachmentCount = forumSettings?.maxAttachmentCount ?? 5
+  const maxAttachmentSizeMb = forumSettings?.maxAttachmentSizeMb ?? 5
+  const badgeRefreshSeconds = forumSettings?.badgeRefreshSeconds ?? 60
+  const badgesQuery = useThreadBadges(isAuthenticated, badgeRefreshSeconds)
 
   const [replyContent, setReplyContent] = useState('')
   const [attachments, setAttachments] = useState<AttachmentDraft[]>([])
   const [subscribeToThread, setSubscribeToThread] = useState(true)
+
+  useEffect(() => {
+    if (!attachmentsEnabled && attachments.length > 0) {
+      setAttachments([])
+    }
+  }, [attachmentsEnabled, attachments])
 
   const isSubscribed = useMemo(() => {
     if (!threadId) return false
@@ -51,9 +64,9 @@ export function ThreadDetailPage() {
     }
   }, [acknowledgeBadge, badgesQuery.data, threadId])
 
-  useEffect(() => {
-    setSubscribeToThread(!isSubscribed)
-  }, [isSubscribed])
+useEffect(() => {
+  setSubscribeToThread(isSubscribed ? false : forumSettings?.enableEmailNotifications ?? true)
+}, [isSubscribed, forumSettings?.enableEmailNotifications])
 
   const handleSubmitReply = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -71,12 +84,14 @@ export function ThreadDetailPage() {
       await createPostMutation.mutateAsync({
         content: replyContent.trim(),
         subscribeToThread,
-        attachments: attachments.map(({ fileName, contentType, dataBase64, size }) => ({
-          fileName,
-          contentType,
-          dataBase64,
-          size,
-        })),
+        attachments: attachmentsEnabled
+          ? attachments.map(({ fileName, contentType, dataBase64, size }) => ({
+              fileName,
+              contentType,
+              dataBase64,
+              size,
+            }))
+          : [],
       })
       showSuccess(t('forum.reply.success'))
       setReplyContent('')
@@ -212,35 +227,46 @@ export function ThreadDetailPage() {
         <Card className="border border-gray-200 dark:border-gray-700">
           <form onSubmit={handleSubmitReply} className="space-y-4 p-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label htmlFor="forum-reply-content" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 {t('forum.reply.fields.content')}
               </label>
               <textarea
+                id="forum-reply-content"
+                name="replyContent"
                 value={replyContent}
                 onChange={(event) => setReplyContent(event.target.value)}
                 rows={5}
                 className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                 maxLength={4000}
+                placeholder={t('forum.reply.fields.content')}
+                aria-label={t('forum.reply.fields.content')}
                 required
               />
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+            <label className="flex items-center text-sm text-gray-600 dark:text-gray-300">
               <input
                 id="forum-reply-subscribe"
                 type="checkbox"
                 checked={subscribeToThread}
                 onChange={(event) => setSubscribeToThread(event.target.checked)}
+                className="form-checkbox"
               />
-              <label htmlFor="forum-reply-subscribe">{t('forum.reply.subscribeLabel')}</label>
-            </div>
+              <span className="ml-2">{t('forum.reply.subscribeLabel')}</span>
+            </label>
 
-            <AttachmentPicker
-              attachments={attachments}
-              onAttachmentsChange={setAttachments}
-              disabled={createPostMutation.isPending}
-              inputId="forum-reply-attachments"
-            />
+            {attachmentsEnabled ? (
+              <AttachmentPicker
+                attachments={attachments}
+                onAttachmentsChange={setAttachments}
+                disabled={createPostMutation.isPending}
+                inputId="forum-reply-attachments"
+                maxAttachments={maxAttachmentCount}
+                maxAttachmentSizeMb={maxAttachmentSizeMb}
+              />
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('forum.attachments.disabled')}</p>
+            )}
 
             <div className="flex justify-end gap-3">
               <Button

@@ -21,9 +21,19 @@ public class GlobalSettingsService : IGlobalSettingsService
         return await _cache.GetLlmSettingsAsync();
     }
 
+    public async Task<ForumSettings?> GetForumSettingsAsync()
+    {
+        return await _cache.GetForumSettingsAsync();
+    }
+
     public async Task SetLlmSettingsAsync(LlmSettings settings)
     {
         await _cache.SetLlmSettingsAsync(settings, _context);
+    }
+
+    public async Task SetForumSettingsAsync(ForumSettings settings)
+    {
+        await _cache.SetForumSettingsAsync(settings, _context);
     }
 
     public async Task InitializeLlmSettingsAsync(IConfiguration configuration, ChatDbContext context)
@@ -49,6 +59,31 @@ public class GlobalSettingsService : IGlobalSettingsService
 
         var jsonValue = JsonSerializer.Serialize(settings);
         var dbSetting = new GlobalSetting { Key = "LlmService", Value = jsonValue };
+        context.GlobalSettings.Add(dbSetting);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task InitializeForumSettingsAsync(IConfiguration configuration, ChatDbContext context)
+    {
+        var key = "ForumSettings";
+        var existing = await context.GlobalSettings.AnyAsync(s => s.Key == key);
+        if (existing)
+        {
+            return;
+        }
+
+        var forumSection = configuration.GetSection("Services:Forum");
+        var settings = new ForumSettings
+        {
+            EnableAttachments = bool.TryParse(forumSection["EnableAttachments"], out var enableAttachments) ? enableAttachments : true,
+            MaxAttachmentCount = int.TryParse(forumSection["MaxAttachmentCount"], out var maxCount) ? maxCount : 5,
+            MaxAttachmentSizeMb = int.TryParse(forumSection["MaxAttachmentSizeMb"], out var maxSize) ? maxSize : 5,
+            EnableEmailNotifications = bool.TryParse(forumSection["EnableEmailNotifications"], out var enableNotifications) ? enableNotifications : true,
+            BadgeRefreshSeconds = int.TryParse(forumSection["BadgeRefreshSeconds"], out var badgeSeconds) ? badgeSeconds : 60
+        };
+
+        var jsonValue = JsonSerializer.Serialize(settings);
+        var dbSetting = new GlobalSetting { Key = key, Value = jsonValue };
         context.GlobalSettings.Add(dbSetting);
         await context.SaveChangesAsync();
     }

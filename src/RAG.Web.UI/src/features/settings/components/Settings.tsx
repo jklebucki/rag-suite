@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { SettingsForm } from './SettingsForm'
 import { UserSettings } from './UserSettings'
 import { SettingsSidebar } from './SettingsSidebar'
+import { ForumSettingsPanel } from './ForumSettingsPanel'
 import type { SettingsTab } from '@/features/settings/types/settings'
 import { FeedbackAdminPanel } from './FeedbackAdminPanel'
 import { useAuth } from '@/shared/contexts/AuthContext'
@@ -15,23 +16,27 @@ export function Settings() {
   const roles = user?.roles ?? []
   const canManageUsers = roles.includes('Admin')
   const canManageFeedback = roles.includes('Admin') || roles.includes('PowerUser')
+  const canManageForum = roles.includes('Admin')
 
   const availableTabs = useMemo<SettingsTab[]>(() => {
     const tabs: SettingsTab[] = ['llm']
     if (canManageUsers) tabs.push('user')
     if (canManageFeedback) tabs.push('feedback')
+    if (canManageForum) tabs.push('forum')
     return tabs
-  }, [canManageUsers, canManageFeedback])
+  }, [canManageFeedback, canManageForum, canManageUsers])
 
   useEffect(() => {
     if (activeTab === 'user' && !canManageUsers) {
       setActiveTab(canManageFeedback ? 'feedback' : 'llm')
     } else if (activeTab === 'feedback' && !canManageFeedback) {
       setActiveTab(canManageUsers ? 'user' : 'llm')
+    } else if (activeTab === 'forum' && !canManageForum) {
+      setActiveTab(canManageUsers ? 'user' : canManageFeedback ? 'feedback' : 'llm')
     } else if (!availableTabs.includes(activeTab)) {
       setActiveTab('llm')
     }
-  }, [activeTab, availableTabs, canManageFeedback, canManageUsers])
+  }, [activeTab, availableTabs, canManageFeedback, canManageForum, canManageUsers])
 
   return (
     // On mobile we want the sidebar topbar above content (column). On md+ use row with sidebar left.
@@ -41,6 +46,7 @@ export function Settings() {
         setActiveTab={setActiveTab}
         canManageUsers={canManageUsers}
         canManageFeedback={canManageFeedback}
+        canManageForum={canManageForum}
       />
 
       {/* Main Content */}
@@ -48,6 +54,7 @@ export function Settings() {
         {activeTab === 'llm' && <SettingsForm />}
         {activeTab === 'user' && <UserSettings />}
         {activeTab === 'feedback' && canManageFeedback && <FeedbackAdminPanel />}
+        {activeTab === 'forum' && canManageForum && <ForumSettingsPanel />}
       </div>
     </div>
   )

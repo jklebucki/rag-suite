@@ -1,19 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   acknowledgeThreadBadge,
+  createForumCategory,
   createForumPost,
   createForumThread,
+  deleteForumCategory,
   fetchForumCategories,
   fetchForumThread,
   fetchForumThreads,
   fetchThreadBadges,
+  getForumSettings,
   subscribeToThread,
   unsubscribeFromThread,
+  updateForumCategory,
+  updateForumSettings,
 } from '../services/forum.service'
 import type {
   CreatePostPayload,
   CreateThreadPayload,
   ForumCategory,
+  ForumSettings,
   ForumThreadDetail,
   ListThreadsParams,
   ListThreadsResponse,
@@ -22,10 +28,11 @@ import type {
 
 export const forumKeys = {
   all: ['forum'] as const,
-  categories: () => [...forumKeys.all, 'categories'] as const,
   threads: (params: ListThreadsParams) => [...forumKeys.all, 'threads', params] as const,
   thread: (threadId: string) => [...forumKeys.all, 'thread', threadId] as const,
   badges: () => [...forumKeys.all, 'badges'] as const,
+  settings: () => [...forumKeys.all, 'settings'] as const,
+  categories: () => [...forumKeys.all, 'categories'] as const,
 }
 
 export function useForumCategories() {
@@ -48,6 +55,14 @@ export function useForumThread(threadId?: string) {
     queryKey: threadId ? forumKeys.thread(threadId) : ['forum', 'thread', 'unknown'],
     queryFn: () => fetchForumThread(threadId as string),
     enabled: Boolean(threadId),
+  })
+}
+
+export function useForumSettingsQuery(options?: { enabled?: boolean }) {
+  return useQuery<ForumSettings>({
+    queryKey: forumKeys.settings(),
+    queryFn: getForumSettings,
+    enabled: options?.enabled ?? true,
   })
 }
 
@@ -81,12 +96,12 @@ export function useCreateForumPost(threadId: string) {
   })
 }
 
-export function useThreadBadges(enabled: boolean) {
+export function useThreadBadges(enabled: boolean, refreshSeconds = 60) {
   return useQuery<ThreadBadgesResponse>({
     queryKey: forumKeys.badges(),
     queryFn: fetchThreadBadges,
     enabled,
-    refetchInterval: enabled ? 60_000 : false,
+    refetchInterval: enabled ? refreshSeconds * 1000 : false,
   })
 }
 
@@ -128,6 +143,50 @@ export function useAcknowledgeThreadBadge() {
         queryClient.invalidateQueries({ queryKey: forumKeys.badges() }),
         queryClient.invalidateQueries({ queryKey: forumKeys.thread(threadId) }),
       ])
+    },
+  })
+}
+
+export function useUpdateForumSettings() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: ForumSettings) => updateForumSettings(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: forumKeys.settings() })
+    },
+  })
+}
+
+export function useCreateForumCategoryMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createForumCategory,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: forumKeys.categories() })
+    },
+  })
+}
+
+export function useUpdateForumCategoryMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: updateForumCategory,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: forumKeys.categories() })
+    },
+  })
+}
+
+export function useDeleteForumCategoryMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: deleteForumCategory,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: forumKeys.categories() })
     },
   })
 }

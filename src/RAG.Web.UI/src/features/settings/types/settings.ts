@@ -1,6 +1,6 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-export type SettingsTab = 'llm' | 'user' | 'feedback'
+export type SettingsTab = 'llm' | 'user' | 'feedback' | 'forum'
 
 export interface UserFilters {
   searchText: string

@@ -1,16 +1,29 @@
-import { forumHttpClient } from '@/shared/services/api/httpClients'
+import { apiHttpClient, forumHttpClient } from '@/shared/services/api/httpClients'
 import type {
   CreatePostPayload,
   CreatePostResponse,
   CreateThreadPayload,
   CreateThreadResponse,
   ForumCategory,
+  ForumSettings,
   ForumThreadDetail,
   GetThreadResponse,
   ListThreadsParams,
   ListThreadsResponse,
   ThreadBadgesResponse,
 } from '../types/forum'
+
+export interface CreateForumCategoryPayload {
+  name: string
+  slug: string
+  description?: string | null
+  order?: number
+  isArchived?: boolean
+}
+
+export interface UpdateForumCategoryPayload extends CreateForumCategoryPayload {
+  id: string
+}
 
 export async function fetchForumCategories(): Promise<ForumCategory[]> {
   const { data } = await forumHttpClient.get<{ categories: ForumCategory[] }>('/categories')
@@ -59,5 +72,29 @@ export async function fetchThreadBadges(): Promise<ThreadBadgesResponse> {
 
 export async function acknowledgeThreadBadge(threadId: string): Promise<void> {
   await forumHttpClient.patch(`/badges/${threadId}/ack`)
+}
+
+export async function getForumSettings(): Promise<ForumSettings> {
+  const { data } = await apiHttpClient.get<ForumSettings>('/settings/forum')
+  return data
+}
+
+export async function updateForumSettings(payload: ForumSettings): Promise<void> {
+  await apiHttpClient.put('/settings/forum', payload)
+}
+
+export async function createForumCategory(payload: CreateForumCategoryPayload): Promise<ForumCategory> {
+  const { data } = await forumHttpClient.post<ForumCategory>('/categories', payload)
+  return data
+}
+
+export async function updateForumCategory(payload: UpdateForumCategoryPayload): Promise<ForumCategory> {
+  const { id, ...rest } = payload
+  const { data } = await forumHttpClient.put<ForumCategory>(`/categories/${id}`, rest)
+  return data
+}
+
+export async function deleteForumCategory(id: string): Promise<void> {
+  await forumHttpClient.delete(`/categories/${id}`)
 }
 

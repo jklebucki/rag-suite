@@ -112,3 +112,11 @@ export interface ListThreadsParams {
   search?: string
 }
 
+export interface ForumSettings {
+  enableAttachments: boolean
+  maxAttachmentCount: number
+  maxAttachmentSizeMb: number
+  enableEmailNotifications: boolean
+  badgeRefreshSeconds: number
+}
+

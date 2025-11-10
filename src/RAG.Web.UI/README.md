@@ -11,6 +11,7 @@ Modern React TypeScript frontend for RAG Suite.
 * 📊 **Dashboard**: System metrics and usage analytics
 * 🔌 **Plugin Management**: Monitor and manage RAG plugins
 * 🧠 **Knowledge Exchange Forum**: Share knowledge, follow discussions, and receive updates on new replies
+* ⚙️ **Forum Administration**: Configure categories, attachment limits, and notifications directly in Settings
 * 📱 **Responsive Design**: Works on desktop and mobile devices
 
 ## Getting Started
@@ -74,10 +75,11 @@ The forum adds a structured discussion area tightly integrated with the suite:
 * Accessible from the main sidebar as **“Wymiana wiedzy / Knowledge Exchange”**
 * Requires authentication; unauthenticated users are redirected to login
 * Filter threads by category, search titles, and paginate results
-* Create threads with rich text and file attachments (max 5 files, 5 MB each)
+* Create threads with rich text and file attachments (defaults configurable by administrators)
 * Reply to threads with attachments and optionally subscribe for email notifications
 * View unread badges and acknowledge them once a thread is read
 * Download attachments securely via the orchestrator API
+* Administrators can manage categories, attachment limits, and email notifications under **Settings → Forum**
 
 ## Configuration
 

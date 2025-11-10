@@ -8,8 +8,14 @@ import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useToast } from '@/shared/contexts/ToastContext'
 import { formatRelativeTime } from '@/utils/date'
-import { useForumCategories, useForumThreads, useCreateForumThread, useThreadBadges } from '../hooks/useForumQueries'
-import type { ForumCategory, ForumThreadSummary, ListThreadsParams } from '../types/forum'
+import {
+  useForumCategories,
+  useForumThreads,
+  useCreateForumThread,
+  useThreadBadges,
+  useForumSettingsQuery,
+} from '../hooks/useForumQueries'
+import type { ForumCategory, ForumSettings, ForumThreadSummary, ListThreadsParams } from '../types/forum'
 import type { LanguageCode } from '@/shared/types/i18n'
 import { AttachmentPicker, AttachmentDraft } from './AttachmentPicker'
 import { Modal } from '@/shared/components/ui/Modal'
@@ -42,7 +48,9 @@ export function ForumPage() {
   const categoriesQuery = useForumCategories()
   const threadsQuery = useForumThreads(threadParams)
   const createThreadMutation = useCreateForumThread()
-  const badgesQuery = useThreadBadges(isAuthenticated)
+  const forumSettingsQuery = useForumSettingsQuery({ enabled: isAuthenticated })
+  const badgeRefreshSeconds = forumSettingsQuery.data?.badgeRefreshSeconds ?? 60
+  const badgesQuery = useThreadBadges(isAuthenticated, badgeRefreshSeconds)
 
   const unreadThreadIds = useMemo(() => {
     if (!badgesQuery.data) return new Set<string>()
@@ -148,6 +156,7 @@ export function ForumPage() {
         onSubmit={handleCreateThread}
         categories={categoriesQuery.data ?? []}
         isSubmitting={createThreadMutation.isPending}
+        forumSettings={forumSettingsQuery.data}
       />
     </div>
   )
@@ -349,15 +358,19 @@ interface CreateThreadModalProps {
   onSubmit: (values: CreateThreadFormState) => Promise<void>
   categories: ForumCategory[]
   isSubmitting: boolean
+  forumSettings?: ForumSettings
 }
 
-function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting }: CreateThreadModalProps) {
+function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting, forumSettings }: CreateThreadModalProps) {
   const { t } = useI18n()
   const { showError } = useToast()
   const [categoryId, setCategoryId] = useState<string>('')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [attachments, setAttachments] = useState<AttachmentDraft[]>([])
+  const attachmentsEnabled = forumSettings?.enableAttachments ?? true
+  const maxAttachmentCount = forumSettings?.maxAttachmentCount ?? 5
+  const maxAttachmentSizeMb = forumSettings?.maxAttachmentSizeMb ?? 5
 
   const resetForm = () => {
     setCategoryId('')
@@ -365,6 +378,12 @@ function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting
     setContent('')
     setAttachments([])
   }
+
+  React.useEffect(() => {
+    if (!attachmentsEnabled && attachments.length > 0) {
+      setAttachments([])
+    }
+  }, [attachmentsEnabled, attachments])
 
   const handleClose = () => {
     if (!isSubmitting) {
@@ -395,7 +414,7 @@ function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting
       categoryId,
       title: title.trim(),
       content: content.trim(),
-      attachments,
+      attachments: attachmentsEnabled ? attachments : [],
     })
     resetForm()
   }
@@ -451,12 +470,18 @@ function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting
           />
         </div>
 
-        <AttachmentPicker
-          attachments={attachments}
-          onAttachmentsChange={setAttachments}
-          disabled={isSubmitting}
-          inputId="forum-thread-attachments"
-        />
+        {attachmentsEnabled ? (
+          <AttachmentPicker
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+            disabled={isSubmitting}
+            inputId="forum-thread-attachments"
+            maxAttachments={maxAttachmentCount}
+            maxAttachmentSizeMb={maxAttachmentSizeMb}
+          />
+        ) : (
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('forum.attachments.disabled')}</p>
+        )}
 
         <div className="flex justify-end gap-3">
           <Button type="button" variant="secondary" onClick={handleClose} disabled={isSubmitting}>

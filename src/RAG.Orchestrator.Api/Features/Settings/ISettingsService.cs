@@ -6,4 +6,6 @@ public interface ISettingsService
 {
     Task<LlmSettings?> GetLlmSettingsAsync();
     Task SetLlmSettingsAsync(LlmSettings settings);
+    Task<ForumSettings?> GetForumSettingsAsync();
+    Task SetForumSettingsAsync(ForumSettings settings);
 }

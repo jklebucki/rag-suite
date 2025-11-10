@@ -21,6 +21,7 @@ public static class ForumEndpoints
         group.MapThreadSubscriptions();
         group.MapThreadBadges();
         group.MapDownloadThreadAttachment();
+        group.MapManageCategories();
 
         return group;
     }

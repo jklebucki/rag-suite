@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using RAG.Forum.Data;
 using RAG.Forum.Domain;
 using RAG.Forum.Features.Shared;
+using RAG.Forum.Services;
 using RAG.Security.Services;
 
 namespace RAG.Forum.Features.Threads;
@@ -28,6 +29,7 @@ public static class CreateThreadEndpoint
         [FromBody] CreateThreadRequest request,
         ForumDbContext dbContext,
         IUserContextService userContext,
+        IForumSettingsProvider settingsProvider,
         CancellationToken cancellationToken)
     {
         var userId = userContext.GetCurrentUserId();
@@ -55,15 +57,27 @@ public static class CreateThreadEndpoint
         var utcNow = DateTime.UtcNow;
         var threadId = Guid.NewGuid();
 
-        if (!AttachmentMapper.TryCreateAttachments(
-                request.Attachments,
-                threadId,
-                postId: null,
-                createdAt: utcNow,
-                out var attachments,
-                out var attachmentErrors))
+        var forumSettings = await settingsProvider.GetSettingsAsync(cancellationToken);
+        List<ForumAttachment> attachments = new();
+
+        if (forumSettings.EnableAttachments)
         {
-            MergeErrors(validationErrors, attachmentErrors);
+            if (!AttachmentMapper.TryCreateAttachments(
+                    request.Attachments,
+                    threadId,
+                    postId: null,
+                    createdAt: utcNow,
+                    maxAttachmentCount: forumSettings.MaxAttachmentCount,
+                    maxAttachmentSizeBytes: forumSettings.MaxAttachmentSizeMb * 1024 * 1024,
+                    out attachments,
+                    out var attachmentErrors))
+            {
+                MergeErrors(validationErrors, attachmentErrors);
+            }
+        }
+        else if (request.Attachments is { })
+        {
+            validationErrors["attachments"] = new[] { "Attachments are currently disabled." };
         }
 
         if (validationErrors.Count > 0)
@@ -89,9 +103,12 @@ public static class CreateThreadEndpoint
             ViewCount = 0
         };
 
-        foreach (var attachment in attachments)
+        if (forumSettings.EnableAttachments)
         {
-            thread.Attachments.Add(attachment);
+            foreach (var attachment in attachments)
+            {
+                thread.Attachments.Add(attachment);
+            }
         }
 
         thread.Subscriptions.Add(new ThreadSubscription
@@ -100,7 +117,7 @@ public static class CreateThreadEndpoint
             ThreadId = thread.Id,
             UserId = userId,
             Email = userEmail,
-            NotifyOnReply = false,
+            NotifyOnReply = forumSettings.EnableEmailNotifications,
             SubscribedAt = utcNow
         });
 

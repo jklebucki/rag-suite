@@ -8,4 +8,7 @@ public interface IGlobalSettingsService
     Task<LlmSettings?> GetLlmSettingsAsync();
     Task SetLlmSettingsAsync(LlmSettings settings);
     Task InitializeLlmSettingsAsync(IConfiguration configuration, ChatDbContext context);
+    Task<ForumSettings?> GetForumSettingsAsync();
+    Task SetForumSettingsAsync(ForumSettings settings);
+    Task InitializeForumSettingsAsync(IConfiguration configuration, ChatDbContext context);
 }

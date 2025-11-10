@@ -29,4 +29,14 @@ public interface IGlobalSettingsCache
     /// In case of database error, rolls back changes in the singleton.
     /// </summary>
     Task SetLlmSettingsAsync(LlmSettings settings, ChatDbContext context, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves Forum settings.
+    /// </summary>
+    Task<ForumSettings?> GetForumSettingsAsync();
+
+    /// <summary>
+    /// Updates Forum settings with two-phase commit (cache + database).
+    /// </summary>
+    Task SetForumSettingsAsync(ForumSettings settings, ChatDbContext context, CancellationToken cancellationToken = default);
 }

@@ -3,9 +3,6 @@ import { useI18n } from '@/shared/contexts/I18nContext'
 import { useToast } from '@/shared/contexts/ToastContext'
 import type { UploadAttachment } from '../types/forum'
 
-const MAX_ATTACHMENTS = 5
-const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024
-
 export interface AttachmentDraft extends UploadAttachment {
   id: string
   dataUrl: string
@@ -16,11 +13,21 @@ interface AttachmentPickerProps {
   onAttachmentsChange: (attachments: AttachmentDraft[]) => void
   disabled?: boolean
   inputId: string
+  maxAttachments: number
+  maxAttachmentSizeMb: number
 }
 
-export function AttachmentPicker({ attachments, onAttachmentsChange, disabled = false, inputId }: AttachmentPickerProps) {
+export function AttachmentPicker({
+  attachments,
+  onAttachmentsChange,
+  disabled = false,
+  inputId,
+  maxAttachments,
+  maxAttachmentSizeMb,
+}: AttachmentPickerProps) {
   const { t } = useI18n()
   const { showError } = useToast()
+  const maxAttachmentSizeBytes = maxAttachmentSizeMb * 1024 * 1024
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
@@ -30,16 +37,16 @@ export function AttachmentPicker({ attachments, onAttachmentsChange, disabled = 
       return
     }
 
-    if (attachments.length + files.length > MAX_ATTACHMENTS) {
-      showError(t('forum.attachments.limit', { count: String(MAX_ATTACHMENTS) }))
+    if (attachments.length + files.length > maxAttachments) {
+      showError(t('forum.attachments.limit', { count: String(maxAttachments) }))
       return
     }
 
     const processed: AttachmentDraft[] = []
 
     for (const file of files) {
-      if (file.size > MAX_ATTACHMENT_SIZE) {
-        showError(t('forum.attachments.tooLarge', { size: formatBytes(MAX_ATTACHMENT_SIZE) }))
+      if (file.size > maxAttachmentSizeBytes) {
+        showError(t('forum.attachments.tooLarge', { size: formatBytes(maxAttachmentSizeBytes) }))
         continue
       }
 
@@ -78,14 +85,14 @@ export function AttachmentPicker({ attachments, onAttachmentsChange, disabled = 
           type="file"
           multiple
           onChange={handleFileChange}
-          disabled={disabled || attachments.length >= MAX_ATTACHMENTS}
+          disabled={disabled || attachments.length >= maxAttachments}
           className="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-3 file:rounded-lg file:border-0 file:bg-primary-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white file:cursor-pointer hover:file:bg-primary-600 disabled:file:cursor-not-allowed"
           accept="*/*"
         />
         <p className="text-xs text-gray-500 dark:text-gray-400">
           {t('forum.attachments.hint', {
-            count: String(MAX_ATTACHMENTS),
-            size: formatBytes(MAX_ATTACHMENT_SIZE),
+            count: String(maxAttachments),
+            size: formatBytes(maxAttachmentSizeBytes),
           })}
         </p>
       </div>

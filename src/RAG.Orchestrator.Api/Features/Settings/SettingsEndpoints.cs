@@ -67,6 +67,52 @@ public static class SettingsEndpoints
         .WithSummary("Update LLM settings")
         .WithDescription("Updates the LLM service configuration settings.");
 
+        group.MapGet("/forum", async (ISettingsService service) =>
+        {
+            var settings = await service.GetForumSettingsAsync() ?? new ForumSettings();
+            var response = new ForumSettingsResponse(
+                settings.EnableAttachments,
+                settings.MaxAttachmentCount,
+                settings.MaxAttachmentSizeMb,
+                settings.EnableEmailNotifications,
+                settings.BadgeRefreshSeconds);
+
+            return Results.Ok(response);
+        })
+        .RequireAuthorization()
+        .WithName("GetForumSettings")
+        .WithSummary("Get Forum settings")
+        .WithDescription("Retrieves configuration for forum behaviour.");
+
+        group.MapPut("/forum", async (
+            ForumSettingsRequest request,
+            ISettingsService service,
+            IValidator<ForumSettingsRequest> validator) =>
+        {
+            var validationResult = await validator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return Results.ValidationProblem(validationResult.ToDictionary());
+            }
+
+            var settings = new ForumSettings
+            {
+                EnableAttachments = request.EnableAttachments,
+                MaxAttachmentCount = request.MaxAttachmentCount,
+                MaxAttachmentSizeMb = request.MaxAttachmentSizeMb,
+                EnableEmailNotifications = request.EnableEmailNotifications,
+                BadgeRefreshSeconds = request.BadgeRefreshSeconds
+            };
+
+            await service.SetForumSettingsAsync(settings);
+
+            return Results.Ok(new { Message = "Forum settings updated successfully" });
+        })
+        .RequireAuthorization(policy => policy.RequireRole("Admin"))
+        .WithName("UpdateForumSettings")
+        .WithSummary("Update Forum settings")
+        .WithDescription("Updates forum configuration values.");
+
         group.MapGet("/llm/models", async (string url, bool isOllama, ILlmService llmService) =>
         {
             try

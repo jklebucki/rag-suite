@@ -5,14 +5,13 @@ namespace RAG.Forum.Features.Shared;
 
 public static class AttachmentMapper
 {
-    public const int MaxAttachments = 5;
-    public const int MaxAttachmentSizeBytes = 5 * 1024 * 1024; // 5 MB
-
     public static bool TryCreateAttachments(
         IEnumerable<ForumAttachmentUpload>? uploads,
         Guid threadId,
         Guid? postId,
         DateTime createdAt,
+        int maxAttachmentCount,
+        int maxAttachmentSizeBytes,
         out List<ForumAttachment> attachments,
         out Dictionary<string, string[]> errors)
     {
@@ -25,11 +24,11 @@ public static class AttachmentMapper
         }
 
         var uploadList = uploads.ToList();
-        if (uploadList.Count > MaxAttachments)
+        if (uploadList.Count > maxAttachmentCount)
         {
             errors["attachments"] = new[]
             {
-                $"You can upload up to {MaxAttachments} attachments per message."
+                $"You can upload up to {maxAttachmentCount} attachments per message."
             };
             return false;
         }
@@ -73,9 +72,9 @@ public static class AttachmentMapper
                 continue;
             }
 
-            if (data.Length > MaxAttachmentSizeBytes)
+            if (data.Length > maxAttachmentSizeBytes)
             {
-                errorMessages.Add($"Attachment '{upload.FileName}' exceeds the maximum size of {FormatBytes(MaxAttachmentSizeBytes)}.");
+                errorMessages.Add($"Attachment '{upload.FileName}' exceeds the maximum size of {FormatBytes(maxAttachmentSizeBytes)}.");
                 continue;
             }
 

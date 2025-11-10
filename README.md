@@ -49,6 +49,7 @@ Modern React TypeScript frontend providing:
 * **📊 Dashboard**: System metrics, analytics, and usage monitoring
 * **🔌 Plugin Management**: Monitor and manage RAG plugins
 * **🧠 Knowledge Exchange Forum**: Authenticated discussions with attachments, unread badges, and email notifications
+* **⚙️ Forum Administration**: Configure categories, attachment limits, and reply notifications from the Settings panel
 * **👤 User Authentication**: JWT-based login with role-based access
 * **📱 Responsive Design**: Works seamlessly on desktop and mobile
 

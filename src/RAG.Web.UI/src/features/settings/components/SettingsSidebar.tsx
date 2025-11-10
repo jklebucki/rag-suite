@@ -1,7 +1,7 @@
 // All code comments must be written in English, regardless of the conversation language.
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Settings as SettingsIcon, User, Menu, MessageSquare } from 'lucide-react'
+import { Settings as SettingsIcon, User, Menu, MessageSquare, UsersRound } from 'lucide-react'
 import type { SettingsTab } from '@/features/settings/types/settings'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
@@ -9,12 +9,14 @@ export function SettingsSidebar({
   activeTab,
   setActiveTab,
   canManageUsers,
-  canManageFeedback
+  canManageFeedback,
+  canManageForum
 }: {
   activeTab: SettingsTab
   setActiveTab: (tab: SettingsTab) => void
   canManageUsers: boolean
   canManageFeedback: boolean
+  canManageForum: boolean
 }) {
   const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -85,8 +87,16 @@ export function SettingsSidebar({
       })
     }
 
+    if (canManageForum) {
+      items.push({
+        tab: 'forum',
+        label: t('settings.sidebar.tabs.forum'),
+        icon: <UsersRound className="h-5 w-5" />
+      })
+    }
+
     return items
-  }, [canManageFeedback, canManageUsers, t])
+  }, [canManageFeedback, canManageForum, canManageUsers, t])
 
   return (
     <>

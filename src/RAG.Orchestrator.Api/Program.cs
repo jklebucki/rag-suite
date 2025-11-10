@@ -81,6 +81,7 @@ try
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var chatDbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
     await globalSettingsService.InitializeLlmSettingsAsync(configuration, chatDbContext);
+    await globalSettingsService.InitializeForumSettingsAsync(configuration, chatDbContext);
 
     // Initialize global settings cache
     var globalSettingsCache = scope.ServiceProvider.GetRequiredService<IGlobalSettingsCache>();

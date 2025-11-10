@@ -36,23 +36,16 @@ public static class ThreadBadgesEndpoint
         var badges = await dbContext.Badges
             .AsNoTracking()
             .Where(b => b.UserId == userId)
-            .Join(
-                dbContext.Threads.AsNoTracking(),
-                badge => badge.ThreadId,
-                thread => thread.Id,
-                (badge, thread) => new { badge, thread })
-            .Join(
-                dbContext.Categories.AsNoTracking(),
-                combined => combined.thread.CategoryId,
-                category => category.Id,
-                (combined, category) => new ThreadBadgeDto(
-                    combined.badge.ThreadId,
-                    combined.thread.Title,
-                    category.Name,
-                    combined.badge.HasUnreadReplies,
-                    combined.badge.UpdatedAt,
-                    combined.badge.LastSeenPostId))
+            .Include(b => b.Thread)
+                .ThenInclude(t => t.Category)
             .OrderByDescending(b => b.UpdatedAt)
+            .Select(b => new ThreadBadgeDto(
+                b.ThreadId,
+                b.Thread.Title,
+                b.Thread.Category.Name,
+                b.HasUnreadReplies,
+                b.UpdatedAt,
+                b.LastSeenPostId))
             .ToListAsync(cancellationToken);
 
         return Results.Ok(new ThreadBadgesResponse(badges));

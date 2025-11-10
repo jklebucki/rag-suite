@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using RAG.Forum.Data;
 using RAG.Forum.Domain;
 using RAG.Forum.Features.Shared;
+using RAG.Forum.Services;
 using RAG.Security.Services;
 
 namespace RAG.Forum.Features.Threads;
@@ -33,6 +34,7 @@ public static class CreatePostEndpoint
         IEmailService emailService,
         IConfiguration configuration,
         ILoggerFactory loggerFactory,
+        IForumSettingsProvider settingsProvider,
         CancellationToken cancellationToken)
     {
         var userId = userContext.GetCurrentUserId();
@@ -64,15 +66,27 @@ public static class CreatePostEndpoint
         var utcNow = DateTime.UtcNow;
         var postId = Guid.NewGuid();
 
-        if (!AttachmentMapper.TryCreateAttachments(
-                request.Attachments,
-                thread.Id,
-                postId: postId,
-                createdAt: utcNow,
-                out var attachments,
-                out var attachmentErrors))
+        var forumSettings = await settingsProvider.GetSettingsAsync(cancellationToken);
+        List<ForumAttachment> attachments = new();
+
+        if (forumSettings.EnableAttachments)
         {
-            MergeErrors(validationErrors, attachmentErrors);
+            if (!AttachmentMapper.TryCreateAttachments(
+                    request.Attachments,
+                    thread.Id,
+                    postId: postId,
+                    createdAt: utcNow,
+                    maxAttachmentCount: forumSettings.MaxAttachmentCount,
+                    maxAttachmentSizeBytes: forumSettings.MaxAttachmentSizeMb * 1024 * 1024,
+                    out attachments,
+                    out var attachmentErrors))
+            {
+                MergeErrors(validationErrors, attachmentErrors);
+            }
+        }
+        else if (request.Attachments is { })
+        {
+            validationErrors["attachments"] = new[] { "Attachments are currently disabled." };
         }
 
         if (validationErrors.Count > 0)
@@ -94,9 +108,12 @@ public static class CreatePostEndpoint
             UpdatedAt = utcNow
         };
 
-        foreach (var attachment in attachments)
+        if (forumSettings.EnableAttachments)
         {
-            post.Attachments.Add(attachment);
+            foreach (var attachment in attachments)
+            {
+                post.Attachments.Add(attachment);
+            }
         }
 
         dbContext.Posts.Add(post);
@@ -115,7 +132,7 @@ public static class CreatePostEndpoint
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        if (subscriberEmails.Count > 0)
+        if (forumSettings.EnableEmailNotifications && subscriberEmails.Count > 0)
         {
             var threadLink = BuildThreadLink(configuration, thread.Id);
             var preview = BuildPreview(trimmedContent);

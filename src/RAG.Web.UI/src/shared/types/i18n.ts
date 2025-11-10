@@ -282,6 +282,7 @@ export interface TranslationKeys {
   'settings.sidebar.tabs.llm': string;
   'settings.sidebar.tabs.user': string;
   'settings.sidebar.tabs.feedback': string;
+  'settings.sidebar.tabs.forum': string;
 
   'settings.llm.loading': string;
   'settings.llm.title': string;
@@ -382,6 +383,50 @@ export interface TranslationKeys {
   'settings.feedback.title': string;
   'settings.feedback.subtitle': string;
 
+  'settings.forum.section.general': string;
+  'settings.forum.section.general_hint': string;
+  'settings.forum.fields.enableAttachments': string;
+  'settings.forum.fields.enableEmailNotifications': string;
+  'settings.forum.fields.maxAttachmentCount': string;
+  'settings.forum.fields.maxAttachmentSizeMb': string;
+  'settings.forum.fields.badgeRefreshSeconds': string;
+  'settings.forum.hints.maxAttachmentCount': string;
+  'settings.forum.hints.maxAttachmentSizeMb': string;
+  'settings.forum.hints.badgeRefreshSeconds': string;
+  'settings.forum.hints.slug': string;
+  'settings.forum.actions.save': string;
+  'settings.forum.actions.addCategory': string;
+  'settings.forum.actions.create': string;
+
+  'settings.forum.section.categories': string;
+  'settings.forum.section.categories_hint': string;
+  'settings.forum.table.name': string;
+  'settings.forum.table.slug': string;
+  'settings.forum.table.order': string;
+  'settings.forum.table.status': string;
+  'settings.forum.table.actions': string;
+  'settings.forum.status.active': string;
+  'settings.forum.status.archived': string;
+  'settings.forum.empty.categories': string;
+
+  'settings.forum.modal.createCategoryTitle': string;
+  'settings.forum.modal.editCategoryTitle': string;
+  'settings.forum.fields.name': string;
+  'settings.forum.fields.slug': string;
+  'settings.forum.fields.description': string;
+  'settings.forum.fields.order': string;
+  'settings.forum.fields.isArchived': string;
+
+  'settings.forum.toast.update_success': string;
+  'settings.forum.toast.update_error': string;
+  'settings.forum.toast.category_created': string;
+  'settings.forum.toast.category_updated': string;
+  'settings.forum.toast.category_error': string;
+  'settings.forum.toast.category_deleted': string;
+  'settings.forum.toast.category_delete_error': string;
+
+  'settings.forum.confirm.delete_category': string;
+
   'feedback.menu.submit': string;
   'feedback.menu.my_feedback': string;
   'feedback.modal.title': string;
@@ -455,6 +500,7 @@ export interface TranslationKeys {
   'forum.attachments.threadTitle': string;
   'forum.attachments.replyTitle': string;
   'forum.attachments.downloadError': string;
+  'forum.attachments.disabled': string;
   'forum.detail.error': string;
   'forum.detail.author': string;
   'forum.detail.created': string;

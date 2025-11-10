@@ -38,7 +38,7 @@ public class GlobalSettingsCache : IGlobalSettingsCache
     /// </summary>
     public Task<LlmSettings?> GetLlmSettingsAsync()
     {
-        if (_settings.TryGetValue("LlmService", out var setting) && !string.IsNullOrEmpty(setting.Value))
+        if (_settings.TryGetValue(GlobalSettingKeys.LlmService, out var setting) && !string.IsNullOrEmpty(setting.Value))
         {
             try
             {
@@ -59,7 +59,7 @@ public class GlobalSettingsCache : IGlobalSettingsCache
     public async Task SetLlmSettingsAsync(LlmSettings settings, ChatDbContext context, CancellationToken cancellationToken = default)
     {
         var jsonValue = JsonSerializer.Serialize(settings);
-        var key = "LlmService";
+        var key = GlobalSettingKeys.LlmService;
 
         // Phase 1: Update in memory (with memory of previous value for rollback)
         GlobalSetting? previousSetting = null;
@@ -116,5 +116,88 @@ public class GlobalSettingsCache : IGlobalSettingsCache
             }
             throw; // Rethrow the exception
         }
+    }
+
+    public Task<ForumSettings?> GetForumSettingsAsync()
+    {
+        if (_settings.TryGetValue(GlobalSettingKeys.ForumSettings, out var setting) && !string.IsNullOrEmpty(setting.Value))
+        {
+            try
+            {
+                return Task.FromResult(JsonSerializer.Deserialize<ForumSettings>(setting.Value));
+            }
+            catch
+            {
+                return Task.FromResult<ForumSettings?>(null);
+            }
+        }
+
+        return Task.FromResult<ForumSettings?>(null);
+    }
+
+    public async Task SetForumSettingsAsync(ForumSettings settings, ChatDbContext context, CancellationToken cancellationToken = default)
+    {
+        var jsonValue = JsonSerializer.Serialize(settings);
+        var key = GlobalSettingKeys.ForumSettings;
+
+        GlobalSetting? previousSetting = null;
+        lock (_lock)
+        {
+            if (_settings.TryGetValue(key, out var existing))
+            {
+                previousSetting = new GlobalSetting
+                {
+                    Id = existing.Id,
+                    Key = existing.Key,
+                    Value = existing.Value
+                };
+            }
+
+            var newSetting = new GlobalSetting
+            {
+                Id = previousSetting?.Id ?? 0,
+                Key = key,
+                Value = jsonValue
+            };
+
+            _settings[key] = newSetting;
+        }
+
+        try
+        {
+            var dbSetting = await context.GlobalSettings.FirstOrDefaultAsync(s => s.Key == key, cancellationToken);
+            if (dbSetting == null)
+            {
+                dbSetting = new GlobalSetting { Key = key, Value = jsonValue };
+                context.GlobalSettings.Add(dbSetting);
+            }
+            else
+            {
+                dbSetting.Value = jsonValue;
+            }
+
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            lock (_lock)
+            {
+                if (previousSetting != null)
+                {
+                    _settings[key] = previousSetting;
+                }
+                else
+                {
+                    _settings.TryRemove(key, out _);
+                }
+            }
+            throw;
+        }
+    }
+
+    private static class GlobalSettingKeys
+    {
+        public const string LlmService = "LlmService";
+        public const string ForumSettings = "ForumSettings";
     }
 }
