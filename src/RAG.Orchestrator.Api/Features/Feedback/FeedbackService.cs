@@ -134,5 +134,22 @@ public class FeedbackService : IFeedbackService
 
         return feedback;
     }
+
+    public async Task<bool> DeleteFeedbackAsync(Guid feedbackId, CancellationToken cancellationToken = default)
+    {
+        var feedback = await _dbContext.FeedbackEntries
+            .Include(f => f.Attachments)
+            .FirstOrDefaultAsync(f => f.Id == feedbackId, cancellationToken);
+
+        if (feedback == null)
+        {
+            return false;
+        }
+
+        _dbContext.FeedbackEntries.Remove(feedback);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
 }
 

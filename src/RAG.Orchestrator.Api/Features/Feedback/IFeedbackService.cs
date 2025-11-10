@@ -9,5 +9,6 @@ public interface IFeedbackService
     Task<FeedbackModel?> RespondToFeedbackAsync(Guid feedbackId, string responderId, string? responderEmail, string response, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<FeedbackModel>> GetUserFeedbackAsync(string userId, CancellationToken cancellationToken = default);
     Task<FeedbackModel?> MarkFeedbackResponseAsViewedAsync(Guid feedbackId, string userId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteFeedbackAsync(Guid feedbackId, CancellationToken cancellationToken = default);
 }
 

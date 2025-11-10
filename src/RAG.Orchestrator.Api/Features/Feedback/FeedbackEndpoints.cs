@@ -129,6 +129,29 @@ public static class FeedbackEndpoints
         .WithSummary("Mark feedback response as viewed")
         .WithDescription("Marks a feedback response as viewed by its author.");
 
+        group.MapDelete("/{feedbackId:guid}", async (
+            Guid feedbackId,
+            ClaimsPrincipal user,
+            IFeedbackService service) =>
+        {
+            if (!user.IsInRole(UserRoles.Admin) && !user.IsInRole(UserRoles.PowerUser))
+            {
+                return Results.Forbid();
+            }
+
+            var deleted = await service.DeleteFeedbackAsync(feedbackId);
+            if (!deleted)
+            {
+                return Results.NotFound(new { Message = "Feedback entry not found." });
+            }
+
+            return Results.NoContent();
+        })
+        .RequireAuthorization(policy => policy.RequireRole(UserRoles.Admin, UserRoles.PowerUser))
+        .WithName("DeleteFeedback")
+        .WithSummary("Delete feedback")
+        .WithDescription("Allows administrators and power users to delete a feedback entry along with its attachments.");
+
         return app;
     }
 

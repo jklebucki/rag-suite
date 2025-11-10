@@ -28,6 +28,7 @@ export interface FeedbackFilters {
   to?: string
   subject?: string
   userId?: string
+  userEmail?: string
 }
 
 export interface FeedbackAttachment {

@@ -431,6 +431,13 @@ export const pl: TranslationKeys = {
   'feedback.admin.details.save': 'Zapisz odpowiedź',
   'feedback.admin.details.success': 'Odpowiedź została zapisana.',
   'feedback.admin.details.error': 'Nie udało się zapisać odpowiedzi.',
+  'feedback.admin.delete.title': 'Usuń opinię',
+  'feedback.admin.delete.description': 'Czy na pewno chcesz usunąć „{subject}”?',
+  'feedback.admin.delete.confirm': 'Usunięcie opinii spowoduje także usunięcie wiadomości, odpowiedzi i załączników. Tej operacji nie można cofnąć.',
+  'feedback.admin.delete.confirm_button': 'Usuń opinię',
+  'feedback.admin.delete.success': 'Opinia została usunięta.',
+  'feedback.admin.delete.error': 'Nie udało się usunąć opinii.',
+  'feedback.admin.table.delete': 'Usuń opinię',
   'feedback.admin.details.attachments': 'Załączniki',
   'feedback.admin.details.download_attachment': 'Pobierz',
   // Cyber Panel

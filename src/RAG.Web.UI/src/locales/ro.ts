@@ -536,6 +536,13 @@ export const ro: TranslationKeys = {
   'feedback.admin.details.save': 'Salvează răspunsul',
   'feedback.admin.details.success': 'Răspunsul a fost salvat.',
   'feedback.admin.details.error': 'Nu s-a putut salva răspunsul.',
+  'feedback.admin.delete.title': 'Șterge feedback-ul',
+  'feedback.admin.delete.description': 'Sigur dorești să ștergi „{subject}”?',
+  'feedback.admin.delete.confirm': 'Ștergerea va elimina mesajul, orice răspuns și toate atașamentele. Această acțiune este ireversibilă.',
+  'feedback.admin.delete.confirm_button': 'Șterge feedback-ul',
+  'feedback.admin.delete.success': 'Feedback-ul a fost șters.',
+  'feedback.admin.delete.error': 'Nu s-a putut șterge feedback-ul.',
+  'feedback.admin.table.delete': 'Șterge feedback-ul',
   'feedback.admin.details.attachments': 'Atașamente',
   'feedback.admin.details.download_attachment': 'Descarcă',
 

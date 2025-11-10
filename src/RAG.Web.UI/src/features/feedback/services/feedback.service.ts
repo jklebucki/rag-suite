@@ -21,6 +21,7 @@ export async function getFeedbackList(filters: FeedbackFilters = {}): Promise<Fe
   if (filters.to) params.set('to', filters.to)
   if (filters.subject) params.set('subject', filters.subject)
   if (filters.userId) params.set('userId', filters.userId)
+  if ((filters as any).userEmail) params.set('userEmail', (filters as any).userEmail)
 
   const query = params.toString()
   const response = await apiHttpClient.get<FeedbackItem[]>(query ? `/feedback?${query}` : '/feedback')
@@ -30,6 +31,10 @@ export async function getFeedbackList(filters: FeedbackFilters = {}): Promise<Fe
 export async function respondToFeedback(id: string, payload: RespondFeedbackRequest): Promise<FeedbackItem> {
   const response = await apiHttpClient.post<FeedbackItem>(`/feedback/${id}/response`, payload)
   return response.data
+}
+
+export async function deleteFeedback(id: string): Promise<void> {
+  await apiHttpClient.delete(`/feedback/${id}`)
 }
 
 export async function getMyFeedback(): Promise<FeedbackItem[]> {
@@ -46,6 +51,7 @@ const feedbackService = {
   submitFeedback,
   getFeedbackList,
   respondToFeedback,
+  deleteFeedback,
   getMyFeedback,
   acknowledgeFeedbackResponse
 }

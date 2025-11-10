@@ -452,6 +452,13 @@ export interface TranslationKeys {
   'feedback.admin.details.error': string;
   'feedback.admin.details.attachments': string;
   'feedback.admin.details.download_attachment': string;
+  'feedback.admin.delete.title': string;
+  'feedback.admin.delete.description': string;
+  'feedback.admin.delete.confirm': string;
+  'feedback.admin.delete.confirm_button': string;
+  'feedback.admin.delete.success': string;
+  'feedback.admin.delete.error': string;
+  'feedback.admin.table.delete': string;
 
   // Cyber Panel
   'cyberpanel.quizzes': string;

@@ -535,6 +535,13 @@ export const hu: TranslationKeys = {
   'feedback.admin.details.save': 'Válasz mentése',
   'feedback.admin.details.success': 'A válasz sikeresen mentve.',
   'feedback.admin.details.error': 'A válasz mentése nem sikerült.',
+  'feedback.admin.delete.title': 'Visszajelzés törlése',
+  'feedback.admin.delete.description': 'Biztosan törli ezt: „{subject}”?',
+  'feedback.admin.delete.confirm': 'A törlés eltávolítja az üzenetet, a választ és az összes mellékletet is. A művelet nem vonható vissza.',
+  'feedback.admin.delete.confirm_button': 'Visszajelzés törlése',
+  'feedback.admin.delete.success': 'A visszajelzést töröltük.',
+  'feedback.admin.delete.error': 'A visszajelzés törlése nem sikerült.',
+  'feedback.admin.table.delete': 'Visszajelzés törlése',
   'feedback.admin.details.attachments': 'Mellékletek',
   'feedback.admin.details.download_attachment': 'Letöltés',
 

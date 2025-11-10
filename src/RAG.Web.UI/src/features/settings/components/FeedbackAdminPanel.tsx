@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Inbox, Eye } from 'lucide-react'
+import { Loader2, Inbox, Eye, Trash2 } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import feedbackService from '@/features/feedback/services/feedback.service'
 import type { FeedbackFilters, FeedbackItem } from '@/features/feedback/types/feedback'
 import { useToast } from '@/shared/hooks/useToast'
 import { FeedbackDetailsModal } from '@/features/feedback/components/FeedbackDetailsModal'
-
+import { Modal } from '@/shared/components/ui/Modal'
 interface FilterState {
   subject: string
   userId: string
@@ -29,11 +29,13 @@ export function FeedbackAdminPanel() {
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [feedbackToDelete, setFeedbackToDelete] = useState<FeedbackItem | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-  const queryFilters = useMemo<FeedbackFilters>(() => {
-    const result: FeedbackFilters = {}
+  const queryFilters = useMemo(() => {
+    const result: FeedbackFilters & { userEmail?: string } = {}
     if (filters.subject.trim()) result.subject = filters.subject.trim()
-    if (filters.userId.trim()) result.userId = filters.userId.trim()
+    if (filters.userId.trim()) result.userEmail = filters.userId.trim()
     if (filters.fromDate) result.from = new Date(`${filters.fromDate}T00:00:00Z`).toISOString()
     if (filters.toDate) result.to = new Date(`${filters.toDate}T23:59:59Z`).toISOString()
     return result
@@ -59,6 +61,19 @@ export function FeedbackAdminPanel() {
     }
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => feedbackService.deleteFeedback(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['feedback'] })
+      showSuccess(t('feedback.admin.delete.success'))
+      setIsDeleteModalOpen(false)
+      setFeedbackToDelete(null)
+    },
+    onError: () => {
+      showError(t('feedback.admin.delete.error'))
+    }
+  })
+
   const handleOpenDetails = (feedback: FeedbackItem) => {
     setSelectedFeedback(feedback)
     setIsDetailsOpen(true)
@@ -70,6 +85,22 @@ export function FeedbackAdminPanel() {
 
   const handleRespond = async (id: string, response: string) => {
     await respondMutation.mutateAsync({ id, response })
+  }
+
+  const handleDeleteClick = (feedback: FeedbackItem) => {
+    setFeedbackToDelete(feedback)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!feedbackToDelete || deleteMutation.isPending) return
+    deleteMutation.mutate(feedbackToDelete.id)
+  }
+
+  const handleCloseDeleteModal = () => {
+    if (deleteMutation.isPending) return
+    setIsDeleteModalOpen(false)
+    setFeedbackToDelete(null)
   }
 
   const handleFiltersReset = () => {
@@ -234,13 +265,25 @@ export function FeedbackAdminPanel() {
                           {renderStatus(feedback)}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <button
-                            onClick={() => handleOpenDetails(feedback)}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm"
-                          >
-                            <Eye className="h-4 w-4" />
-                            {t('feedback.admin.table.view')}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleOpenDetails(feedback)}
+                              className="inline-flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                              aria-label={t('feedback.admin.table.view')}
+                              title={t('feedback.admin.table.view')}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(feedback)}
+                              className="inline-flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                              aria-label={t('feedback.admin.table.delete')}
+                              title={t('feedback.admin.table.delete')}
+                              disabled={deleteMutation.isPending && feedbackToDelete?.id === feedback.id}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -259,6 +302,46 @@ export function FeedbackAdminPanel() {
         onRespond={handleRespond}
         isResponding={respondMutation.isPending}
       />
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        title={
+          <div className="flex flex-col gap-1">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
+              {t('feedback.admin.delete.title')}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {t('feedback.admin.delete.description', { subject: feedbackToDelete?.subject ?? '' })}
+            </p>
+          </div>
+        }
+        size="sm"
+      >
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-gray-700 dark:text-gray-200">
+            {t('feedback.admin.delete.confirm')}
+          </p>
+          <div className="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleCloseDeleteModal}
+              className="btn-secondary"
+              disabled={deleteMutation.isPending}
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="btn-primary bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? t('common.processing') : t('feedback.admin.delete.confirm_button')}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

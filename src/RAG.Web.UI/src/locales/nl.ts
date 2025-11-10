@@ -535,6 +535,13 @@ export const nl: TranslationKeys = {
   'feedback.admin.details.save': 'Antwoord opslaan',
   'feedback.admin.details.success': 'Antwoord succesvol opgeslagen.',
   'feedback.admin.details.error': 'Opslaan van het antwoord is mislukt.',
+  'feedback.admin.delete.title': 'Feedback verwijderen',
+  'feedback.admin.delete.description': 'Weet u zeker dat u “{subject}” wilt verwijderen?',
+  'feedback.admin.delete.confirm': 'Bij het verwijderen worden het bericht, eventuele antwoorden en alle bijlagen permanent verwijderd.',
+  'feedback.admin.delete.confirm_button': 'Feedback verwijderen',
+  'feedback.admin.delete.success': 'Feedback is verwijderd.',
+  'feedback.admin.delete.error': 'Feedback verwijderen is mislukt.',
+  'feedback.admin.table.delete': 'Feedback verwijderen',
   'feedback.admin.details.attachments': 'Bijlagen',
   'feedback.admin.details.download_attachment': 'Downloaden',
 

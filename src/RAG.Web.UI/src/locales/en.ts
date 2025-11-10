@@ -433,6 +433,13 @@ export const en: TranslationKeys = {
   'feedback.admin.details.error': 'Failed to save response.',
   'feedback.admin.details.attachments': 'Attachments',
   'feedback.admin.details.download_attachment': 'Download',
+  'feedback.admin.delete.title': 'Delete feedback',
+  'feedback.admin.delete.description': 'Are you sure you want to delete “{subject}”?',
+  'feedback.admin.delete.confirm': 'Deleting this feedback will remove the message, any responses, and all attachments. This action cannot be undone.',
+  'feedback.admin.delete.confirm_button': 'Delete feedback',
+  'feedback.admin.delete.success': 'Feedback deleted successfully.',
+  'feedback.admin.delete.error': 'Failed to delete feedback.',
+  'feedback.admin.table.delete': 'Delete feedback',
   // Cyber Panel
   'cyberpanel.quizzes': 'Quizzes',
   'cyberpanel.builder': 'Quiz Builder',
