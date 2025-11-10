@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Loader2, MessageSquare, AlertCircle, ChevronDown, Image as ImageIcon, FileText, X } from 'lucide-react'
+import { Loader2, MessageSquare, AlertCircle, ChevronDown, Image as ImageIcon, FileText } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useToast } from '@/shared/contexts/ToastContext'
 import feedbackService from '@/features/feedback/services/feedback.service'
 import type { FeedbackItem } from '@/features/feedback/types/feedback'
+import { Modal } from '@/shared/components/ui/Modal'
 
 interface MyFeedbackModalProps {
   isOpen: boolean
@@ -228,27 +229,25 @@ export function MyFeedbackModal({ isOpen, onClose }: MyFeedbackModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4">
-      <div className="surface w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl shadow-xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('feedback.my.title')}</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t('feedback.my.subtitle')}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-            aria-label={t('common.close')}
-          >
-            <X className="h-5 w-5" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div className="flex flex-col gap-1">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
+            {t('feedback.my.title')}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('feedback.my.subtitle')}
+          </p>
         </div>
-
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-          {content}
-        </div>
+      }
+      size="xl"
+    >
+      <div className="p-6">
+        {content}
       </div>
-    </div>
+    </Modal>
   )
 }
 
