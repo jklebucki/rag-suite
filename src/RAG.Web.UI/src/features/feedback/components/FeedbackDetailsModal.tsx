@@ -37,6 +37,8 @@ export function FeedbackDetailsModal({
     return new Date(feedback.respondedAt).toLocaleString()
   }, [feedback])
 
+  const attachments = feedback?.attachments ?? []
+
   if (!feedback) {
     return null
   }
@@ -105,6 +107,48 @@ export function FeedbackDetailsModal({
           <div className="p-4 bg-gray-50 dark:bg-gray-800/80 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
             {feedback.message}
           </div>
+
+          {attachments.length > 0 && (
+            <div className="mt-4 space-y-4">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {t('feedback.admin.details.attachments')}
+              </p>
+              <div className="flex flex-col gap-4">
+                {attachments.map((attachment) => {
+                  const isImage = attachment.contentType.startsWith('image/')
+                  const dataUrl = `data:${attachment.contentType};base64,${attachment.dataBase64}`
+
+                  return (
+                    <div
+                      key={attachment.id}
+                      className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-3 space-y-2"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 break-all">
+                          {attachment.fileName}
+                        </div>
+                        <a
+                          href={dataUrl}
+                          download={attachment.fileName}
+                          className="text-xs font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                        >
+                          {t('feedback.admin.details.download_attachment')}
+                        </a>
+                      </div>
+
+                      {isImage && (
+                        <img
+                          src={dataUrl}
+                          alt={attachment.fileName}
+                          className="max-h-96 w-full rounded-md border border-gray-200 object-contain dark:border-gray-700"
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

@@ -28,8 +28,12 @@ public class Feedback
     [MaxLength(320)]
     public string? ResponseAuthorEmail { get; set; }
 
+    public DateTime? ResponseViewedAt { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public DateTime? RespondedAt { get; set; }
+
+    public ICollection<FeedbackAttachment> Attachments { get; set; } = new List<FeedbackAttachment>();
 }
 

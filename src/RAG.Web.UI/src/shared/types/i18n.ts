@@ -380,6 +380,7 @@ export interface TranslationKeys {
   'settings.feedback.subtitle': string;
 
   'feedback.menu.submit': string;
+  'feedback.menu.my_feedback': string;
   'feedback.modal.title': string;
   'feedback.modal.subtitle': string;
   'feedback.modal.subject': string;
@@ -394,6 +395,29 @@ export interface TranslationKeys {
   'feedback.modal.error': string;
   'feedback.modal.validation_required': string;
   'feedback.modal.notice': string;
+  'feedback.modal.attachments': string;
+  'feedback.modal.attachments_hint': string;
+  'feedback.modal.attachments_remove': string;
+  'feedback.modal.attachments_limit': string;
+  'feedback.modal.attachments_too_large': string;
+  'feedback.modal.attachments_error': string;
+
+  'feedback.my.title': string;
+  'feedback.my.subtitle': string;
+  'feedback.my.empty.title': string;
+  'feedback.my.empty.description': string;
+  'feedback.my.status.pending': string;
+  'feedback.my.status.responded': string;
+  'feedback.my.status.unread_badge': string;
+  'feedback.my.submitted_at': string;
+  'feedback.my.responded_at': string;
+  'feedback.my.message_label': string;
+  'feedback.my.response_label': string;
+  'feedback.my.attachments': string;
+  'feedback.my.download': string;
+  'feedback.my.loading': string;
+  'feedback.my.error': string;
+  'feedback.my.error_acknowledge': string;
 
   'feedback.admin.title': string;
   'feedback.admin.subtitle': string;
@@ -426,6 +450,8 @@ export interface TranslationKeys {
   'feedback.admin.details.save': string;
   'feedback.admin.details.success': string;
   'feedback.admin.details.error': string;
+  'feedback.admin.details.attachments': string;
+  'feedback.admin.details.download_attachment': string;
 
   // Cyber Panel
   'cyberpanel.quizzes': string;

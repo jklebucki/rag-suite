@@ -1,8 +1,20 @@
 import React, { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Modal } from '@/shared/components/ui/Modal'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import feedbackService from '@/features/feedback/services/feedback.service'
 import { useToast } from '@/shared/contexts/ToastContext'
+
+type AttachmentDraft = {
+  id: string
+  fileName: string
+  contentType: string
+  dataUrl: string
+  dataBase64: string
+  size: number
+}
+
+const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024
 
 interface FeedbackModalProps {
   isOpen: boolean
@@ -12,14 +24,17 @@ interface FeedbackModalProps {
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { t } = useI18n()
   const { showSuccess, showError } = useToast()
+  const queryClient = useQueryClient()
 
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
+  const [attachments, setAttachments] = useState<AttachmentDraft[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const resetForm = () => {
     setSubject('')
     setMessage('')
+    setAttachments([])
   }
 
   const handleClose = () => {
@@ -42,9 +57,15 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       setIsSubmitting(true)
       await feedbackService.submitFeedback({
         subject: trimmedSubject,
-        message: trimmedMessage
+        message: trimmedMessage,
+        attachments: attachments.map((attachment) => ({
+          fileName: attachment.fileName,
+          contentType: attachment.contentType,
+          dataBase64: attachment.dataBase64
+        }))
       })
       showSuccess(t('feedback.modal.success'))
+      queryClient.invalidateQueries({ queryKey: ['my-feedback'] })
       resetForm()
       onClose()
     } catch (error) {
@@ -110,6 +131,12 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             </div>
           </div>
 
+          <AttachmentPicker
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+            isSubmitting={isSubmitting}
+          />
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {t('feedback.modal.notice')}
@@ -145,3 +172,136 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   )
 }
 
+interface AttachmentPickerProps {
+  attachments: AttachmentDraft[]
+  onAttachmentsChange: (attachments: AttachmentDraft[]) => void
+  isSubmitting: boolean
+}
+
+function AttachmentPicker({ attachments, onAttachmentsChange, isSubmitting }: AttachmentPickerProps) {
+  const { t } = useI18n()
+  const { showError } = useToast()
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
+    event.target.value = ''
+
+    if (files.length === 0) {
+      return
+    }
+
+    if (attachments.length + files.length > 5) {
+      showError(t('feedback.modal.attachments_limit'))
+      return
+    }
+
+    const processed: AttachmentDraft[] = []
+    const maxSizeLabel = formatBytes(MAX_ATTACHMENT_SIZE)
+
+    for (const file of files) {
+      if (file.size > MAX_ATTACHMENT_SIZE) {
+        showError(t('feedback.modal.attachments_too_large', { size: maxSizeLabel }))
+        continue
+      }
+
+      try {
+        const { dataUrl, base64 } = await readFileAsDataUrl(file)
+        processed.push({
+          id: generateId(),
+          fileName: file.name,
+          contentType: file.type || 'application/octet-stream',
+          dataUrl,
+          dataBase64: base64,
+          size: file.size
+        })
+      } catch {
+        showError(t('feedback.modal.attachments_error'))
+      }
+    }
+
+    if (processed.length > 0) {
+      onAttachmentsChange([...attachments, ...processed])
+    }
+  }
+
+  const handleRemove = (id: string) => {
+    onAttachmentsChange(attachments.filter((item) => item.id !== id))
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-2">
+        <label htmlFor="feedback-attachments" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          {t('feedback.modal.attachments')}
+        </label>
+        <input
+          id="feedback-attachments"
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          disabled={isSubmitting || attachments.length >= 5}
+          className="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-3 file:rounded-lg file:border-0 file:bg-primary-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white file:cursor-pointer hover:file:bg-primary-600 disabled:file:cursor-not-allowed"
+          accept="*/*"
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          {t('feedback.modal.attachments_hint', { count: '5', size: formatBytes(MAX_ATTACHMENT_SIZE) })}
+        </p>
+      </div>
+
+      {attachments.length > 0 && (
+        <ul className="space-y-2">
+          {attachments.map((attachment) => (
+            <li
+              key={attachment.id}
+              className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 px-3 py-2 text-sm text-gray-700 dark:text-gray-200"
+            >
+              <div className="flex flex-col">
+                <span className="font-medium break-all">{attachment.fileName}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatBytes(attachment.size)} • {attachment.contentType}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemove(attachment.id)}
+                className="text-xs font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
+              >
+                {t('feedback.modal.attachments_remove')}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function readFileAsDataUrl(file: File): Promise<{ dataUrl: string; base64: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      const base64Index = result.indexOf(',')
+      const base64 = base64Index >= 0 ? result.slice(base64Index + 1) : result
+      resolve({ dataUrl: result, base64 })
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const value = bytes / Math.pow(k, i)
+  return `${value.toFixed(value > 100 ? 0 : 1)} ${sizes[i]}`
+}
+
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+}

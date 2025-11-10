@@ -7,7 +7,10 @@ import type {
 } from '@/features/feedback/types/feedback'
 
 export async function submitFeedback(payload: SubmitFeedbackRequest): Promise<FeedbackItem> {
-  const response = await apiHttpClient.post<FeedbackItem>('/feedback', payload)
+  const response = await apiHttpClient.post<FeedbackItem>('/feedback', {
+    ...payload,
+    attachments: payload.attachments ?? []
+  })
   return response.data
 }
 
@@ -29,10 +32,22 @@ export async function respondToFeedback(id: string, payload: RespondFeedbackRequ
   return response.data
 }
 
+export async function getMyFeedback(): Promise<FeedbackItem[]> {
+  const response = await apiHttpClient.get<FeedbackItem[]>('/feedback/mine')
+  return response.data
+}
+
+export async function acknowledgeFeedbackResponse(id: string): Promise<FeedbackItem> {
+  const response = await apiHttpClient.post<FeedbackItem>(`/feedback/${id}/acknowledge`)
+  return response.data
+}
+
 const feedbackService = {
   submitFeedback,
   getFeedbackList,
-  respondToFeedback
+  respondToFeedback,
+  getMyFeedback,
+  acknowledgeFeedbackResponse
 }
 
 export default feedbackService

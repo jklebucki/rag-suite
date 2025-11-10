@@ -28,6 +28,23 @@ public class FeedbackService : IFeedbackService
             UpdatedAt = utcNow
         };
 
+        var attachments = request.Attachments ?? Array.Empty<FeedbackAttachmentUpload>();
+
+        foreach (var attachment in attachments)
+        {
+            var data = Convert.FromBase64String(attachment.DataBase64.Trim());
+
+            feedback.Attachments.Add(new Models.FeedbackAttachment
+            {
+                Id = Guid.NewGuid(),
+                FeedbackId = feedback.Id,
+                FileName = attachment.FileName.Trim(),
+                ContentType = attachment.ContentType.Trim(),
+                Data = data,
+                CreatedAt = utcNow
+            });
+        }
+
         _dbContext.FeedbackEntries.Add(feedback);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -36,7 +53,9 @@ public class FeedbackService : IFeedbackService
 
     public async Task<IReadOnlyList<FeedbackModel>> GetFeedbackAsync(DateTime? from, DateTime? to, string? subject, string? userId, CancellationToken cancellationToken = default)
     {
-        var query = _dbContext.FeedbackEntries.AsQueryable();
+        var query = _dbContext.FeedbackEntries
+            .Include(f => f.Attachments)
+            .AsQueryable();
 
         if (from.HasValue)
         {
@@ -64,9 +83,20 @@ public class FeedbackService : IFeedbackService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<FeedbackModel>> GetUserFeedbackAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.FeedbackEntries
+            .Include(f => f.Attachments)
+            .Where(f => f.UserId == userId)
+            .OrderByDescending(f => f.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<FeedbackModel?> RespondToFeedbackAsync(Guid feedbackId, string responderId, string? responderEmail, string response, CancellationToken cancellationToken = default)
     {
-        var feedback = await _dbContext.FeedbackEntries.FirstOrDefaultAsync(f => f.Id == feedbackId, cancellationToken);
+        var feedback = await _dbContext.FeedbackEntries
+            .Include(f => f.Attachments)
+            .FirstOrDefaultAsync(f => f.Id == feedbackId, cancellationToken);
         if (feedback == null)
         {
             return null;
@@ -78,7 +108,27 @@ public class FeedbackService : IFeedbackService
             ? responderId
             : responderEmail.Trim();
         feedback.RespondedAt = utcNow;
+        feedback.ResponseViewedAt = null;
         feedback.UpdatedAt = utcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return feedback;
+    }
+
+    public async Task<FeedbackModel?> MarkFeedbackResponseAsViewedAsync(Guid feedbackId, string userId, CancellationToken cancellationToken = default)
+    {
+        var feedback = await _dbContext.FeedbackEntries
+            .Include(f => f.Attachments)
+            .FirstOrDefaultAsync(f => f.Id == feedbackId && f.UserId == userId, cancellationToken);
+
+        if (feedback == null || feedback.RespondedAt == null)
+        {
+            return null;
+        }
+
+        feedback.ResponseViewedAt = DateTime.UtcNow;
+        feedback.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

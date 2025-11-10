@@ -108,10 +108,11 @@ export function FeedbackAdminPanel() {
       <div className="surface p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="feedback-filter-subject" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               {t('feedback.admin.filters.subject')}
             </label>
             <input
+              id="feedback-filter-subject"
               type="text"
               value={filters.subject}
               onChange={(e) => setFilters(prev => ({ ...prev, subject: e.target.value }))}
@@ -120,10 +121,11 @@ export function FeedbackAdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="feedback-filter-user" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               {t('feedback.admin.filters.user')}
             </label>
             <input
+              id="feedback-filter-user"
               type="text"
               value={filters.userId}
               onChange={(e) => setFilters(prev => ({ ...prev, userId: e.target.value }))}
@@ -132,10 +134,11 @@ export function FeedbackAdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="feedback-filter-date-from" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               {t('feedback.admin.filters.date_from')}
             </label>
             <input
+              id="feedback-filter-date-from"
               type="date"
               value={filters.fromDate}
               onChange={(e) => setFilters(prev => ({ ...prev, fromDate: e.target.value }))}
@@ -143,10 +146,11 @@ export function FeedbackAdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="feedback-filter-date-to" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               {t('feedback.admin.filters.date_to')}
             </label>
             <input
+              id="feedback-filter-date-to"
               type="date"
               value={filters.toDate}
               onChange={(e) => setFilters(prev => ({ ...prev, toDate: e.target.value }))}

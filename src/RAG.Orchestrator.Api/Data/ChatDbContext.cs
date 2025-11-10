@@ -13,6 +13,7 @@ public class ChatDbContext : DbContext
     public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<GlobalSetting> GlobalSettings { get; set; }
     public DbSet<Feedback> FeedbackEntries { get; set; }
+    public DbSet<FeedbackAttachment> FeedbackAttachments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -196,6 +197,37 @@ public class ChatDbContext : DbContext
 
             entity.HasIndex(e => e.CreatedAt)
                 .HasDatabaseName("ix_feedback_created_at");
+
+            entity.HasMany(e => e.Attachments)
+                .WithOne(a => a.Feedback)
+                .HasForeignKey(a => a.FeedbackId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<FeedbackAttachment>(entity =>
+        {
+            entity.ToTable("feedback_attachments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.FileName)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.ContentType)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Data)
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.HasIndex(e => e.FeedbackId)
+                .HasDatabaseName("ix_feedback_attachments_feedback_id");
         });
     }
 }

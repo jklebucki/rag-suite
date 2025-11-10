@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RAG.Orchestrator.Api.Data;
@@ -11,9 +12,11 @@ using RAG.Orchestrator.Api.Data;
 namespace RAG.Orchestrator.Api.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110114436_AddFeedbackAttachments")]
+    partial class AddFeedbackAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,10 +149,6 @@ namespace RAG.Orchestrator.Api.Migrations
                         .HasMaxLength(320)
                         .HasColumnType("character varying(320)")
                         .HasColumnName("response_author_email");
-
-                    b.Property<DateTime?>("ResponseViewedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("response_viewed_at");
 
                     b.Property<string>("Subject")
                         .IsRequired()

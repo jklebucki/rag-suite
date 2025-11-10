@@ -1,6 +1,7 @@
 export interface SubmitFeedbackRequest {
   subject: string
   message: string
+  attachments: FeedbackAttachmentUpload[]
 }
 
 export interface RespondFeedbackRequest {
@@ -18,6 +19,8 @@ export interface FeedbackItem {
   createdAt: string
   updatedAt: string
   respondedAt?: string | null
+  responseViewedAt?: string | null
+  attachments: FeedbackAttachment[]
 }
 
 export interface FeedbackFilters {
@@ -25,5 +28,18 @@ export interface FeedbackFilters {
   to?: string
   subject?: string
   userId?: string
+}
+
+export interface FeedbackAttachment {
+  id: string
+  fileName: string
+  contentType: string
+  dataBase64: string
+}
+
+export interface FeedbackAttachmentUpload {
+  fileName: string
+  contentType: string
+  dataBase64: string
 }
 

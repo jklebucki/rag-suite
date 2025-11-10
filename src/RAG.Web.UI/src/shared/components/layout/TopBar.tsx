@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare, List } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/shared/components/ui/LanguageSelector'
 import { ThemeToggle } from '@/shared/components/ui/ThemeToggle'
 import { UserAccountModal } from '@/features/settings/components/UserAccountModal'
 import { SessionExpiredModal } from '@/shared/components/ui/SessionExpiredModal'
 import { FeedbackModal } from '@/features/feedback/components/FeedbackModal'
+import { MyFeedbackModal } from '@/features/feedback/components/MyFeedbackModal'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { logger } from '@/utils/logger'
+import feedbackService from '@/features/feedback/services/feedback.service'
 
 interface TopBarProps {
   onToggleSidebar: () => void
@@ -17,10 +20,25 @@ interface TopBarProps {
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { t, language } = useI18n()
   const { user, logout, refreshError, logoutAllDevices, clearRefreshError } = useAuth()
+  const queryClient = useQueryClient()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
+  const [isMyFeedbackModalOpen, setIsMyFeedbackModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const { data: myFeedback = [] } = useQuery({
+    queryKey: ['my-feedback'],
+    queryFn: feedbackService.getMyFeedback,
+    enabled: Boolean(user),
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: false
+  })
+
+  const hasUnreadFeedbackResponses = myFeedback.some(
+    (item) => item.respondedAt && !item.responseViewedAt
+  )
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -56,6 +74,18 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     setIsFeedbackModalOpen(true)
     setIsUserMenuOpen(false)
   }
+
+  const handleMyFeedbackClick = () => {
+    setIsMyFeedbackModalOpen(true)
+    setIsUserMenuOpen(false)
+    queryClient.invalidateQueries({ queryKey: ['my-feedback'] })
+  }
+
+  useEffect(() => {
+    if (!user) {
+      queryClient.removeQueries({ queryKey: ['my-feedback'] })
+    }
+  }, [user, queryClient])
 
   const handleTryAgain = () => {
     // Clear the refresh error and try to refresh auth
@@ -130,7 +160,12 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
               title={t('common.user_menu')}
               aria-label={t('common.user_menu')}
             >
-              <User className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <span className="relative">
+                <User className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                {hasUnreadFeedbackResponses && (
+                  <span className="absolute -top-1 -right-1 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
+                )}
+              </span>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
                 {user.fullName || user.email}
               </span>
@@ -165,6 +200,13 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                     {t('feedback.menu.submit')}
                   </button>
                   <button
+                    onClick={handleMyFeedbackClick}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <List className="h-4 w-4" />
+                    {t('feedback.menu.my_feedback')}
+                  </button>
+                  <button
                     onClick={handleAccountClick}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
@@ -195,6 +237,11 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       <FeedbackModal
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
+      />
+
+      <MyFeedbackModal
+        isOpen={isMyFeedbackModalOpen}
+        onClose={() => setIsMyFeedbackModalOpen(false)}
       />
 
       {/* Session Expired Modal */}

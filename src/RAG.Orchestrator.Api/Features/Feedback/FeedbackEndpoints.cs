@@ -1,3 +1,4 @@
+using System;
 using FluentValidation;
 using FeedbackModel = RAG.Orchestrator.Api.Models.Feedback;
 using RAG.Security.Models;
@@ -55,6 +56,23 @@ public static class FeedbackEndpoints
         .WithSummary("List feedback")
         .WithDescription("Returns feedback submitted by users, optionally filtered by subject, author, or date range.");
 
+        group.MapGet("/mine", async (
+            ClaimsPrincipal user,
+            IFeedbackService service) =>
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var feedback = await service.GetUserFeedbackAsync(userId);
+            return Results.Ok(feedback.Select(f => f.ToResponseItem()));
+        })
+        .WithName("GetCurrentUserFeedback")
+        .WithSummary("Get feedback submitted by the current user")
+        .WithDescription("Returns feedback entries submitted by the authenticated user including responses and attachments.");
+
         group.MapPost("/{feedbackId:guid}/response", async (
             Guid feedbackId,
             ClaimsPrincipal user,
@@ -88,6 +106,29 @@ public static class FeedbackEndpoints
         .WithSummary("Respond to feedback")
         .WithDescription("Allows administrators and power users to respond to a feedback entry.");
 
+        group.MapPost("/{feedbackId:guid}/acknowledge", async (
+            Guid feedbackId,
+            ClaimsPrincipal user,
+            IFeedbackService service) =>
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var updated = await service.MarkFeedbackResponseAsViewedAsync(feedbackId, userId);
+            if (updated == null)
+            {
+                return Results.NotFound(new { Message = "Feedback entry not found or has no response yet." });
+            }
+
+            return Results.Ok(updated.ToResponseItem());
+        })
+        .WithName("AcknowledgeFeedbackResponse")
+        .WithSummary("Mark feedback response as viewed")
+        .WithDescription("Marks a feedback response as viewed by its author.");
+
         return app;
     }
 
@@ -104,7 +145,18 @@ public static class FeedbackEndpoints
             ResponseAuthorEmail = feedback.ResponseAuthorEmail,
             CreatedAt = feedback.CreatedAt,
             UpdatedAt = feedback.UpdatedAt,
-            RespondedAt = feedback.RespondedAt
+            RespondedAt = feedback.RespondedAt,
+            ResponseViewedAt = feedback.ResponseViewedAt,
+            Attachments = feedback.Attachments?
+                .OrderBy(a => a.CreatedAt)
+                .Select(a => new FeedbackAttachmentResponseItem
+                {
+                    Id = a.Id,
+                    FileName = a.FileName,
+                    ContentType = a.ContentType,
+                    DataBase64 = Convert.ToBase64String(a.Data)
+                })
+                .ToList() ?? new List<FeedbackAttachmentResponseItem>()
         };
     }
 }
