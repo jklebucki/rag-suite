@@ -1,8 +1,8 @@
 # RAG Suite
 
  ![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)
- ![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
- ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+ ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
+ ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)
  ![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)
  ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-orange?style=for-the-badge&logo=elasticsearch)
  ![BGE-M3 Embeddings](https://img.shields.io/badge/BGE--M3-1024D-green?style=for-the-badge)
@@ -47,7 +47,7 @@
 
 Modern React TypeScript frontend providing:
 
-* **🚀 Modern Stack**: React 18 + TypeScript + Vite + Tailwind CSS
+* **🚀 Modern Stack**: React 19 + TypeScript 5.6 + Vite 7 + Tailwind CSS 3.4 (Node ≥ 20.10)
 * **💬 Interactive Chat**: RAG-powered chat interface with multilingual support
 * **🔍 Advanced Search**: Full-text and semantic search with filters
 * **📊 Dashboard**: System metrics, analytics, and usage monitoring
@@ -72,7 +72,7 @@ Complete security infrastructure with:
 
 Core API orchestrating the RAG system:
 
-* **🧠 Semantic Kernel Integration**: AI-powered response generation
+* **🧠 Semantic Kernel 1.24 Integration**: AI-powered response generation
 * **💬 Per-User Chat Sessions**: Isolated chat sessions for each user
 * **🌍 Multilingual Support**: Auto-detection and translation
 * **🔍 Vector Search**: BGE-M3 embeddings with Elasticsearch
@@ -124,6 +124,8 @@ Admin users can adjust these options from the Settings panel; values are persist
    ```
 
    > Ensure PostgreSQL is running and matches the `SecurityDatabase` connection string (default `Host=localhost:5432;Database=rag-suite;Username=pg-dev;Password=pg-dev`). Update `appsettings.Development.json` if your environment differs.
+   >
+   > The compose stack launches Elasticsearch 8.11.3, Kibana 8.11.3, Hugging Face Text Embeddings Inference 1.8 (MiniLM-L6-v2), Text Generation Inference 2.4.0 (GPT-2), and the latest Ollama image.
 2. **Run the API**:
 
    ```bash
@@ -134,6 +136,8 @@ Admin users can adjust these options from the Settings panel; values are persist
    ```bash
    cd src/RAG.Web.UI && npm install && npm run dev
    ```
+
+   > Requires Node.js ≥ 20.10 and npm ≥ 10 (enforced via `package.json` engines).
 4. **Access the application**:
    * Frontend: http://localhost:3000
    * API: http://localhost:7107

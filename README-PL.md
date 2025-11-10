@@ -1,8 +1,8 @@
 # RAG Suite
 
 ![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)
-![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)
 ![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-orange?style=for-the-badge&logo=elasticsearch)
 ![BGE-M3 Embeddings](https://img.shields.io/badge/BGE--M3-1024D-green?style=for-the-badge)
@@ -43,7 +43,7 @@ RAG Suite to monorepo .NET 8, którego celem jest implementacja systemu RAG (Ret
 
 Nowoczesny frontend React TypeScript oferujący:
 
-* **🚀 Nowoczesny stack**: React 18 + TypeScript + Vite + Tailwind CSS
+* **🚀 Nowoczesny stack**: React 19 + TypeScript 5.6 + Vite 7 + Tailwind CSS 3.4 (Node ≥ 20.10)
 * **💬 Interaktywny chat**: Interfejs chat z obsługą RAG i wielojęzyczności
 * **🔍 Zaawansowane wyszukiwanie**: Wyszukiwanie full-text i semantyczne z filtrami
 * **📊 Dashboard**: Metryki systemu, analityka i monitoring użycia
@@ -68,7 +68,7 @@ Kompletna infrastruktura bezpieczeństwa z:
 
 Główne API orkiestrujące system RAG:
 
-* **🧠 Integracja Semantic Kernel**: Generowanie odpowiedzi AI
+* **🧠 Integracja Semantic Kernel 1.24**: Generowanie odpowiedzi AI
 * **💬 Sesje chat per użytkownik**: Izolowane sesje chat dla każdego użytkownika
 * **🌍 Obsługa wielojęzyczności**: Auto-detekcja i tłumaczenie
 * **🔍 Wyszukiwanie wektorowe**: Embeddingi BGE-M3 z Elasticsearch
@@ -117,6 +117,8 @@ Ustawieniami zarządzają administratorzy w panelu Settings; wartości są zapis
    cd deploy && docker-compose up -d
    ```
    > Aplikacja wymaga PostgreSQL dostępnego pod `ConnectionStrings:SecurityDatabase` (domyślnie `Host=localhost:5432;Database=rag-suite;Username=pg-dev;Password=pg-dev`). Uruchom lokalny serwer lub zaktualizuj `appsettings.Development.json`.
+   >
+   > Stos docker-compose uruchamia Elasticsearch 8.11.3, Kibana 8.11.3, Hugging Face Text Embeddings Inference 1.8 (MiniLM-L6-v2), Text Generation Inference 2.4.0 (GPT-2) oraz najnowszy obraz Ollama.
 
 2. **Uruchom API**:
    ```bash
@@ -127,6 +129,7 @@ Ustawieniami zarządzają administratorzy w panelu Settings; wartości są zapis
    ```bash
    cd src/RAG.Web.UI && npm install && npm run dev
    ```
+   > Wymaga Node.js ≥ 20.10 oraz npm ≥ 10 (zgodnie z sekcją `engines` w `package.json`).
 
 4. **Dostęp do aplikacji**:
    - Frontend: http://localhost:3000
