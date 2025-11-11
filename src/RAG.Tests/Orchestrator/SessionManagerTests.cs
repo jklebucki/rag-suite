@@ -1,14 +1,12 @@
-using Xunit;
-using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
-using RAG.Orchestrator.Api.Data;
-using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Models;
-using RAG.Orchestrator.Api.Services;
-using RAG.Orchestrator.Api.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using FluentAssertions;
+using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
+using RAG.Orchestrator.Api.Localization;
+using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Tests.Orchestrator;
 

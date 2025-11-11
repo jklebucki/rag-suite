@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using RAG.Forum.Domain;
 
 namespace RAG.Forum.Data;

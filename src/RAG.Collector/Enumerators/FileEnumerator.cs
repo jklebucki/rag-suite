@@ -2,7 +2,6 @@ using RAG.Collector.Acl;
 using RAG.Collector.Config;
 using RAG.Collector.Models;
 using System.Runtime.CompilerServices;
-using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Enumerators;
 

@@ -1,13 +1,7 @@
-using Xunit;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ListContacts;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.AddressBook;
 
@@ -38,7 +32,7 @@ public class ListContactsServiceTests : IDisposable
         var active1 = new Contact { FirstName = "Active", LastName = "One", IsActive = true };
         var active2 = new Contact { FirstName = "Active", LastName = "Two", IsActive = true };
         var inactive = new Contact { FirstName = "Inactive", LastName = "Three", IsActive = false };
-        
+
         _context.Contacts.AddRange(active1, active2, inactive);
         await _context.SaveChangesAsync();
 
@@ -63,7 +57,7 @@ public class ListContactsServiceTests : IDisposable
         // Arrange
         var active = new Contact { FirstName = "Active", LastName = "One", IsActive = true };
         var inactive = new Contact { FirstName = "Inactive", LastName = "Two", IsActive = false };
-        
+
         _context.Contacts.AddRange(active, inactive);
         await _context.SaveChangesAsync();
 
@@ -88,7 +82,7 @@ public class ListContactsServiceTests : IDisposable
         var itContact = new Contact { FirstName = "IT", LastName = "User", Department = "IT", IsActive = true };
         var salesContact = new Contact { FirstName = "Sales", LastName = "User", Department = "Sales", IsActive = true };
         var anotherItContact = new Contact { FirstName = "Another", LastName = "IT", Department = "IT", IsActive = true };
-        
+
         _context.Contacts.AddRange(itContact, salesContact, anotherItContact);
         await _context.SaveChangesAsync();
 
@@ -113,7 +107,7 @@ public class ListContactsServiceTests : IDisposable
         var warsawContact = new Contact { FirstName = "Warsaw", LastName = "User", Location = "Warsaw", IsActive = true };
         var krakowContact = new Contact { FirstName = "Krakow", LastName = "User", Location = "Krakow", IsActive = true };
         var anotherWarsawContact = new Contact { FirstName = "Another", LastName = "Warsaw", Location = "Warsaw", IsActive = true };
-        
+
         _context.Contacts.AddRange(warsawContact, krakowContact, anotherWarsawContact);
         await _context.SaveChangesAsync();
 
@@ -138,7 +132,7 @@ public class ListContactsServiceTests : IDisposable
         var matching = new Contact { FirstName = "Match", LastName = "One", Department = "IT", Location = "Warsaw", IsActive = true };
         var wrongDept = new Contact { FirstName = "Wrong", LastName = "Dept", Department = "Sales", Location = "Warsaw", IsActive = true };
         var wrongLocation = new Contact { FirstName = "Wrong", LastName = "Loc", Department = "IT", Location = "Krakow", IsActive = true };
-        
+
         _context.Contacts.AddRange(matching, wrongDept, wrongLocation);
         await _context.SaveChangesAsync();
 
@@ -164,7 +158,7 @@ public class ListContactsServiceTests : IDisposable
         var contact1 = new Contact { FirstName = "Alice", LastName = "Zebra", IsActive = true };
         var contact2 = new Contact { FirstName = "Bob", LastName = "Apple", IsActive = true };
         var contact3 = new Contact { FirstName = "Charlie", LastName = "Apple", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2, contact3);
         await _context.SaveChangesAsync();
 

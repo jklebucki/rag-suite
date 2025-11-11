@@ -1,8 +1,8 @@
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.Security.Services;
+using System.Text;
 
 namespace RAG.AddressBook.Features.ImportContacts;
 
@@ -42,7 +42,7 @@ public class ImportContactsHandler
         }
 
         var lines = request.CsvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        
+
         if (lines.Length == 0)
         {
             errors.Add("CSV file is empty");
@@ -66,7 +66,7 @@ public class ImportContactsHandler
             try
             {
                 var contact = ParseCsvLine(line, userId);
-                
+
                 if (contact == null)
                 {
                     skippedCount++;
@@ -74,8 +74,8 @@ public class ImportContactsHandler
                 }
 
                 // Check for duplicates by email
-                if (request.SkipDuplicates && 
-                    !string.IsNullOrWhiteSpace(contact.Email) && 
+                if (request.SkipDuplicates &&
+                    !string.IsNullOrWhiteSpace(contact.Email) &&
                     existingEmails.Contains(contact.Email.ToLower()))
                 {
                     skippedCount++;
@@ -220,7 +220,7 @@ public class ImportContactsHandler
             return null;
 
         field = field.Trim();
-        
+
         // Remove surrounding quotes
         if (field.StartsWith("\"") && field.EndsWith("\""))
         {

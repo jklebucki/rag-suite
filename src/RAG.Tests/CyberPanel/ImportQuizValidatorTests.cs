@@ -1,4 +1,3 @@
-using Xunit;
 using RAG.CyberPanel.Features.ImportQuiz;
 
 namespace RAG.Tests.CyberPanel;

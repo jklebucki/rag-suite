@@ -1,5 +1,4 @@
 using RAG.Abstractions.Search;
-using RAG.Orchestrator.Api.Features.Search;
 using System.Text.Json;
 
 namespace RAG.Orchestrator.Api.Features.Search.ResultMapping;

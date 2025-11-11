@@ -1,11 +1,8 @@
-using Xunit;
-using RAG.Orchestrator.Api.Features.FileDownload;
-using RAG.Abstractions.Conversion;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
-using FluentAssertions;
-using System.IO;
+using RAG.Abstractions.Conversion;
+using RAG.Orchestrator.Api.Features.FileDownload;
 
 namespace RAG.Tests.Orchestrator;
 

@@ -1,10 +1,8 @@
-using Xunit;
-using RAG.Orchestrator.Api.Features.Chat;
-using RAG.Orchestrator.Api.Models;
-using System.Collections.Generic;
 using Moq;
-using RAG.Orchestrator.Api.Localization;
 using RAG.Abstractions.Search;
+using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Localization;
+using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Tests.Orchestrator;
 

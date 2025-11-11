@@ -1,13 +1,11 @@
-using Xunit;
-using RAG.Orchestrator.Api.Features.Embeddings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
+using RAG.Orchestrator.Api.Features.Embeddings;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using FluentAssertions;
 
 namespace RAG.Tests.Orchestrator;
 

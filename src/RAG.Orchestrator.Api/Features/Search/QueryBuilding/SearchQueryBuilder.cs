@@ -1,6 +1,3 @@
-using RAG.Abstractions.Search;
-using System.Text.Json;
-
 namespace RAG.Orchestrator.Api.Features.Search.QueryBuilding;
 
 /// <summary>

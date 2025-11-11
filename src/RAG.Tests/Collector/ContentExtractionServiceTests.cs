@@ -1,9 +1,6 @@
-using Xunit;
-using RAG.Collector.ContentExtractors;
 using Microsoft.Extensions.Logging;
 using Moq;
-using FluentAssertions;
-using System.IO;
+using RAG.Collector.ContentExtractors;
 
 namespace RAG.Tests.Collector;
 
@@ -175,7 +172,7 @@ public class ContentExtractionServiceTests : IDisposable
         var mockExtractor = new Mock<IContentExtractor>();
         mockExtractor.Setup(x => x.SupportedExtensions).Returns(new[] { ".txt" });
         mockExtractor.Setup(x => x.CanExtract(".txt")).Returns(true);
-        
+
         // Mock extractor that throws OperationCanceledException when cancellation is requested
         mockExtractor
             .Setup(x => x.ExtractAsync(
@@ -207,7 +204,7 @@ public class ContentExtractionServiceTests : IDisposable
         // Verify that ContentExtractionService properly propagates cancellation
         // by testing with an extractor that respects cancellation
         var result = await serviceWithMock.ExtractContentAsync(filePath, cts.Token);
-        
+
         // ContentExtractionService catches exceptions and returns failure, but we can verify
         // that cancellation token is passed through
         result.IsSuccess.Should().BeFalse();

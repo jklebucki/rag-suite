@@ -5,7 +5,6 @@ using RAG.Collector.ContentExtractors;
 using RAG.Collector.Enumerators;
 using RAG.Collector.Indexing;
 using RAG.Collector.Models;
-using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Workers;
 

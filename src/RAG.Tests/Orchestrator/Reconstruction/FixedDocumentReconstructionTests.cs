@@ -1,8 +1,7 @@
-using RAG.Orchestrator.Api.Features.Reconstruction;
-using RAG.Orchestrator.Api.Features.Search;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
+using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Features.Search;
 using Xunit.Abstractions;
 
 namespace RAG.Tests.Orchestrator.Reconstruction;
@@ -40,14 +39,14 @@ public class FixedDocumentReconstructionTests
 
         // Act
         var result = _service.ReconstructDocument(chunks);
-        
+
         _output.WriteLine($"Result: '{result}'");
 
         // Assert - sprawdzamy czy nie ma duplikacji, ale nie wymuszamy konkretnego formatu
         Assert.DoesNotContain("shared content at the end. shared content at the end.", result);
         Assert.Contains("This is the first chunk", result);
         Assert.Contains("This is the second chunk", result);
-        
+
         // Sprawdź czy długość jest rozsądna (mniejsza niż suma, ale większa niż tylko jeden chunk)
         var totalLength = chunks.Sum(c => c.Content?.Length ?? 0);
         Assert.True(result.Length < totalLength, "Result should be shorter than sum of all chunks");
@@ -74,7 +73,7 @@ public class FixedDocumentReconstructionTests
 
         // Act
         var result = _service.ReconstructDocument(chunks);
-        
+
         _output.WriteLine($"Result: '{result}'");
 
         // Assert - główne sprawdzenie to brak duplikacji
@@ -103,7 +102,7 @@ public class FixedDocumentReconstructionTests
 
         // Act
         var result = _service.ReconstructDocument(chunks);
-        
+
         _output.WriteLine($"Result: '{result}'");
 
         // Assert

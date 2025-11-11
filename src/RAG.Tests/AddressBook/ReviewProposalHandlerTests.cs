@@ -1,17 +1,11 @@
-using Xunit;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ProposeChange;
 using RAG.AddressBook.Features.ReviewProposal;
 using RAG.AddressBook.Services;
-using Moq;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Text.Json;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.AddressBook;
 

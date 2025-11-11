@@ -1,5 +1,4 @@
 using RAG.Orchestrator.Api.Models;
-using RAG.Orchestrator.Api.Services;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
@@ -225,7 +224,7 @@ public class LlmService : ILlmService
     public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
     {
         var settings = await GetSettingsAsync();
-        
+
         if (!settings.IsOllama)
         {
             return new[] { settings.Model };
@@ -451,10 +450,10 @@ public class LlmService : ILlmService
             }
 
             var message = await LoadSystemMessageAsync(targetLanguage, firstName, lastName, email, role, cancellationToken);
-            
+
             // Cache the loaded message
             _systemMessageCache.TryAdd(cacheKey, message);
-            
+
             return message;
         }
         catch (Exception ex)
@@ -490,7 +489,7 @@ public class LlmService : ILlmService
         }
 
         // Replace user information placeholders if any are provided
-        if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName) || 
+        if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName) ||
             !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(role))
         {
             systemMessage = systemMessage

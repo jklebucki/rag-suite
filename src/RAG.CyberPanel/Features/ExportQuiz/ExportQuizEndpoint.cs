@@ -32,7 +32,7 @@ public static class ExportQuizEndpoint
         try
         {
             var exportedQuiz = await exportService.ExportQuizAsync(quizId, cancellationToken);
-            
+
             // Return JSON with proper content disposition for download
             return Results.Ok(exportedQuiz);
         }

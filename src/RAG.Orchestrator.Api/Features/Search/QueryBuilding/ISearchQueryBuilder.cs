@@ -1,5 +1,3 @@
-using RAG.Abstractions.Search;
-
 namespace RAG.Orchestrator.Api.Features.Search.QueryBuilding;
 
 /// <summary>

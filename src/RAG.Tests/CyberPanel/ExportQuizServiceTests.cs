@@ -1,12 +1,7 @@
-using Xunit;
-using RAG.CyberPanel.Features.ExportQuiz;
+using Microsoft.EntityFrameworkCore;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Domain;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using RAG.CyberPanel.Features.ExportQuiz;
 
 namespace RAG.Tests.CyberPanel;
 
@@ -99,7 +94,7 @@ public class ExportQuizServiceTests : IDisposable
         // Assert
         Assert.Equal(2, result.Questions[0].Options.Length);
         Assert.Equal(3, result.Questions[1].Options.Length);
-        
+
         Assert.True(result.Questions[0].Options[0].IsCorrect);
         Assert.False(result.Questions[0].Options[1].IsCorrect);
     }
@@ -111,7 +106,7 @@ public class ExportQuizServiceTests : IDisposable
         var quiz = CreateSampleQuiz();
         quiz.Questions.First().ImageUrl = "data:image/png;base64,ABC123";
         quiz.Questions.First().Options.First().ImageUrl = "data:image/png;base64,XYZ789";
-        
+
         await _context.Quizzes.AddAsync(quiz);
         await _context.SaveChangesAsync();
 

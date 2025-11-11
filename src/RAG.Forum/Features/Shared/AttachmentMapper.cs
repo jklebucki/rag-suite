@@ -1,4 +1,3 @@
-using System.Text;
 using RAG.Forum.Domain;
 
 namespace RAG.Forum.Features.Shared;

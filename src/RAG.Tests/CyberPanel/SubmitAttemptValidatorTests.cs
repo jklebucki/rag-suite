@@ -1,4 +1,3 @@
-using Xunit;
 using RAG.CyberPanel.Features.SubmitAttempt;
 
 namespace RAG.Tests.CyberPanel;

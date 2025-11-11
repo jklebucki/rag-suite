@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RAG.Security.DTOs;
+using RAG.Security.Models;
 using RAG.Security.Requests;
 using RAG.Security.Services;
 using System.Security.Claims;
-using RAG.Security.Models;
-using System;
 
 namespace RAG.Security.Controllers;
 

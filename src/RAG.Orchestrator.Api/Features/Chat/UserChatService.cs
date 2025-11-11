@@ -303,7 +303,7 @@ public class UserChatService : IUserChatService
 
             // Extract summary from the LLM response and update session title if present
             var (cleanedResponse, extractedSummary) = ExtractSummaryFromResponse(aiResponseContent);
-            
+
             // Use cleaned response (without summary line) for saving
             aiResponseContent = cleanedResponse;
 
@@ -581,13 +581,13 @@ public class UserChatService : IUserChatService
         if (match.Success)
         {
             var summary = match.Groups[1].Value.Trim();
-            
+
             // Remove the last line from the response
             var cleanedLines = lines.Take(lines.Length - 1).ToArray();
             var cleanedResponse = string.Join(Environment.NewLine, cleanedLines).TrimEnd();
 
             _logger.LogInformation("Extracted summary from LLM response: {Summary}", summary);
-            
+
             return (cleanedResponse, summary);
         }
 

@@ -12,7 +12,7 @@ public class ListAttemptsHandler
     private readonly IUserContextService _userContext;
 
     public ListAttemptsHandler(
-        CyberPanelDbContext db, 
+        CyberPanelDbContext db,
         SecurityDbContext securityDb,
         IUserContextService userContext)
     {

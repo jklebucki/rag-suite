@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-
 namespace RAG.Forum.Data;
 
 public class ForumDbContextFactory : IDesignTimeDbContextFactory<ForumDbContext>

@@ -1,12 +1,7 @@
-using Xunit;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.DeleteContact;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.AddressBook;
 

@@ -60,7 +60,7 @@ public record RefreshTokenRequest
 {
     [Required]
     public string RefreshToken { get; init; } = string.Empty;
-    
+
     public string? AccessToken { get; init; }
 }
 

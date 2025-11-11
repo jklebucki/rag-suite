@@ -1,8 +1,8 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Services;
+using System.Text.Json;
 
 namespace RAG.AddressBook.Features.ProposeChange;
 
@@ -38,7 +38,7 @@ public class ProposeChangeHandler
         {
             var contactExists = await _context.Contacts
                 .AnyAsync(c => c.Id == request.ContactId.Value, cancellationToken);
-            
+
             if (!contactExists)
             {
                 throw new InvalidOperationException($"Contact with ID {request.ContactId} not found");

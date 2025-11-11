@@ -58,13 +58,13 @@ public class ImportQuizHandler
             var questionsToRemove = quiz.Questions.ToList();
             quiz.Questions.Clear();
             _db.Questions.RemoveRange(questionsToRemove);
-            
+
             // Save changes to persist question deletion before adding new ones
             await _db.SaveChangesAsync(cancellationToken);
-            
+
             // After SaveChanges, quiz.Questions should be empty and ready for new questions
             // No need to reload quiz as it's still tracked and properties are already updated
-            
+
             wasOverwritten = true;
         }
         else

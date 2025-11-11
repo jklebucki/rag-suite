@@ -1,4 +1,3 @@
-using Xunit;
 using RAG.CyberPanel.Features.UpdateQuiz;
 
 namespace RAG.Tests.CyberPanel;

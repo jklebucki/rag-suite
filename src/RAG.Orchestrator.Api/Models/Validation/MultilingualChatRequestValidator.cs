@@ -1,5 +1,4 @@
 using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using RAG.Orchestrator.Api.Common.Constants;
 
 namespace RAG.Orchestrator.Api.Models.Validation;

@@ -1,8 +1,6 @@
-using Xunit;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using RAG.Security.Services;
-using System.Collections.Generic;
 
 namespace RAG.Tests.Security;
 

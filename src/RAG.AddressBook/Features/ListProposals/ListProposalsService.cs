@@ -59,8 +59,8 @@ public class ListProposalsService
             {
                 Id = p.Id,
                 ContactId = p.ContactId,
-                ContactName = p.Contact != null 
-                    ? $"{p.Contact.FirstName} {p.Contact.LastName}" 
+                ContactName = p.Contact != null
+                    ? $"{p.Contact.FirstName} {p.Contact.LastName}"
                     : null,
                 ProposalType = p.ProposalType,
                 Status = p.Status,

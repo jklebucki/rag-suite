@@ -1,5 +1,3 @@
-using RAG.Orchestrator.Api.Features.Chat;
-
 namespace RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 
 /// <summary>

@@ -1,13 +1,7 @@
-using Xunit;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.AddressBook;
 
@@ -97,7 +91,7 @@ public class AddressBookServiceTests : IDisposable
         // Arrange
         var activeContact = new Contact { FirstName = "Active", LastName = "User", IsActive = true };
         var inactiveContact = new Contact { FirstName = "Inactive", LastName = "User", IsActive = false };
-        
+
         _context.Contacts.AddRange(activeContact, inactiveContact);
         await _context.SaveChangesAsync();
 
@@ -115,7 +109,7 @@ public class AddressBookServiceTests : IDisposable
         // Arrange
         var activeContact = new Contact { FirstName = "Active", LastName = "User", IsActive = true };
         var inactiveContact = new Contact { FirstName = "Inactive", LastName = "User", IsActive = false };
-        
+
         _context.Contacts.AddRange(activeContact, inactiveContact);
         await _context.SaveChangesAsync();
 
@@ -207,7 +201,7 @@ public class AddressBookServiceTests : IDisposable
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Email = "john@example.com" };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com" };
         var contact3 = new Contact { FirstName = "Bob", LastName = "Johnson", Email = "bob@example.com" };
-        
+
         _context.Contacts.AddRange(contact1, contact2, contact3);
         await _context.SaveChangesAsync();
 

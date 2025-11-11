@@ -46,8 +46,8 @@ public class SubmitAttemptHandler
 
             foreach (var optId in ans.SelectedOptionIds.Distinct())
             {
-                qa.SelectedOptions.Add(new QuizAnswerOption 
-                { 
+                qa.SelectedOptions.Add(new QuizAnswerOption
+                {
                     OptionId = optId,
                     QuizAnswer = qa
                 });

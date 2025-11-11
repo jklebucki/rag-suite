@@ -1,11 +1,9 @@
-using Xunit;
-using RAG.Collector.Elasticsearch;
-using RAG.Collector.Config;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using FluentAssertions;
+using RAG.Collector.Config;
+using RAG.Collector.Elasticsearch;
 
 namespace RAG.Tests.Collector;
 

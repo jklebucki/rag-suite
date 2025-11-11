@@ -1,6 +1,4 @@
-using Xunit;
 using RAG.Collector.ContentExtractors;
-using FluentAssertions;
 
 namespace RAG.Tests.Collector;
 

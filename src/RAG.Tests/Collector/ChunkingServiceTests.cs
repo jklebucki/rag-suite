@@ -1,9 +1,7 @@
-using Xunit;
-using RAG.Collector.Chunking;
-using RAG.Collector.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
-using FluentAssertions;
+using RAG.Collector.Chunking;
+using RAG.Collector.Models;
 
 namespace RAG.Tests.Collector;
 
@@ -256,7 +254,7 @@ public class ChunkingServiceTests
         var mockChunker = new Mock<ITextChunker>();
         mockChunker.Setup(x => x.SupportedContentTypes).Returns(new[] { "text/plain" });
         mockChunker.Setup(x => x.CanChunk("text/plain")).Returns(true);
-        
+
         // Mock chunker that throws OperationCanceledException when cancellation is requested
         mockChunker
             .Setup(x => x.ChunkAsync(
@@ -289,14 +287,14 @@ public class ChunkingServiceTests
         // Verify that ChunkingService properly propagates cancellation
         // by testing with a chunker that respects cancellation
         var serviceWithMockChunker = CreateServiceWithMockChunker(mockChunker.Object);
-        
+
         using var cts2 = new CancellationTokenSource();
         cts2.Cancel();
 
         // ChunkingService catches exceptions and returns empty list, but we can verify
         // that cancellation token is passed through
         var result = await serviceWithMockChunker.ChunkAsync(fileItem, cancellationToken: cts2.Token);
-        
+
         // ChunkingService catches exceptions, so it returns empty list instead of throwing
         // But we verified that the chunker itself respects cancellation
         result.Should().BeEmpty();
@@ -306,15 +304,15 @@ public class ChunkingServiceTests
     {
         // Use reflection to inject mock chunker for testing
         var service = new ChunkingService(_mockLogger.Object);
-        var chunkersField = typeof(ChunkingService).GetField("_chunkers", 
+        var chunkersField = typeof(ChunkingService).GetField("_chunkers",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
+
         if (chunkersField != null)
         {
             var chunkers = (Dictionary<string, ITextChunker>)chunkersField.GetValue(service)!;
             chunkers["text/plain"] = mockChunker;
         }
-        
+
         return service;
     }
 }

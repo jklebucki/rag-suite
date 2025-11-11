@@ -54,7 +54,7 @@ public class AddressBookDbContext : DbContext
             b.HasIndex(p => p.Status);
             b.HasIndex(p => p.ProposedByUserId);
             b.HasIndex(p => new { p.ContactId, p.Status });
-            
+
             b.Property(p => p.ProposalType).IsRequired();
             b.Property(p => p.ProposedData).IsRequired();
             b.Property(p => p.Status).IsRequired();
@@ -64,7 +64,7 @@ public class AddressBookDbContext : DbContext
             b.Property(p => p.ReviewedByUserName).HasMaxLength(256);
             b.Property(p => p.Reason).HasMaxLength(1000);
             b.Property(p => p.ReviewComment).HasMaxLength(1000);
-            
+
             b.HasOne(p => p.Contact)
                 .WithMany()
                 .HasForeignKey(p => p.ContactId)

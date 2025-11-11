@@ -1,10 +1,8 @@
-using Xunit;
+using Moq;
+using RAG.Abstractions.Search;
+using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Localization;
-using RAG.Orchestrator.Api.Common.Constants;
-using RAG.Abstractions.Search;
-using Moq;
-using FluentAssertions;
 
 namespace RAG.Tests.Orchestrator;
 

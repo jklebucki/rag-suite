@@ -1,8 +1,7 @@
-using RAG.Orchestrator.Api.Features.Reconstruction;
-using RAG.Orchestrator.Api.Features.Search;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
+using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Features.Search;
 using Xunit.Abstractions;
 
 namespace RAG.Tests.Orchestrator.Reconstruction;
@@ -29,7 +28,7 @@ public class DebugDocumentReconstructionTests
 
         // Act
         var result = _service.RemoveOverlap(previousText, currentText, 200);
-        
+
         // Debug output
         _output.WriteLine($"Previous text: '{previousText}'");
         _output.WriteLine($"Current text: '{currentText}'");
@@ -49,7 +48,7 @@ public class DebugDocumentReconstructionTests
 
         // Act
         var result = _service.RemoveOverlap(previousText, currentText, 200);
-        
+
         _output.WriteLine($"Previous: '{previousText}'");
         _output.WriteLine($"Current: '{currentText}'");
         _output.WriteLine($"Result: '{result}'");
@@ -78,7 +77,7 @@ public class DebugDocumentReconstructionTests
 
         // Act
         var result = _service.ReconstructDocument(chunks);
-        
+
         _output.WriteLine($"Chunk 1: '{chunks[0].Content}'");
         _output.WriteLine($"Chunk 2: '{chunks[1].Content}'");
         _output.WriteLine($"Result: '{result}'");

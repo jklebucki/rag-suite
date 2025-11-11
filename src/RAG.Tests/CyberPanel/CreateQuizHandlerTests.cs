@@ -1,12 +1,8 @@
-using Xunit;
-using RAG.CyberPanel.Features.CreateQuiz;
-using RAG.CyberPanel.Data;
-using RAG.Security.Services;
-using Moq;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Moq;
+using RAG.CyberPanel.Data;
+using RAG.CyberPanel.Features.CreateQuiz;
+using RAG.Security.Services;
 
 namespace RAG.Tests.CyberPanel;
 

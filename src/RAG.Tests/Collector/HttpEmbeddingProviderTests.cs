@@ -1,12 +1,10 @@
-using Xunit;
-using RAG.Collector.Embeddings;
-using RAG.Collector.Models;
-using RAG.Collector.Config;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
-using FluentAssertions;
+using RAG.Collector.Config;
+using RAG.Collector.Embeddings;
+using RAG.Collector.Models;
 using System.Net;
 using System.Text;
 using System.Text.Json;

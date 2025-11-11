@@ -47,7 +47,7 @@ public static class ImportQuizEndpoint
         try
         {
             var result = await handler.Handle(request, cancellationToken);
-            
+
             return Results.Created(
                 $"/api/cyberpanel/quizzes/{result.QuizId}",
                 result

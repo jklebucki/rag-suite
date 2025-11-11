@@ -1,11 +1,7 @@
-using Xunit;
-using RAG.CyberPanel.Features.GetQuiz;
+using Microsoft.EntityFrameworkCore;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Domain;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using RAG.CyberPanel.Features.GetQuiz;
 
 namespace RAG.Tests.CyberPanel;
 

@@ -276,7 +276,7 @@ public class PromptBuilder : IPromptBuilder
             "system_prompts",
             LocalizationKeys.SystemPrompts.RagAssistant,
             language) ?? "";
-        
+
         if (!string.IsNullOrEmpty(prePrompt))
         {
             contextBuilder.AppendLine(prePrompt);

@@ -1,8 +1,7 @@
-using System;
 using FluentValidation;
-using FeedbackModel = RAG.Orchestrator.Api.Models.Feedback;
 using RAG.Security.Models;
 using System.Security.Claims;
+using FeedbackModel = RAG.Orchestrator.Api.Models.Feedback;
 
 namespace RAG.Orchestrator.Api.Features.Feedback;
 

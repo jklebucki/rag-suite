@@ -1,7 +1,6 @@
-using Xunit;
-using RAG.Orchestrator.Api.Localization;
-using Moq;
 using Microsoft.Extensions.Logging;
+using Moq;
+using RAG.Orchestrator.Api.Localization;
 
 namespace RAG.Tests.Orchestrator;
 

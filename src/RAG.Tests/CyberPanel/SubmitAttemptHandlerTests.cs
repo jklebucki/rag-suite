@@ -1,15 +1,10 @@
-using Xunit;
-using RAG.CyberPanel.Features.SubmitAttempt;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Domain;
+using RAG.CyberPanel.Features.SubmitAttempt;
 using RAG.CyberPanel.Services;
 using RAG.Security.Services;
-using Moq;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.CyberPanel;
 
@@ -124,7 +119,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         );
 
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => 
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             handler.Handle(request, CancellationToken.None));
     }
 
@@ -280,7 +275,7 @@ public class SubmitAttemptHandlerTests : IDisposable
 
         // Assert
         Assert.Equal(2, result.PerQuestionResults.Length);
-        
+
         var q1Result = result.PerQuestionResults.First(r => r.QuestionId == q1.Id);
         Assert.True(q1Result.Correct);
         Assert.Equal(5, q1Result.PointsAwarded);

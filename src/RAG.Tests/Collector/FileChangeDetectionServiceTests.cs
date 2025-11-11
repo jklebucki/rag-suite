@@ -1,9 +1,7 @@
-using Xunit;
-using RAG.Collector.Indexing;
-using RAG.Collector.Elasticsearch;
 using Microsoft.Extensions.Logging;
 using Moq;
-using FluentAssertions;
+using RAG.Collector.Elasticsearch;
+using RAG.Collector.Indexing;
 
 namespace RAG.Tests.Collector;
 

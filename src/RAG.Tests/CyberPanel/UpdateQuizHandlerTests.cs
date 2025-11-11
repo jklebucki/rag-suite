@@ -1,14 +1,9 @@
-using Xunit;
-using RAG.CyberPanel.Features.UpdateQuiz;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using RAG.CyberPanel.Data;
 using RAG.CyberPanel.Domain;
+using RAG.CyberPanel.Features.UpdateQuiz;
 using RAG.Security.Services;
-using Moq;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.CyberPanel;
 
@@ -80,7 +75,7 @@ public class UpdateQuizHandlerTests : IDisposable
         Assert.Equal("Updated Description", updatedQuiz.Description);
         Assert.Equal("pl", updatedQuiz.Language);
         Assert.Single(updatedQuiz.Questions);
-        
+
         var question = updatedQuiz.Questions.First();
         Assert.Equal("New Question", question.Text);
         Assert.Equal(10, question.Points);
@@ -248,7 +243,7 @@ public class UpdateQuizHandlerTests : IDisposable
 
         Assert.NotNull(updatedQuiz);
         Assert.Equal(3, updatedQuiz.Questions.Count); // 3 new questions
-        
+
         var questions = updatedQuiz.Questions.OrderBy(q => q.Order).ToList();
         Assert.Equal("Brand New Question 1", questions[0].Text);
         Assert.Equal("Brand New Question 2", questions[1].Text);

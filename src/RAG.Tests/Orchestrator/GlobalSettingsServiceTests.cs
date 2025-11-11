@@ -1,10 +1,9 @@
-using Xunit;
-using RAG.Orchestrator.Api.Services;
-using RAG.Orchestrator.Api.Data;
-using Moq;
 using Microsoft.EntityFrameworkCore;
-using RAG.Orchestrator.Api.Models;
 using Microsoft.Extensions.Configuration;
+using Moq;
+using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Services;
 
 namespace RAG.Tests.Orchestrator;
 

@@ -4,7 +4,6 @@ using RAG.Collector.Config;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Elasticsearch;
 

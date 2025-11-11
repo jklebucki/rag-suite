@@ -1,6 +1,4 @@
-using Xunit;
 using RAG.Collector.Config;
-using FluentAssertions;
 
 namespace RAG.Tests.Collector;
 

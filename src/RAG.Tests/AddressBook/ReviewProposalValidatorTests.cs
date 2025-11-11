@@ -1,8 +1,5 @@
-using Xunit;
-using FluentAssertions;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ReviewProposal;
-using FluentValidation;
 
 namespace RAG.Tests.AddressBook;
 

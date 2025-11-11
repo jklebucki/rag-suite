@@ -1,13 +1,7 @@
-using Xunit;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using RAG.Security.Services;
 using RAG.Security.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using RAG.Security.Services;
 
 namespace RAG.Tests.Security;
 

@@ -1,8 +1,7 @@
-using RAG.Orchestrator.Api.Features.Reconstruction;
-using RAG.Orchestrator.Api.Features.Search;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
+using RAG.Orchestrator.Api.Features.Reconstruction;
+using RAG.Orchestrator.Api.Features.Search;
 
 namespace RAG.Tests.Orchestrator.Reconstruction;
 
@@ -67,7 +66,7 @@ public class WinSpedDocumentReconstructionTests
 
         // Sprawdź długość - powinna być mniejsza niż suma wszystkich chunków
         var totalChunkLength = chunks.Sum(c => c.Content?.Length ?? 0);
-        Assert.True(result.Length < totalChunkLength, 
+        Assert.True(result.Length < totalChunkLength,
             $"Reconstructed length ({result.Length}) should be less than total chunk length ({totalChunkLength})");
     }
 

@@ -1,6 +1,5 @@
 using RAG.Collector.Config;
 using RAG.Collector.Elasticsearch;
-using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Indexing;
 

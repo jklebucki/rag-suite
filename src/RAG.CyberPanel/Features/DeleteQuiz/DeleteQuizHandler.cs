@@ -13,7 +13,7 @@ public class DeleteQuizHandler
     private readonly IUserContextService _userContext;
 
     public DeleteQuizHandler(
-        CyberPanelDbContext db, 
+        CyberPanelDbContext db,
         SecurityDbContext securityDb,
         IUserContextService userContext)
     {

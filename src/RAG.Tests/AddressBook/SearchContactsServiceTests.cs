@@ -1,13 +1,7 @@
-using Xunit;
-using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.SearchContacts;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RAG.Tests.AddressBook;
 
@@ -38,7 +32,7 @@ public class SearchContactsServiceTests : IDisposable
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Email = "john@example.com", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com", IsActive = true };
         var contact3 = new Contact { FirstName = "Johnny", LastName = "Johnson", Email = "johnny@example.com", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2, contact3);
         await _context.SaveChangesAsync();
 
@@ -62,7 +56,7 @@ public class SearchContactsServiceTests : IDisposable
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Email = "john@example.com", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Doe", Email = "jane@example.com", IsActive = true };
         var contact3 = new Contact { FirstName = "Bob", LastName = "Smith", Email = "bob@example.com", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2, contact3);
         await _context.SaveChangesAsync();
 
@@ -83,7 +77,7 @@ public class SearchContactsServiceTests : IDisposable
         // Arrange
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Smith", Email = "jane.smith@test.com", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2);
         await _context.SaveChangesAsync();
 
@@ -104,7 +98,7 @@ public class SearchContactsServiceTests : IDisposable
         // Arrange
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Department = "IT Department", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Brown", Department = "Sales", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2);
         await _context.SaveChangesAsync();
 
@@ -125,7 +119,7 @@ public class SearchContactsServiceTests : IDisposable
         // Arrange
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Position = "Senior Developer", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Smith", Position = "Manager", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2);
         await _context.SaveChangesAsync();
 
@@ -146,7 +140,7 @@ public class SearchContactsServiceTests : IDisposable
         // Arrange
         var contact1 = new Contact { FirstName = "John", LastName = "Doe", Location = "Warsaw, Poland", IsActive = true };
         var contact2 = new Contact { FirstName = "Jane", LastName = "Smith", Location = "Krakow", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2);
         await _context.SaveChangesAsync();
 
@@ -185,7 +179,7 @@ public class SearchContactsServiceTests : IDisposable
         // Arrange
         var active = new Contact { FirstName = "Active", LastName = "User", Email = "active@example.com", IsActive = true };
         var inactive = new Contact { FirstName = "Inactive", LastName = "User", Email = "inactive@example.com", IsActive = false };
-        
+
         _context.Contacts.AddRange(active, inactive);
         await _context.SaveChangesAsync();
 
@@ -264,7 +258,7 @@ public class SearchContactsServiceTests : IDisposable
         var contact1 = new Contact { FirstName = "Alice", LastName = "Zebra", IsActive = true };
         var contact2 = new Contact { FirstName = "Bob", LastName = "Apple", IsActive = true };
         var contact3 = new Contact { FirstName = "Charlie", LastName = "Apple", IsActive = true };
-        
+
         _context.Contacts.AddRange(contact1, contact2, contact3);
         await _context.SaveChangesAsync();
 

@@ -1,9 +1,9 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ProposeChange;
 using RAG.AddressBook.Services;
+using System.Text.Json;
 
 namespace RAG.AddressBook.Features.GetProposal;
 
@@ -67,7 +67,7 @@ public class GetProposalService
             return null; // User can only view their own proposals
         }
 
-        var proposedData = JsonSerializer.Deserialize<ContactDataDto>(proposal.ProposedData) 
+        var proposedData = JsonSerializer.Deserialize<ContactDataDto>(proposal.ProposedData)
             ?? new ContactDataDto();
 
         return new GetProposalResponse

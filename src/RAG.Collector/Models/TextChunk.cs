@@ -1,5 +1,4 @@
 using RAG.Collector.Config;
-using static RAG.Collector.Config.Constants;
 
 namespace RAG.Collector.Models;
 
