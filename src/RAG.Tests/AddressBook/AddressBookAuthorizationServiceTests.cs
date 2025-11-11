@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using RAG.AddressBook.Services;
 using RAG.Security.Services;

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using RAG.Collector.Config;
 
 namespace RAG.Tests.Collector;

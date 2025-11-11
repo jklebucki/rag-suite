@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RAG.Collector.ContentExtractors;

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ProposeChange;
 

@@ -1,4 +1,5 @@
 using Elasticsearch.Net;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Common.Constants;

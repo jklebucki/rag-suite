@@ -1,3 +1,4 @@
+using FluentAssertions;
 using RAG.Collector.ContentExtractors;
 
 namespace RAG.Tests.Collector;
