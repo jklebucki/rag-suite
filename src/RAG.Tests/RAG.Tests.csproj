@@ -41,6 +41,7 @@
     <ProjectReference Include="..\RAG.CyberPanel\RAG.CyberPanel.csproj" />
     <ProjectReference Include="..\RAG.Collector\RAG.Collector.csproj" />
     <ProjectReference Include="..\RAG.Orchestrator.Api\RAG.Orchestrator.Api.csproj" />
+    <ProjectReference Include="..\RAG.Forum\RAG.Forum.csproj" />
   </ItemGroup>
 
 </Project>

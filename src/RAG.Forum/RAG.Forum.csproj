@@ -23,4 +23,8 @@
     <ProjectReference Include="..\RAG.Security\RAG.Security.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="RAG.Tests" />
+  </ItemGroup>
+
 </Project>
