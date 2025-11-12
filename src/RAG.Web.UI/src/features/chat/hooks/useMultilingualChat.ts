@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useOptimistic, useTransition } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import chatService from '@/features/chat/services/chat.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
@@ -38,6 +38,24 @@ export function useMultilingualChat() {
     enabled: !!currentSessionId,
   })
 
+  // Optimistic messages state using React 19 useOptimistic
+  const [isPending, startTransition] = useTransition()
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    currentSession?.messages || [],
+    (state: ChatMessage[], newMessage: ChatMessage) => {
+      // Check if message already exists (prevent duplicates)
+      if (state.some(msg => msg.id === newMessage.id)) {
+        return state
+      }
+      return [...state, newMessage]
+    }
+  )
+
+  // Use optimistic messages if available, otherwise use currentSession messages
+  const displaySession = currentSession
+    ? { ...currentSession, messages: optimisticMessages }
+    : currentSession
+
   // Send multilingual message mutation
   const sendMultilingualMessageMutation = useMutation({
     mutationFn: ({ sessionId, request }: { sessionId: string; request: MultilingualChatRequest }) => {
@@ -74,6 +92,8 @@ export function useMultilingualChat() {
       logger.error('Failed to send multilingual message:', error)
       showError('Failed to send message', 'Please check your connection and try again')
       setIsTyping(false)
+      // useOptimistic automatically rolls back on error, but we need to ensure cache is synced
+      queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
     },
   })
 
@@ -150,13 +170,9 @@ export function useMultilingualChat() {
       timestamp: messageTimestamp
     }
 
-    // Add user message to local state immediately
-    queryClient.setQueryData(['chat-session', currentSessionId], (oldData: ChatSession | undefined) => {
-      if (!oldData) return oldData
-      return {
-        ...oldData,
-        messages: [...oldData.messages, tempUserMessage]
-      }
+    // Add optimistic message using React 19 useOptimistic
+    startTransition(() => {
+      addOptimisticMessage(tempUserMessage)
     })
 
     logger.debug('Setting isTyping to true')
@@ -208,10 +224,10 @@ export function useMultilingualChat() {
     }
   }
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (use optimistic messages)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [currentSession?.messages])
+  }, [optimisticMessages])
 
   // Set first session as current if none selected
   useEffect(() => {
@@ -255,9 +271,9 @@ export function useMultilingualChat() {
     setCurrentSessionId,
     message,
     setMessage,
-    isTyping,
+    isTyping: isTyping || isPending,
     sessions,
-    currentSession,
+    currentSession: displaySession,
     lastResponse,
     messagesEndRef,
     sessionToDelete,

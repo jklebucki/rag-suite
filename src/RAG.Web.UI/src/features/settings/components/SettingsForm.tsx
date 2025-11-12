@@ -1,6 +1,6 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useActionState } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
 import { useToast } from '@/shared/contexts'
 import llmService from '@/features/settings/services/llm.service'
@@ -10,6 +10,13 @@ import { LlmFormField, ModelSelectField } from './LlmFormFields'
 import type { LlmFormErrors } from '@/features/settings/types/settings'
 import { logger } from '@/utils/logger'
 import { useI18n } from '@/shared/contexts/I18nContext'
+import { SubmitButton } from '@/shared/components/ui/SubmitButton'
+
+interface FormState {
+  success: boolean
+  error: string | null
+  fieldErrors: LlmFormErrors
+}
 
 interface SettingsFormProps {
   onSettingsChange?: (settings: LlmSettings) => void
@@ -32,9 +39,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [loadingModels, setLoadingModels] = useState(false)
-  const [validationErrors, setValidationErrors] = useState<LlmFormErrors>({})
 
   const loadSettings = useCallback(async () => {
     try {
@@ -95,71 +100,83 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
       ...prev,
       [name]: newValue
     }))
-
-    // Clear validation error for this field
-    if (name in validationErrors) {
-      setValidationErrors(prev => {
-        const updated = { ...prev }
-        delete updated[name as keyof LlmFormErrors]
-        return updated
-      })
-    }
   }
 
-  const validateForm = (): boolean => {
-    const { isValid, errors } = validateLlmSettings(settings)
-    if (!isValid) {
-      const translatedErrors = Object.entries(errors).reduce<LlmFormErrors>((acc, [key, value]) => {
-        if (value) {
-          acc[key as keyof LlmFormErrors] = t(value)
-        }
-        return acc
-      }, {})
-      setValidationErrors(translatedErrors)
-    } else {
-      setValidationErrors({})
-    }
-    return isValid
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    try {
-      setSaving(true)
-      const request: LlmSettingsRequest = {
-        url: settings.url,
-        maxTokens: settings.maxTokens,
-        temperature: settings.temperature,
-        model: settings.model,
-        isOllama: settings.isOllama,
-        timeoutMinutes: settings.timeoutMinutes,
-        chatEndpoint: settings.chatEndpoint,
-        generateEndpoint: settings.generateEndpoint
+  const [state, formAction] = useActionState(
+    async (prevState: FormState | null, formData: FormData): Promise<FormState> => {
+      // Extract form data
+      const formSettings: LlmSettings = {
+        url: formData.get('url') as string,
+        maxTokens: parseInt(formData.get('maxTokens') as string, 10) || 0,
+        temperature: parseFloat(formData.get('temperature') as string) || 0,
+        model: formData.get('model') as string,
+        isOllama: formData.get('isOllama') === 'on',
+        timeoutMinutes: parseInt(formData.get('timeoutMinutes') as string, 10) || 0,
+        chatEndpoint: formData.get('chatEndpoint') as string,
+        generateEndpoint: formData.get('generateEndpoint') as string
       }
 
-      await llmService.updateLlmSettings(request)
-      addToast({
-        type: 'success',
-        title: t('common.success'),
-        message: t('settings.llm.messages.update_success')
-      })
-      onSettingsChange?.(settings)
-    } catch (error) {
-      logger.error('Failed to update LLM settings:', error)
-      addToast({
-        type: 'error',
-        title: t('common.error'),
-        message: t('settings.llm.messages.update_error')
-      })
-    } finally {
-      setSaving(false)
-    }
-  }
+      // Validate
+      const { isValid, errors } = validateLlmSettings(formSettings)
+      if (!isValid) {
+        const translatedErrors = Object.entries(errors).reduce<LlmFormErrors>((acc, [key, value]) => {
+          if (value) {
+            acc[key as keyof LlmFormErrors] = t(value)
+          }
+          return acc
+        }, {})
+        return {
+          success: false,
+          error: null,
+          fieldErrors: translatedErrors
+        }
+      }
+
+      try {
+        const request: LlmSettingsRequest = {
+          url: formSettings.url,
+          maxTokens: formSettings.maxTokens,
+          temperature: formSettings.temperature,
+          model: formSettings.model,
+          isOllama: formSettings.isOllama,
+          timeoutMinutes: formSettings.timeoutMinutes,
+          chatEndpoint: formSettings.chatEndpoint,
+          generateEndpoint: formSettings.generateEndpoint
+        }
+
+        await llmService.updateLlmSettings(request)
+        
+        // Update local state
+        setSettings(formSettings)
+        onSettingsChange?.(formSettings)
+        
+        addToast({
+          type: 'success',
+          title: t('common.success'),
+          message: t('settings.llm.messages.update_success')
+        })
+        
+        return {
+          success: true,
+          error: null,
+          fieldErrors: {}
+        }
+      } catch (error) {
+        logger.error('Failed to update LLM settings:', error)
+        addToast({
+          type: 'error',
+          title: t('common.error'),
+          message: t('settings.llm.messages.update_error')
+        })
+        return {
+          success: false,
+          error: t('settings.llm.messages.update_error'),
+          fieldErrors: {}
+        }
+      }
+    },
+    null
+  )
 
   const handleRefreshModels = () => {
     loadAvailableModels()
@@ -211,7 +228,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form action={formAction} className="space-y-6">
           <LlmFormField
             id="url"
             name="url"
@@ -219,7 +236,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             type="url"
             value={settings.url}
             onChange={handleChange}
-            error={validationErrors.url}
+            error={state?.fieldErrors.url}
             placeholder={t('settings.llm.fields.url.placeholder')}
           />
 
@@ -230,7 +247,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             onRefresh={handleRefreshModels}
             isLoading={loadingModels}
             disabled={!settings.url.trim()}
-            error={validationErrors.model}
+            error={state?.fieldErrors.model}
           />
 
           <LlmFormField
@@ -240,7 +257,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             type="number"
             value={settings.maxTokens}
             onChange={handleChange}
-            error={validationErrors.maxTokens}
+            error={state?.fieldErrors.maxTokens}
             min={1}
             max={100000}
           />
@@ -252,7 +269,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             type="number"
             value={settings.temperature}
             onChange={handleChange}
-            error={validationErrors.temperature}
+            error={state?.fieldErrors.temperature}
             min={0}
             max={2}
             step={0.1}
@@ -274,7 +291,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             type="number"
             value={settings.timeoutMinutes}
             onChange={handleChange}
-            error={validationErrors.timeoutMinutes}
+            error={state?.fieldErrors.timeoutMinutes}
             min={1}
             max={120}
           />
@@ -299,25 +316,22 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             placeholder={t('settings.llm.fields.generate_endpoint.placeholder')}
           />
 
+          {/* Error Message */}
+          {state?.error && (
+            <div className="rounded-xl border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 px-4 py-3">
+              {state.error}
+            </div>
+          )}
+
           {/* Submit Button */}
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            <SubmitButton
+              className="btn-primary inline-flex items-center gap-2"
+              loadingText={t('settings.llm.actions.saving')}
             >
-              {saving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>{t('settings.llm.actions.saving')}</span>
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  <span>{t('settings.llm.actions.save')}</span>
-                </>
-              )}
-            </button>
+              <Save className="h-4 w-4" />
+              <span>{t('settings.llm.actions.save')}</span>
+            </SubmitButton>
           </div>
         </form>
       </div>

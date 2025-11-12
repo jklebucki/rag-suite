@@ -1,0 +1,27 @@
+# Polecenia do debugowania testów SettingsForm
+
+# 1. Uruchomienie z verbose output
+npm test -- --run src/features/settings/components/SettingsForm.test.tsx --reporter=verbose
+
+# 2. Uruchomienie z UI (najlepsze do debugowania)
+npm test -- --ui
+
+# 3. Uruchomienie konkretnego testu
+npm test -- --run src/features/settings/components/SettingsForm.test.tsx -t "should use useActionState for form submission" --reporter=verbose
+
+npm test -- --run src/features/settings/components/SettingsForm.test.tsx -t "should display field errors from useActionState" --reporter=verbose
+
+# 4. Uruchomienie wersji debugowej (z console.log)
+npm test -- --run src/features/settings/components/SettingsForm.test.debug.tsx --reporter=verbose
+
+# 5. Uruchomienie z większym timeoutem
+npm test -- --run src/features/settings/components/SettingsForm.test.tsx --test-timeout=30000 --reporter=verbose
+
+# 6. Uruchomienie w trybie watch
+npm test -- src/features/settings/components/SettingsForm.test.tsx
+
+# 7. Uruchomienie z wyświetlaniem stack trace
+npm test -- --run src/features/settings/components/SettingsForm.test.tsx --reporter=verbose --bail=1
+
+# 8. Uruchomienie z Node.js debuggerem
+node --inspect-brk node_modules/.bin/vitest --run src/features/settings/components/SettingsForm.test.tsx

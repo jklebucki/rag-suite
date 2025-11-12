@@ -3,6 +3,7 @@ import { useMultilingualSearch } from '@/features/search/hooks/useMultilingualSe
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
+import { SearchingIndicator } from '@/shared/components/common/SearchingIndicator'
 import { logger } from '@/utils/logger'
 
 export function SearchInterface() {

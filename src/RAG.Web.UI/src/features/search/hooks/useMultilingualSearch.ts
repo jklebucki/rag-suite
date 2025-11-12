@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useDeferredValue } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import searchService from '@/features/search/services/search.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
@@ -20,6 +20,10 @@ export function useMultilingualSearch() {
   const { showError, showSuccess } = useToastContext()
   const { language: currentLanguage } = useI18n()
 
+  // Use useDeferredValue for better UI responsiveness during typing
+  const deferredQuery = useDeferredValue(query)
+  const isQueryDeferred = query !== deferredQuery
+
   const hasFilters = () => {
     return filters.documentType || filters.source || filters.dateRange
   }
@@ -31,12 +35,12 @@ export function useMultilingualSearch() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['multilingual-search', query, filters, currentLanguage],
+    queryKey: ['multilingual-search', deferredQuery, filters, currentLanguage],
     queryFn: async ({ signal }) => {
-      logger.debug('Multilingual searching for:', query, 'in language:', currentLanguage)
+      logger.debug('Multilingual searching for:', deferredQuery, 'in language:', currentLanguage)
       try {
         const searchQuery: MultilingualSearchQuery = {
-          query,
+          query: deferredQuery,
           language: currentLanguage,
           resultLanguage: currentLanguage,
           maxResults: 20,
@@ -65,7 +69,7 @@ export function useMultilingualSearch() {
           results: [],
           total: 0,
           took: 0,
-          query: query
+          query: deferredQuery
         }
       } catch (error) {
         logger.error('Multilingual search error:', error)
@@ -76,12 +80,12 @@ export function useMultilingualSearch() {
   })
 
   const handleSearch = async () => {
-    if (!query.trim()) {
+    if (!deferredQuery.trim()) {
       showError('Search query required', 'Please enter a search query')
       return
     }
 
-    logger.debug('Starting multilingual search for:', query)
+    logger.debug('Starting multilingual search for:', deferredQuery)
     setHasSearched(true)
     setIsSearching(true)
 
@@ -126,7 +130,7 @@ export function useMultilingualSearch() {
     hasSearched,
     lastSearchLanguage,
     currentLanguage,
-    isSearching,
+    isSearching: isSearching || isQueryDeferred,
 
     // Data
     searchResults,

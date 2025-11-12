@@ -6,9 +6,9 @@ import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
 import { MessageSources } from './MessageSources'
 import { MarkdownMessage } from './MarkdownMessage'
+import { MessageItem } from './MessageItem'
 import { ActionModal } from '@/shared/components/ui/ActionModal'
-import { formatDateTime, formatRelativeTime } from '@/utils/date'
-import type { ChatMessage } from '@/features/chat/types/chat'
+import { formatDateTime } from '@/utils/date'
 
 export function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()
@@ -74,57 +74,15 @@ export function ChatInterface() {
           <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 scrollbar-hide">
-              {currentSession.messages.map((msg: ChatMessage) => (
-                <div key={msg.id} className={`flex items-start gap-2 md:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`p-1.5 md:p-2 rounded-full shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
-                    {msg.role === 'user' ? (
-                      <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-300" />
-                    ) : (
-                      <Bot className="h-4 w-4 md:h-5 md:w-5 text-primary-600 dark:text-primary-300" />
-                    )}
-                  </div>
-                  <div
-                    className={`max-w-[85%] md:max-w-5xl rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-gray-100'
-                    }`}
-                  >
-                    <MarkdownMessage content={msg.content} isUserMessage={msg.role === 'user'} />
-
-                    {/* Sources for assistant messages */}
-                    {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <MessageSources sources={msg.sources} messageRole={msg.role} />
-                    )}
-
-                    {/* Timestamp */}
-                    <div
-                      className={`mt-2 text-xs cursor-help ${
-                        msg.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-slate-400'
-                      }`}
-                      title={`Sent at ${formatDateTime(msg.timestamp, currentLanguage)}`}
-                    >
-                      <span className="font-medium">{formatRelativeTime(msg.timestamp, currentLanguage)}</span>
-                      <span className="ml-2 opacity-75">{formatDateTime(msg.timestamp, currentLanguage)}</span>
-                    </div>
-
-                    {/* Language detection info */}
-                    {lastMessageLanguage && msg.id === currentSession.messages[currentSession.messages.length - 1]?.id && (
-                      <div className="mt-1 text-xs opacity-75">
-                        {lastMessageLanguage !== currentLanguage && (
-                          <span className={msg.role === 'user' ? 'text-blue-200' : 'text-blue-600 dark:text-blue-300'}>
-                            Detected: {lastMessageLanguage} • Response: {currentLanguage}
-                          </span>
-                        )}
-                        {translationStatus === 'translated' && (
-                          <span className={`ml-2 ${msg.role === 'user' ? 'text-green-200' : 'text-green-600 dark:text-green-400'}`}>
-                            ✓ Translated
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {currentSession.messages.map((msg: ChatMessage, index: number) => (
+                <MessageItem
+                  key={msg.id}
+                  message={msg}
+                  currentLanguage={currentLanguage}
+                  lastMessageLanguage={lastMessageLanguage}
+                  translationStatus={translationStatus}
+                  isLastMessage={index === currentSession.messages.length - 1}
+                />
               ))}
               {isTyping && (
                 <div className="flex items-start gap-2 md:gap-3">

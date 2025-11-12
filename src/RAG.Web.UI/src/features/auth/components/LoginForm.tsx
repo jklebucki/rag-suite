@@ -1,18 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useActionState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useToast } from '@/shared/contexts/ToastContext'
 import { validateEmail, validatePassword } from '@/utils/validation'
+import { SubmitButton } from '@/shared/components/ui/SubmitButton'
 import type { LoginRequest } from '@/features/auth/types/auth'
+
+interface FormState {
+  success: boolean
+  error: string | null
+  fieldErrors: Record<string, string>
+}
 
 interface LoginFormProps {
   onSuccess?: () => void
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
-  const { login, loading, error, clearError } = useAuth()
+  const { login } = useAuth()
   const { t } = useI18n()
   const { addToast } = useToast()
   const navigate = useNavigate()
@@ -24,7 +31,80 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     rememberMe: false,
   })
   const [showPassword, setShowPassword] = useState(false)
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: FormState | null, formData: FormData): Promise<FormState> => {
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+      const rememberMe = formData.get('rememberMe') === 'on'
+
+      // Validation
+      const fieldErrors: Record<string, string> = {}
+
+      if (!email) {
+        fieldErrors.email = t('auth.validation.email_required')
+      } else if (!validateEmail(email)) {
+        fieldErrors.email = t('auth.validation.email_invalid')
+      }
+
+      const passwordValidation = validatePassword(password, 6)
+      if (!passwordValidation.isValid) {
+        fieldErrors.password = passwordValidation.error || t('auth.validation.password_required')
+      }
+
+      if (Object.keys(fieldErrors).length > 0) {
+        return {
+          success: false,
+          error: null,
+          fieldErrors,
+        }
+      }
+
+      // Attempt login
+      try {
+        const success = await login({ email, password, rememberMe })
+
+        if (success) {
+          addToast({
+            type: 'success',
+            title: t('auth.login.success_title'),
+            message: t('auth.login.success_message'),
+          })
+
+          onSuccess?.()
+
+          // Navigate back to the page that required auth, if provided
+          const redirectState = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from
+          if (redirectState?.pathname) {
+            const { pathname, search = '', hash = '' } = redirectState
+            navigate(`${pathname}${search}${hash}`, { replace: true })
+          } else {
+            navigate('/', { replace: true })
+          }
+
+          return {
+            success: true,
+            error: null,
+            fieldErrors: {},
+          }
+        } else {
+          return {
+            success: false,
+            error: t('common.error') || 'Invalid credentials',
+            fieldErrors: {},
+          }
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : (t('common.error') || 'An error occurred')
+        return {
+          success: false,
+          error: errorMessage,
+          fieldErrors: {},
+        }
+      }
+    },
+    null
+  )
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -32,67 +112,6 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
-
-    // Clear validation error when user starts typing
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
-    }
-
-    // Clear general error
-    if (error) {
-      clearError()
-    }
-  }
-
-  const validateForm = (): boolean => {
-    const errors: Record<string, string> = {}
-
-    // Email validation using utility
-    if (!formData.email) {
-      errors.email = t('auth.validation.email_required')
-    } else if (!validateEmail(formData.email)) {
-      errors.email = t('auth.validation.email_invalid')
-    }
-
-    // Password validation using utility
-    const passwordValidation = validatePassword(formData.password, 6)
-    if (!passwordValidation.isValid) {
-      errors.password = passwordValidation.error || t('auth.validation.password_required')
-    }
-
-    setValidationErrors(errors)
-    return Object.keys(errors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    const success = await login(formData)
-
-    if (success) {
-      addToast({
-        type: 'success',
-        title: t('auth.login.success_title'),
-        message: t('auth.login.success_message')
-      })
-      onSuccess?.()
-
-      // Navigate back to the page that required auth, if provided
-      const redirectState = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from
-      if (redirectState?.pathname) {
-        const { pathname, search = '', hash = '' } = redirectState
-        navigate(`${pathname}${search}${hash}`, { replace: true })
-      } else {
-        navigate('/', { replace: true })
-      }
-    }
   }
 
   return (
@@ -109,7 +128,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form action={formAction} className="space-y-6">
         {/* Email Field */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -128,13 +147,13 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               value={formData.email}
               onChange={handleChange}
               className={`form-input pl-10 pr-3 ${
-                validationErrors.email ? 'form-input-error' : ''
+                state?.fieldErrors.email ? 'form-input-error' : ''
               }`}
               placeholder={t('auth.placeholders.email')}
             />
           </div>
-          {validationErrors.email && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.email}</p>
+          {state?.fieldErrors.email && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{state.fieldErrors.email}</p>
           )}
         </div>
 
@@ -156,7 +175,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               value={formData.password}
               onChange={handleChange}
               className={`form-input pl-10 pr-10 ${
-                validationErrors.password ? 'form-input-error' : ''
+                state?.fieldErrors.password ? 'form-input-error' : ''
               }`}
               placeholder={t('auth.placeholders.password')}
             />
@@ -173,8 +192,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               )}
             </button>
           </div>
-          {validationErrors.password && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.password}</p>
+          {state?.fieldErrors.password && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{state.fieldErrors.password}</p>
           )}
         </div>
 
@@ -202,30 +221,22 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         </div>
 
         {/* Error Message */}
-        {error && (
+        {state?.error && (
           <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg p-3">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
           </div>
         )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        {/* Submit Button - Uses useFormStatus internally */}
+        <SubmitButton
+          className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors"
+          loadingText={t('auth.login.signing_in')}
         >
-          {loading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              {t('auth.login.signing_in')}
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <LogIn className="w-4 h-4 mr-2" />
-              {t('auth.login.sign_in')}
-            </div>
-          )}
-        </button>
+          <div className="flex items-center">
+            <LogIn className="w-4 h-4 mr-2" />
+            {t('auth.login.sign_in')}
+          </div>
+        </SubmitButton>
 
         {/* Register Link */}
         <div className="text-center">

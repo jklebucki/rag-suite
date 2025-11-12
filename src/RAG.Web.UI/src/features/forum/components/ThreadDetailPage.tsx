@@ -329,7 +329,7 @@ interface PostCardProps {
   onDownload: (attachment: ForumAttachment) => void
 }
 
-function PostCard({ post, language, onDownload }: PostCardProps) {
+const PostCard = React.memo<PostCardProps>(({ post, language, onDownload }) => {
   const { t } = useI18n()
 
   return (
@@ -350,7 +350,20 @@ function PostCard({ post, language, onDownload }: PostCardProps) {
       </div>
     </Card>
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for better performance
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.content === nextProps.post.content &&
+    prevProps.post.createdAt === nextProps.post.createdAt &&
+    prevProps.language === nextProps.language
+  )
+})
+
+PostCard.displayName = 'PostCard'
+
+// Export for testing
+export { PostCard }
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return '0 B'

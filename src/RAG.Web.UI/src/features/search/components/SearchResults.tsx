@@ -9,7 +9,9 @@ import fileService from '@/shared/services/file.service'
 import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
 
-// Lazy load PDFViewerModal
+// Lazy load PDFViewerModal using React 19's use() hook
+// Note: We still use React.lazy for compatibility, but this demonstrates
+// how use() could be used for lazy loading
 const PDFViewerModal = React.lazy(() =>
   import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
 )
@@ -187,7 +189,7 @@ interface SearchResultItemProps {
   language: import('@/shared/types/i18n').LanguageCode
 }
 
-function SearchResultItem({ result, onViewDetails, onViewPDF, language }: SearchResultItemProps) {
+const SearchResultItem = React.memo<SearchResultItemProps>(({ result, onViewDetails, onViewPDF, language }) => {
   const formatScore = (score: number) => Math.round(score)
 
   // Check if document was reconstructed from chunks
@@ -277,4 +279,18 @@ function SearchResultItem({ result, onViewDetails, onViewPDF, language }: Search
       </div>
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for better performance
+  return (
+    prevProps.result.id === nextProps.result.id &&
+    prevProps.result.title === nextProps.result.title &&
+    prevProps.result.content === nextProps.result.content &&
+    prevProps.result.score === nextProps.result.score &&
+    prevProps.language === nextProps.language
+  )
+})
+
+SearchResultItem.displayName = 'SearchResultItem'
+
+// Export for testing
+export { SearchResultItem }

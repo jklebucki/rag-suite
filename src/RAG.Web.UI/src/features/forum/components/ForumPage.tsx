@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useOptimistic, useTransition, useDeferredValue } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, RefreshCcw, Search as SearchIcon } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
@@ -19,6 +19,8 @@ import type { ForumCategory, ForumSettings, ForumThreadSummary, ListThreadsParam
 import type { LanguageCode } from '@/shared/types/i18n'
 import { AttachmentPicker, AttachmentDraft } from './AttachmentPicker'
 import { Modal } from '@/shared/components/ui/Modal'
+import { ThreadItem } from './ThreadItem'
+import { SearchingIndicator } from '@/shared/components/common/SearchingIndicator'
 
 const PAGE_SIZE = 10
 
@@ -26,23 +28,25 @@ export function ForumPage() {
   const { t, language } = useI18n()
   const navigate = useNavigate()
   const { showError, showSuccess } = useToast()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
 
   const [page, setPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>()
   const [searchTerm, setSearchTerm] = useState('')
   const [isComposerOpen, setComposerOpen] = useState(false)
 
-  const debouncedSearch = useDebouncedValue(searchTerm, 300)
+  // Use useDeferredValue for better UI responsiveness during typing
+  const deferredSearchTerm = useDeferredValue(searchTerm)
+  const isSearching = searchTerm !== deferredSearchTerm
 
   const threadParams: ListThreadsParams = useMemo(
     () => ({
       page,
       pageSize: PAGE_SIZE,
       categoryId: selectedCategory,
-      search: debouncedSearch || undefined,
+      search: deferredSearchTerm || undefined,
     }),
-    [page, selectedCategory, debouncedSearch],
+    [page, selectedCategory, deferredSearchTerm],
   )
 
   const categoriesQuery = useForumCategories()
@@ -51,6 +55,21 @@ export function ForumPage() {
   const forumSettingsQuery = useForumSettingsQuery({ enabled: isAuthenticated })
   const badgeRefreshSeconds = forumSettingsQuery.data?.badgeRefreshSeconds ?? 60
   const badgesQuery = useThreadBadges(isAuthenticated, badgeRefreshSeconds)
+
+  // Optimistic threads state using React 19 useOptimistic
+  const [isPending, startTransition] = useTransition()
+  const baseThreads = threadsQuery.data?.threads ?? []
+  const [optimisticThreads, addOptimisticThread] = useOptimistic(
+    baseThreads,
+    (state: ForumThreadSummary[], newThread: ForumThreadSummary) => {
+      // Check if thread already exists (prevent duplicates)
+      if (state.some(thread => thread.id === newThread.id)) {
+        return state
+      }
+      // Add new thread at the beginning (most recent first)
+      return [newThread, ...state]
+    }
+  )
 
   const unreadThreadIds = useMemo(() => {
     if (!badgesQuery.data) return new Set<string>()
@@ -76,8 +95,33 @@ export function ForumPage() {
   }
 
   const handleCreateThread = async (values: CreateThreadFormState) => {
+    const category = categoriesQuery.data?.find(c => c.id === values.categoryId)
+    const now = new Date().toISOString()
+
+    // Create optimistic thread
+    const optimisticThread: ForumThreadSummary = {
+      id: `temp-${Date.now()}`,
+      categoryId: values.categoryId,
+      categoryName: category?.name || '',
+      title: values.title,
+      authorId: user?.id || '',
+      authorEmail: user?.email || '',
+      createdAt: now,
+      updatedAt: now,
+      lastPostAt: now,
+      isLocked: false,
+      viewCount: 0,
+      replyCount: 0,
+      attachmentCount: values.attachments.length,
+    }
+
+    // Add optimistic thread immediately
+    startTransition(() => {
+      addOptimisticThread(optimisticThread)
+    })
+
     try {
-      await createThreadMutation.mutateAsync({
+      const result = await createThreadMutation.mutateAsync({
         categoryId: values.categoryId,
         title: values.title,
         content: values.content,
@@ -91,13 +135,15 @@ export function ForumPage() {
       showSuccess(t('forum.create.success'))
       setComposerOpen(false)
       setPage(1)
+      // React Query will automatically update the list, useOptimistic will sync
     } catch (error) {
       console.error(error)
       showError(t('forum.create.error'))
+      // useOptimistic automatically rolls back on error
     }
   }
 
-  const threads = threadsQuery.data?.threads ?? []
+  const threads = optimisticThreads
 
   return (
     <div className="space-y-6">
@@ -115,6 +161,11 @@ export function ForumPage() {
               placeholder={t('forum.search.placeholder')}
               className="pl-9"
             />
+            {isSearching && (
+              <div className="absolute right-3 top-2.5">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary-500" />
+              </div>
+            )}
           </div>
           <Button
             variant="primary"
@@ -258,49 +309,20 @@ function ThreadList({
       {threads.map((thread) => {
         const hasUnread = unreadThreadIds.has(thread.id)
         return (
-          <Card
+          <ThreadItem
             key={thread.id}
-            className="border border-gray-200 transition-shadow hover:shadow-md dark:border-gray-700"
-          >
-            <button
-              type="button"
-              onClick={() => onThreadClick(thread.id)}
-              className="flex w-full flex-col gap-3 p-4 text-left sm:flex-row sm:items-start sm:justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium uppercase tracking-wide text-primary-600 dark:text-primary-400">
-                    {thread.categoryName}
-                  </span>
-                  {hasUnread && <Badge>{t('forum.list.badgeNew')}</Badge>}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{thread.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {t('forum.list.meta', {
-                    author: thread.authorEmail || thread.authorId,
-                    replies: String(thread.replyCount),
-                    attachments: String(thread.attachmentCount),
-                  })}
-                </p>
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {formatRelativeTime(thread.lastPostAt, language)}
-              </div>
-            </button>
-          </Card>
+            thread={thread}
+            language={language}
+            hasUnread={hasUnread}
+            onThreadClick={onThreadClick}
+            t={t}
+          />
         )
       })}
     </div>
   )
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full bg-primary-500 px-2 py-0.5 text-xs font-semibold text-white">
-      {children}
-    </span>
-  )
-}
 
 interface PaginationProps {
   currentPage: number
@@ -494,21 +516,5 @@ function CreateThreadModal({ isOpen, onClose, onSubmit, categories, isSubmitting
       </form>
     </Modal>
   )
-}
-
-function useDebouncedValue<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  React.useEffect(() => {
-    const handler = window.setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      window.clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
 }
 

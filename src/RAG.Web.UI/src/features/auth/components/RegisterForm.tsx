@@ -6,6 +6,7 @@ import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useToast } from '@/shared/contexts/ToastContext'
 import { useRegisterValidation, usePasswordRequirements } from '@/features/auth/hooks/useRegisterValidation'
+import { SubmitButton } from '@/shared/components/ui/SubmitButton'
 
 interface RegisterFormData {
   firstName: string
@@ -288,23 +289,16 @@ export function RegisterForm() {
           </div>
 
           <div>
-            <button
-              type="submit"
+            <SubmitButton
               disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors"
+              loadingText={t('auth.register.signing_up')}
             >
-              {isSubmitting ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {t('auth.register.signing_up')}
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <Check className="h-4 w-4 mr-2" />
-                  {t('auth.register.sign_up')}
-                </div>
-              )}
-            </button>
+              <div className="flex items-center">
+                <Check className="h-4 w-4 mr-2" />
+                {t('auth.register.sign_up')}
+              </div>
+            </SubmitButton>
           </div>
 
           <div className="text-center">

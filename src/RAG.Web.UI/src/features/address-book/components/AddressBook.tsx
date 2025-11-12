@@ -1,5 +1,5 @@
 // AddressBook - Main component for managing contacts
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import addressBookService from '@/features/address-book/services/addressBook.service'
@@ -50,6 +50,20 @@ export function AddressBook() {
   // Check if user can modify directly (Admin/PowerUser)
   const canModify = !!(isAuthenticated && (user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')))
 
+  // Optimistic contacts state using React 19 useOptimistic
+  const [isPending, startTransition] = useTransition()
+  const [optimisticContacts, addOptimisticContact] = useOptimistic(
+    contacts,
+    (state: ContactListItem[], newContact: ContactListItem) => {
+      // Check if contact already exists (prevent duplicates)
+      if (state.some(contact => contact.id === newContact.id)) {
+        return state
+      }
+      // Add new contact at the beginning
+      return [newContact, ...state]
+    }
+  )
+
   // Load contacts on mount
   useEffect(() => {
     loadContacts()
@@ -91,8 +105,33 @@ export function AddressBook() {
 
   const handleCreateContact = async (data: CreateContactRequest) => {
     if (canModify) {
-      await addressBookService.createContact(data)
-      await loadContacts()
+      // Create optimistic contact
+      const optimisticContact: ContactListItem = {
+        id: `temp-${Date.now()}`,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        displayName: data.displayName,
+        department: data.department,
+        position: data.position,
+        location: data.location,
+        email: data.email,
+        mobilePhone: data.mobilePhone,
+        isActive: true,
+      }
+
+      // Add optimistic contact immediately
+      startTransition(() => {
+        addOptimisticContact(optimisticContact)
+      })
+
+      try {
+        await addressBookService.createContact(data)
+        // Reload to get the real contact with proper ID
+        await loadContacts()
+      } catch (error) {
+        // useOptimistic automatically rolls back on error
+        throw error
+      }
     } else {
       // Propose change
       await addressBookService.proposeChange({
@@ -251,7 +290,7 @@ export function AddressBook() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-slate-600'
             }`}
           >
-            {t('addressBook.tabs.contacts')} ({contacts.length})
+            {t('addressBook.tabs.contacts')} ({optimisticContacts.length})
           </button>
           {canModify && (
             <>
@@ -314,7 +353,7 @@ export function AddressBook() {
           </div>
 
           <ContactsTable
-            contacts={contacts}
+            contacts={optimisticContacts}
             onEdit={canModify ? openEditForm : undefined}
             onDelete={canModify ? handleDeleteContact : undefined}
             onProposeChange={!canModify && isAuthenticated ? handleProposeChange : undefined}

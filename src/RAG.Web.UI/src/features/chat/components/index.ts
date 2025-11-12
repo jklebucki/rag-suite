@@ -4,3 +4,4 @@ export { ChatSidebar } from './ChatSidebar';
 export { MessageInput } from './MessageInput';
 export { MessageSources } from './MessageSources';
 export { MarkdownMessage } from './MarkdownMessage';
+export { MessageItem } from './MessageItem';
