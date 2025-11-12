@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using RAG.Abstractions.Common.Api;
+using RAG.CyberPanel.Common;
 
 namespace RAG.CyberPanel.Features.GetQuiz;
 
@@ -17,10 +19,9 @@ public static class GetQuizEndpoint
         {
             var result = await service.GetQuizAsync(id, ct);
 
-            if (result == null)
-                return Results.NotFound(new { Message = "Quiz not found" });
-
-            return Results.Ok(result);
+            return result != null
+                ? result.ToApiResponse()
+                : ApiResponseExtensions.ToApiNotFoundResponse<GetQuizResponse>("Quiz not found");
         })
         .WithName("GetQuiz")
         .WithOpenApi()

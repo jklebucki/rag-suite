@@ -1,5 +1,6 @@
 import { apiHttpClient } from '@/shared/services/api/httpClients'
 import { logger } from '@/utils/logger'
+import type { ApiResponse } from '@/shared/types/api'
 import type {
   Contact,
   ContactChangeProposal,
@@ -34,8 +35,8 @@ class AddressBookService {
   }
 
   async getContact(contactId: string): Promise<Contact> {
-    const response = await apiHttpClient.get<Contact>(`/addressbook/${contactId}`)
-    return response.data
+    const response = await apiHttpClient.get<ApiResponse<Contact>>(`/addressbook/${contactId}`)
+    return response.data.data
   }
 
   async searchContacts(request?: SearchContactsRequest): Promise<SearchContactsResponse> {

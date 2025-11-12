@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using RAG.Abstractions.Common.Api;
+using RAG.AddressBook.Common;
 
 namespace RAG.AddressBook.Features.GetContact;
 
@@ -22,6 +24,8 @@ public static class GetContactEndpoint
         CancellationToken cancellationToken)
     {
         var response = await service.GetByIdAsync(id, cancellationToken);
-        return response is not null ? Results.Ok(response) : Results.NotFound();
+        return response != null
+            ? response.ToApiResponse()
+            : ApiResponseExtensions.ToApiNotFoundResponse<GetContactResponse>("Contact not found");
     }
 }

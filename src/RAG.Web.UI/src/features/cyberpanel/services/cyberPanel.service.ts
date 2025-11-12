@@ -1,4 +1,5 @@
 import { apiHttpClient } from '@/shared/services/api/httpClients'
+import type { ApiResponse } from '@/shared/types/api'
 import type {
   CreateQuizRequest,
   CreateQuizResponse,
@@ -22,8 +23,8 @@ class CyberPanelService {
   }
 
   async getQuizForTaking(quizId: string): Promise<GetQuizResponse> {
-    const response = await apiHttpClient.get<GetQuizResponse>(`/cyberpanel/quizzes/${quizId}`)
-    return response.data
+    const response = await apiHttpClient.get<ApiResponse<GetQuizResponse>>(`/cyberpanel/quizzes/${quizId}`)
+    return response.data.data
   }
 
   async createQuiz(quiz: CreateQuizRequest): Promise<CreateQuizResponse> {

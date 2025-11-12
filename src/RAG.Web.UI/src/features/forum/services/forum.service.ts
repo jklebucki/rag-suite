@@ -1,4 +1,5 @@
 import { apiHttpClient, forumHttpClient } from '@/shared/services/api/httpClients'
+import type { ApiResponse } from '@/shared/types/api'
 import type {
   CreatePostPayload,
   CreatePostResponse,
@@ -36,8 +37,8 @@ export async function fetchForumThreads(params: ListThreadsParams): Promise<List
 }
 
 export async function fetchForumThread(threadId: string): Promise<ForumThreadDetail> {
-  const { data } = await forumHttpClient.get<GetThreadResponse>(`/threads/${threadId}`)
-  return data.thread
+  const { data } = await forumHttpClient.get<ApiResponse<GetThreadResponse>>(`/threads/${threadId}`)
+  return data.data.thread
 }
 
 export async function createForumThread(payload: CreateThreadPayload): Promise<CreateThreadResponse> {

@@ -1,35 +1,32 @@
-namespace RAG.Orchestrator.Api.Models;
+using Microsoft.AspNetCore.Http;
+using RAG.Abstractions.Common.Api;
 
-public record ApiResponse<T>(
-    T Data,
-    bool Success = true,
-    string? Message = null,
-    string[]? Errors = null
-);
+namespace RAG.CyberPanel.Common;
 
 public static class ApiResponseExtensions
 {
     public static IResult ToApiResponse<T>(this T data, string? message = null)
     {
         var response = new ApiResponse<T>(data, true, message);
-        return Results.Ok(response);
+        return Microsoft.AspNetCore.Http.Results.Ok(response);
     }
 
     public static IResult ToApiErrorResponse<T>(string message, string[]? errors = null)
     {
         var response = new ApiResponse<T>(default!, false, message, errors);
-        return Results.BadRequest(response);
+        return Microsoft.AspNetCore.Http.Results.BadRequest(response);
     }
 
     public static IResult ToApiNotFoundResponse<T>(string? message = null)
     {
         var response = new ApiResponse<T>(default!, false, message ?? "Resource not found");
-        return Results.NotFound(response);
+        return Microsoft.AspNetCore.Http.Results.NotFound(response);
     }
 
     public static IResult ToApiCreatedResponse<T>(this T data, string location, string? message = null)
     {
         var response = new ApiResponse<T>(data, true, message);
-        return Results.Created(location, response);
+        return Microsoft.AspNetCore.Http.Results.Created(location, response);
     }
 }
+
