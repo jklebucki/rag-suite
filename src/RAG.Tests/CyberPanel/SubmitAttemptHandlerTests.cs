@@ -12,7 +12,7 @@ public class SubmitAttemptHandlerTests : IDisposable
 {
     private readonly CyberPanelDbContext _context;
     private readonly Mock<IUserContextService> _mockUserContext;
-    private readonly Mock<ICyberPanelService> _mockService;
+    private readonly ICyberPanelService _realService;
 
     public SubmitAttemptHandlerTests()
     {
@@ -22,7 +22,8 @@ public class SubmitAttemptHandlerTests : IDisposable
 
         _context = new CyberPanelDbContext(options);
         _mockUserContext = new Mock<IUserContextService>();
-        _mockService = new Mock<ICyberPanelService>();
+        // Używamy rzeczywistego serwisu zamiast mocka, żeby testować rzeczywistą logikę biznesową
+        _realService = new CyberPanelService();
     }
 
     public void Dispose()
@@ -43,11 +44,10 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(5);
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
+        // Używamy poprawnej odpowiedzi (q1Options[0] jest poprawne)
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
@@ -61,6 +61,7 @@ public class SubmitAttemptHandlerTests : IDisposable
 
         // Assert
         Assert.NotEqual(Guid.Empty, result.AttemptId);
+        // Rzeczywisty wynik z logiki biznesowej - pierwsza odpowiedź jest poprawna (5 punktów)
         Assert.Equal(5, result.Score);
         Assert.Equal(10, result.MaxScore); // 5 + 5 points
         Assert.Single(result.PerQuestionResults);
@@ -84,11 +85,10 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns((string?)null);
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(0);
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
+        // Używamy niepoprawnej odpowiedzi (q1Options[1] jest niepoprawne)
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
@@ -111,7 +111,7 @@ public class SubmitAttemptHandlerTests : IDisposable
     {
         // Arrange
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
         var request = new SubmitAttemptRequest(
             Guid.NewGuid(),
@@ -138,17 +138,16 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q2Options = q2.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(10); // Full score
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
+        // Używamy poprawnych odpowiedzi dla obu pytań
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
             {
-                new AnswerDto(q1.Id, new[] { q1Options[0].Id }),
-                new AnswerDto(q2.Id, new[] { q2Options[0].Id })
+                new AnswerDto(q1.Id, new[] { q1Options[0].Id }), // Poprawna odpowiedź
+                new AnswerDto(q2.Id, new[] { q2Options[0].Id }) // Poprawna odpowiedź
             }
         );
 
@@ -156,6 +155,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var result = await handler.Handle(request, CancellationToken.None);
 
         // Assert
+        // Rzeczywisty wynik z logiki biznesowej - obie odpowiedzi są poprawne (5 + 5 = 10 punktów)
         Assert.Equal(10, result.Score);
         Assert.Equal(10, result.MaxScore);
         Assert.Equal(2, result.PerQuestionResults.Length);
@@ -175,17 +175,15 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(5); // Partial score
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
-        // Only answer first question
+        // Odpowiadamy tylko na pierwsze pytanie (poprawnie)
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
             {
-                new AnswerDto(q1.Id, new[] { q1Options[0].Id })
+                new AnswerDto(q1.Id, new[] { q1Options[0].Id }) // Poprawna odpowiedź
             }
         );
 
@@ -193,6 +191,7 @@ public class SubmitAttemptHandlerTests : IDisposable
         var result = await handler.Handle(request, CancellationToken.None);
 
         // Assert
+        // Rzeczywisty wynik z logiki biznesowej - tylko pierwsza odpowiedź jest poprawna (5 punktów)
         Assert.Equal(5, result.Score);
         Assert.Equal(10, result.MaxScore);
         Assert.Single(result.PerQuestionResults);
@@ -211,17 +210,16 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q1Options = q1.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(5);
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
+        // Używamy poprawnej opcji (q1Options[0] jest poprawne)
         var optionId = q1Options[0].Id;
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
             {
-                // Duplicate option IDs
+                // Duplikaty ID opcji - powinny być usunięte przez Distinct()
                 new AnswerDto(q1.Id, new Guid[] { optionId, optionId, optionId })
             }
         );
@@ -254,18 +252,16 @@ public class SubmitAttemptHandlerTests : IDisposable
         var q2Options = q2.Options.ToList();
 
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
-        _mockService.Setup(s => s.CalculateScore(It.IsAny<Quiz>(), It.IsAny<IEnumerable<QuizAnswer>>()))
-            .Returns(5);
 
-        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _mockService.Object);
+        var handler = new SubmitAttemptHandler(_context, _mockUserContext.Object, _realService);
 
         var request = new SubmitAttemptRequest(
             quiz.Id,
             new[]
             {
-                // Correct answer
+                // Poprawna odpowiedź (q1Options[0] jest poprawne)
                 new AnswerDto(q1.Id, new[] { q1Options[0].Id }),
-                // Wrong answer
+                // Niepoprawna odpowiedź (q2Options[1] jest niepoprawne)
                 new AnswerDto(q2.Id, new[] { q2Options[1].Id })
             }
         );
@@ -274,6 +270,8 @@ public class SubmitAttemptHandlerTests : IDisposable
         var result = await handler.Handle(request, CancellationToken.None);
 
         // Assert
+        // Rzeczywisty wynik z logiki biznesowej - tylko pierwsza odpowiedź jest poprawna (5 punktów)
+        Assert.Equal(5, result.Score);
         Assert.Equal(2, result.PerQuestionResults.Length);
 
         var q1Result = result.PerQuestionResults.First(r => r.QuestionId == q1.Id);
