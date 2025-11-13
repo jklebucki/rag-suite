@@ -154,6 +154,7 @@ export const pl: TranslationKeys = {
   'auth.login.sign_up': 'Zarejestruj się',
   'auth.login.success_title': 'Witaj ponownie!',
   'auth.login.success_message': 'Zostałeś pomyślnie zalogowany.',
+  'auth.login.error_invalid_credentials': 'Nieprawidłowy email lub hasło. Sprawdź wprowadzone dane i spróbuj ponownie.',
 
   'auth.register.title': 'Utwórz konto',
   'auth.register.subtitle': 'Dołącz do nas i rozpocznij swoją podróż.',

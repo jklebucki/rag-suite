@@ -154,6 +154,7 @@ export const hu: TranslationKeys = {
   'auth.login.sign_up': 'Regisztrálj',
   'auth.login.success_title': 'Üdvözlünk újra!',
   'auth.login.success_message': 'Sikeresen bejelentkeztél.',
+  'auth.login.error_invalid_credentials': 'Érvénytelen email vagy jelszó. Kérjük, ellenőrizze a megadott adatokat és próbálja újra.',
 
   'auth.register.title': 'Fiók Létrehozása',
   'auth.register.subtitle': 'Csatlakozz hozzánk és kezdd el az utazást.',

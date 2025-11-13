@@ -90,12 +90,34 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         } else {
           return {
             success: false,
-            error: t('common.error') || 'Invalid credentials',
+            error: t('auth.login.error_invalid_credentials'),
             fieldErrors: {},
           }
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : (t('common.error') || 'An error occurred')
+        // Extract error message from API response
+        let errorMessage = t('auth.login.error_invalid_credentials')
+        
+        if (error && typeof error === 'object') {
+          const apiError = error as { response?: { status?: number; data?: { message?: string } }; message?: string }
+          
+          // Check if it's a 401 error (unauthorized/invalid credentials)
+          if (apiError.response?.status === 401) {
+            // Use message from API if available, otherwise use translation
+            errorMessage = apiError.response.data?.message 
+              ? apiError.response.data.message 
+              : t('auth.login.error_invalid_credentials')
+          } else if (apiError.response?.data?.message) {
+            // For other errors, use API message if available
+            errorMessage = apiError.response.data.message
+          } else if (apiError.message && !apiError.message.includes('status code')) {
+            // Use error message if it's not a generic axios error message
+            errorMessage = apiError.message
+          }
+        } else if (error instanceof Error && !error.message.includes('status code')) {
+          errorMessage = error.message
+        }
+        
         return {
           success: false,
           error: errorMessage,

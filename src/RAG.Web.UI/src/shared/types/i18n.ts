@@ -173,6 +173,7 @@ export interface TranslationKeys {
   'auth.login.sign_up': string;
   'auth.login.success_title': string;
   'auth.login.success_message': string;
+  'auth.login.error_invalid_credentials': string;
 
   'auth.register.title': string;
   'auth.register.subtitle': string;

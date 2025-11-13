@@ -259,6 +259,7 @@ export const ro: TranslationKeys = {
   'auth.login.sign_up': 'Înregistrează-te',
   'auth.login.success_title': 'Bun venit înapoi!',
   'auth.login.success_message': 'Te-ai autentificat cu succes.',
+  'auth.login.error_invalid_credentials': 'Email sau parolă incorectă. Verifică datele introduse și încearcă din nou.',
 
   'auth.register.title': 'Creează Cont',
   'auth.register.subtitle': 'Alătură-te nouă și începe călătoria.',

@@ -154,6 +154,7 @@ export const en: TranslationKeys = {
   'auth.login.sign_up': 'Sign up',
   'auth.login.success_title': 'Welcome back!',
   'auth.login.success_message': 'You have been successfully signed in.',
+  'auth.login.error_invalid_credentials': 'Invalid email or password. Please check your credentials and try again.',
 
   'auth.register.title': 'Create Account',
   'auth.register.subtitle': 'Join us and start your journey.',

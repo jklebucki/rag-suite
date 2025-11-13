@@ -154,6 +154,7 @@ export const nl: TranslationKeys = {
   'auth.login.sign_up': 'Registreren',
   'auth.login.success_title': 'Welkom terug!',
   'auth.login.success_message': 'Je bent succesvol ingelogd.',
+  'auth.login.error_invalid_credentials': 'Ongeldig e-mailadres of wachtwoord. Controleer uw gegevens en probeer het opnieuw.',
 
   'auth.register.title': 'Account Aanmaken',
   'auth.register.subtitle': 'Sluit je bij ons aan en begin je reis.',
