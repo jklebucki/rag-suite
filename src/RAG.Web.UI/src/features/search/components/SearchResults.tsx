@@ -8,13 +8,15 @@ import { formatDate } from '@/utils/date'
 import fileService from '@/shared/services/file.service'
 import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
+import { useAsyncComponent } from '@/shared/hooks/useAsyncComponent'
 
 // Lazy load PDFViewerModal using React 19's use() hook
-// Note: We still use React.lazy for compatibility, but this demonstrates
-// how use() could be used for lazy loading
-const PDFViewerModal = React.lazy(() =>
-  import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
-)
+const PDFViewerModalPromise = import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
+
+function PDFViewerModalLoader(props: React.ComponentProps<typeof import('@/shared/components/ui/PDFViewerModal').PDFViewerModal>) {
+  const PDFViewerModal = useAsyncComponent(PDFViewerModalPromise)
+  return <PDFViewerModal {...props} />
+}
 
 interface SearchResultsProps {
   searchResults?: {
@@ -171,7 +173,7 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
           </div>
         </Modal>
       }>
-        <PDFViewerModal
+        <PDFViewerModalLoader
           isOpen={!!pdfViewerFilePath}
           onClose={() => setPdfViewerFilePath(null)}
           filePath={pdfViewerFilePath || ''}

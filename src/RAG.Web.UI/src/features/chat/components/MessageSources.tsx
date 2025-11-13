@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { FileText, ExternalLink, Clock, Star, Folder, Download, Eye } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
@@ -8,11 +8,15 @@ import { DocumentDetail } from '@/features/search/components/DocumentDetail'
 import { useDocumentDetail } from '@/features/search/hooks/useDocumentDetail'
 import type { SearchResult } from '@/features/search/types/search'
 import { logger } from '@/utils/logger'
+import { useAsyncComponent } from '@/shared/hooks/useAsyncComponent'
 
-// Lazy load PDFViewerModal
-const PDFViewerModal = React.lazy(() =>
-  import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
-)
+// Lazy load PDFViewerModal using React 19's use() hook
+const PDFViewerModalPromise = import('@/shared/components/ui/PDFViewerModal').then(module => ({ default: module.PDFViewerModal }))
+
+function PDFViewerModalLoader(props: React.ComponentProps<typeof import('@/shared/components/ui/PDFViewerModal').PDFViewerModal>) {
+  const PDFViewerModal = useAsyncComponent(PDFViewerModalPromise)
+  return <PDFViewerModal {...props} />
+}
 
 interface MessageSourcesProps {
   sources: SearchResult[]
@@ -227,7 +231,7 @@ export function MessageSources({ sources, messageRole }: MessageSourcesProps) {
           </div>
         </div>
       }>
-        <PDFViewerModal
+        <PDFViewerModalLoader
           isOpen={!!pdfViewerFilePath}
           onClose={() => setPdfViewerFilePath(null)}
           filePath={pdfViewerFilePath || ''}

@@ -1,74 +1,137 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from 'react-router-dom'
 import { Layout } from '@/shared/components/layout'
 import { LandingPage } from '@/features/landing/components/LandingPage'
 import { ProtectedRoute, AuthRoute, AdminProtectedRoute } from '@/features/auth/components'
 import { RoleProtectedRoute } from '@/features/auth/components/RoleProtectedRoute'
+import { useAsyncComponent } from '@/shared/hooks/useAsyncComponent'
 
-const Dashboard = lazy(() =>
-  import('@/features/dashboard/components/Dashboard').then(module => ({ default: module.Dashboard })),
-)
-const ChatInterface = lazy(() =>
-  import('@/features/chat/components/ChatInterface').then(module => ({ default: module.ChatInterface })),
-)
-const SearchInterface = lazy(() =>
-  import('@/features/search/components/SearchInterface').then(module => ({ default: module.SearchInterface })),
-)
-const Settings = lazy(() =>
-  import('@/features/settings/components/Settings').then(module => ({ default: module.Settings })),
-)
-const About = lazy(() =>
-  import('@/features/about/components/About').then(module => ({ default: module.About })),
-)
-const UserGuide = lazy(() =>
-  import('@/features/user-guide/components/UserGuide').then(module => ({ default: module.UserGuide })),
-)
-const AddressBook = lazy(() =>
-  import('@/features/address-book/components/AddressBook').then(module => ({ default: module.AddressBook })),
-)
-const LoginForm = lazy(() =>
-  import('@/features/auth/components/LoginForm').then(module => ({ default: module.LoginForm })),
-)
-const RegisterForm = lazy(() =>
-  import('@/features/auth/components/RegisterForm').then(module => ({ default: module.RegisterForm })),
-)
-const ResetPasswordForm = lazy(() =>
-  import('@/features/auth/components/ResetPasswordForm').then(module => ({ default: module.ResetPasswordForm })),
-)
-const ResetPasswordConfirmForm = lazy(() =>
-  import('@/features/auth/components/ResetPasswordConfirmForm').then(module => ({
-    default: module.ResetPasswordConfirmForm,
-  })),
-)
-const CyberPanelLayout = lazy(() =>
-  import('@/features/cyberpanel/components/CyberPanelLayout').then(module => ({
-    default: module.CyberPanelLayout,
-  })),
-)
-const Quizzes = lazy(() =>
-  import('@/features/cyberpanel/components/Quizzes').then(module => ({ default: module.Quizzes })),
-)
-const QuizManager = lazy(() =>
-  import('@/features/cyberpanel/components/QuizManager').then(module => ({ default: module.QuizManager })),
-)
-const QuizBuilder = lazy(() =>
-  import('@/features/cyberpanel/components/QuizBuilder').then(module => ({ default: module.QuizBuilder })),
-)
-const QuizResults = lazy(() =>
-  import('@/features/cyberpanel/components/QuizResults').then(module => ({ default: module.QuizResults })),
-)
-const QuizDetail = lazy(() =>
-  import('@/features/cyberpanel/components/QuizDetail').then(module => ({ default: module.QuizDetail })),
-)
-const AttemptDetail = lazy(() =>
-  import('@/features/cyberpanel/components/AttemptDetail').then(module => ({ default: module.AttemptDetail })),
-)
-const ForumPage = lazy(() =>
-  import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage })),
-)
-const ThreadDetailPage = lazy(() =>
-  import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage })),
-)
+// Component promises for lazy loading using React 19's use() hook
+const DashboardPromise = import('@/features/dashboard/components/Dashboard').then(module => ({ default: module.Dashboard }))
+const ChatInterfacePromise = import('@/features/chat/components/ChatInterface').then(module => ({ default: module.ChatInterface }))
+const SearchInterfacePromise = import('@/features/search/components/SearchInterface').then(module => ({ default: module.SearchInterface }))
+const SettingsPromise = import('@/features/settings/components/Settings').then(module => ({ default: module.Settings }))
+const AboutPromise = import('@/features/about/components/About').then(module => ({ default: module.About }))
+const UserGuidePromise = import('@/features/user-guide/components/UserGuide').then(module => ({ default: module.UserGuide }))
+const AddressBookPromise = import('@/features/address-book/components/AddressBook').then(module => ({ default: module.AddressBook }))
+const LoginFormPromise = import('@/features/auth/components/LoginForm').then(module => ({ default: module.LoginForm }))
+const RegisterFormPromise = import('@/features/auth/components/RegisterForm').then(module => ({ default: module.RegisterForm }))
+const ResetPasswordFormPromise = import('@/features/auth/components/ResetPasswordForm').then(module => ({ default: module.ResetPasswordForm }))
+const ResetPasswordConfirmFormPromise = import('@/features/auth/components/ResetPasswordConfirmForm').then(module => ({
+  default: module.ResetPasswordConfirmForm,
+}))
+const CyberPanelLayoutPromise = import('@/features/cyberpanel/components/CyberPanelLayout').then(module => ({
+  default: module.CyberPanelLayout,
+}))
+const QuizzesPromise = import('@/features/cyberpanel/components/Quizzes').then(module => ({ default: module.Quizzes }))
+const QuizManagerPromise = import('@/features/cyberpanel/components/QuizManager').then(module => ({ default: module.QuizManager }))
+const QuizBuilderPromise = import('@/features/cyberpanel/components/QuizBuilder').then(module => ({ default: module.QuizBuilder }))
+const QuizResultsPromise = import('@/features/cyberpanel/components/QuizResults').then(module => ({ default: module.QuizResults }))
+const QuizDetailPromise = import('@/features/cyberpanel/components/QuizDetail').then(module => ({ default: module.QuizDetail }))
+const AttemptDetailPromise = import('@/features/cyberpanel/components/AttemptDetail').then(module => ({ default: module.AttemptDetail }))
+const ForumPagePromise = import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage }))
+const ThreadDetailPagePromise = import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage }))
+
+// Component loaders using use() hook
+function DashboardLoader() {
+  const Dashboard = useAsyncComponent(DashboardPromise)
+  return <Dashboard />
+}
+
+function ChatInterfaceLoader() {
+  const ChatInterface = useAsyncComponent(ChatInterfacePromise)
+  return <ChatInterface />
+}
+
+function SearchInterfaceLoader() {
+  const SearchInterface = useAsyncComponent(SearchInterfacePromise)
+  return <SearchInterface />
+}
+
+function SettingsLoader() {
+  const Settings = useAsyncComponent(SettingsPromise)
+  return <Settings />
+}
+
+function AboutLoader() {
+  const About = useAsyncComponent(AboutPromise)
+  return <About />
+}
+
+function UserGuideLoader() {
+  const UserGuide = useAsyncComponent(UserGuidePromise)
+  return <UserGuide />
+}
+
+function AddressBookLoader() {
+  const AddressBook = useAsyncComponent(AddressBookPromise)
+  return <AddressBook />
+}
+
+function LoginFormLoader() {
+  const LoginForm = useAsyncComponent(LoginFormPromise)
+  return <LoginForm />
+}
+
+function RegisterFormLoader() {
+  const RegisterForm = useAsyncComponent(RegisterFormPromise)
+  return <RegisterForm />
+}
+
+function ResetPasswordFormLoader() {
+  const ResetPasswordForm = useAsyncComponent(ResetPasswordFormPromise)
+  return <ResetPasswordForm />
+}
+
+function ResetPasswordConfirmFormLoader() {
+  const ResetPasswordConfirmForm = useAsyncComponent(ResetPasswordConfirmFormPromise)
+  return <ResetPasswordConfirmForm />
+}
+
+function CyberPanelLayoutLoader() {
+  const CyberPanelLayout = useAsyncComponent(CyberPanelLayoutPromise)
+  return <CyberPanelLayout />
+}
+
+function QuizzesLoader() {
+  const Quizzes = useAsyncComponent(QuizzesPromise)
+  return <Quizzes />
+}
+
+function QuizManagerLoader() {
+  const QuizManager = useAsyncComponent(QuizManagerPromise)
+  return <QuizManager />
+}
+
+function QuizBuilderLoader() {
+  const QuizBuilder = useAsyncComponent(QuizBuilderPromise)
+  return <QuizBuilder />
+}
+
+function QuizResultsLoader() {
+  const QuizResults = useAsyncComponent(QuizResultsPromise)
+  return <QuizResults />
+}
+
+function QuizDetailLoader() {
+  const QuizDetail = useAsyncComponent(QuizDetailPromise)
+  return <QuizDetail />
+}
+
+function AttemptDetailLoader() {
+  const AttemptDetail = useAsyncComponent(AttemptDetailPromise)
+  return <AttemptDetail />
+}
+
+function ForumPageLoader() {
+  const ForumPage = useAsyncComponent(ForumPagePromise)
+  return <ForumPage />
+}
+
+function ThreadDetailPageLoader() {
+  const ThreadDetailPage = useAsyncComponent(ThreadDetailPagePromise)
+  return <ThreadDetailPage />
+}
 
 function RouteSuspense({ children }: { children: ReactNode }) {
   return (
@@ -100,7 +163,7 @@ function ChatRoute() {
     }
   }, [location.key, location.pathname])
 
-  return <ChatInterface key={renderKey} />
+  return <ChatInterfaceLoader key={renderKey} />
 }
 
 export function createAppRouter() {
@@ -118,7 +181,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
@@ -138,7 +201,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <SearchInterface />
+                  <SearchInterfaceLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
@@ -148,7 +211,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <ForumPage />
+                  <ForumPageLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
@@ -158,7 +221,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <ThreadDetailPage />
+                  <ThreadDetailPageLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
@@ -167,7 +230,7 @@ export function createAppRouter() {
             path: 'address-book',
             element: (
               <RouteSuspense>
-                <AddressBook />
+                <AddressBookLoader />
               </RouteSuspense>
             ),
           },
@@ -175,7 +238,7 @@ export function createAppRouter() {
             path: 'guide',
             element: (
               <RouteSuspense>
-                <UserGuide />
+                <UserGuideLoader />
               </RouteSuspense>
             ),
           },
@@ -183,7 +246,7 @@ export function createAppRouter() {
             path: 'about',
             element: (
               <RouteSuspense>
-                <About />
+                <AboutLoader />
               </RouteSuspense>
             ),
           },
@@ -192,7 +255,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <AdminProtectedRoute>
-                  <Settings />
+                  <SettingsLoader />
                 </AdminProtectedRoute>
               </RouteSuspense>
             ),
@@ -202,7 +265,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <CyberPanelLayout />
+                  <CyberPanelLayoutLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
@@ -211,7 +274,7 @@ export function createAppRouter() {
                 index: true,
                 element: (
                   <RouteSuspense>
-                    <Quizzes />
+                    <QuizzesLoader />
                   </RouteSuspense>
                 ),
               },
@@ -219,7 +282,7 @@ export function createAppRouter() {
                 path: 'quizzes',
                 element: (
                   <RouteSuspense>
-                    <Quizzes />
+                    <QuizzesLoader />
                   </RouteSuspense>
                 ),
               },
@@ -227,7 +290,7 @@ export function createAppRouter() {
                 path: 'quizzes/:id',
                 element: (
                   <RouteSuspense>
-                    <QuizDetail />
+                    <QuizDetailLoader />
                   </RouteSuspense>
                 ),
               },
@@ -236,7 +299,7 @@ export function createAppRouter() {
                 element: (
                   <RouteSuspense>
                     <RoleProtectedRoute allowedRoles={['Admin', 'PowerUser']}>
-                      <QuizManager />
+                      <QuizManagerLoader />
                     </RoleProtectedRoute>
                   </RouteSuspense>
                 ),
@@ -246,7 +309,7 @@ export function createAppRouter() {
                 element: (
                   <RouteSuspense>
                     <AdminProtectedRoute>
-                      <QuizBuilder />
+                      <QuizBuilderLoader />
                     </AdminProtectedRoute>
                   </RouteSuspense>
                 ),
@@ -256,7 +319,7 @@ export function createAppRouter() {
                 element: (
                   <RouteSuspense>
                     <RoleProtectedRoute allowedRoles={['Admin', 'PowerUser', 'User']}>
-                      <QuizResults />
+                      <QuizResultsLoader />
                     </RoleProtectedRoute>
                   </RouteSuspense>
                 ),
@@ -266,7 +329,7 @@ export function createAppRouter() {
                 element: (
                   <RouteSuspense>
                     <RoleProtectedRoute allowedRoles={['Admin', 'PowerUser', 'User']}>
-                      <AttemptDetail />
+                      <AttemptDetailLoader />
                     </RoleProtectedRoute>
                   </RouteSuspense>
                 ),
@@ -278,7 +341,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <AuthRoute>
-                  <LoginForm />
+                  <LoginFormLoader />
                 </AuthRoute>
               </RouteSuspense>
             ),
@@ -288,7 +351,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <AuthRoute>
-                  <RegisterForm />
+                  <RegisterFormLoader />
                 </AuthRoute>
               </RouteSuspense>
             ),
@@ -298,7 +361,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <AuthRoute>
-                  <ResetPasswordForm />
+                  <ResetPasswordFormLoader />
                 </AuthRoute>
               </RouteSuspense>
             ),
@@ -308,7 +371,7 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <AuthRoute>
-                  <ResetPasswordConfirmForm />
+                  <ResetPasswordConfirmFormLoader />
                 </AuthRoute>
               </RouteSuspense>
             ),

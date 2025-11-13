@@ -54,7 +54,15 @@ export function AddressBook() {
   const [isPending, startTransition] = useTransition()
   const [optimisticContacts, addOptimisticContact] = useOptimistic(
     contacts,
-    (state: ContactListItem[], newContact: ContactListItem) => {
+    (state: ContactListItem[], action: ContactListItem | { type: 'update'; contact: ContactListItem }) => {
+      // Handle update action
+      if (typeof action === 'object' && 'type' in action && action.type === 'update') {
+        return state.map(contact =>
+          contact.id === action.contact.id ? action.contact : contact
+        )
+      }
+      // Handle add action (backward compatibility)
+      const newContact = action as ContactListItem
       // Check if contact already exists (prevent duplicates)
       if (state.some(contact => contact.id === newContact.id)) {
         return state
@@ -105,31 +113,41 @@ export function AddressBook() {
 
   const handleCreateContact = async (data: CreateContactRequest) => {
     if (canModify) {
-      // Create optimistic contact
-      const optimisticContact: ContactListItem = {
-        id: `temp-${Date.now()}`,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        displayName: data.displayName,
-        department: data.department,
-        position: data.position,
-        location: data.location,
-        email: data.email,
-        mobilePhone: data.mobilePhone,
-        isActive: true,
-      }
-
-      // Add optimistic contact immediately
-      startTransition(() => {
-        addOptimisticContact(optimisticContact)
-      })
-
       try {
-        await addressBookService.createContact(data)
-        // Reload to get the real contact with proper ID
-        await loadContacts()
+        const response = await addressBookService.createContact(data)
+        
+        // Create full ContactListItem from form data + API response id
+        const newContact: ContactListItem = {
+          id: response.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          displayName: data.displayName,
+          department: data.department,
+          position: data.position,
+          location: data.location,
+          email: data.email,
+          mobilePhone: data.mobilePhone,
+          isActive: true,
+        }
+        
+        // Add contact locally (at the beginning, will be sorted by table if needed)
+        startTransition(() => {
+          setContacts(prevContacts => [newContact, ...prevContacts])
+        })
+        
+        // Navigate to new contact after a short delay to allow DOM update
+        setTimeout(() => {
+          const contactRow = document.querySelector(`[data-contact-id="${response.id}"]`)
+          if (contactRow) {
+            contactRow.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            // Highlight the row briefly
+            contactRow.classList.add('bg-blue-50', 'dark:bg-blue-900/20')
+            setTimeout(() => {
+              contactRow.classList.remove('bg-blue-50', 'dark:bg-blue-900/20')
+            }, 2000)
+          }
+        }, 100)
       } catch (error) {
-        // useOptimistic automatically rolls back on error
         throw error
       }
     } else {
@@ -152,8 +170,34 @@ export function AddressBook() {
     if (!editingContact) return
 
     if (canModify) {
-      await addressBookService.updateContact(editingContact.id, data)
-      await loadContacts()
+      try {
+        await addressBookService.updateContact(editingContact.id, data)
+        
+        // Update only this specific row locally using form data
+        // API success guarantees data correctness
+        startTransition(() => {
+          setContacts(prevContacts =>
+            prevContacts.map(contact =>
+              contact.id === editingContact.id
+                ? {
+                    ...contact,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    displayName: data.displayName,
+                    department: data.department,
+                    position: data.position,
+                    location: data.location,
+                    email: data.email,
+                    mobilePhone: data.mobilePhone,
+                    isActive: data.isActive,
+                  }
+                : contact
+            )
+          )
+        })
+      } catch (error) {
+        throw error
+      }
     } else {
       // Propose change
       await addressBookService.proposeChange({
