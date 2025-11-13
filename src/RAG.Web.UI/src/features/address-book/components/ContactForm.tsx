@@ -1,6 +1,6 @@
 // ContactForm - Modal form for creating/editing contacts
 import React, { useState, useEffect, useActionState } from 'react'
-import type { ContactListItem, ContactData, CreateContactRequest, UpdateContactRequest } from '@/features/address-book/types/addressbook'
+import type { ContactListItem, Contact, ContactData, CreateContactRequest, UpdateContactRequest } from '@/features/address-book/types/addressbook'
 import { SubmitButton } from '@/shared/components/ui/SubmitButton'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
@@ -10,7 +10,7 @@ interface FormState {
 }
 
 interface ContactFormProps {
-  contact?: ContactListItem | null // null/undefined = create mode
+  contact?: ContactListItem | Contact | null // null/undefined = create mode
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: CreateContactRequest | UpdateContactRequest) => Promise<void>
@@ -56,14 +56,23 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         department: contact.department,
         position: contact.position,
         location: contact.location,
-        company: null, // not in list view
-        workPhone: null,
+        company: 'company' in contact ? contact.company : null, // Contact has company, ContactListItem doesn't
+        workPhone: 'workPhone' in contact ? contact.workPhone : null, // Contact has workPhone, ContactListItem doesn't
         mobilePhone: contact.mobilePhone,
         email: contact.email,
-        notes: null,
-        photoUrl: null
+        notes: 'notes' in contact ? contact.notes : null, // Contact has notes, ContactListItem doesn't
+        photoUrl: 'photoUrl' in contact ? contact.photoUrl : null // Contact has photoUrl, ContactListItem doesn't
       })
       setIsActive(contact.isActive)
+      
+      // Map ContactTagDto[] → string[] if contact has tags (Contact type)
+      // ContactListItem doesn't have tags, so this is for future compatibility
+      if ('tags' in contact && contact.tags) {
+        const tagNames = contact.tags.map(tag => typeof tag === 'string' ? tag : tag.tagName)
+        setTags(tagNames)
+      } else {
+        setTags([])
+      }
     } else {
       // Reset form for create mode
       setFormData({

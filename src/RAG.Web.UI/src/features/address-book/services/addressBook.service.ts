@@ -41,8 +41,7 @@ class AddressBookService {
 
   async searchContacts(request?: SearchContactsRequest): Promise<SearchContactsResponse> {
     const params = new URLSearchParams()
-    if (request?.query) params.append('query', request.query)
-    if (request?.includeInactive) params.append('includeInactive', 'true')
+    if (request?.searchTerm) params.append('searchTerm', request.searchTerm)
 
     const url = params.toString() ? `/addressbook/search?${params}` : '/addressbook/search'
     const response = await apiHttpClient.get<SearchContactsResponse>(url)

@@ -6,7 +6,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, act } from '@testing-library/react'
-import { fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SettingsForm } from './SettingsForm'
 
@@ -103,6 +102,7 @@ describe('SettingsForm', () => {
     mockUpdateLlmSettings.mockResolvedValue({})
     mockValidateLlmSettings.mockReturnValue({ isValid: true, errors: {} })
 
+    const user = userEvent.setup()
     render(<SettingsForm />)
     
     // Wait for form to load and data to be populated
@@ -121,12 +121,15 @@ describe('SettingsForm', () => {
       expect(form).toBeTruthy()
     }, { timeout: 5000 })
     
+    // Wait for loadAvailableModels to complete (it's called when url changes)
+    await waitFor(() => {
+      expect(mockGetAvailableLlmModelsFromUrl).toHaveBeenCalled()
+    }, { timeout: 5000 })
+    
     // Wait a bit more to ensure all effects have completed
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 200))
     })
-    
-    const form = document.querySelector('form') as HTMLFormElement
     
     // Verify form has all required values before submitting
     const urlInput = document.querySelector('input[name="url"]') as HTMLInputElement
@@ -135,9 +138,9 @@ describe('SettingsForm', () => {
     expect(urlInput?.value).toBe('http://localhost:11434')
     expect(isOllamaCheckbox?.checked).toBe(true) // Default value from mock
     
-    // Submit form using fireEvent.submit to trigger formAction
-    // This ensures FormData is properly constructed and formAction is called
-    fireEvent.submit(form)
+    // Get submit button and submit form using user.click to trigger proper useFormStatus flow
+    const submitButton = screen.getByRole('button', { name: /save/i })
+    await user.click(submitButton)
     
     // useActionState should call updateLlmSettings through formAction
     // formAction processes FormData, validates, and then calls updateLlmSettings
@@ -163,25 +166,47 @@ describe('SettingsForm', () => {
     const user = userEvent.setup()
     render(<SettingsForm />)
     
+    // Wait for form to load and data to be populated
+    // SettingsForm loads data in useEffect via loadSettings
     await waitFor(() => {
+      expect(mockGetLlmSettings).toHaveBeenCalled()
+    }, { timeout: 5000 })
+    
+    // Wait for form inputs to be populated with data
+    await waitFor(() => {
+      const urlInput = document.querySelector('input[name="url"]') as HTMLInputElement
+      expect(urlInput?.value).toBe('http://localhost:11434')
       expect(screen.getByLabelText(/url/i)).toBeInTheDocument()
+    }, { timeout: 5000 })
+    
+    // Wait for loadAvailableModels to complete (it's called when url changes)
+    await waitFor(() => {
+      expect(mockGetAvailableLlmModelsFromUrl).toHaveBeenCalled()
+    }, { timeout: 5000 })
+    
+    // Wait a bit more to ensure all effects have completed
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 200))
     })
     
     const submitButton = screen.getByRole('button', { name: /save/i })
     
-    await act(async () => {
-      await user.click(submitButton)
-    })
+    // Click submit button to trigger formAction
+    await user.click(submitButton)
     
     // SubmitButton should be disabled during submission (useFormStatus)
+    // formAction is async, so wait for it to start processing
     await waitFor(() => {
       expect(submitButton).toBeDisabled()
-    })
+    }, { timeout: 3000 })
     
+    // Resolve the promise to complete the submission
     resolveUpdate!()
+    
+    // Wait for updateLlmSettings to be called
     await waitFor(() => {
       expect(mockUpdateLlmSettings).toHaveBeenCalled()
-    })
+    }, { timeout: 3000 })
   })
 
   // Note: Error handling verification has been moved to SettingsForm.integration.test.tsx

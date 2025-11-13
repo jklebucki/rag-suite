@@ -37,7 +37,7 @@ export interface Contact {
   notes?: string | null
   photoUrl?: string | null
   isActive: boolean
-  tags?: string[]
+  tags?: ContactTagDto[]
   createdAt: string
   updatedAt?: string | null
   createdByUserId?: string | null
@@ -143,14 +143,23 @@ export interface UpdateContactResponse {
   tags: ContactTagDto[]
 }
 
+export interface ContactSearchResultDto {
+  id: string
+  firstName: string
+  lastName: string
+  displayName?: string | null
+  department?: string | null
+  position?: string | null
+  email?: string | null
+  mobilePhone?: string | null
+}
+
 export interface SearchContactsRequest {
-  query: string
-  includeInactive?: boolean
-  limit?: number
+  searchTerm: string
 }
 
 export interface SearchContactsResponse {
-  contacts: ContactListItem[]
+  results: ContactSearchResultDto[]
   totalCount: number
 }
 

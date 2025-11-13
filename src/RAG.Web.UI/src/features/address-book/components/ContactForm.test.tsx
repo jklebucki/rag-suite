@@ -36,14 +36,14 @@ describe('ContactForm', () => {
   it('should render form when isOpen is true', () => {
     render(<ContactForm {...defaultProps} />)
     
-    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/last name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/addressbook\.form\.firstname/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/addressbook\.form\.lastname/i)).toBeInTheDocument()
   })
 
   it('should not render form when isOpen is false', () => {
     render(<ContactForm {...defaultProps} isOpen={false} />)
     
-    expect(screen.queryByLabelText(/first name/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/addressbook\.form\.firstname/i)).not.toBeInTheDocument()
   })
 
   it('should render SubmitButton component', () => {
@@ -59,8 +59,8 @@ describe('ContactForm', () => {
     const user = userEvent.setup()
     render(<ContactForm {...defaultProps} />)
     
-    const firstNameInput = screen.getByLabelText(/first name/i)
-    const lastNameInput = screen.getByLabelText(/last name/i)
+    const firstNameInput = screen.getByLabelText(/addressbook\.form\.firstname/i)
+    const lastNameInput = screen.getByLabelText(/addressbook\.form\.lastname/i)
     const submitButton = screen.getByRole('button', { name: /create|update/i })
     
     await act(async () => {
@@ -85,8 +85,8 @@ describe('ContactForm', () => {
     const user = userEvent.setup()
     render(<ContactForm {...defaultProps} />)
     
-    const firstNameInput = screen.getByLabelText(/first name/i)
-    const lastNameInput = screen.getByLabelText(/last name/i)
+    const firstNameInput = screen.getByLabelText(/addressbook\.form\.firstname/i)
+    const lastNameInput = screen.getByLabelText(/addressbook\.form\.lastname/i)
     const submitButton = screen.getByRole('button', { name: /create|update/i })
     
     await act(async () => {
@@ -117,7 +117,7 @@ describe('ContactForm', () => {
     
     render(<ContactForm {...defaultProps} contact={contact} />)
     
-    const firstNameInput = screen.getByLabelText(/first name/i) as HTMLInputElement
+    const firstNameInput = screen.getByLabelText(/addressbook\.form\.firstname/i) as HTMLInputElement
     expect(firstNameInput.value).toBe('John')
   })
 
@@ -131,8 +131,8 @@ describe('ContactForm', () => {
     
     // Fill required fields first
     await act(async () => {
-      await user.type(screen.getByLabelText(/first name/i), 'John')
-      await user.type(screen.getByLabelText(/last name/i), 'Doe')
+      await user.type(screen.getByLabelText(/addressbook\.form\.firstname/i), 'John')
+      await user.type(screen.getByLabelText(/addressbook\.form\.lastname/i), 'Doe')
       await user.click(submitButton)
     })
     
