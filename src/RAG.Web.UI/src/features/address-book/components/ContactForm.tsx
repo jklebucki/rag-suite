@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useActionState } from 'react'
 import type { ContactListItem, ContactData, CreateContactRequest, UpdateContactRequest } from '@/features/address-book/types/addressbook'
 import { SubmitButton } from '@/shared/components/ui/SubmitButton'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface FormState {
   success: boolean
@@ -25,6 +26,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   canModify,
   title
 }) => {
+  const { t } = useI18n()
   const isEditMode = !!contact
   const [formData, setFormData] = useState<ContactData>({
     firstName: '',
@@ -175,7 +177,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <div className="sticky top-0 surface-muted border-b border-gray-200 dark:border-slate-700 px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              {title || (isEditMode ? 'Edit Contact' : 'Create Contact')}
+              {title || (isEditMode ? t('addressBook.form.title.edit') : t('addressBook.form.title.create'))}
             </h2>
             <button
               onClick={onClose}
@@ -187,7 +189,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </div>
           {!canModify && (
             <p className="text-sm text-purple-600 dark:text-purple-300 mt-2">
-              You are proposing a change. It will be reviewed by an administrator.
+              {t('addressBook.form.proposalNotice')}
             </p>
           )}
         </div>
@@ -209,7 +211,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                First Name <span className="text-red-500">*</span>
+                {t('addressBook.form.firstName')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="firstName"
@@ -218,13 +220,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 required
                 value={formData.firstName}
                 onChange={(e) => handleInputChange('firstName', e.target.value)}
-                placeholder="Enter first name"
+                placeholder={t('addressBook.form.firstNamePlaceholder')}
                 className="form-input"
               />
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                Last Name <span className="text-red-500">*</span>
+                {t('addressBook.form.lastName')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="lastName"
@@ -233,7 +235,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 required
                 value={formData.lastName}
                 onChange={(e) => handleInputChange('lastName', e.target.value)}
-                placeholder="Enter last name"
+                placeholder={t('addressBook.form.lastNamePlaceholder')}
                 className="form-input"
               />
             </div>
@@ -241,40 +243,40 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           {/* Optional Fields */}
           <div>
-            <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Display Name</label>
+            <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.displayName')}</label>
             <input
               id="displayName"
               name="displayName"
               type="text"
               value={formData.displayName || ''}
               onChange={(e) => handleInputChange('displayName', e.target.value)}
-              placeholder="Enter display name"
+              placeholder={t('addressBook.form.displayNamePlaceholder')}
               className="form-input"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.email')}</label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="email@example.com"
+                placeholder={t('addressBook.form.emailPlaceholder')}
                 className="form-input"
               />
             </div>
             <div>
-              <label htmlFor="mobilePhone" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Mobile Phone</label>
+              <label htmlFor="mobilePhone" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.mobilePhone')}</label>
               <input
                 id="mobilePhone"
                 name="mobilePhone"
                 type="tel"
                 value={formData.mobilePhone || ''}
                 onChange={(e) => handleInputChange('mobilePhone', e.target.value)}
-                placeholder="+48 123 456 789"
+                placeholder={t('addressBook.form.mobilePhonePlaceholder')}
                 className="form-input"
               />
             </div>
@@ -282,26 +284,26 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="workPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Work Phone</label>
+              <label htmlFor="workPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.workPhone')}</label>
               <input
                 id="workPhone"
                 name="workPhone"
                 type="tel"
                 value={formData.workPhone || ''}
                 onChange={(e) => handleInputChange('workPhone', e.target.value)}
-                placeholder="+48 123 456 789"
+                placeholder={t('addressBook.form.workPhonePlaceholder')}
                 className="form-input"
               />
             </div>
             <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Company</label>
+              <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.company')}</label>
               <input
                 id="company"
                 name="company"
                 type="text"
                 value={formData.company || ''}
                 onChange={(e) => handleInputChange('company', e.target.value)}
-                placeholder="Company name"
+                placeholder={t('addressBook.form.companyPlaceholder')}
                 className="form-input"
               />
             </div>
@@ -309,72 +311,72 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Department</label>
+              <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.department')}</label>
               <input
                 id="department"
                 name="department"
                 type="text"
                 value={formData.department || ''}
                 onChange={(e) => handleInputChange('department', e.target.value)}
-                placeholder="Department"
+                placeholder={t('addressBook.form.departmentPlaceholder')}
                 className="form-input"
               />
             </div>
             <div>
-              <label htmlFor="position" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Position</label>
+              <label htmlFor="position" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.position')}</label>
               <input
                 id="position"
                 name="position"
                 type="text"
                 value={formData.position || ''}
                 onChange={(e) => handleInputChange('position', e.target.value)}
-                placeholder="Position"
+                placeholder={t('addressBook.form.positionPlaceholder')}
                 className="form-input"
               />
             </div>
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Location</label>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.location')}</label>
               <input
                 id="location"
                 name="location"
                 type="text"
                 value={formData.location || ''}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="Location"
+                placeholder={t('addressBook.form.locationPlaceholder')}
                 className="form-input"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Notes</label>
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.notes')}</label>
             <textarea
               id="notes"
               name="notes"
               value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={3}
-              placeholder="Additional notes"
+              placeholder={t('addressBook.form.notesPlaceholder')}
               className="form-input min-h-[120px]"
             />
           </div>
 
           <div>
-            <label htmlFor="photoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Photo URL</label>
+            <label htmlFor="photoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.photoUrl')}</label>
             <input
               id="photoUrl"
               name="photoUrl"
               type="url"
               value={formData.photoUrl || ''}
               onChange={(e) => handleInputChange('photoUrl', e.target.value)}
-              placeholder="https://example.com/photo.jpg"
+              placeholder={t('addressBook.form.photoUrlPlaceholder')}
               className="form-input"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label htmlFor="tagInput" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags</label>
+            <label htmlFor="tagInput" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('addressBook.form.tags')}</label>
             <div className="flex flex-col sm:flex-row gap-2 mb-2">
               <input
                 id="tagInput"
@@ -382,7 +384,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                placeholder="Add tag..."
+                placeholder={t('addressBook.form.tagInputPlaceholder')}
                 className="form-input sm:flex-1"
               />
               <button
@@ -390,7 +392,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 onClick={handleAddTag}
                 className="btn-secondary whitespace-nowrap"
               >
-                Add
+                {t('addressBook.form.addTag')}
               </button>
             </div>
             {tags.length > 0 && (
@@ -425,7 +427,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   onChange={(e) => setIsActive(e.target.checked)}
                   className="form-checkbox"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Active</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addressBook.form.isActive')}</span>
               </label>
             </div>
           )}
@@ -437,13 +439,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
               onClick={onClose}
               className="btn-secondary"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <SubmitButton
               className="btn-primary"
-              loadingText="Submitting..."
+              loadingText={t('addressBook.messages.submitting')}
             >
-              {canModify ? (isEditMode ? 'Update' : 'Create') : 'Propose Change'}
+              {canModify ? (isEditMode ? t('addressBook.messages.update') : t('addressBook.messages.create')) : t('addressBook.messages.proposeChange')}
             </SubmitButton>
           </div>
         </form>
