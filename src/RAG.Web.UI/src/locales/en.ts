@@ -753,6 +753,19 @@ export const en: TranslationKeys = {
   'addressBook.import.imported': 'Imported',
   'addressBook.import.skipped': 'Skipped',
   'addressBook.import.errors': 'Errors',
+  'addressBook.import.dropCsvFile': 'Please drop a CSV file',
+  'addressBook.import.formatDescSemicolon': 'Expected columns (semicolon-separated):',
+  'addressBook.import.csvExample': 'Imię;Nazwisko;Stanowisko;Telefon służbowy;Telefon komórkowy;Email;Lokalizacja;Wyświetlana nazwa;Notatki',
+  'addressBook.import.columnMappingNote': 'Polish column names are automatically mapped to English. Encoding: UTF-8.',
+  'addressBook.import.encodingLabel': 'File encoding:',
+  'addressBook.import.totalRowsLabel': 'Total rows:',
+  'addressBook.import.importedLabel': 'Imported:',
+  'addressBook.import.skippedLabel': 'Skipped:',
+  'addressBook.import.errorsLabel': 'Errors:',
+  'addressBook.import.sampleContacts': 'Sample imported contacts (first 5):',
+  'addressBook.import.importing': 'Importing...',
+  'addressBook.import.importContacts': 'Import Contacts',
+  'addressBook.form.title.proposeFor': 'Propose Change for {firstName} {lastName}',
 
   // Proposals
   'addressBook.proposals.title': 'Pending Proposals',
@@ -780,6 +793,8 @@ export const en: TranslationKeys = {
   'addressBook.proposals.noProposalsFound': 'No proposals found',
   'addressBook.proposals.newContact': 'New Contact',
   'addressBook.proposals.failedToReview': 'Failed to review proposal',
+  'addressBook.proposals.type.unknown': 'Unknown',
+  'addressBook.proposals.status.unknown': 'Unknown',
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Failed to load contacts',

@@ -700,6 +700,19 @@ export const nl: TranslationKeys = {
   'addressBook.import.imported': 'Geïmporteerd',
   'addressBook.import.skipped': 'Overgeslagen',
   'addressBook.import.errors': 'Fouten',
+  'addressBook.import.dropCsvFile': 'Sleep een CSV-bestand hierheen',
+  'addressBook.import.formatDescSemicolon': 'Verwachte kolommen (gescheiden door puntkomma):',
+  'addressBook.import.csvExample': 'Imię;Nazwisko;Stanowisko;Telefon służbowy;Telefon komórkowy;Email;Lokalizacja;Wyświetlana nazwa;Notatki',
+  'addressBook.import.columnMappingNote': 'Poolse kolomnamen worden automatisch gemapt naar Engels. Codering: UTF-8.',
+  'addressBook.import.encodingLabel': 'Bestandscodering:',
+  'addressBook.import.totalRowsLabel': 'Totaal aantal rijen:',
+  'addressBook.import.importedLabel': 'Geïmporteerd:',
+  'addressBook.import.skippedLabel': 'Overgeslagen:',
+  'addressBook.import.errorsLabel': 'Fouten:',
+  'addressBook.import.sampleContacts': 'Voorbeeld geïmporteerde contacten (eerste 5):',
+  'addressBook.import.importing': 'Importeren...',
+  'addressBook.import.importContacts': 'Contacten Importeren',
+  'addressBook.form.title.proposeFor': 'Wijziging Voorstellen voor {firstName} {lastName}',
 
   // Proposals
   'addressBook.proposals.title': 'In Afwachting zijnde Voorstellen',
@@ -727,6 +740,8 @@ export const nl: TranslationKeys = {
   'addressBook.proposals.noProposalsFound': 'Geen voorstellen gevonden',
   'addressBook.proposals.newContact': 'Nieuw Contact',
   'addressBook.proposals.failedToReview': 'Beoordeling voorstel mislukt',
+  'addressBook.proposals.type.unknown': 'Onbekend',
+  'addressBook.proposals.status.unknown': 'Onbekend',
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Laden contacten mislukt',

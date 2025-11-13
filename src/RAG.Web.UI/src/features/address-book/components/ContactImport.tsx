@@ -1,6 +1,7 @@
 // ContactImport - CSV file upload component for importing contacts
 import React, { useState, useRef } from 'react'
 import type { ImportContactsResponse } from '@/features/address-book/types/addressbook'
+import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface ContactImportProps {
   onImport: (file: File, skipDuplicates: boolean, encoding: string) => Promise<ImportContactsResponse>
@@ -8,6 +9,7 @@ interface ContactImportProps {
 }
 
 export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose }) => {
+  const { t } = useI18n()
   const [file, setFile] = useState<File | null>(null)
   const [skipDuplicates, setSkipDuplicates] = useState(true)
   const [encoding, setEncoding] = useState<string>('UTF-8')
@@ -20,7 +22,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
       if (!selectedFile.name.endsWith('.csv')) {
-        setError('Please select a CSV file')
+        setError(t('addressBook.import.csvFileOnly'))
         setFile(null)
         return
       }
@@ -32,7 +34,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
 
   const handleUpload = async () => {
     if (!file) {
-      setError('Please select a file first')
+      setError(t('addressBook.import.selectFile'))
       return
     }
 
@@ -47,7 +49,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
         fileInputRef.current.value = ''
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Import failed')
+      setError(err instanceof Error ? err.message : t('addressBook.messages.importFailed'))
     } finally {
       setIsUploading(false)
     }
@@ -65,7 +67,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
     const droppedFile = e.dataTransfer.files?.[0]
     if (droppedFile) {
       if (!droppedFile.name.endsWith('.csv')) {
-        setError('Please drop a CSV file')
+        setError(t('addressBook.import.dropCsvFile'))
         return
       }
       setFile(droppedFile)
@@ -77,15 +79,15 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
   return (
     <div className="space-y-5">
       <div className="surface-muted border border-blue-200 dark:border-blue-900/40 rounded-xl p-4">
-        <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2">CSV Import Format</h3>
+        <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2">{t('addressBook.import.format')}</h3>
         <p className="text-sm text-blue-800 dark:text-blue-200/80 mb-2">
-          Expected columns (semicolon-separated):
+          {t('addressBook.import.formatDescSemicolon')}
         </p>
         <code className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 px-3 py-2 rounded-lg block overflow-x-auto">
-          Imię;Nazwisko;Stanowisko;Telefon służbowy;Telefon komórkowy;Email;Lokalizacja;Wyświetlana nazwa;Notatki
+          {t('addressBook.import.csvExample')}
         </code>
         <p className="text-xs text-blue-700 dark:text-blue-200/70 mt-2">
-          Polish column names are automatically mapped to English. Encoding: UTF-8.
+          {t('addressBook.import.columnMappingNote')}
         </p>
       </div>
 
@@ -129,11 +131,11 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
               <span className="text-green-600 dark:text-green-400 font-medium">{file.name}</span>
             ) : (
               <>
-                <span className="text-primary-600 dark:text-primary-300 font-medium">Click to upload</span> or drag and drop
+                <span className="text-primary-600 dark:text-primary-300 font-medium">{t('addressBook.import.clickOrDrag')}</span>
               </>
             )}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">CSV files only</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('addressBook.import.csvOnly')}</span>
         </label>
       </div>
 
@@ -149,14 +151,14 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
             className="form-checkbox"
           />
           <label htmlFor="skip-duplicates" className="text-sm text-gray-700 dark:text-gray-200">
-            Skip contacts with duplicate emails
+            {t('addressBook.import.skipDuplicates')}
           </label>
         </div>
 
         {/* Encoding selector */}
         <div className="flex items-center gap-3">
           <label htmlFor="encoding" className="text-sm text-gray-700 dark:text-gray-200 font-medium">
-            File encoding:
+            {t('addressBook.import.encodingLabel')}
           </label>
           <select
             id="encoding"
@@ -182,29 +184,29 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
       {/* Import Result */}
       {result && (
         <div className="surface border border-green-200 dark:border-green-900/40 rounded-xl p-4">
-          <h3 className="font-medium text-green-900 dark:text-green-200 mb-2">Import Complete</h3>
+          <h3 className="font-medium text-green-900 dark:text-green-200 mb-2">{t('addressBook.import.complete')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
             <div>
-              <span>Total rows:</span>{' '}
+              <span>{t('addressBook.import.totalRowsLabel')}</span>{' '}
               <span className="font-semibold text-gray-900 dark:text-gray-100">{result.totalRows}</span>
             </div>
             <div>
-              <span>Imported:</span>{' '}
+              <span>{t('addressBook.import.importedLabel')}</span>{' '}
               <span className="font-semibold text-green-700 dark:text-green-300">{result.successCount}</span>
             </div>
             <div>
-              <span>Skipped:</span>{' '}
+              <span>{t('addressBook.import.skippedLabel')}</span>{' '}
               <span className="font-semibold text-yellow-700 dark:text-yellow-300">{result.skippedCount}</span>
             </div>
             <div>
-              <span>Errors:</span>{' '}
+              <span>{t('addressBook.import.errorsLabel')}</span>{' '}
               <span className="font-semibold text-red-700 dark:text-red-300">{result.errorCount}</span>
             </div>
           </div>
 
           {result.errors.length > 0 && (
             <div className="mt-3">
-              <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">Errors:</p>
+              <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">{t('addressBook.import.errorsLabel')}</p>
               <ul className="text-xs text-red-700 dark:text-red-300 space-y-1 max-h-32 overflow-y-auto">
                 {result.errors.map((err, idx) => (
                   <li key={idx}>• {err}</li>
@@ -216,7 +218,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
           {result.importedContacts.length > 0 && (
             <div className="mt-3">
               <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-1">
-                Sample imported contacts (first 5):
+                {t('addressBook.import.sampleContacts')}
               </p>
               <ul className="text-xs text-green-700 dark:text-green-300 space-y-1">
                 {result.importedContacts.slice(0, 5).map((contact) => (
@@ -239,7 +241,7 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
           disabled={isUploading}
           className="btn-secondary disabled:opacity-50"
         >
-          {result ? 'Close' : 'Cancel'}
+          {result ? t('common.close') : t('common.cancel')}
         </button>
         {!result && (
           <button
@@ -266,10 +268,10 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Importing...
+                {t('addressBook.import.importing')}
               </span>
             ) : (
-              'Import Contacts'
+              t('addressBook.import.importContacts')
             )}
           </button>
         )}

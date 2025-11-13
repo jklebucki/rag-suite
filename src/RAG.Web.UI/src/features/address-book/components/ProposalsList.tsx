@@ -54,7 +54,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       case ChangeProposalType.Delete:
         return t('addressBook.proposals.type.delete')
       default:
-        return 'Unknown'
+        return t('addressBook.proposals.type.unknown')
     }
   }
 
@@ -82,7 +82,7 @@ export const ProposalsList: React.FC<ProposalsListProps> = ({
       case ProposalStatus.Applied:
         return t('addressBook.proposals.status.applied')
       default:
-        return 'Unknown'
+        return t('addressBook.proposals.status.unknown')
     }
   }
 

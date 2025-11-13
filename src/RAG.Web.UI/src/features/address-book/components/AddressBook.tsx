@@ -395,7 +395,7 @@ export function AddressBook() {
           canModify={canModify}
           title={
             proposingContact
-              ? `Propose Change for ${proposingContact.firstName} ${proposingContact.lastName}`
+              ? t('addressBook.form.title.proposeFor', { firstName: proposingContact.firstName, lastName: proposingContact.lastName })
               : undefined
           }
         />

@@ -765,6 +765,19 @@ export interface TranslationKeys {
   'addressBook.import.imported': string;
   'addressBook.import.skipped': string;
   'addressBook.import.errors': string;
+  'addressBook.import.dropCsvFile': string;
+  'addressBook.import.formatDescSemicolon': string;
+  'addressBook.import.csvExample': string;
+  'addressBook.import.columnMappingNote': string;
+  'addressBook.import.encodingLabel': string;
+  'addressBook.import.totalRowsLabel': string;
+  'addressBook.import.importedLabel': string;
+  'addressBook.import.skippedLabel': string;
+  'addressBook.import.errorsLabel': string;
+  'addressBook.import.sampleContacts': string;
+  'addressBook.import.importing': string;
+  'addressBook.import.importContacts': string;
+  'addressBook.form.title.proposeFor': string;
   'addressBook.proposals.title': string;
   'addressBook.proposals.noProposals': string;
   'addressBook.proposals.type.create': string;
@@ -790,6 +803,8 @@ export interface TranslationKeys {
   'addressBook.proposals.noProposalsFound': string;
   'addressBook.proposals.newContact': string;
   'addressBook.proposals.failedToReview': string;
+  'addressBook.proposals.type.unknown': string;
+  'addressBook.proposals.status.unknown': string;
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': string;

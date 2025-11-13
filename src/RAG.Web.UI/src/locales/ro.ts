@@ -701,6 +701,19 @@ export const ro: TranslationKeys = {
   'addressBook.import.imported': 'Importate',
   'addressBook.import.skipped': 'Omise',
   'addressBook.import.errors': 'Erori',
+  'addressBook.import.dropCsvFile': 'Lăsați un fișier CSV',
+  'addressBook.import.formatDescSemicolon': 'Coloane așteptate (separate prin punct și virgulă):',
+  'addressBook.import.csvExample': 'Imię;Nazwisko;Stanowisko;Telefon służbowy;Telefon komórkowy;Email;Lokalizacja;Wyświetlana nazwa;Notatki',
+  'addressBook.import.columnMappingNote': 'Numele coloanelor poloneze sunt mapate automat la engleză. Codare: UTF-8.',
+  'addressBook.import.encodingLabel': 'Codarea fișierului:',
+  'addressBook.import.totalRowsLabel': 'Rânduri totale:',
+  'addressBook.import.importedLabel': 'Importate:',
+  'addressBook.import.skippedLabel': 'Omise:',
+  'addressBook.import.errorsLabel': 'Erori:',
+  'addressBook.import.sampleContacts': 'Contacte importate exemplu (primele 5):',
+  'addressBook.import.importing': 'Se importă...',
+  'addressBook.import.importContacts': 'Importă Contacte',
+  'addressBook.form.title.proposeFor': 'Propune Schimbare pentru {firstName} {lastName}',
 
   // Proposals
   'addressBook.proposals.title': 'Propuneri în Așteptare',
@@ -728,6 +741,8 @@ export const ro: TranslationKeys = {
   'addressBook.proposals.noProposalsFound': 'Nu s-au găsit propuneri',
   'addressBook.proposals.newContact': 'Contact Nou',
   'addressBook.proposals.failedToReview': 'Eșuat la revizuirea propunerii',
+  'addressBook.proposals.type.unknown': 'Necunoscut',
+  'addressBook.proposals.status.unknown': 'Necunoscut',
 
   // Messages and alerts
   'addressBook.messages.failedToLoad': 'Eșuat la încărcarea contactelor',
