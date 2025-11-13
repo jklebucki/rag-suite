@@ -395,8 +395,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                               <img
                                 src={row.original.photoUrl.startsWith('data:') ? row.original.photoUrl : `data:image/png;base64,${row.original.photoUrl}`}
                                 alt={`${row.original.firstName} ${row.original.lastName}`}
-                                className="w-48 h-auto rounded-lg border-2 border-gray-300 dark:border-slate-600 object-contain bg-gray-100 dark:bg-slate-700"
-                                style={{ maxHeight: '384px' }}
+                                className="w-48 max-h-96 h-auto rounded-lg border-2 border-gray-300 dark:border-slate-600 object-contain bg-gray-100 dark:bg-slate-700"
                               />
                             </div>
                           )}

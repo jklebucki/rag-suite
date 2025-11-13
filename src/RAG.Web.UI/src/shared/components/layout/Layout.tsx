@@ -47,7 +47,7 @@ export function Layout({ children }: LayoutProps) {
         <TopBar onToggleSidebar={toggleSidebar} />
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-6 h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
           {children}
         </main>
       </div>

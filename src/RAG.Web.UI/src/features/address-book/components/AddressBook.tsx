@@ -330,8 +330,8 @@ export function AddressBook() {
       : []
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6">
+    <div className="w-full h-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
+      <div className="mb-6 flex-shrink-0">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('addressBook.title')}</h1>
         <p className="text-gray-600 dark:text-gray-300 mt-1">
           {t('addressBook.subtitle')}
@@ -339,7 +339,7 @@ export function AddressBook() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-slate-700 mb-6">
+      <div className="border-b border-gray-200 dark:border-slate-700 mb-6 flex-shrink-0">
         <nav className="flex gap-6 whitespace-nowrap overflow-x-auto scrollbar-hide">
           <button
             onClick={() => setActiveTab('contacts')}
@@ -385,15 +385,15 @@ export function AddressBook() {
 
       {/* Error Message */}
       {error && (
-        <div className="surface-muted border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl mb-6">
+        <div className="surface-muted border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl mb-6 flex-shrink-0">
           {error}
         </div>
       )}
 
       {/* Tab Content */}
       {activeTab === 'contacts' && (
-        <div className="space-y-4">
-          <div className="flex flex-wrap justify-between items-center gap-3">
+        <div className="space-y-4 flex-1 min-h-0 overflow-hidden flex flex-col">
+          <div className="flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
             <div className="text-sm text-gray-600 dark:text-gray-300">
               {isAuthenticated
                 ? canModify
@@ -411,15 +411,17 @@ export function AddressBook() {
             )}
           </div>
 
-          <ContactsTable
-            contacts={optimisticContacts}
-            onEdit={canModify ? openEditForm : undefined}
-            onDelete={canModify ? handleDeleteContact : undefined}
-            onProposeChange={!canModify && isAuthenticated ? handleProposeChange : undefined}
-            canModify={canModify}
-            isAuthenticated={isAuthenticated}
-            loading={loading}
-          />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ContactsTable
+              contacts={optimisticContacts}
+              onEdit={canModify ? openEditForm : undefined}
+              onDelete={canModify ? handleDeleteContact : undefined}
+              onProposeChange={!canModify && isAuthenticated ? handleProposeChange : undefined}
+              canModify={canModify}
+              isAuthenticated={isAuthenticated}
+              loading={loading}
+            />
+          </div>
         </div>
       )}
 
