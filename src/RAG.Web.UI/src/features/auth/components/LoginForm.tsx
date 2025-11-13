@@ -103,10 +103,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           
           // Check if it's a 401 error (unauthorized/invalid credentials)
           if (apiError.response?.status === 401) {
-            // Use message from API if available, otherwise use translation
-            errorMessage = apiError.response.data?.message 
-              ? apiError.response.data.message 
-              : t('auth.login.error_invalid_credentials')
+            // Always use localized translation for 401 errors (invalid credentials)
+            // API message is in English and not localized, so we use UI translation
+            errorMessage = t('auth.login.error_invalid_credentials')
           } else if (apiError.response?.data?.message) {
             // For other errors, use API message if available
             errorMessage = apiError.response.data.message
