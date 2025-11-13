@@ -315,7 +315,7 @@ function ThreadList({
             language={language}
             hasUnread={hasUnread}
             onThreadClick={onThreadClick}
-            t={t}
+            t={t as (key: string, params?: Record<string, string>) => string}
           />
         )
       })}

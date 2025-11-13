@@ -9,6 +9,7 @@ import { MarkdownMessage } from './MarkdownMessage'
 import { MessageItem } from './MessageItem'
 import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { formatDateTime } from '@/utils/date'
+import type { ChatMessage } from '@/features/chat/types/chat'
 
 export function ChatInterface() {
   const { t, language: currentLanguage } = useI18n()
@@ -80,7 +81,7 @@ export function ChatInterface() {
                   message={msg}
                   currentLanguage={currentLanguage}
                   lastMessageLanguage={lastMessageLanguage}
-                  translationStatus={translationStatus}
+                  translationStatus={translationStatus as 'translated' | 'original' | undefined}
                   isLastMessage={index === currentSession.messages.length - 1}
                 />
               ))}
