@@ -26,8 +26,8 @@ export function SearchInterface() {
   } = useMultilingualSearch()
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 px-4 sm:px-6">
-      <div className="mb-6 sm:mb-8">
+    <div className="w-full h-full mx-auto px-4 sm:px-6 flex flex-col">
+      <div className="mb-6 sm:mb-8 flex-shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('search.title')}</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
           {t('search.subtitle')}
@@ -39,30 +39,34 @@ export function SearchInterface() {
         </p>
       </div>
 
-      <SearchForm
-        query={query}
-        isAdvancedMode={isAdvancedMode}
-        filters={filters}
-        onQueryChange={setQuery}
-        onToggleAdvanced={toggleAdvancedMode}
-        onSearch={(e) => {
-          e.preventDefault()
-          handleSearch()
-        }}
-        onFilterChange={handleFilterChange}
-        onClear={handleClearSearch}
-      />
+      <div className="flex-shrink-0 mb-6">
+        <SearchForm
+          query={query}
+          isAdvancedMode={isAdvancedMode}
+          filters={filters}
+          onQueryChange={setQuery}
+          onToggleAdvanced={toggleAdvancedMode}
+          onSearch={(e) => {
+            e.preventDefault()
+            handleSearch()
+          }}
+          onFilterChange={handleFilterChange}
+          onClear={handleClearSearch}
+        />
+      </div>
 
-      <SearchResults
-        searchResults={searchResults}
-        isLoading={isSearching}
-        error={error instanceof Error ? error.message : error ? String(error) : null}
-        hasSearched={hasSearched}
-        onExport={() => {
-          // TODO: Implement export functionality
-          logger.debug('Export results:', searchResults)
-        }}
-      />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <SearchResults
+          searchResults={searchResults}
+          isLoading={isSearching}
+          error={error instanceof Error ? error.message : error ? String(error) : null}
+          hasSearched={hasSearched}
+          onExport={() => {
+            // TODO: Implement export functionality
+            logger.debug('Export results:', searchResults)
+          }}
+        />
+      </div>
     </div>
   )
 }

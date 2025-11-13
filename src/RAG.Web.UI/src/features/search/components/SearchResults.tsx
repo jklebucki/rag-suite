@@ -60,9 +60,11 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   // Spinner jak przy pierwszym wyszukiwaniu - przy każdym wyszukiwaniu gdy isLoading i hasSearched
   if (isLoading && hasSearched) {
     return (
-      <div className="text-center py-8 px-4 text-gray-600 dark:text-gray-300">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-        <p className="mt-4 text-sm sm:text-base">{t('search.loading')}</p>
+      <div className="surface h-full flex items-center justify-center rounded-2xl">
+        <div className="text-center py-8 px-4 text-gray-600 dark:text-gray-300">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+          <p className="mt-4 text-sm sm:text-base">{t('search.loading')}</p>
+        </div>
       </div>
     )
   }
@@ -70,19 +72,21 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   if (error && hasSearched) {
     logger.error('Search error in component:', error)
     return (
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4 mx-4 sm:mx-0">
-        <p className="text-red-700 dark:text-red-300 text-sm sm:text-base">{t('search.error')}</p>
-        <details className="mt-2">
-          <summary className="cursor-pointer text-sm dark:text-red-200">Error details</summary>
-          <pre className="text-xs mt-1 text-red-600 dark:text-red-300 overflow-x-auto">{JSON.stringify(error, null, 2)}</pre>
-        </details>
+      <div className="surface h-full flex items-center justify-center rounded-2xl">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-2xl p-4 mx-4 sm:mx-0">
+          <p className="text-red-700 dark:text-red-300 text-sm sm:text-base">{t('search.error')}</p>
+          <details className="mt-2">
+            <summary className="cursor-pointer text-sm dark:text-red-200">Error details</summary>
+            <pre className="text-xs mt-1 text-red-600 dark:text-red-300 overflow-x-auto">{JSON.stringify(error, null, 2)}</pre>
+          </details>
+        </div>
       </div>
     )
   }
 
   if (!hasSearched || (hasSearched && !searchResults && !isLoading)) {
     return (
-      <div className="surface p-6 sm:p-8">
+      <div className="surface h-full flex items-center justify-center rounded-2xl">
         <div className="text-center text-gray-500 dark:text-gray-400">
           <Search className="h-12 sm:h-16 w-12 sm:w-16 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
           <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('search.title')}</h3>
@@ -100,14 +104,14 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
   }
 
   return (
-    <div className="surface relative">
+    <div className="surface relative h-full flex flex-col overflow-hidden rounded-2xl">
       {/* Dodaj overlay z spinnerem jeśli isLoading, hasSearched i są wyniki (np. przy zmianie inputu po wyszukaniu) */}
       {isLoading && hasSearched && searchResults && (
         <div className="absolute inset-0 bg-white dark:bg-slate-900 bg-opacity-75 dark:bg-opacity-80 flex items-center justify-center z-10 rounded-2xl">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
       )}
-      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 flex-shrink-0">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('search.results')}</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -120,24 +124,26 @@ export function SearchResults({ searchResults, isLoading, error, hasSearched, on
         </button>
       </div>
 
-      <div className="divide-y divide-gray-200 dark:divide-slate-800">
-        {resultsToShow.results.map((result) => (
-          <SearchResultItem
-            key={result.id}
-            result={result}
-            onViewDetails={() => setSelectedDocumentId(result.id)}
-            onViewPDF={(filePath) => setPdfViewerFilePath(filePath)}
-            language={language}
-          />
-        ))}
-      </div>
-
-      {resultsToShow.results.length === 0 && (
-        <div className="p-6 sm:p-8 text-center text-gray-500 dark:text-gray-400">
-          <Search className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
-          <p className="text-sm sm:text-base">{t('search.no_results')}</p>
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="divide-y divide-gray-200 dark:divide-slate-800">
+          {resultsToShow.results.map((result) => (
+            <SearchResultItem
+              key={result.id}
+              result={result}
+              onViewDetails={() => setSelectedDocumentId(result.id)}
+              onViewPDF={(filePath) => setPdfViewerFilePath(filePath)}
+              language={language}
+            />
+          ))}
         </div>
-      )}
+
+        {resultsToShow.results.length === 0 && (
+          <div className="p-6 sm:p-8 text-center text-gray-500 dark:text-gray-400">
+            <Search className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
+            <p className="text-sm sm:text-base">{t('search.no_results')}</p>
+          </div>
+        )}
+      </div>
 
       {/* Document Detail Modal */}
       <Modal
