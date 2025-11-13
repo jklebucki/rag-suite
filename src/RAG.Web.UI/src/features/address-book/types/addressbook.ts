@@ -52,8 +52,12 @@ export interface ContactListItem {
   department?: string | null
   position?: string | null
   location?: string | null
-  email?: string | null
+  company?: string | null
+  workPhone?: string | null
   mobilePhone?: string | null
+  email?: string | null
+  notes?: string | null
+  photoUrl?: string | null
   isActive: boolean
 }
 
@@ -138,7 +142,17 @@ export interface UpdateContactResponse {
   id: string
   firstName: string
   lastName: string
+  displayName?: string | null
+  department?: string | null
+  position?: string | null
+  location?: string | null
+  company?: string | null
+  workPhone?: string | null
+  mobilePhone?: string | null
   email?: string | null
+  notes?: string | null
+  photoUrl?: string | null
+  isActive: boolean
   updatedAt: string
   tags: ContactTagDto[]
 }

@@ -387,39 +387,186 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                   </tr>
                   {row.getIsExpanded() && (
                     <tr className="bg-gray-50 dark:bg-slate-800/60">
-                      <td colSpan={columns.length} className="px-6 py-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700 dark:text-gray-300">
-                          {row.original.displayName && (
-                            <div>
-                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.displayName')}:</span>
-                              <span className="ml-2 text-gray-900 dark:text-gray-100">{row.original.displayName}</span>
+                      <td colSpan={columns.length} className="px-6 py-6">
+                        <div className="flex flex-col sm:flex-row gap-6">
+                          {/* Photo - Left side */}
+                          {row.original.photoUrl && (row.original.photoUrl.startsWith('data:') || row.original.photoUrl.length > 100) && (
+                            <div className="flex-shrink-0">
+                              <img
+                                src={row.original.photoUrl.startsWith('data:') ? row.original.photoUrl : `data:image/png;base64,${row.original.photoUrl}`}
+                                alt={`${row.original.firstName} ${row.original.lastName}`}
+                                className="w-48 h-auto rounded-lg border-2 border-gray-300 dark:border-slate-600 object-contain bg-gray-100 dark:bg-slate-700"
+                                style={{ maxHeight: '384px' }}
+                              />
                             </div>
                           )}
-                          {row.original.mobilePhone && (
-                            <div>
-                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.mobile')}:</span>
-                              <a href={`tel:${row.original.mobilePhone}`} className="ml-2 text-primary-600 dark:text-primary-300 hover:underline">
-                                {row.original.mobilePhone}
-                              </a>
+
+                          {/* Details - Right side */}
+                          <div className="flex-1 min-w-0">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                              {row.original.displayName && (
+                                <div className="md:col-span-2">
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.displayName')}
+                                    </span>
+                                    <span className="text-base font-medium text-gray-900 dark:text-gray-100">
+                                      {row.original.displayName}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.email && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.email')}
+                                    </span>
+                                    <a 
+                                      href={`mailto:${row.original.email}`} 
+                                      className="text-primary-600 dark:text-primary-400 hover:underline break-words"
+                                    >
+                                      {row.original.email}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.mobilePhone && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.mobile')}
+                                    </span>
+                                    <a 
+                                      href={`tel:${row.original.mobilePhone}`} 
+                                      className="text-primary-600 dark:text-primary-400 hover:underline"
+                                    >
+                                      {row.original.mobilePhone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.workPhone && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.workPhone')}
+                                    </span>
+                                    <a 
+                                      href={`tel:${row.original.workPhone}`} 
+                                      className="text-primary-600 dark:text-primary-400 hover:underline"
+                                    >
+                                      {row.original.workPhone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.department && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.department')}
+                                    </span>
+                                    <span className="text-gray-900 dark:text-gray-100">
+                                      {row.original.department}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.position && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.position')}
+                                    </span>
+                                    <span className="text-gray-900 dark:text-gray-100">
+                                      {row.original.position}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.location && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.location')}
+                                    </span>
+                                    <span className="text-gray-900 dark:text-gray-100">
+                                      {row.original.location}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.company && (
+                                <div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.company')}
+                                    </span>
+                                    <span className="text-gray-900 dark:text-gray-100">
+                                      {row.original.company}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {row.original.notes && (
+                                <div className="md:col-span-2">
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.notes')}
+                                    </span>
+                                    <span className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap leading-relaxed">
+                                      {row.original.notes}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Photo URL (if not base64) */}
+                              {row.original.photoUrl && !row.original.photoUrl.startsWith('data:') && row.original.photoUrl.length <= 100 && (
+                                <div className="md:col-span-2">
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                      {t('addressBook.table.photoUrl')}
+                                    </span>
+                                    <a 
+                                      href={row.original.photoUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="text-primary-600 dark:text-primary-400 hover:underline break-words"
+                                    >
+                                      {row.original.photoUrl}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Status */}
+                              <div>
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                    {t('addressBook.table.status')}
+                                  </span>
+                                  <span
+                                    className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium w-fit ${
+                                      row.original.isActive
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                                        : 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-200'
+                                    }`}
+                                  >
+                                    {row.original.isActive ? t('addressBook.table.active') : t('addressBook.table.inactive')}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          )}
-                          {row.original.location && (
-                            <div>
-                              <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.location')}:</span>
-                              <span className="ml-2 text-gray-900 dark:text-gray-100">{row.original.location}</span>
-                            </div>
-                          )}
-                          <div>
-                            <span className="font-medium text-gray-700 dark:text-gray-200">{t('addressBook.table.status')}:</span>
-                            <span
-                              className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
-                                row.original.isActive
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
-                                  : 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-gray-200'
-                              }`}
-                            >
-                              {row.original.isActive ? t('addressBook.table.active') : t('addressBook.table.inactive')}
-                            </span>
                           </div>
                         </div>
                       </td>

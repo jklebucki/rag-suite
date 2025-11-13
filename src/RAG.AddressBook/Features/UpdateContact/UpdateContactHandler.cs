@@ -24,6 +24,7 @@ public class UpdateContactHandler
     {
         var userId = _userContext.GetCurrentUserId() ?? "system";
 
+        // Load contact with tags
         var contact = await _context.Contacts
             .Include(c => c.Tags)
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
@@ -31,7 +32,7 @@ public class UpdateContactHandler
         if (contact == null)
             return null;
 
-        // Update properties
+        // Update Contact properties first
         contact.FirstName = request.FirstName;
         contact.LastName = request.LastName;
         contact.DisplayName = request.DisplayName;
@@ -48,10 +49,10 @@ public class UpdateContactHandler
         contact.UpdatedAt = DateTime.UtcNow;
         contact.UpdatedByUserId = userId;
 
-        // Update tags
+        // Handle tags separately to avoid concurrency issues
         if (request.Tags != null)
         {
-            // Get existing tag names before modification
+            // Get existing tag names
             var existingTagNames = contact.Tags.Select(t => t.TagName).ToList();
             
             // Remove tags that are not in the new list
@@ -60,38 +61,59 @@ public class UpdateContactHandler
                 .ToList();
             foreach (var tag in tagsToRemove)
             {
-                contact.Tags.Remove(tag);
                 _context.ContactTags.Remove(tag);
             }
 
             // Add new tags that don't exist yet
             var tagsToAdd = request.Tags
                 .Where(tagName => !existingTagNames.Contains(tagName))
-                .ToList();
-            foreach (var tagName in tagsToAdd)
-            {
-                contact.Tags.Add(new ContactTag
+                .Select(tagName => new ContactTag
                 {
+                    ContactId = contact.Id,
                     TagName = tagName,
                     CreatedAt = DateTime.UtcNow
-                });
+                })
+                .ToList();
+            
+            if (tagsToAdd.Any())
+            {
+                await _context.ContactTags.AddRangeAsync(tagsToAdd, cancellationToken);
             }
         }
         else
         {
             // If Tags is null, remove all tags
-            _context.ContactTags.RemoveRange(contact.Tags);
-            contact.Tags.Clear();
+            var allTags = contact.Tags.ToList();
+            _context.ContactTags.RemoveRange(allTags);
         }
 
+        // Save all changes
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Reload contact with updated tags for response
+        contact = await _context.Contacts
+            .Include(c => c.Tags)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+        if (contact == null)
+            return null;
 
         return new UpdateContactResponse
         {
             Id = contact.Id,
             FirstName = contact.FirstName,
             LastName = contact.LastName,
+            DisplayName = contact.DisplayName,
+            Department = contact.Department,
+            Position = contact.Position,
+            Location = contact.Location,
+            Company = contact.Company,
+            WorkPhone = contact.WorkPhone,
+            MobilePhone = contact.MobilePhone,
             Email = contact.Email,
+            Notes = contact.Notes,
+            PhotoUrl = contact.PhotoUrl,
+            IsActive = contact.IsActive,
             UpdatedAt = contact.UpdatedAt ?? DateTime.UtcNow,
             Tags = contact.Tags.Select(t => new ContactTagDto
             {

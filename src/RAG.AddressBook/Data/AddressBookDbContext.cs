@@ -37,7 +37,8 @@ public class AddressBookDbContext : DbContext
             b.Property(c => c.WorkPhone).HasMaxLength(50);
             b.Property(c => c.MobilePhone).HasMaxLength(50);
             b.Property(c => c.Email).HasMaxLength(255);
-            b.Property(c => c.PhotoUrl).HasMaxLength(500);
+            // PhotoUrl stores base64 encoded images (up to 1MB), so we use text without length limit
+            b.Property(c => c.PhotoUrl).HasColumnType("text");
         });
 
         modelBuilder.Entity<ContactTag>(b =>

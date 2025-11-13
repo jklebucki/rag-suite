@@ -46,8 +46,12 @@ public class ListContactsService
                 Department = c.Department,
                 Position = c.Position,
                 Location = c.Location,
-                Email = c.Email,
+                Company = c.Company,
+                WorkPhone = c.WorkPhone,
                 MobilePhone = c.MobilePhone,
+                Email = c.Email,
+                Notes = c.Notes,
+                PhotoUrl = c.PhotoUrl,
                 IsActive = c.IsActive
             })
             .ToListAsync(cancellationToken);

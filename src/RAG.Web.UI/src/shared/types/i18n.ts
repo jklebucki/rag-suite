@@ -701,6 +701,10 @@ export interface TranslationKeys {
   'addressBook.table.searchIn': string;
   'addressBook.table.displayName': string;
   'addressBook.table.mobile': string;
+  'addressBook.table.workPhone': string;
+  'addressBook.table.company': string;
+  'addressBook.table.notes': string;
+  'addressBook.table.photoUrl': string;
   'addressBook.table.status': string;
   'addressBook.table.active': string;
   'addressBook.table.inactive': string;
@@ -732,6 +736,15 @@ export interface TranslationKeys {
   'addressBook.form.reason': string;
   'addressBook.form.reasonPlaceholder': string;
   'addressBook.form.photoUrl': string;
+  'addressBook.form.photo': string;
+  'addressBook.form.photoDragDrop': string;
+  'addressBook.form.photoMaxSize': string;
+  'addressBook.form.photoTooLarge': string;
+  'addressBook.form.photoInvalidFormat': string;
+  'addressBook.form.photoError': string;
+  'addressBook.form.photoPreview': string;
+  'addressBook.form.removePhoto': string;
+  'addressBook.form.changePhoto': string;
   'addressBook.form.firstNamePlaceholder': string;
   'addressBook.form.lastNamePlaceholder': string;
   'addressBook.form.displayNamePlaceholder': string;

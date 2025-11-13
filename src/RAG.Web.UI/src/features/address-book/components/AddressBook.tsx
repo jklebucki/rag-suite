@@ -8,6 +8,7 @@ import { ContactForm } from './ContactForm'
 import { ContactImport } from './ContactImport'
 import { ProposalsList } from './ProposalsList'
 import type {
+  Contact,
   ContactListItem,
   CreateContactRequest,
   UpdateContactRequest,
@@ -38,7 +39,7 @@ export function AddressBook() {
 
   // Form/Modal states
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingContact, setEditingContact] = useState<ContactListItem | null>(null)
+  const [editingContact, setEditingContact] = useState<Contact | ContactListItem | null>(null)
   const [proposingContact, setProposingContact] = useState<ContactListItem | null>(null)
   const [alertState, setAlertState] = useState<AlertState | null>(null)
   const [contactToDelete, setContactToDelete] = useState<ContactListItem | null>(null)
@@ -187,8 +188,12 @@ export function AddressBook() {
                     department: data.department,
                     position: data.position,
                     location: data.location,
-                    email: data.email,
+                    company: data.company,
+                    workPhone: data.workPhone,
                     mobilePhone: data.mobilePhone,
+                    email: data.email,
+                    notes: data.notes,
+                    photoUrl: data.photoUrl,
                     isActive: data.isActive,
                   }
                 : contact
@@ -286,10 +291,20 @@ export function AddressBook() {
     setIsFormOpen(true)
   }
 
-  const openEditForm = (contact: ContactListItem) => {
-    setEditingContact(contact)
-    setProposingContact(null)
-    setIsFormOpen(true)
+  const openEditForm = async (contact: ContactListItem) => {
+    try {
+      // Load full contact data before opening form
+      const fullContact = await addressBookService.getContact(contact.id)
+      setEditingContact(fullContact)
+      setProposingContact(null)
+      setIsFormOpen(true)
+    } catch (err) {
+      logger.error('Failed to load contact details:', err)
+      // Fallback to using ContactListItem if getContact fails
+      setEditingContact(contact)
+      setProposingContact(null)
+      setIsFormOpen(true)
+    }
   }
 
   const closeForm = () => {

@@ -22,7 +22,11 @@ public record ContactListItemDto
     public string? Department { get; init; }
     public string? Position { get; init; }
     public string? Location { get; init; }
-    public string? Email { get; init; }
+    public string? Company { get; init; }
+    public string? WorkPhone { get; init; }
     public string? MobilePhone { get; init; }
+    public string? Email { get; init; }
+    public string? Notes { get; init; }
+    public string? PhotoUrl { get; init; }
     public bool IsActive { get; init; }
 }
