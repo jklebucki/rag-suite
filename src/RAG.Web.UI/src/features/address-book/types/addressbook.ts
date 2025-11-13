@@ -128,12 +128,19 @@ export interface UpdateContactRequest {
   tags?: string[]
 }
 
+export interface ContactTagDto {
+  id: string
+  tagName: string
+  color?: string | null
+}
+
 export interface UpdateContactResponse {
   id: string
   firstName: string
   lastName: string
   email?: string | null
   updatedAt: string
+  tags: ContactTagDto[]
 }
 
 export interface SearchContactsRequest {

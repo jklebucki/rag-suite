@@ -80,7 +80,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
   loading = false
 }) => {
   const { t } = useI18n()
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'lastName',
+      desc: false // ascending (rosnące)
+    }
+  ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [expanded, setExpanded] = useState<ExpandedState>({})
@@ -250,7 +255,13 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
     initialState: {
       pagination: {
         pageSize: 20
-      }
+      },
+      sorting: [
+        {
+          id: 'lastName',
+          desc: false // ascending (rosnące)
+        }
+      ]
     }
   })
 

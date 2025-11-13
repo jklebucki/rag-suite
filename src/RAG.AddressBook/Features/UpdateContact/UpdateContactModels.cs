@@ -1,3 +1,5 @@
+using RAG.AddressBook.Features.GetContact;
+
 namespace RAG.AddressBook.Features.UpdateContact;
 
 public record UpdateContactRequest
@@ -15,4 +17,15 @@ public record UpdateContactRequest
     public string? Notes { get; init; }
     public bool IsActive { get; init; } = true;
     public string? PhotoUrl { get; init; }
+    public List<string>? Tags { get; init; }
+}
+
+public record UpdateContactResponse
+{
+    public Guid Id { get; init; }
+    public string FirstName { get; init; } = string.Empty;
+    public string LastName { get; init; } = string.Empty;
+    public string? Email { get; init; }
+    public DateTime UpdatedAt { get; init; }
+    public List<ContactTagDto> Tags { get; init; } = new();
 }

@@ -22,7 +22,7 @@ public static class UpdateContactEndpoint
         [FromServices] UpdateContactHandler handler,
         CancellationToken cancellationToken)
     {
-        var success = await handler.HandleAsync(id, request, cancellationToken);
-        return success ? Results.NoContent() : Results.NotFound();
+        var response = await handler.HandleAsync(id, request, cancellationToken);
+        return response != null ? Results.Ok(response) : Results.NotFound();
     }
 }
