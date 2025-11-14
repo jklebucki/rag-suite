@@ -4,7 +4,6 @@ import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare,
 import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/shared/components/ui/LanguageSelector'
 import { ThemeToggle } from '@/shared/components/ui/ThemeToggle'
-import { UserAccountModal } from '@/features/settings/components/UserAccountModal'
 import { SessionExpiredModal } from '@/shared/components/ui/SessionExpiredModal'
 import { FeedbackModal } from '@/features/feedback/components/FeedbackModal'
 import { MyFeedbackModal } from '@/features/feedback/components/MyFeedbackModal'
@@ -15,14 +14,14 @@ import feedbackService from '@/features/feedback/services/feedback.service'
 
 interface TopBarProps {
   onToggleSidebar: () => void
+  onOpenAccountModal: () => void
 }
 
-export function TopBar({ onToggleSidebar }: TopBarProps) {
+export function TopBar({ onToggleSidebar, onOpenAccountModal }: TopBarProps) {
   const { t, language } = useI18n()
   const { user, logout, refreshError, logoutAllDevices, clearRefreshError } = useAuth()
   const queryClient = useQueryClient()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [isMyFeedbackModalOpen, setIsMyFeedbackModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -71,7 +70,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   }
 
   const handleAccountClick = () => {
-    setIsAccountModalOpen(true)
+    onOpenAccountModal()
     setIsUserMenuOpen(false)
   }
 
@@ -237,12 +236,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
           </div>
         )}
       </div>
-
-      {/* User Account Modal */}
-      <UserAccountModal 
-        isOpen={isAccountModalOpen} 
-        onClose={() => setIsAccountModalOpen(false)} 
-      />
 
       <FeedbackModal
         isOpen={isFeedbackModalOpen}

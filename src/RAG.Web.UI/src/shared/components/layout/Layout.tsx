@@ -1,9 +1,10 @@
-import React, { ReactNode, useMemo } from 'react'
+import React, { ReactNode, useMemo, useState } from 'react'
 import { useLayout } from '@/shared/hooks/useLayout'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useForumSettingsQuery, useThreadBadges } from '@/features/forum/hooks/useForumQueries'
+import { UserAccountModal } from '@/features/settings/components/UserAccountModal'
 
 interface LayoutProps {
   children: ReactNode
@@ -21,6 +22,7 @@ export function Layout({ children }: LayoutProps) {
   const { isAuthenticated } = useAuth()
   const { data: forumSettings } = useForumSettingsQuery({ enabled: isAuthenticated })
   const { data: badgesData } = useThreadBadges(isAuthenticated, forumSettings?.badgeRefreshSeconds ?? 60)
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
 
   const forumBadgeCount = badgesData?.badges.filter((badge) => badge.hasUnreadReplies).length ?? 0
 
@@ -43,13 +45,19 @@ export function Layout({ children }: LayoutProps) {
       />
 
       {/* Main content */}
-      <div className="lg:pl-64">
-        <TopBar onToggleSidebar={toggleSidebar} />
+      <div className="lg:pl-64 relative">
+        <TopBar onToggleSidebar={toggleSidebar} onOpenAccountModal={() => setIsAccountModalOpen(true)} />
 
         {/* Page content */}
         <main className="p-6 h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
           {children}
         </main>
+
+        {/* User Account Modal - rendered in main container for proper positioning */}
+        <UserAccountModal 
+          isOpen={isAccountModalOpen} 
+          onClose={() => setIsAccountModalOpen(false)} 
+        />
       </div>
     </div>
   )
