@@ -320,52 +320,60 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto overflow-y-auto surface rounded-2xl shadow-sm address-book-table flex-1">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 h-full">
-          <thead className="bg-gray-50 dark:bg-slate-800/80">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <React.Fragment key={headerGroup.id}>
-                <tr>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className={`px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors ${header.column.getCanSort() ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-slate-700/60' : ''} ${header.id === 'expand' ? 'w-12' : ''} ${header.id === 'actions' ? 'w-32' : ''}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getCanSort() && (
-                          <span className="text-gray-400 dark:text-gray-500">
-                            {{
-                              asc: ' ↑',
-                              desc: ' ↓'
-                            }[header.column.getIsSorted() as string] ?? '↕'}
-                          </span>
-                        )}
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-                <tr>
-                  {headerGroup.headers.map((header) => (
-                    <th key={`filter-${header.id}`} className="px-3 py-2 bg-gray-100 dark:bg-slate-800/60">
-                      {header.column.getCanFilter() ? (
-                        <input
-                          type="text"
-                          value={(header.column.getFilterValue() ?? '') as string}
-                          onChange={(e) => header.column.setFilterValue(e.target.value)}
-                          placeholder={`${t('addressBook.table.searchIn')} ${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header.toLowerCase() : ''}...`}
-                          className="form-input w-full py-1 text-xs"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      ) : null}
-                    </th>
-                  ))}
-                </tr>
-              </React.Fragment>
-            ))}
-          </thead>
-          <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-800">
+      <div className="surface rounded-2xl shadow-sm address-book-table flex-1 flex flex-col overflow-hidden">
+        {/* Header table - sticky */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-800/80">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <React.Fragment key={headerGroup.id}>
+                  <tr>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors ${header.column.getCanSort() ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-slate-700/60' : ''} ${header.id === 'expand' ? 'w-12' : ''} ${header.id === 'actions' ? 'w-32' : ''}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getCanSort() && (
+                            <span className="text-gray-400 dark:text-gray-500">
+                              {{
+                                asc: ' ↑',
+                                desc: ' ↓'
+                              }[header.column.getIsSorted() as string] ?? '↕'}
+                            </span>
+                          )}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                  <tr>
+                    {headerGroup.headers.map((header) => (
+                      <th key={`filter-${header.id}`} className="px-3 py-2 bg-gray-100 dark:bg-slate-800/60">
+                        {header.column.getCanFilter() ? (
+                          <input
+                            type="text"
+                            value={(header.column.getFilterValue() ?? '') as string}
+                            onChange={(e) => header.column.setFilterValue(e.target.value)}
+                            placeholder={`${t('addressBook.table.searchIn')} ${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header.toLowerCase() : ''}...`}
+                            className="form-input w-full py-1 text-xs"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : null}
+                      </th>
+                    ))}
+                  </tr>
+                </React.Fragment>
+              ))}
+            </thead>
+          </table>
+        </div>
+
+        {/* Body table - scrollable */}
+        <div className="overflow-x-auto overflow-y-auto flex-1">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-800">
             {table.getRowModel().rows.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
@@ -574,8 +582,9 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                 </React.Fragment>
               ))
             )}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 flex-shrink-0">
