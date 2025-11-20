@@ -49,14 +49,14 @@ export function Layout({ children }: LayoutProps) {
         <TopBar onToggleSidebar={toggleSidebar} onOpenAccountModal={() => setIsAccountModalOpen(true)} />
 
         {/* Page content */}
-        <main className="p-6 h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
+        <main className="p-6 h-[calc(100vh-4rem)] overflow-y-auto flex flex-col">
           {children}
         </main>
 
         {/* User Account Modal - rendered in main container for proper positioning */}
-        <UserAccountModal 
-          isOpen={isAccountModalOpen} 
-          onClose={() => setIsAccountModalOpen(false)} 
+        <UserAccountModal
+          isOpen={isAccountModalOpen}
+          onClose={() => setIsAccountModalOpen(false)}
         />
       </div>
     </div>
