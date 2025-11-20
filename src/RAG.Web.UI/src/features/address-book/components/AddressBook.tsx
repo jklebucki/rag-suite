@@ -116,7 +116,7 @@ export function AddressBook() {
     if (canModify) {
       try {
         const response = await addressBookService.createContact(data)
-        
+
         // Create full ContactListItem from form data + API response id
         const newContact: ContactListItem = {
           id: response.id,
@@ -130,12 +130,12 @@ export function AddressBook() {
           mobilePhone: data.mobilePhone,
           isActive: true,
         }
-        
+
         // Add contact locally (at the beginning, will be sorted by table if needed)
         startTransition(() => {
           setContacts(prevContacts => [newContact, ...prevContacts])
         })
-        
+
         // Navigate to new contact after a short delay to allow DOM update
         setTimeout(() => {
           const contactRow = document.querySelector(`[data-contact-id="${response.id}"]`)
@@ -173,7 +173,7 @@ export function AddressBook() {
     if (canModify) {
       try {
         await addressBookService.updateContact(editingContact.id, data)
-        
+
         // Update only this specific row locally using form data
         // API success guarantees data correctness
         startTransition(() => {
@@ -411,7 +411,7 @@ export function AddressBook() {
             )}
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <ContactsTable
               contacts={optimisticContacts}
               onEdit={canModify ? openEditForm : undefined}

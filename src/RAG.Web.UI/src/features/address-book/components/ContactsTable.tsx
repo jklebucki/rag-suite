@@ -30,10 +30,10 @@ import {
 const diacriticsInsensitiveFilter: FilterFn<ContactListItem> = (row, columnId, filterValue) => {
   const value = row.getValue(columnId)
   if (value == null) return false
-  
+
   const normalizedValue = removeAccents(String(value)).toLowerCase()
   const normalizedFilter = removeAccents(String(filterValue)).toLowerCase()
-  
+
   return normalizedValue.includes(normalizedFilter)
 }
 
@@ -51,10 +51,10 @@ const globalDiacriticsFilter: FilterFn<ContactListItem> = (row, columnId, filter
   ]
     .filter(Boolean)
     .join(' ')
-  
+
   const normalizedSearchable = removeAccents(searchableValues).toLowerCase()
   const normalizedFilter = removeAccents(String(filterValue)).toLowerCase()
-  
+
   return normalizedSearchable.includes(normalizedFilter)
 }
 
@@ -320,7 +320,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto surface rounded-2xl shadow-sm address-book-table flex-1">
+      <div className="overflow-x-auto overflow-y-auto surface rounded-2xl shadow-sm address-book-table flex-1">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 h-full">
           <thead className="bg-gray-50 dark:bg-slate-800/80">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -375,7 +375,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
             ) : (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
-                  <tr 
+                  <tr
                     data-contact-id={row.original.id}
                     className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
@@ -422,8 +422,8 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                                       {t('addressBook.table.email')}
                                     </span>
-                                    <a 
-                                      href={`mailto:${row.original.email}`} 
+                                    <a
+                                      href={`mailto:${row.original.email}`}
                                       className="text-primary-600 dark:text-primary-400 hover:underline break-words"
                                     >
                                       {row.original.email}
@@ -438,8 +438,8 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                                       {t('addressBook.table.mobile')}
                                     </span>
-                                    <a 
-                                      href={`tel:${row.original.mobilePhone}`} 
+                                    <a
+                                      href={`tel:${row.original.mobilePhone}`}
                                       className="text-primary-600 dark:text-primary-400 hover:underline"
                                     >
                                       {row.original.mobilePhone}
@@ -454,8 +454,8 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                                       {t('addressBook.table.workPhone')}
                                     </span>
-                                    <a 
-                                      href={`tel:${row.original.workPhone}`} 
+                                    <a
+                                      href={`tel:${row.original.workPhone}`}
                                       className="text-primary-600 dark:text-primary-400 hover:underline"
                                     >
                                       {row.original.workPhone}
@@ -536,10 +536,10 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                                       {t('addressBook.table.photoUrl')}
                                     </span>
-                                    <a 
-                                      href={row.original.photoUrl} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer" 
+                                    <a
+                                      href={row.original.photoUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
                                       className="text-primary-600 dark:text-primary-400 hover:underline break-words"
                                     >
                                       {row.original.photoUrl}
@@ -637,12 +637,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           .address-book-table table {
             font-size: 0.875rem;
           }
-          
+
           .address-book-table th,
           .address-book-table td {
             padding: 0.5rem !important;
           }
-          
+
           /* Hide department and position on tablets */
           .address-book-table th:nth-child(6),
           .address-book-table td:nth-child(6),
@@ -651,7 +651,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
             display: none;
           }
         }
-        
+
         @media (max-width: 640px) {
           /* Hide email and mobilePhone on phones */
           .address-book-table th:nth-child(4),
