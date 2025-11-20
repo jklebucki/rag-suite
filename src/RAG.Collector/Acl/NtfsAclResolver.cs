@@ -123,7 +123,7 @@ public class NtfsAclResolver : IAclResolver
         }
         catch (Exception ex)
         {
-            _logger.LogTrace(ex, "Failed to resolve SID {Sid}", sid);
+            _logger.LogDebug("SID resolution failed for {Sid}: {ExceptionType} - {Message}", sid, ex.GetType().Name, ex.Message);
             return null;
         }
     }
@@ -152,21 +152,45 @@ public class NtfsAclResolver : IAclResolver
             var domain = parts[0];
             var name = parts[1];
 
-            // Try to find the principal in Active Directory
-            using var context = new PrincipalContext(ContextType.Domain, domain);
-            using var principal = Principal.FindByIdentity(context, IdentityType.SamAccountName, name);
-
-            if (principal != null)
+            // Skip resolution for built-in domains and well-known authorities
+            if (string.Equals(domain, "BUILTIN", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(domain, "NT AUTHORITY", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(domain, "LOCAL AUTHORITY", StringComparison.OrdinalIgnoreCase))
             {
-                // Prefer UserPrincipalName, fall back to Name, then SamAccountName
-                return principal.UserPrincipalName ?? principal.Name ?? principal.SamAccountName;
+                return accountName;
+            }
+
+            // Determine context type based on domain part
+            var contextType = string.Equals(domain, Environment.MachineName, StringComparison.OrdinalIgnoreCase)
+                ? ContextType.Machine
+                : ContextType.Domain;
+
+            try
+            {
+                // Try to find the principal in Active Directory or Local Machine
+                using var context = new PrincipalContext(contextType, domain);
+                using var principal = Principal.FindByIdentity(context, IdentityType.SamAccountName, name);
+
+                if (principal != null)
+                {
+                    // Prefer UserPrincipalName, fall back to Name, then SamAccountName
+                    return principal.UserPrincipalName ?? principal.Name ?? principal.SamAccountName;
+                }
+            }
+            catch (Exception ex) when (ex is PrincipalException or ArgumentException or System.Runtime.InteropServices.COMException)
+            {
+                // Common exceptions when AD is not reachable or domain is invalid
+                _logger.LogDebug("AD principal resolution failed for {Name}@{Domain}: {ExceptionType} - {Message}", 
+                    name, domain, ex.GetType().Name, ex.Message);
+                return accountName;
             }
 
             return accountName; // Return original if not found in AD
         }
         catch (Exception ex)
         {
-            _logger.LogTrace(ex, "Failed to resolve account through AD: {AccountName}", accountName);
+            _logger.LogDebug("AD resolution error for {AccountName}: {ExceptionType} - {Message}", 
+                accountName, ex.GetType().Name, ex.Message);
             return accountName; // Return original on error
         }
     }
