@@ -1,6 +1,7 @@
 import React from 'react'
 import { Send, FileSearch } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
+import useAutoGrowTextarea from '../hooks/useAutoGrowTextarea'
 
 interface MessageInputProps {
   message: string
@@ -23,17 +24,12 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
   const actualRef = (ref as React.RefObject<HTMLTextAreaElement>) || textareaRef
 
-  // Auto-resize textarea
-  React.useEffect(() => {
-    const textarea = actualRef.current
-    if (textarea) {
-      textarea.style.height = 'auto'
-      const scrollHeight = textarea.scrollHeight
-      const lineHeight = 24 // approximate line height in pixels
-      const maxHeight = lineHeight * 8 // 4 lines max
-      textarea.style.height = Math.min(scrollHeight, maxHeight) + 'px'
-    }
-  }, [message, actualRef])
+  // Use shared hook to auto-grow the textarea starting from 3 rows up to 10 rows
+  // After hitting 10 rows the textarea will show an internal scrollbar
+  // and the parent chat container will continue to expand (layout uses flex)
+  // The hook calculates line-height and clamps the height accordingly.
+  // Keep `resize-none` to prevent manual resizing by the user.
+  useAutoGrowTextarea(actualRef, message, { minRows: 3, maxRows: 10 })
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -66,9 +62,9 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
           onChange={(e) => onMessageChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('chat.input.placeholder')}
-          className="form-input flex-1 min-w-0 resize-none overflow-y-auto text-sm md:text-base py-2 md:py-3"
+          className="form-input flex-1 min-w-0 resize-none text-sm md:text-base py-2 md:py-3"
           disabled={isSending}
-          rows={1}
+          rows={3}
         />
         <button
           type="submit"
