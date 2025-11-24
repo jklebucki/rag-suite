@@ -54,7 +54,7 @@ public class UpdateContactHandler
         {
             // Get existing tag names
             var existingTagNames = contact.Tags.Select(t => t.TagName).ToList();
-            
+
             // Remove tags that are not in the new list
             var tagsToRemove = contact.Tags
                 .Where(t => !request.Tags.Contains(t.TagName))
@@ -74,7 +74,7 @@ public class UpdateContactHandler
                     CreatedAt = DateTime.UtcNow
                 })
                 .ToList();
-            
+
             if (tagsToAdd.Any())
             {
                 await _context.ContactTags.AddRangeAsync(tagsToAdd, cancellationToken);

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using RAG.Abstractions.Common.Api;
 using RAG.Forum.Common;
 using RAG.Forum.Data;
 

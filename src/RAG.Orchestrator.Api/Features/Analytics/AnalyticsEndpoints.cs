@@ -1,4 +1,3 @@
-using RAG.Abstractions.Common.Api;
 using RAG.Orchestrator.Api.Common.Api;
 
 namespace RAG.Orchestrator.Api.Features.Analytics;

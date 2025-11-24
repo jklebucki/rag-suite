@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using RAG.Abstractions.Common.Api;
 using RAG.AddressBook.Common;
 
 namespace RAG.AddressBook.Features.GetContact;

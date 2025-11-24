@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using RAG.Abstractions.Common.Api;
 
 namespace RAG.Orchestrator.Api.Common.Api;

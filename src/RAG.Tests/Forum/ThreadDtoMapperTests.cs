@@ -1,6 +1,5 @@
 using FluentAssertions;
 using RAG.Forum.Domain;
-using RAG.Forum.Features.Shared;
 using RAG.Forum.Features.Threads;
 
 namespace RAG.Tests.Forum;

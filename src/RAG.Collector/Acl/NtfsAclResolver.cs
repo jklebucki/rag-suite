@@ -180,7 +180,7 @@ public class NtfsAclResolver : IAclResolver
             catch (Exception ex) when (ex is PrincipalException or ArgumentException or System.Runtime.InteropServices.COMException)
             {
                 // Common exceptions when AD is not reachable or domain is invalid
-                _logger.LogDebug("AD principal resolution failed for {Name}@{Domain}: {ExceptionType} - {Message}", 
+                _logger.LogDebug("AD principal resolution failed for {Name}@{Domain}: {ExceptionType} - {Message}",
                     name, domain, ex.GetType().Name, ex.Message);
                 return accountName;
             }
@@ -189,7 +189,7 @@ public class NtfsAclResolver : IAclResolver
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("AD resolution error for {AccountName}: {ExceptionType} - {Message}", 
+            _logger.LogDebug("AD resolution error for {AccountName}: {ExceptionType} - {Message}",
                 accountName, ex.GetType().Name, ex.Message);
             return accountName; // Return original on error
         }
