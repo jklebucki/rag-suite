@@ -39,6 +39,8 @@ export interface MultilingualChatRequest {
 export interface MultilingualChatResponse {
   response: string
   sessionId?: string
+  userMessageId?: string
+  assistantMessageId?: string
   detectedLanguage: string
   responseLanguage: string
   wasTranslated: boolean

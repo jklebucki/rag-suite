@@ -350,6 +350,8 @@ public class UserChatService : IUserChatService
             {
                 Response = aiDbMessage.Content,
                 SessionId = sessionId,
+                UserMessageId = userDbMessage.Id,
+                AssistantMessageId = aiDbMessage.Id,
                 DetectedLanguage = detectedLanguage ?? "unknown",
                 ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false, // TODO: Implement translation logic when needed
@@ -383,6 +385,8 @@ public class UserChatService : IUserChatService
             {
                 Response = errorDbMessage.Content,
                 SessionId = sessionId,
+                UserMessageId = userDbMessage.Id,
+                AssistantMessageId = errorDbMessage.Id,
                 DetectedLanguage = detectedLanguage ?? "unknown",
                 ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false,

@@ -82,6 +82,7 @@ export const pl: TranslationKeys = {
   'chat.sources.title': 'Źródła ({0})',
   'chat.sources.summary': 'Wyświetlanie {0} dokumentów źródłowych',
   'chat.useDocumentSearch': 'Przeszukaj dokumenty',
+  'chat.assistant_typing': 'Asystent pisze...',
 
   // Document database status
   'chat.documents_unavailable': 'Baza dokumentów niedostępna',

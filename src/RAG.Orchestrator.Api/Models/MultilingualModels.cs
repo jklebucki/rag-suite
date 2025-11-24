@@ -57,6 +57,16 @@ public class MultilingualChatResponse
     public string? SessionId { get; set; }
 
     /// <summary>
+    /// User message ID from database
+    /// </summary>
+    public string? UserMessageId { get; set; }
+
+    /// <summary>
+    /// Assistant message ID from database
+    /// </summary>
+    public string? AssistantMessageId { get; set; }
+
+    /// <summary>
     /// Detected language of the original message
     /// </summary>
     public string DetectedLanguage { get; set; } = "en";

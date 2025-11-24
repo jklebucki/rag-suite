@@ -93,7 +93,7 @@ export function ChatInterface() {
                   <div className="bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-3 md:p-4 min-w-[100px] text-gray-700 dark:text-gray-100">
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin text-primary-600 dark:text-primary-300" />
-                      <span className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Assistant is typing...</span>
+                      <span className="text-xs md:text-sm text-gray-600 dark:text-gray-300">{t('chat.assistant_typing')}</span>
                     </div>
                     <div className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                       <span className="font-medium">now</span>

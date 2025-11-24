@@ -107,6 +107,7 @@ export const nl: TranslationKeys = {
   'chat.sources.title': 'Bronnen ({0})',
   'chat.sources.summary': '{0} brondocumenten weergeven',
   'chat.useDocumentSearch': 'Documenten doorzoeken',
+  'chat.assistant_typing': 'Assistent is aan het typen...',
 
   // Document database status
   'chat.documents_unavailable': 'Documenten database niet beschikbaar',

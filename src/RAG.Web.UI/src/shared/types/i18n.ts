@@ -126,6 +126,7 @@ export interface TranslationKeys {
   'chat.sources.title': string;
   'chat.sources.summary': string;
   'chat.useDocumentSearch': string;
+  'chat.assistant_typing': string;
 
   // Document database status
   'chat.documents_unavailable': string;

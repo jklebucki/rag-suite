@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useOptimistic, useTransition } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import chatService from '@/features/chat/services/chat.service'
 import { useToastContext } from '@/shared/contexts/ToastContext'
@@ -20,6 +20,7 @@ export function useMultilingualChat() {
   const [documentsAvailable, setDocumentsAvailable] = useState<boolean>(true)
   const [useDocumentSearch, setUseDocumentSearch] = useState<boolean>(false)
   const [isNewSession, setIsNewSession] = useState<boolean>(false)
+  const [pendingMessages, setPendingMessages] = useState<ChatMessage[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const { showError, showSuccess } = useToastContext()
@@ -38,22 +39,17 @@ export function useMultilingualChat() {
     enabled: !!currentSessionId,
   })
 
-  // Optimistic messages state using React 19 useOptimistic
-  const [isPending, startTransition] = useTransition()
-  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
-    currentSession?.messages || [],
-    (state: ChatMessage[], newMessage: ChatMessage) => {
-      // Check if message already exists (prevent duplicates)
-      if (state.some(msg => msg.id === newMessage.id)) {
-        return state
-      }
-      return [...state, newMessage]
-    }
-  )
-
-  // Use optimistic messages if available, otherwise use currentSession messages
+  // Merge server messages with pending messages for display
   const displaySession = currentSession
-    ? { ...currentSession, messages: optimisticMessages }
+    ? {
+        ...currentSession,
+        messages: [
+          ...(currentSession.messages || []),
+          ...pendingMessages.filter(
+            pending => !currentSession.messages.some(msg => msg.id === pending.id)
+          )
+        ]
+      }
     : currentSession
 
   // Send multilingual message mutation
@@ -62,7 +58,7 @@ export function useMultilingualChat() {
       logger.debug('Calling sendMultilingualMessage API with:', { sessionId, request })
       return chatService.sendMultilingualMessage(sessionId, request)
     },
-    retry: false, // 🆕 No retry to prevent double sending
+    retry: false,
     onSuccess: (response) => {
       logger.debug('sendMultilingualMessage success:', response)
       setLastResponse(response)
@@ -72,12 +68,13 @@ export function useMultilingualChat() {
         setDocumentsAvailable(response.metadata.documentsAvailable as boolean)
       }
 
-      // Refresh the current session to get the real messages from server
+      // Clear pending messages - server now has the real ones
+      setPendingMessages([])
+
+      // Refresh queries to get updated messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
-      
-      // Refresh the sessions list to update the title if it changed
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
-      
+
       setIsTyping(false)
 
       // Show language detection info if available
@@ -92,7 +89,8 @@ export function useMultilingualChat() {
       logger.error('Failed to send multilingual message:', error)
       showError('Failed to send message', 'Please check your connection and try again')
       setIsTyping(false)
-      // useOptimistic automatically rolls back on error, but we need to ensure cache is synced
+      // Clear pending messages on error
+      setPendingMessages([])
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
     },
   })
@@ -170,10 +168,8 @@ export function useMultilingualChat() {
       timestamp: messageTimestamp
     }
 
-    // Add optimistic message using React 19 useOptimistic
-    startTransition(() => {
-      addOptimisticMessage(tempUserMessage)
-    })
+    // Add to pending messages immediately for display
+    setPendingMessages(prev => [...prev, tempUserMessage])
 
     logger.debug('Setting isTyping to true')
     setIsTyping(true)
@@ -192,7 +188,10 @@ export function useMultilingualChat() {
     }
 
     logger.debug('Sending multilingual message:', request)
-    sendMultilingualMessageMutation.mutate({ sessionId: currentSessionId, request })
+    sendMultilingualMessageMutation.mutate({
+      sessionId: currentSessionId,
+      request
+    })
   }
 
   const handleCreateSession = async () => {
@@ -224,10 +223,10 @@ export function useMultilingualChat() {
     }
   }
 
-  // Auto-scroll to bottom when new messages arrive (use optimistic messages)
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [optimisticMessages])
+  }, [displaySession?.messages])
 
   // Set first session as current if none selected
   useEffect(() => {
@@ -271,7 +270,7 @@ export function useMultilingualChat() {
     setCurrentSessionId,
     message,
     setMessage,
-    isTyping: isTyping || isPending,
+    isTyping,
     sessions,
     currentSession: displaySession,
     lastResponse,
