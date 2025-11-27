@@ -44,7 +44,34 @@ public class FileDownloadServiceTests : IDisposable
     {
         if (Directory.Exists(_testDirectory))
         {
-            Directory.Delete(_testDirectory, true);
+            try
+            {
+                // Give the OS time to release file handles
+                System.Threading.Thread.Sleep(100);
+                
+                // Try to delete files first
+                var files = Directory.GetFiles(_testDirectory, "*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        File.SetAttributes(file, FileAttributes.Normal);
+                        File.Delete(file);
+                    }
+                    catch
+                    {
+                        // Ignore individual file deletion errors
+                    }
+                }
+                
+                // Then try to delete the directory
+                Directory.Delete(_testDirectory, true);
+            }
+            catch
+            {
+                // Ignore cleanup errors in tests
+                // The temp directory will be cleaned up by the OS eventually
+            }
         }
     }
 

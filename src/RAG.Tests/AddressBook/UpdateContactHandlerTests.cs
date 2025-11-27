@@ -60,7 +60,11 @@ public class UpdateContactHandlerTests : IDisposable
         var result = await _handler.HandleAsync(contact.Id, request);
 
         // Assert
-        result.Should().BeTrue();
+        result.Should().NotBeNull();
+        result!.FirstName.Should().Be("Updated");
+        result.Email.Should().Be("updated@example.com");
+        result.Department.Should().Be("IT");
+        result.Position.Should().Be("Senior Developer");
 
         var updatedContact = await _context.Contacts.FindAsync(contact.Id);
         updatedContact.Should().NotBeNull();
@@ -73,7 +77,7 @@ public class UpdateContactHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleAsync_NonExistentContact_ReturnsFalse()
+    public async Task HandleAsync_NonExistentContact_ReturnsNull()
     {
         // Arrange
         _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
@@ -89,7 +93,7 @@ public class UpdateContactHandlerTests : IDisposable
         var result = await _handler.HandleAsync(nonExistentId, request);
 
         // Assert
-        result.Should().BeFalse();
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -117,7 +121,7 @@ public class UpdateContactHandlerTests : IDisposable
         var result = await _handler.HandleAsync(contact.Id, request);
 
         // Assert
-        result.Should().BeTrue();
+        result.Should().NotBeNull();
 
         var updatedContact = await _context.Contacts.FindAsync(contact.Id);
         updatedContact!.UpdatedByUserId.Should().Be("system");
@@ -159,7 +163,19 @@ public class UpdateContactHandlerTests : IDisposable
         var result = await _handler.HandleAsync(contact.Id, request);
 
         // Assert
-        result.Should().BeTrue();
+        result.Should().NotBeNull();
+        result!.FirstName.Should().Be("New");
+        result.DisplayName.Should().Be("New Display");
+        result.Department.Should().Be("Sales");
+        result.Position.Should().Be("Manager");
+        result.Location.Should().Be("Warsaw");
+        result.Company.Should().Be("New Corp");
+        result.WorkPhone.Should().Be("+48123456789");
+        result.MobilePhone.Should().Be("+48987654321");
+        result.Email.Should().Be("new@example.com");
+        result.Notes.Should().Be("Updated notes");
+        result.PhotoUrl.Should().Be("https://example.com/new-photo.jpg");
+        result.IsActive.Should().Be(false);
 
         var updatedContact = await _context.Contacts.FindAsync(contact.Id);
         updatedContact!.FirstName.Should().Be("New");
@@ -173,7 +189,7 @@ public class UpdateContactHandlerTests : IDisposable
         updatedContact.Email.Should().Be("new@example.com");
         updatedContact.Notes.Should().Be("Updated notes");
         updatedContact.PhotoUrl.Should().Be("https://example.com/new-photo.jpg");
-        updatedContact.IsActive.Should().BeFalse();
+        updatedContact.IsActive.Should().Be(false);
     }
 
     [Fact]

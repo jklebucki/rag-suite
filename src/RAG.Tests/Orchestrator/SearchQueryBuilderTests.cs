@@ -40,11 +40,11 @@ public class SearchQueryBuilderTests
         query.Should().NotBeNull();
         query!.Should().ContainKey("bool");
 
-        var boolQuery = query["bool"] as Dictionary<string, object>;
+        var boolQuery = query!["bool"] as Dictionary<string, object>;;
         boolQuery.Should().NotBeNull();
         boolQuery!.Should().ContainKey("should");
 
-        var should = boolQuery["should"] as object[];
+        var should = boolQuery!["should"] as object[];
         should.Should().NotBeNull();
         should!.Should().NotBeEmpty();
     }
@@ -119,7 +119,7 @@ public class SearchQueryBuilderTests
         query.Should().NotBeNull();
         query!.Should().ContainKey("script_score");
 
-        var scriptScore = query["script_score"] as Dictionary<string, object>;
+        var scriptScore = query!["script_score"] as Dictionary<string, object>;
         scriptScore.Should().NotBeNull();
         scriptScore!.Should().ContainKey("query");
         scriptScore.Should().ContainKey("script");
@@ -211,8 +211,8 @@ public class SearchQueryBuilderTests
         var paramsDict = script!["params"] as Dictionary<string, object>;
         paramsDict.Should().NotBeNull();
 
-        paramsDict.Should().ContainKey("query_vector");
-        var queryVector = paramsDict["query_vector"] as float[];
+        paramsDict!.Should().ContainKey("query_vector");
+        var queryVector = paramsDict!["query_vector"] as float[];
         queryVector.Should().NotBeNull();
         queryVector.Should().BeEquivalentTo(embedding);
     }

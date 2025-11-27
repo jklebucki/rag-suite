@@ -23,11 +23,12 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Path mapping */
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    
+
     /* Types */
     "types": ["vite/client"]
   },
