@@ -1,4 +1,5 @@
 using RAG.Orchestrator.Api.Models;
+using RAG.Orchestrator.Api.Common.Prompting;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
@@ -446,7 +447,7 @@ public class LlmService : ILlmService
             // Check cache first
             if (_systemMessageCache.TryGetValue(cacheKey, out var cachedMessage))
             {
-                return cachedMessage;
+                return AppendRuntimeServerContext(cachedMessage);
             }
 
             var message = await LoadSystemMessageAsync(targetLanguage, firstName, lastName, email, role, cancellationToken);
@@ -454,12 +455,12 @@ public class LlmService : ILlmService
             // Cache the loaded message
             _systemMessageCache.TryAdd(cacheKey, message);
 
-            return message;
+            return AppendRuntimeServerContext(message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading system message for language: {Language}", language);
-            return DefaultSystemMessage;
+            return AppendRuntimeServerContext(DefaultSystemMessage);
         }
     }
 
@@ -501,5 +502,14 @@ public class LlmService : ILlmService
 
         _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
         return systemMessage;
+    }
+
+    private static string AppendRuntimeServerContext(string systemMessage)
+    {
+        var baseMessage = string.IsNullOrWhiteSpace(systemMessage)
+            ? DefaultSystemMessage
+            : systemMessage.TrimEnd();
+
+        return $"{baseMessage}{Environment.NewLine}{Environment.NewLine}{RuntimePromptContextBuilder.BuildServerDateTimeContext()}";
     }
 }

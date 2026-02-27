@@ -1,5 +1,6 @@
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Common.Constants;
+using RAG.Orchestrator.Api.Common.Prompting;
 using RAG.Orchestrator.Api.Localization;
 using System.Text;
 
@@ -45,6 +46,7 @@ public class PromptBuilder : IPromptBuilder
 
         promptBuilder.AppendLine(systemPrompt);
         promptBuilder.AppendLine(contextInstruction);
+        AppendServerDateTimeContext(promptBuilder);
 
         // Add context from search results if available and enabled
         if (context.UseDocumentSearch && context.SearchResults.Length > 0)
@@ -166,6 +168,7 @@ public class PromptBuilder : IPromptBuilder
 
         promptBuilder.AppendLine(systemPrompt);
         promptBuilder.AppendLine(contextInstruction);
+        AppendServerDateTimeContext(promptBuilder);
 
         if (context.UseDocumentSearch && context.DocumentsAvailable && context.SearchResults.Length > 0)
         {
@@ -291,6 +294,7 @@ public class PromptBuilder : IPromptBuilder
             language);
         contextBuilder.AppendLine($"IMPORTANT: {languageInstruction}");
         contextBuilder.AppendLine($"MUST RESPOND IN: {language.ToUpper()}");
+        AppendServerDateTimeContext(contextBuilder);
 
         // Add context header using localization
         var contextHeader = _languageService.GetLocalizedString(
@@ -418,6 +422,12 @@ public class PromptBuilder : IPromptBuilder
         {
             builder.AppendLine($"- {rule}");
         }
+    }
+
+    private static void AppendServerDateTimeContext(StringBuilder builder)
+    {
+        builder.AppendLine();
+        builder.AppendLine(RuntimePromptContextBuilder.BuildServerDateTimeContext());
     }
 
     private string FormatSourcesSummary(SearchResult[] searchResults, string language)
