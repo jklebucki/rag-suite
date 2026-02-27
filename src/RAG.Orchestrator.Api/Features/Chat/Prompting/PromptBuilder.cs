@@ -363,7 +363,7 @@ public class PromptBuilder : IPromptBuilder
                     "Zwracaj wyłącznie poprawny Markdown.",
                     "Nie zwracaj HTML, JSON ani XML.",
                     "Treść odpowiedzi musi zawierać co najmniej jeden jawny znacznik Markdown (np. nagłówek `##`, lista `-`, `**pogrubienie**` lub blok kodu).",
-                    "Ostatnia linia musi mieć dokładnie format: `{pięć słów podsumowania}`.",
+                    "Ostatnia linia ma być w nawiasach klamrowych i zawierać dokładnie 5 słów podsumowania tej odpowiedzi, np. `{reset hasła i odzyskanie dostępu}`. Nie kopiuj przykładu dosłownie.",
                     "Po linii z `{}` nie dodawaj żadnego tekstu."
                 ];
                 break;
@@ -374,7 +374,7 @@ public class PromptBuilder : IPromptBuilder
                     "Csak érvényes Markdown formátumot használj.",
                     "Ne adj vissza HTML-, JSON- vagy XML-kimenetet.",
                     "A válasz tartalmazzon legalább egy egyértelmű Markdown elemet (pl. `##` címsor, `-` lista, `**félkövér**`, vagy kódblokk).",
-                    "Az utolsó sor pontosan ilyen legyen: `{öt szóból álló összefoglaló}`.",
+                    "Az utolsó sor kapcsos zárójelben tartalmazzon pontosan 5 szavas összefoglalót, pl. `{jelszó visszaállítás és fiók helyreállítás}`. A példát ne másold szó szerint.",
                     "A `{}` sor után ne írj több szöveget."
                 ];
                 break;
@@ -385,7 +385,7 @@ public class PromptBuilder : IPromptBuilder
                     "Geef uitsluitend geldige Markdown terug.",
                     "Geef geen HTML, JSON of XML terug.",
                     "Het antwoord moet minimaal één expliciet Markdown-element bevatten (bijv. `##` kop, `-` lijst, `**vet**` of codeblok).",
-                    "De laatste regel moet exact dit formaat hebben: `{samenvatting in vijf woorden}`.",
+                    "De laatste regel moet tussen accolades staan en exact 5 woorden bevatten als samenvatting, bijv. `{wachtwoord reset en account herstel}`. Kopieer het voorbeeld niet letterlijk.",
                     "Voeg geen tekst toe na de regel met `{}`."
                 ];
                 break;
@@ -396,7 +396,7 @@ public class PromptBuilder : IPromptBuilder
                     "Răspunde exclusiv în Markdown valid.",
                     "Nu returna HTML, JSON sau XML.",
                     "Răspunsul trebuie să conțină cel puțin un element Markdown explicit (de ex. titlu `##`, listă `-`, `**bold**` sau bloc de cod).",
-                    "Ultima linie trebuie să fie exact în formatul: `{rezumat din cinci cuvinte}`.",
+                    "Ultima linie trebuie să fie între acolade și să conțină exact 5 cuvinte ca rezumat, de exemplu `{resetare parolă și recuperare cont}`. Nu copia exemplul literal.",
                     "Nu adăuga text după linia cu `{}`."
                 ];
                 break;
@@ -407,7 +407,7 @@ public class PromptBuilder : IPromptBuilder
                     "Return valid Markdown only.",
                     "Do not return HTML, JSON, or XML.",
                     "The response body must include at least one explicit Markdown construct (for example: `##` heading, `-` list, `**bold**`, or a fenced code block).",
-                    "The last line must be exactly in this format: `{five-word summary}`.",
+                    "The last line must be inside curly braces and contain exactly 5 words summarizing this answer, for example `{password reset and account recovery}`. Do not copy the example literally.",
                     "Do not add any text after the `{}` line."
                 ];
                 break;

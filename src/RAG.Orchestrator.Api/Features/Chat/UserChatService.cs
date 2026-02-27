@@ -574,18 +574,72 @@ public class UserChatService : IUserChatService
         if (string.IsNullOrWhiteSpace(response))
             return (response, null);
 
+        var trimmedResponse = response.TrimEnd();
+        var lastLineStart = trimmedResponse.LastIndexOfAny(new[] { '\r', '\n' }) + 1;
+        var lastLine = trimmedResponse[lastLineStart..].Trim();
+
+        if (IsLiteralSummaryPlaceholder(lastLine))
+        {
+            var cleanedPlaceholderResponse = lastLineStart > 0
+                ? trimmedResponse[..lastLineStart].TrimEnd()
+                : string.Empty;
+            _logger.LogWarning("Removed literal summary placeholder from LLM response end: {Summary}", lastLine);
+            return (cleanedPlaceholderResponse, null);
+        }
+
         // Extract final {...} token from the end of the response regardless of line breaks.
         var match = System.Text.RegularExpressions.Regex.Match(response, @"\{([^{}\r\n]+)\}\s*$");
         if (!match.Success)
             return (response, null);
 
         var summary = match.Groups[1].Value.Trim();
-        if (string.IsNullOrWhiteSpace(summary))
-            return (response, null);
-
         var cleanedResponse = response[..match.Index].TrimEnd();
+
+        if (string.IsNullOrWhiteSpace(summary))
+            return (cleanedResponse, null);
+
+        if (IsLiteralSummaryPlaceholder(summary))
+        {
+            _logger.LogWarning("Ignored literal summary placeholder extracted from LLM response: {Summary}", summary);
+            return (cleanedResponse, null);
+        }
+
+        var summaryWordCount = CountWords(summary);
+        if (summaryWordCount != 5)
+        {
+            _logger.LogWarning("Ignored extracted summary with invalid word count ({WordCount}): {Summary}", summaryWordCount, summary);
+            return (cleanedResponse, null);
+        }
+
         _logger.LogInformation("Extracted summary from LLM response: {Summary}", summary);
 
         return (cleanedResponse, summary);
+    }
+
+    private static bool IsLiteralSummaryPlaceholder(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var normalized = System.Text.RegularExpressions.Regex.Replace(value.ToLowerInvariant(), @"[^\p{L}\p{N}\s]", " ");
+        normalized = System.Text.RegularExpressions.Regex.Replace(normalized, @"\s+", " ").Trim();
+
+        return normalized is
+            "pięć słów podsumowania" or
+            "piec slow podsumowania" or
+            "five word summary" or
+            "summary in five words" or
+            "öt szavas összefoglaló" or
+            "ot szavas osszefoglalo" or
+            "samenvatting in vijf woorden" or
+            "rezumat din cinci cuvinte";
+    }
+
+    private static int CountWords(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0;
+
+        return System.Text.RegularExpressions.Regex.Matches(value, @"[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)?").Count;
     }
 }
