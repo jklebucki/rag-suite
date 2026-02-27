@@ -564,7 +564,7 @@ public class UserChatService : IUserChatService
     }
 
     /// <summary>
-    /// Extracts summary from the last line of LLM response if it's enclosed in {} brackets.
+    /// Extracts summary from the end of LLM response if it's enclosed in {} brackets.
     /// Returns the cleaned response and the extracted summary.
     /// </summary>
     /// <param name="response">The LLM response text</param>
@@ -574,27 +574,18 @@ public class UserChatService : IUserChatService
         if (string.IsNullOrWhiteSpace(response))
             return (response, null);
 
-        var lines = response.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-        if (lines.Length == 0)
+        // Extract final {...} token from the end of the response regardless of line breaks.
+        var match = System.Text.RegularExpressions.Regex.Match(response, @"\{([^{}\r\n]+)\}\s*$");
+        if (!match.Success)
             return (response, null);
 
-        var lastLine = lines[^1].Trim();
+        var summary = match.Groups[1].Value.Trim();
+        if (string.IsNullOrWhiteSpace(summary))
+            return (response, null);
 
-        // Check if the last line contains a summary enclosed in {}
-        var match = System.Text.RegularExpressions.Regex.Match(lastLine, @"^\{(.+)\}$");
-        if (match.Success)
-        {
-            var summary = match.Groups[1].Value.Trim();
+        var cleanedResponse = response[..match.Index].TrimEnd();
+        _logger.LogInformation("Extracted summary from LLM response: {Summary}", summary);
 
-            // Remove the last line from the response
-            var cleanedLines = lines.Take(lines.Length - 1).ToArray();
-            var cleanedResponse = string.Join(Environment.NewLine, cleanedLines).TrimEnd();
-
-            _logger.LogInformation("Extracted summary from LLM response: {Summary}", summary);
-
-            return (cleanedResponse, summary);
-        }
-
-        return (response, null);
+        return (cleanedResponse, summary);
     }
 }

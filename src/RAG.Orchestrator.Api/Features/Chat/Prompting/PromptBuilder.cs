@@ -120,6 +120,7 @@ public class PromptBuilder : IPromptBuilder
             context.ResponseLanguage);
         promptBuilder.AppendLine($"{userLabel}: {context.UserMessage}");
         promptBuilder.AppendLine();
+        AppendMarkdownOutputContract(promptBuilder, context.ResponseLanguage);
         promptBuilder.AppendLine(_languageService.GetLocalizedString(
             "system_prompts",
             LocalizationKeys.SystemPrompts.Response,
@@ -257,6 +258,7 @@ public class PromptBuilder : IPromptBuilder
 
         // FINAL CRITICAL REMINDER before response
         promptBuilder.AppendLine($"CRITICAL: {languageInstruction}");
+        AppendMarkdownOutputContract(promptBuilder, context.ResponseLanguage);
         promptBuilder.AppendLine(_languageService.GetLocalizedString(
             "system_prompts",
             LocalizationKeys.SystemPrompts.Response,
@@ -336,12 +338,86 @@ public class PromptBuilder : IPromptBuilder
             language) ?? "=== END OF KNOWLEDGE BASE CONTEXT ===";
         contextBuilder.AppendLine(contextFooter);
         contextBuilder.AppendLine($"CRITICAL: {languageInstruction}");
+        AppendMarkdownOutputContract(contextBuilder, language);
         contextBuilder.AppendLine(_languageService.GetLocalizedString(
             "system_prompts",
             LocalizationKeys.SystemPrompts.Response,
             language));
 
         return contextBuilder.ToString();
+    }
+
+    private static void AppendMarkdownOutputContract(StringBuilder builder, string language)
+    {
+        var normalizedLanguage = (language ?? string.Empty).Trim().ToLowerInvariant();
+
+        string title;
+        string[] rules;
+
+        switch (normalizedLanguage)
+        {
+            case "pl":
+                title = "FORMAT ODPOWIEDZI (BEZWZGLĘDNY)";
+                rules =
+                [
+                    "Zwracaj wyłącznie poprawny Markdown.",
+                    "Nie zwracaj HTML, JSON ani XML.",
+                    "Treść odpowiedzi musi zawierać co najmniej jeden jawny znacznik Markdown (np. nagłówek `##`, lista `-`, `**pogrubienie**` lub blok kodu).",
+                    "Ostatnia linia musi mieć dokładnie format: `{pięć słów podsumowania}`.",
+                    "Po linii z `{}` nie dodawaj żadnego tekstu."
+                ];
+                break;
+            case "hu":
+                title = "VÁLASZ FORMÁTUM (KÖTELEZŐ)";
+                rules =
+                [
+                    "Csak érvényes Markdown formátumot használj.",
+                    "Ne adj vissza HTML-, JSON- vagy XML-kimenetet.",
+                    "A válasz tartalmazzon legalább egy egyértelmű Markdown elemet (pl. `##` címsor, `-` lista, `**félkövér**`, vagy kódblokk).",
+                    "Az utolsó sor pontosan ilyen legyen: `{öt szóból álló összefoglaló}`.",
+                    "A `{}` sor után ne írj több szöveget."
+                ];
+                break;
+            case "nl":
+                title = "ANTWOORDFORMAAT (VERPLICHT)";
+                rules =
+                [
+                    "Geef uitsluitend geldige Markdown terug.",
+                    "Geef geen HTML, JSON of XML terug.",
+                    "Het antwoord moet minimaal één expliciet Markdown-element bevatten (bijv. `##` kop, `-` lijst, `**vet**` of codeblok).",
+                    "De laatste regel moet exact dit formaat hebben: `{samenvatting in vijf woorden}`.",
+                    "Voeg geen tekst toe na de regel met `{}`."
+                ];
+                break;
+            case "ro":
+                title = "FORMAT RĂSPUNS (OBLIGATORIU)";
+                rules =
+                [
+                    "Răspunde exclusiv în Markdown valid.",
+                    "Nu returna HTML, JSON sau XML.",
+                    "Răspunsul trebuie să conțină cel puțin un element Markdown explicit (de ex. titlu `##`, listă `-`, `**bold**` sau bloc de cod).",
+                    "Ultima linie trebuie să fie exact în formatul: `{rezumat din cinci cuvinte}`.",
+                    "Nu adăuga text după linia cu `{}`."
+                ];
+                break;
+            default:
+                title = "RESPONSE FORMAT (MANDATORY)";
+                rules =
+                [
+                    "Return valid Markdown only.",
+                    "Do not return HTML, JSON, or XML.",
+                    "The response body must include at least one explicit Markdown construct (for example: `##` heading, `-` list, `**bold**`, or a fenced code block).",
+                    "The last line must be exactly in this format: `{five-word summary}`.",
+                    "Do not add any text after the `{}` line."
+                ];
+                break;
+        }
+
+        builder.AppendLine($"=== {title} ===");
+        foreach (var rule in rules)
+        {
+            builder.AppendLine($"- {rule}");
+        }
     }
 
     private string FormatSourcesSummary(SearchResult[] searchResults, string language)
