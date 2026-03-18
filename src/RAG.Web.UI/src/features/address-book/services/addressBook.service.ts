@@ -6,6 +6,7 @@ import type {
   ContactChangeProposal,
   CreateContactRequest,
   CreateContactResponse,
+  DeleteContactsWithoutPhotoResponse,
   ImportContactsRequest,
   ImportContactsResponse,
   ListContactsRequest,
@@ -60,6 +61,11 @@ class AddressBookService {
 
   async deleteContact(contactId: string): Promise<void> {
     await apiHttpClient.delete(`/addressbook/${contactId}`)
+  }
+
+  async deleteContactsWithoutPhoto(): Promise<DeleteContactsWithoutPhotoResponse> {
+    const response = await apiHttpClient.delete<DeleteContactsWithoutPhotoResponse>('/addressbook/without-photo')
+    return response.data
   }
 
   async proposeChange(request: ProposeChangeRequest): Promise<ProposeChangeResponse> {

@@ -44,12 +44,15 @@ export function AddressBook() {
   const [alertState, setAlertState] = useState<AlertState | null>(null)
   const [contactToDelete, setContactToDelete] = useState<ContactListItem | null>(null)
   const [isDeleteProcessing, setIsDeleteProcessing] = useState(false)
+  const [isDeleteWithoutPhotoModalOpen, setIsDeleteWithoutPhotoModalOpen] = useState(false)
+  const [isDeleteWithoutPhotoProcessing, setIsDeleteWithoutPhotoProcessing] = useState(false)
 
   const showAlert = (state: AlertState) => setAlertState(state)
   const closeAlert = () => setAlertState(null)
 
   // Check if user can modify directly (Admin/PowerUser)
   const canModify = !!(isAuthenticated && (user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')))
+  const isAdmin = !!(isAuthenticated && user?.roles?.includes('Admin'))
 
   // Optimistic contacts state using React 19 useOptimistic
   const [isPending, startTransition] = useTransition()
@@ -264,6 +267,31 @@ export function AddressBook() {
     }
   }
 
+  const confirmDeleteContactsWithoutPhoto = async () => {
+    setIsDeleteWithoutPhotoProcessing(true)
+
+    try {
+      const response = await addressBookService.deleteContactsWithoutPhoto()
+      await loadContacts()
+      setIsDeleteWithoutPhotoModalOpen(false)
+
+      showAlert({
+        title: t('common.success'),
+        message: t('addressBook.import.deleteWithoutPhoto.success', { count: response.deletedCount.toString() }),
+        variant: 'success'
+      })
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : t('addressBook.messages.unknownError')
+      showAlert({
+        title: t('common.error'),
+        message: `${t('addressBook.import.deleteWithoutPhoto.error')}: ${errorMessage}`,
+        variant: 'error'
+      })
+    } finally {
+      setIsDeleteWithoutPhotoProcessing(false)
+    }
+  }
+
   const handleProposeChange = (contact: ContactListItem) => {
     setProposingContact(contact)
     setEditingContact(contact)
@@ -428,6 +456,23 @@ export function AddressBook() {
       {activeTab === 'import' && canModify && (
         <div className="max-w-3xl space-y-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('addressBook.import.title')}</h2>
+          {isAdmin && (
+            <div className="surface-muted border border-red-200 dark:border-red-900/40 rounded-xl p-4">
+              <h3 className="font-medium text-red-900 dark:text-red-300">
+                {t('addressBook.import.deleteWithoutPhoto.title')}
+              </h3>
+              <p className="text-sm text-red-700 dark:text-red-300/80 mt-1">
+                {t('addressBook.import.deleteWithoutPhoto.description')}
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsDeleteWithoutPhotoModalOpen(true)}
+                className="btn-primary bg-red-600 hover:bg-red-700 focus-visible:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600 mt-3"
+              >
+                {t('addressBook.import.deleteWithoutPhoto.button')}
+              </button>
+            </div>
+          )}
           <ContactImport onImport={handleImport} onClose={() => setActiveTab('contacts')} />
         </div>
       )}
@@ -479,6 +524,21 @@ export function AddressBook() {
         }
         details={deleteModalDetails.length ? deleteModalDetails : undefined}
         confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteWithoutPhotoModalOpen}
+        onClose={() => {
+          if (isDeleteWithoutPhotoProcessing) return
+          setIsDeleteWithoutPhotoModalOpen(false)
+        }}
+        onConfirm={confirmDeleteContactsWithoutPhoto}
+        isLoading={isDeleteWithoutPhotoProcessing}
+        title={t('addressBook.import.deleteWithoutPhoto.modalTitle')}
+        message={t('addressBook.import.deleteWithoutPhoto.modalMessage')}
+        itemName={t('addressBook.import.deleteWithoutPhoto.itemName')}
+        confirmText={t('addressBook.import.deleteWithoutPhoto.confirmButton')}
         cancelText={t('common.cancel')}
       />
 

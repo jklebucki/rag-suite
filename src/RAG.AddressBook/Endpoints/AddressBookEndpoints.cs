@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using RAG.AddressBook.Features.CreateContact;
+using RAG.AddressBook.Features.DeleteContactsWithoutPhoto;
 using RAG.AddressBook.Features.DeleteContact;
 using RAG.AddressBook.Features.GetContact;
 using RAG.AddressBook.Features.GetProposal;
@@ -26,6 +27,7 @@ public static class AddressBookEndpoints
         group.MapListContactsEndpoint();
         group.MapUpdateContactEndpoint();
         group.MapDeleteContactEndpoint();
+        group.MapDeleteContactsWithoutPhotoEndpoint();
         group.MapSearchContactsEndpoint();
         group.MapImportContactsEndpoint();
 

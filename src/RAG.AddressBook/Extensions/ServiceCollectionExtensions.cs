@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Features.CreateContact;
+using RAG.AddressBook.Features.DeleteContactsWithoutPhoto;
 using RAG.AddressBook.Features.DeleteContact;
 using RAG.AddressBook.Features.GetContact;
 using RAG.AddressBook.Features.GetProposal;
@@ -41,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ListContactsService>();
         services.AddScoped<UpdateContactHandler>();
         services.AddScoped<DeleteContactHandler>();
+        services.AddScoped<DeleteContactsWithoutPhotoHandler>();
         services.AddScoped<SearchContactsService>();
         services.AddScoped<ImportContactsHandler>();
 
@@ -60,7 +62,9 @@ public static class ServiceCollectionExtensions
         // Add authorization policies
         services.AddAuthorizationBuilder()
             .AddPolicy("AdminOrPowerUser", policy =>
-                policy.RequireRole("Admin", "PowerUser"));
+                policy.RequireRole("Admin", "PowerUser"))
+            .AddPolicy("AdminOnly", policy =>
+                policy.RequireRole("Admin"));
 
         return services;
     }

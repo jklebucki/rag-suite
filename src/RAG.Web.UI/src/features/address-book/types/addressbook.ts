@@ -268,6 +268,10 @@ export interface ImportContactsResponse {
   importedContacts: ImportedContact[]
 }
 
+export interface DeleteContactsWithoutPhotoResponse {
+  deletedCount: number
+}
+
 export interface ImportedContact {
   id: string
   firstName: string

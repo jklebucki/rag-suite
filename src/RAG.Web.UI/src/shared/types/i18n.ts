@@ -792,6 +792,15 @@ export interface TranslationKeys {
   'addressBook.import.sampleContacts': string;
   'addressBook.import.importing': string;
   'addressBook.import.importContacts': string;
+  'addressBook.import.deleteWithoutPhoto.title': string;
+  'addressBook.import.deleteWithoutPhoto.description': string;
+  'addressBook.import.deleteWithoutPhoto.button': string;
+  'addressBook.import.deleteWithoutPhoto.modalTitle': string;
+  'addressBook.import.deleteWithoutPhoto.modalMessage': string;
+  'addressBook.import.deleteWithoutPhoto.itemName': string;
+  'addressBook.import.deleteWithoutPhoto.confirmButton': string;
+  'addressBook.import.deleteWithoutPhoto.success': string;
+  'addressBook.import.deleteWithoutPhoto.error': string;
   'addressBook.form.title.proposeFor': string;
   'addressBook.proposals.title': string;
   'addressBook.proposals.noProposals': string;
@@ -842,4 +851,3 @@ export interface TranslationKeys {
 }
 
 export type Translations = Record<LanguageCode, Partial<TranslationKeys>>;
-

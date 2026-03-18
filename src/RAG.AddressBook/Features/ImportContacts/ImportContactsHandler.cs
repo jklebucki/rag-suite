@@ -25,20 +25,26 @@ public class ImportContactsHandler
         CancellationToken cancellationToken = default)
     {
         var userId = _userContext.GetCurrentUserId() ?? "system";
-        var response = new ImportContactsResponse();
         var errors = new List<string>();
         var importedContacts = new List<ImportedContactDto>();
         var existingEmails = new HashSet<string>();
+        var existingPhoneNumbers = new HashSet<string>();
 
-        if (request.SkipDuplicates)
+        var existingContacts = await _context.Contacts
+            .AsNoTracking()
+            .Select(c => new
+            {
+                c.Email,
+                c.WorkPhone,
+                c.MobilePhone
+            })
+            .ToListAsync(cancellationToken);
+
+        foreach (var existingContact in existingContacts)
         {
-            // Load existing emails for duplicate detection
-            existingEmails = (await _context.Contacts
-                .Where(c => c.Email != null)
-                .Select(c => c.Email!)
-                .ToListAsync(cancellationToken))
-                .Select(e => e.ToLower())
-                .ToHashSet();
+            AddToSet(existingEmails, NormalizeEmail(existingContact.Email));
+            AddToSet(existingPhoneNumbers, NormalizePhone(existingContact.WorkPhone));
+            AddToSet(existingPhoneNumbers, NormalizePhone(existingContact.MobilePhone));
         }
 
         var lines = request.CsvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -61,8 +67,11 @@ public class ImportContactsHandler
         var skippedCount = 0;
         var errorCount = 0;
 
-        foreach (var line in dataLines)
+        for (var index = 0; index < dataLines.Count; index++)
         {
+            var line = dataLines[index];
+            var rowNumber = index + 2; // +1 for zero-based, +1 for header
+
             try
             {
                 var contact = ParseCsvLine(line, userId);
@@ -73,12 +82,19 @@ public class ImportContactsHandler
                     continue;
                 }
 
-                // Check for duplicates by email
-                if (request.SkipDuplicates &&
-                    !string.IsNullOrWhiteSpace(contact.Email) &&
-                    existingEmails.Contains(contact.Email.ToLower()))
+                var duplicateFields = GetDuplicateFields(contact, existingEmails, existingPhoneNumbers);
+                if (duplicateFields.Count > 0)
                 {
-                    skippedCount++;
+                    if (request.SkipDuplicates)
+                    {
+                        skippedCount++;
+                    }
+                    else
+                    {
+                        errorCount++;
+                        errors.Add($"Row {rowNumber}: Duplicate {string.Join(", ", duplicateFields)}");
+                    }
+
                     continue;
                 }
 
@@ -94,16 +110,14 @@ public class ImportContactsHandler
                     Department = contact.Department
                 });
 
-                // Add email to tracking set
-                if (!string.IsNullOrWhiteSpace(contact.Email))
-                {
-                    existingEmails.Add(contact.Email.ToLower());
-                }
+                AddToSet(existingEmails, NormalizeEmail(contact.Email));
+                AddToSet(existingPhoneNumbers, NormalizePhone(contact.WorkPhone));
+                AddToSet(existingPhoneNumbers, NormalizePhone(contact.MobilePhone));
             }
             catch (Exception ex)
             {
                 errorCount++;
-                errors.Add($"Error parsing line: {ex.Message}");
+                errors.Add($"Row {rowNumber}: Error parsing line: {ex.Message}");
             }
         }
 
@@ -230,5 +244,62 @@ public class ImportContactsHandler
         field = field.Trim();
 
         return string.IsNullOrWhiteSpace(field) ? null : field;
+    }
+
+    private static List<string> GetDuplicateFields(
+        Contact contact,
+        HashSet<string> existingEmails,
+        HashSet<string> existingPhoneNumbers)
+    {
+        var duplicateFields = new List<string>();
+
+        var normalizedEmail = NormalizeEmail(contact.Email);
+        if (normalizedEmail != null && existingEmails.Contains(normalizedEmail))
+        {
+            duplicateFields.Add("email");
+        }
+
+        var normalizedWorkPhone = NormalizePhone(contact.WorkPhone);
+        if (normalizedWorkPhone != null && existingPhoneNumbers.Contains(normalizedWorkPhone))
+        {
+            duplicateFields.Add("work phone");
+        }
+
+        var normalizedMobilePhone = NormalizePhone(contact.MobilePhone);
+        if (normalizedMobilePhone != null && existingPhoneNumbers.Contains(normalizedMobilePhone))
+        {
+            duplicateFields.Add("mobile phone");
+        }
+
+        return duplicateFields;
+    }
+
+    private static string? NormalizeEmail(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        return value.Trim().ToLowerInvariant();
+    }
+
+    private static string? NormalizePhone(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        var trimmed = value.Trim();
+        var digitsOnly = new string(trimmed.Where(char.IsDigit).ToArray());
+
+        return string.IsNullOrWhiteSpace(digitsOnly)
+            ? trimmed.ToLowerInvariant()
+            : digitsOnly;
+    }
+
+    private static void AddToSet(HashSet<string> set, string? value)
+    {
+        if (value != null)
+        {
+            set.Add(value);
+        }
     }
 }
