@@ -605,6 +605,57 @@ export const pl: TranslationKeys = {
   'employeeDashboard.certificates': 'Zaświadczenia',
   'employeeDashboard.documents': 'Dokumenty',
 
+  // Employee Dashboard – przegląd
+  'employeeDashboard.overview.lastLogin': 'Ostatnie logowanie',
+
+  'employeeDashboard.leave.title': 'Saldo urlopowe',
+  'employeeDashboard.leave.annual': 'Urlop wypoczynkowy',
+  'employeeDashboard.leave.carryover': 'Urlop zaległy',
+  'employeeDashboard.leave.onDemand': 'Urlop na żądanie',
+  'employeeDashboard.leave.totalAvailable': 'Łącznie {total} dni do wykorzystania',
+
+  'employeeDashboard.payslip.title': 'Ostatnia wypłata',
+  'employeeDashboard.payslip.gross': 'Brutto',
+  'employeeDashboard.payslip.net': 'Netto',
+  'employeeDashboard.payslip.paymentDate': 'Data wypłaty',
+  'employeeDashboard.payslip.download': 'Pobierz pasek płacowy',
+
+  'employeeDashboard.hrRequests.title': 'Moje zgłoszenia HR',
+  'employeeDashboard.hrRequests.pending': 'Oczekujące',
+  'employeeDashboard.hrRequests.approved': 'Zaakceptowane',
+  'employeeDashboard.hrRequests.rejected': 'Odrzucone',
+  'employeeDashboard.hrRequests.total': '{total} łącznie',
+
+  'employeeDashboard.profile.title': 'Moje dane',
+  'employeeDashboard.profile.fullName': 'Imię i nazwisko',
+  'employeeDashboard.profile.position': 'Stanowisko',
+  'employeeDashboard.profile.department': 'Dział',
+  'employeeDashboard.profile.supervisor': 'Przełożony',
+  'employeeDashboard.profile.hireDate': 'Data zatrudnienia',
+  'employeeDashboard.profile.phone': 'Telefon służbowy',
+  'employeeDashboard.profile.email': 'E-mail',
+
+  'employeeDashboard.notifications.title': 'Centrum powiadomień',
+  'employeeDashboard.notifications.empty': 'Brak powiadomień',
+  'employeeDashboard.notifications.category.leave': 'Urlop',
+  'employeeDashboard.notifications.category.payslip': 'Wypłata',
+  'employeeDashboard.notifications.category.medical': 'Badania lekarskie',
+  'employeeDashboard.notifications.category.training': 'Szkolenie',
+  'employeeDashboard.notifications.category.general': 'Ogólne',
+
+  'employeeDashboard.events.title': 'Następne zdarzenia',
+  'employeeDashboard.events.empty': 'Brak nadchodzących zdarzeń',
+  'employeeDashboard.events.today': 'Dzisiaj',
+  'employeeDashboard.events.daysLeft': 'dni',
+  'employeeDashboard.events.eventsCount': 'zdarzeń',
+
+  'employeeDashboard.quickActions.title': 'Szybkie akcje',
+  'employeeDashboard.quickActions.submitLeave': 'Złóż wniosek urlopowy',
+  'employeeDashboard.quickActions.downloadPayslip': 'Pobierz pasek płacowy',
+  'employeeDashboard.quickActions.hrHistory': 'Historia zgłoszeń HR',
+  'employeeDashboard.quickActions.documents': 'Dokumenty pracownicze',
+  'employeeDashboard.quickActions.updatePersonalData': 'Zgłoś zmianę danych',
+
   // Address Book
   'addressBook.title': 'Książka Adresowa',
   'addressBook.subtitle': 'Zarządzaj kontaktami i informacjami kontaktowymi',

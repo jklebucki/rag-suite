@@ -605,6 +605,57 @@ export const nl: TranslationKeys = {
   'employeeDashboard.certificates': 'Certificaten',
   'employeeDashboard.documents': 'Documenten',
 
+  // Employee Dashboard – overzicht
+  'employeeDashboard.overview.lastLogin': 'Laatste aanmelding',
+
+  'employeeDashboard.leave.title': 'Verlofsaldo',
+  'employeeDashboard.leave.annual': 'Jaarlijks verlof',
+  'employeeDashboard.leave.carryover': 'Overgedragen verlof',
+  'employeeDashboard.leave.onDemand': 'Verlof op verzoek',
+  'employeeDashboard.leave.totalAvailable': '{total} dagen beschikbaar',
+
+  'employeeDashboard.payslip.title': 'Laatste loonstrook',
+  'employeeDashboard.payslip.gross': 'Bruto',
+  'employeeDashboard.payslip.net': 'Netto',
+  'employeeDashboard.payslip.paymentDate': 'Betaaldatum',
+  'employeeDashboard.payslip.download': 'Loonstrook downloaden',
+
+  'employeeDashboard.hrRequests.title': 'Mijn HR-verzoeken',
+  'employeeDashboard.hrRequests.pending': 'In behandeling',
+  'employeeDashboard.hrRequests.approved': 'Goedgekeurd',
+  'employeeDashboard.hrRequests.rejected': 'Afgewezen',
+  'employeeDashboard.hrRequests.total': '{total} totaal',
+
+  'employeeDashboard.profile.title': 'Mijn gegevens',
+  'employeeDashboard.profile.fullName': 'Volledige naam',
+  'employeeDashboard.profile.position': 'Functie',
+  'employeeDashboard.profile.department': 'Afdeling',
+  'employeeDashboard.profile.supervisor': 'Leidinggevende',
+  'employeeDashboard.profile.hireDate': 'Datum indiensttreding',
+  'employeeDashboard.profile.phone': 'Zakelijke telefoon',
+  'employeeDashboard.profile.email': 'E-mail',
+
+  'employeeDashboard.notifications.title': 'Meldingen',
+  'employeeDashboard.notifications.empty': 'Geen meldingen',
+  'employeeDashboard.notifications.category.leave': 'Verlof',
+  'employeeDashboard.notifications.category.payslip': 'Loonstrook',
+  'employeeDashboard.notifications.category.medical': 'Medisch',
+  'employeeDashboard.notifications.category.training': 'Training',
+  'employeeDashboard.notifications.category.general': 'Algemeen',
+
+  'employeeDashboard.events.title': 'Aankomende evenementen',
+  'employeeDashboard.events.empty': 'Geen aankomende evenementen',
+  'employeeDashboard.events.today': 'Vandaag',
+  'employeeDashboard.events.daysLeft': 'dagen',
+  'employeeDashboard.events.eventsCount': 'evenementen',
+
+  'employeeDashboard.quickActions.title': 'Snelle acties',
+  'employeeDashboard.quickActions.submitLeave': 'Verlofaanvraag indienen',
+  'employeeDashboard.quickActions.downloadPayslip': 'Loonstrook downloaden',
+  'employeeDashboard.quickActions.hrHistory': 'HR-verzoekengeschiedenis',
+  'employeeDashboard.quickActions.documents': 'Werknemersdocumenten',
+  'employeeDashboard.quickActions.updatePersonalData': 'Persoonlijke gegevens bijwerken',
+
   // Address Book
   'addressBook.title': 'Adresboek',
   'addressBook.subtitle': 'Contacten en contactinformatie beheren',

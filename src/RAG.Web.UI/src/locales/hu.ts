@@ -605,6 +605,57 @@ export const hu: TranslationKeys = {
   'employeeDashboard.certificates': 'Igazolások',
   'employeeDashboard.documents': 'Dokumentumok',
 
+  // Employee Dashboard – áttekintés
+  'employeeDashboard.overview.lastLogin': 'Utolsó bejelentkezés',
+
+  'employeeDashboard.leave.title': 'Szabadság egyenleg',
+  'employeeDashboard.leave.annual': 'Éves szabadság',
+  'employeeDashboard.leave.carryover': 'Átvitt szabadság',
+  'employeeDashboard.leave.onDemand': 'Igény szerinti szabadság',
+  'employeeDashboard.leave.totalAvailable': 'Összesen {total} nap felhasználható',
+
+  'employeeDashboard.payslip.title': 'Utolsó bérjegyzék',
+  'employeeDashboard.payslip.gross': 'Bruttó',
+  'employeeDashboard.payslip.net': 'Nettó',
+  'employeeDashboard.payslip.paymentDate': 'Fizetési dátum',
+  'employeeDashboard.payslip.download': 'Bérjegyzék letöltése',
+
+  'employeeDashboard.hrRequests.title': 'HR kérelmeim',
+  'employeeDashboard.hrRequests.pending': 'Függőben',
+  'employeeDashboard.hrRequests.approved': 'Jóváhagyva',
+  'employeeDashboard.hrRequests.rejected': 'Elutasítva',
+  'employeeDashboard.hrRequests.total': '{total} összesen',
+
+  'employeeDashboard.profile.title': 'Adataim',
+  'employeeDashboard.profile.fullName': 'Teljes név',
+  'employeeDashboard.profile.position': 'Beosztás',
+  'employeeDashboard.profile.department': 'Osztály',
+  'employeeDashboard.profile.supervisor': 'Vező',
+  'employeeDashboard.profile.hireDate': 'Felvétel dátuma',
+  'employeeDashboard.profile.phone': 'Munkahelyi telefon',
+  'employeeDashboard.profile.email': 'E-mail',
+
+  'employeeDashboard.notifications.title': 'Értesítések',
+  'employeeDashboard.notifications.empty': 'Nincs értesítés',
+  'employeeDashboard.notifications.category.leave': 'Szabadság',
+  'employeeDashboard.notifications.category.payslip': 'Bérjegyzék',
+  'employeeDashboard.notifications.category.medical': 'Orvosi',
+  'employeeDashboard.notifications.category.training': 'Képzés',
+  'employeeDashboard.notifications.category.general': 'Általános',
+
+  'employeeDashboard.events.title': 'Közelő események',
+  'employeeDashboard.events.empty': 'Nincs közelő esemény',
+  'employeeDashboard.events.today': 'Ma',
+  'employeeDashboard.events.daysLeft': 'nap múlva',
+  'employeeDashboard.events.eventsCount': 'esemény',
+
+  'employeeDashboard.quickActions.title': 'Gyors műveletek',
+  'employeeDashboard.quickActions.submitLeave': 'Szabadságkérelem',
+  'employeeDashboard.quickActions.downloadPayslip': 'Bérjegyzék letöltése',
+  'employeeDashboard.quickActions.hrHistory': 'HR kérelmek története',
+  'employeeDashboard.quickActions.documents': 'Munkavállalói dokumentumok',
+  'employeeDashboard.quickActions.updatePersonalData': 'Személyes adatok frissítése',
+
   // Address Book
   'addressBook.title': 'Címjegyzék',
   'addressBook.subtitle': 'Kezelheti a névjegyeket és kapcsolattartási adatokat',

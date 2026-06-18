@@ -671,7 +671,7 @@ export interface TranslationKeys {
   'cyberpanel.yourCorrectAnswer': string;
   'cyberpanel.viewDetails': string;
 
-  // Employee Dashboard
+  // Employee Dashboard – navigation
   'employeeDashboard.dashboard': string;
   'employeeDashboard.managerPanel': string;
   'employeeDashboard.personalData': string;
@@ -679,6 +679,64 @@ export interface TranslationKeys {
   'employeeDashboard.salary': string;
   'employeeDashboard.certificates': string;
   'employeeDashboard.documents': string;
+
+  // Employee Dashboard – overview: summary header
+  'employeeDashboard.overview.lastLogin': string;
+
+  // Employee Dashboard – overview: leave balance tile
+  'employeeDashboard.leave.title': string;
+  'employeeDashboard.leave.annual': string;
+  'employeeDashboard.leave.carryover': string;
+  'employeeDashboard.leave.onDemand': string;
+  'employeeDashboard.leave.totalAvailable': string;
+
+  // Employee Dashboard – overview: last payslip tile
+  'employeeDashboard.payslip.title': string;
+  'employeeDashboard.payslip.gross': string;
+  'employeeDashboard.payslip.net': string;
+  'employeeDashboard.payslip.paymentDate': string;
+  'employeeDashboard.payslip.download': string;
+
+  // Employee Dashboard – overview: HR requests tile
+  'employeeDashboard.hrRequests.title': string;
+  'employeeDashboard.hrRequests.pending': string;
+  'employeeDashboard.hrRequests.approved': string;
+  'employeeDashboard.hrRequests.rejected': string;
+  'employeeDashboard.hrRequests.total': string;
+
+  // Employee Dashboard – overview: profile card
+  'employeeDashboard.profile.title': string;
+  'employeeDashboard.profile.fullName': string;
+  'employeeDashboard.profile.position': string;
+  'employeeDashboard.profile.department': string;
+  'employeeDashboard.profile.supervisor': string;
+  'employeeDashboard.profile.hireDate': string;
+  'employeeDashboard.profile.phone': string;
+  'employeeDashboard.profile.email': string;
+
+  // Employee Dashboard – overview: notifications center
+  'employeeDashboard.notifications.title': string;
+  'employeeDashboard.notifications.empty': string;
+  'employeeDashboard.notifications.category.leave': string;
+  'employeeDashboard.notifications.category.payslip': string;
+  'employeeDashboard.notifications.category.medical': string;
+  'employeeDashboard.notifications.category.training': string;
+  'employeeDashboard.notifications.category.general': string;
+
+  // Employee Dashboard – overview: upcoming events
+  'employeeDashboard.events.title': string;
+  'employeeDashboard.events.empty': string;
+  'employeeDashboard.events.today': string;
+  'employeeDashboard.events.daysLeft': string;
+  'employeeDashboard.events.eventsCount': string;
+
+  // Employee Dashboard – overview: quick actions
+  'employeeDashboard.quickActions.title': string;
+  'employeeDashboard.quickActions.submitLeave': string;
+  'employeeDashboard.quickActions.downloadPayslip': string;
+  'employeeDashboard.quickActions.hrHistory': string;
+  'employeeDashboard.quickActions.documents': string;
+  'employeeDashboard.quickActions.updatePersonalData': string;
 
   // Address Book
   'addressBook.title': string;

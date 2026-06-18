@@ -606,6 +606,57 @@ export const ro: TranslationKeys = {
   'employeeDashboard.certificates': 'Certificate',
   'employeeDashboard.documents': 'Documente',
 
+  // Employee Dashboard – prezentare generală
+  'employeeDashboard.overview.lastLogin': 'Úztima conectare',
+
+  'employeeDashboard.leave.title': 'Sold concediu',
+  'employeeDashboard.leave.annual': 'Concediu anual',
+  'employeeDashboard.leave.carryover': 'Concediu reportat',
+  'employeeDashboard.leave.onDemand': 'Concediu la cerere',
+  'employeeDashboard.leave.totalAvailable': '{total} zile disponibile',
+
+  'employeeDashboard.payslip.title': 'Últimul fluturas de salariu',
+  'employeeDashboard.payslip.gross': 'Brut',
+  'employeeDashboard.payslip.net': 'Net',
+  'employeeDashboard.payslip.paymentDate': 'Data plății',
+  'employeeDashboard.payslip.download': 'Descarca fluturas',
+
+  'employeeDashboard.hrRequests.title': 'Cererile mele HR',
+  'employeeDashboard.hrRequests.pending': 'În aşteptare',
+  'employeeDashboard.hrRequests.approved': 'Aprobate',
+  'employeeDashboard.hrRequests.rejected': 'Respinse',
+  'employeeDashboard.hrRequests.total': '{total} total',
+
+  'employeeDashboard.profile.title': 'Datele mele',
+  'employeeDashboard.profile.fullName': 'Nume complet',
+  'employeeDashboard.profile.position': 'Funcție',
+  'employeeDashboard.profile.department': 'Departament',
+  'employeeDashboard.profile.supervisor': 'Superiorul',
+  'employeeDashboard.profile.hireDate': 'Data anga jării',
+  'employeeDashboard.profile.phone': 'Telefon de serviciu',
+  'employeeDashboard.profile.email': 'E-mail',
+
+  'employeeDashboard.notifications.title': 'Notificări',
+  'employeeDashboard.notifications.empty': 'Fără notificări',
+  'employeeDashboard.notifications.category.leave': 'Concediu',
+  'employeeDashboard.notifications.category.payslip': 'Salariu',
+  'employeeDashboard.notifications.category.medical': 'Medical',
+  'employeeDashboard.notifications.category.training': 'Training',
+  'employeeDashboard.notifications.category.general': 'General',
+
+  'employeeDashboard.events.title': 'Evenimente viitoare',
+  'employeeDashboard.events.empty': 'Nu există evenimente viitoare',
+  'employeeDashboard.events.today': 'Astăzi',
+  'employeeDashboard.events.daysLeft': 'zile rămase',
+  'employeeDashboard.events.eventsCount': 'evenimente',
+
+  'employeeDashboard.quickActions.title': 'Acțiuni rapide',
+  'employeeDashboard.quickActions.submitLeave': 'Depune cerere de concediu',
+  'employeeDashboard.quickActions.downloadPayslip': 'Descarca fluturas de salariu',
+  'employeeDashboard.quickActions.hrHistory': 'Istoric cereri HR',
+  'employeeDashboard.quickActions.documents': 'Documente angajat',
+  'employeeDashboard.quickActions.updatePersonalData': 'Actualizează datele personale',
+
   // Address Book
   'addressBook.title': 'Agendă',
   'addressBook.subtitle': 'Gestionează contactele și informațiile de contact',

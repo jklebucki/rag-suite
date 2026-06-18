@@ -660,6 +660,57 @@ export const en: TranslationKeys = {
   'employeeDashboard.certificates': 'Certificates',
   'employeeDashboard.documents': 'Documents',
 
+  // Employee Dashboard – overview
+  'employeeDashboard.overview.lastLogin': 'Last login',
+
+  'employeeDashboard.leave.title': 'Leave Balance',
+  'employeeDashboard.leave.annual': 'Annual leave',
+  'employeeDashboard.leave.carryover': 'Carried-over leave',
+  'employeeDashboard.leave.onDemand': 'On-demand leave',
+  'employeeDashboard.leave.totalAvailable': '{total} days available in total',
+
+  'employeeDashboard.payslip.title': 'Last Payslip',
+  'employeeDashboard.payslip.gross': 'Gross',
+  'employeeDashboard.payslip.net': 'Net',
+  'employeeDashboard.payslip.paymentDate': 'Payment date',
+  'employeeDashboard.payslip.download': 'Download payslip',
+
+  'employeeDashboard.hrRequests.title': 'My HR Requests',
+  'employeeDashboard.hrRequests.pending': 'Pending',
+  'employeeDashboard.hrRequests.approved': 'Approved',
+  'employeeDashboard.hrRequests.rejected': 'Rejected',
+  'employeeDashboard.hrRequests.total': '{total} total',
+
+  'employeeDashboard.profile.title': 'My Data',
+  'employeeDashboard.profile.fullName': 'Full name',
+  'employeeDashboard.profile.position': 'Position',
+  'employeeDashboard.profile.department': 'Department',
+  'employeeDashboard.profile.supervisor': 'Supervisor',
+  'employeeDashboard.profile.hireDate': 'Employment date',
+  'employeeDashboard.profile.phone': 'Business phone',
+  'employeeDashboard.profile.email': 'E-mail',
+
+  'employeeDashboard.notifications.title': 'Notifications',
+  'employeeDashboard.notifications.empty': 'No notifications',
+  'employeeDashboard.notifications.category.leave': 'Leave',
+  'employeeDashboard.notifications.category.payslip': 'Payslip',
+  'employeeDashboard.notifications.category.medical': 'Medical',
+  'employeeDashboard.notifications.category.training': 'Training',
+  'employeeDashboard.notifications.category.general': 'General',
+
+  'employeeDashboard.events.title': 'Upcoming Events',
+  'employeeDashboard.events.empty': 'No upcoming events',
+  'employeeDashboard.events.today': 'Today',
+  'employeeDashboard.events.daysLeft': 'days left',
+  'employeeDashboard.events.eventsCount': 'events',
+
+  'employeeDashboard.quickActions.title': 'Quick Actions',
+  'employeeDashboard.quickActions.submitLeave': 'Submit leave request',
+  'employeeDashboard.quickActions.downloadPayslip': 'Download payslip',
+  'employeeDashboard.quickActions.hrHistory': 'HR request history',
+  'employeeDashboard.quickActions.documents': 'Employee documents',
+  'employeeDashboard.quickActions.updatePersonalData': 'Update personal data',
+
   // Address Book
   'addressBook.title': 'Address Book',
   'addressBook.subtitle': 'Manage contacts and contact information',
