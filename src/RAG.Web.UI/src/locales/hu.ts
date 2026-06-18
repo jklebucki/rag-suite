@@ -15,6 +15,7 @@ export const hu: TranslationKeys = {
   'nav.cyberpanel': 'Cyber Panel',
   'nav.landing': 'Kezdőlap',
   'nav.forum': 'Knowledge Exchange',
+  'nav.employeeDashboard': 'Alkalmazotti irányítópult',
   'app.title': 'RAG Suite',
 
   // User Guide

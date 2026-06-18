@@ -10,6 +10,7 @@ import {
   BookOpen,
   Home,
   UsersRound,
+  LayoutDashboard,
 } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
@@ -38,6 +39,11 @@ export function useLayout() {
     { name: t('nav.settings'), href: '/settings', icon: Settings },
   ]
 
+  // Employee Dashboard - visible to any authenticated user
+  const employeeDashboardNavigation = isAuthenticated
+    ? [{ name: t('nav.employeeDashboard'), href: '/employee-dashboard', icon: LayoutDashboard }]
+    : []
+
   // Cyber Panel navigation entry - visible to any authenticated user and placed before admin items
   const cyberNavigation = isAuthenticated
     ? [{ name: t('nav.cyberpanel'), href: '/cyberpanel', icon: BarChart3 }]
@@ -49,8 +55,8 @@ export function useLayout() {
   ]
 
   const mainNavigation = isAdmin
-    ? [...baseNavigation, ...addressBookNavigation, ...cyberNavigation, ...adminNavigation]
-    : [...baseNavigation, ...addressBookNavigation, ...cyberNavigation]
+    ? [...baseNavigation, ...employeeDashboardNavigation, ...addressBookNavigation, ...cyberNavigation, ...adminNavigation]
+    : [...baseNavigation, ...employeeDashboardNavigation, ...addressBookNavigation, ...cyberNavigation]
 
   const navigation = [...mainNavigation, ...footerNavigation]
 

@@ -33,6 +33,7 @@ export interface TranslationKeys {
   'nav.app_info': string;
   'nav.cyberpanel': string;
   'nav.forum': string;
+  'nav.employeeDashboard': string;
 
   // User Guide
   'userguide.description': string;

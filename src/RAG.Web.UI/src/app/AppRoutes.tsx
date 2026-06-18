@@ -31,6 +31,7 @@ const QuizDetailPromise = import('@/features/cyberpanel/components/QuizDetail').
 const AttemptDetailPromise = import('@/features/cyberpanel/components/AttemptDetail').then(module => ({ default: module.AttemptDetail }))
 const ForumPagePromise = import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage }))
 const ThreadDetailPagePromise = import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage }))
+const EmployeeDashboardPromise = import('@/features/employee-dashboard/components/EmployeeDashboard').then(module => ({ default: module.EmployeeDashboard }))
 
 // Component loaders using use() hook
 function DashboardLoader() {
@@ -128,6 +129,11 @@ function ForumPageLoader() {
   return <ForumPage />
 }
 
+function EmployeeDashboardLoader() {
+  const EmployeeDashboard = useAsyncComponent(EmployeeDashboardPromise)
+  return <EmployeeDashboard />
+}
+
 function ThreadDetailPageLoader() {
   const ThreadDetailPage = useAsyncComponent(ThreadDetailPagePromise)
   return <ThreadDetailPage />
@@ -202,6 +208,16 @@ export function createAppRouter() {
               <RouteSuspense>
                 <ProtectedRoute>
                   <SearchInterfaceLoader />
+                </ProtectedRoute>
+              </RouteSuspense>
+            ),
+          },
+          {
+            path: 'employee-dashboard',
+            element: (
+              <RouteSuspense>
+                <ProtectedRoute>
+                  <EmployeeDashboardLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),

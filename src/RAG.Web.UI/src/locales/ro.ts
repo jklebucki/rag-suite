@@ -15,6 +15,7 @@ export const ro: TranslationKeys = {
   'nav.cyberpanel': 'Cyber Panel',
   'nav.landing': 'Acasă',
   'nav.forum': 'Knowledge Exchange',
+  'nav.employeeDashboard': 'Tabloul de bord al angajatului',
   'app.title': 'RAG Suite',
 
   // User Guide

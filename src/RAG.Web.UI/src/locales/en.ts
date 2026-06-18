@@ -15,6 +15,7 @@ export const en: TranslationKeys = {
   'nav.cyberpanel': 'Cyber Panel',
   'nav.forum': 'Knowledge Exchange',
   'nav.landing': 'Home',
+  'nav.employeeDashboard': 'Employee Dashboard',
   'app.title': 'RAG Suite',
 
   // User Guide
