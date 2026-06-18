@@ -596,6 +596,15 @@ export const hu: TranslationKeys = {
   'feedback.admin.details.attachments': 'Mellékletek',
   'feedback.admin.details.download_attachment': 'Letöltés',
 
+  // Employee Dashboard
+  'employeeDashboard.dashboard': 'Dashboard',
+  'employeeDashboard.managerPanel': 'Vezető panel',
+  'employeeDashboard.personalData': 'Személyes adataim',
+  'employeeDashboard.leaveRequest': 'Szabadságkérelem',
+  'employeeDashboard.salary': 'Fizetés',
+  'employeeDashboard.certificates': 'Igazolások',
+  'employeeDashboard.documents': 'Dokumentumok',
+
   // Address Book
   'addressBook.title': 'Címjegyzék',
   'addressBook.subtitle': 'Kezelheti a névjegyeket és kapcsolattartási adatokat',

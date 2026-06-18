@@ -596,6 +596,15 @@ export const pl: TranslationKeys = {
   'cyberpanel.yourCorrectAnswer': 'Twoja odpowiedź (poprawna)',
   'cyberpanel.viewDetails': 'Zobacz szczegóły',
 
+  // Employee Dashboard
+  'employeeDashboard.dashboard': 'Dashboard',
+  'employeeDashboard.managerPanel': 'Panel przełożonego',
+  'employeeDashboard.personalData': 'Moje dane osobowe',
+  'employeeDashboard.leaveRequest': 'Wniosek urlopowy',
+  'employeeDashboard.salary': 'Wynagrodzenie',
+  'employeeDashboard.certificates': 'Zaświadczenia',
+  'employeeDashboard.documents': 'Dokumenty',
+
   // Address Book
   'addressBook.title': 'Książka Adresowa',
   'addressBook.subtitle': 'Zarządzaj kontaktami i informacjami kontaktowymi',

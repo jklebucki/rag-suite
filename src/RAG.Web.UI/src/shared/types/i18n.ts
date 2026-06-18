@@ -671,6 +671,15 @@ export interface TranslationKeys {
   'cyberpanel.yourCorrectAnswer': string;
   'cyberpanel.viewDetails': string;
 
+  // Employee Dashboard
+  'employeeDashboard.dashboard': string;
+  'employeeDashboard.managerPanel': string;
+  'employeeDashboard.personalData': string;
+  'employeeDashboard.leaveRequest': string;
+  'employeeDashboard.salary': string;
+  'employeeDashboard.certificates': string;
+  'employeeDashboard.documents': string;
+
   // Address Book
   'addressBook.title': string;
   'addressBook.subtitle': string;

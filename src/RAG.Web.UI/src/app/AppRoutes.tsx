@@ -32,6 +32,13 @@ const AttemptDetailPromise = import('@/features/cyberpanel/components/AttemptDet
 const ForumPagePromise = import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage }))
 const ThreadDetailPagePromise = import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage }))
 const EmployeeDashboardPromise = import('@/features/employee-dashboard/components/EmployeeDashboard').then(module => ({ default: module.EmployeeDashboard }))
+const EmployeeDashboardLayoutPromise = import('@/features/employee-dashboard/components/EmployeeDashboardLayout').then(module => ({ default: module.EmployeeDashboardLayout }))
+const ManagerPanelPromise = import('@/features/employee-dashboard/components/ManagerPanel').then(module => ({ default: module.ManagerPanel }))
+const PersonalDataPromise = import('@/features/employee-dashboard/components/PersonalData').then(module => ({ default: module.PersonalData }))
+const LeaveRequestPromise = import('@/features/employee-dashboard/components/LeaveRequest').then(module => ({ default: module.LeaveRequest }))
+const SalaryPromise = import('@/features/employee-dashboard/components/Salary').then(module => ({ default: module.Salary }))
+const CertificatesPromise = import('@/features/employee-dashboard/components/Certificates').then(module => ({ default: module.Certificates }))
+const DocumentsPromise = import('@/features/employee-dashboard/components/Documents').then(module => ({ default: module.Documents }))
 
 // Component loaders using use() hook
 function DashboardLoader() {
@@ -129,9 +136,44 @@ function ForumPageLoader() {
   return <ForumPage />
 }
 
+function EmployeeDashboardLayoutLoader() {
+  const EmployeeDashboardLayout = useAsyncComponent(EmployeeDashboardLayoutPromise)
+  return <EmployeeDashboardLayout />
+}
+
 function EmployeeDashboardLoader() {
   const EmployeeDashboard = useAsyncComponent(EmployeeDashboardPromise)
   return <EmployeeDashboard />
+}
+
+function ManagerPanelLoader() {
+  const ManagerPanel = useAsyncComponent(ManagerPanelPromise)
+  return <ManagerPanel />
+}
+
+function PersonalDataLoader() {
+  const PersonalData = useAsyncComponent(PersonalDataPromise)
+  return <PersonalData />
+}
+
+function LeaveRequestLoader() {
+  const LeaveRequest = useAsyncComponent(LeaveRequestPromise)
+  return <LeaveRequest />
+}
+
+function SalaryLoader() {
+  const Salary = useAsyncComponent(SalaryPromise)
+  return <Salary />
+}
+
+function CertificatesLoader() {
+  const Certificates = useAsyncComponent(CertificatesPromise)
+  return <Certificates />
+}
+
+function DocumentsLoader() {
+  const Documents = useAsyncComponent(DocumentsPromise)
+  return <Documents />
 }
 
 function ThreadDetailPageLoader() {
@@ -217,10 +259,78 @@ export function createAppRouter() {
             element: (
               <RouteSuspense>
                 <ProtectedRoute>
-                  <EmployeeDashboardLoader />
+                  <EmployeeDashboardLayoutLoader />
                 </ProtectedRoute>
               </RouteSuspense>
             ),
+            children: [
+              {
+                index: true,
+                element: (
+                  <RouteSuspense>
+                    <EmployeeDashboardLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'overview',
+                element: (
+                  <RouteSuspense>
+                    <EmployeeDashboardLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'manager',
+                element: (
+                  <RouteSuspense>
+                    <RoleProtectedRoute allowedRoles={['Admin', 'Manager']}>
+                      <ManagerPanelLoader />
+                    </RoleProtectedRoute>
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'personal',
+                element: (
+                  <RouteSuspense>
+                    <PersonalDataLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'leave',
+                element: (
+                  <RouteSuspense>
+                    <LeaveRequestLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'salary',
+                element: (
+                  <RouteSuspense>
+                    <SalaryLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'certificates',
+                element: (
+                  <RouteSuspense>
+                    <CertificatesLoader />
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'documents',
+                element: (
+                  <RouteSuspense>
+                    <DocumentsLoader />
+                  </RouteSuspense>
+                ),
+              },
+            ],
           },
           {
             path: 'forum',

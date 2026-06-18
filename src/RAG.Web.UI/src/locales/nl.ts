@@ -596,7 +596,14 @@ export const nl: TranslationKeys = {
   'feedback.admin.details.attachments': 'Bijlagen',
   'feedback.admin.details.download_attachment': 'Downloaden',
 
-  // Address Book
+  // Employee Dashboard
+  'employeeDashboard.dashboard': 'Dashboard',
+  'employeeDashboard.managerPanel': 'Managerspaneel',
+  'employeeDashboard.personalData': 'Mijn persoonlijke gegevens',
+  'employeeDashboard.leaveRequest': 'Verlofaanvraag',
+  'employeeDashboard.salary': 'Salaris',
+  'employeeDashboard.certificates': 'Certificaten',
+  'employeeDashboard.documents': 'Documenten',
 
   // Address Book
   'addressBook.title': 'Adresboek',

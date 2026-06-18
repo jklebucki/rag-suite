@@ -597,7 +597,14 @@ export const ro: TranslationKeys = {
   'feedback.admin.details.attachments': 'Atașamente',
   'feedback.admin.details.download_attachment': 'Descarcă',
 
-  // Address Book
+  // Employee Dashboard
+  'employeeDashboard.dashboard': 'Dashboard',
+  'employeeDashboard.managerPanel': 'Panoul managerului',
+  'employeeDashboard.personalData': 'Datele mele personale',
+  'employeeDashboard.leaveRequest': 'Cerere de concediu',
+  'employeeDashboard.salary': 'Salariu',
+  'employeeDashboard.certificates': 'Certificate',
+  'employeeDashboard.documents': 'Documente',
 
   // Address Book
   'addressBook.title': 'Agendă',

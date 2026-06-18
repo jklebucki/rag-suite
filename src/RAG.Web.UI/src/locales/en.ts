@@ -651,6 +651,15 @@ export const en: TranslationKeys = {
   'cyberpanel.yourCorrectAnswer': 'Your answer (correct)',
   'cyberpanel.viewDetails': 'View Details',
 
+  // Employee Dashboard
+  'employeeDashboard.dashboard': 'Dashboard',
+  'employeeDashboard.managerPanel': 'Manager Panel',
+  'employeeDashboard.personalData': 'My Personal Data',
+  'employeeDashboard.leaveRequest': 'Leave Request',
+  'employeeDashboard.salary': 'Salary',
+  'employeeDashboard.certificates': 'Certificates',
+  'employeeDashboard.documents': 'Documents',
+
   // Address Book
   'addressBook.title': 'Address Book',
   'addressBook.subtitle': 'Manage contacts and contact information',
