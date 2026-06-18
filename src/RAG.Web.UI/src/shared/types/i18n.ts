@@ -738,6 +738,94 @@ export interface TranslationKeys {
   'employeeDashboard.quickActions.documents': string;
   'employeeDashboard.quickActions.updatePersonalData': string;
 
+  // Employee Dashboard – personal data: section headers
+  'employeeDashboard.personal.basicInfo.title': string;
+  'employeeDashboard.personal.contactInfo.title': string;
+  'employeeDashboard.personal.employmentInfo.title': string;
+  'employeeDashboard.personal.emergencyContact.title': string;
+
+  // Employee Dashboard – personal data: basic info fields
+  'employeeDashboard.personal.basicInfo.firstName': string;
+  'employeeDashboard.personal.basicInfo.lastName': string;
+  'employeeDashboard.personal.basicInfo.employeeCode': string;
+  'employeeDashboard.personal.basicInfo.birthDate': string;
+  'employeeDashboard.personal.basicInfo.position': string;
+  'employeeDashboard.personal.basicInfo.department': string;
+  'employeeDashboard.personal.basicInfo.supervisor': string;
+  'employeeDashboard.personal.basicInfo.hireDate': string;
+
+  // Employee Dashboard – personal data: contact info fields
+  'employeeDashboard.personal.contactInfo.workEmail': string;
+  'employeeDashboard.personal.contactInfo.privateEmail': string;
+  'employeeDashboard.personal.contactInfo.workPhone': string;
+  'employeeDashboard.personal.contactInfo.privatePhone': string;
+  'employeeDashboard.personal.contactInfo.residenceAddress': string;
+  'employeeDashboard.personal.contactInfo.correspondenceAddress': string;
+
+  // Employee Dashboard – personal data: employment info fields
+  'employeeDashboard.personal.employmentInfo.company': string;
+  'employeeDashboard.personal.employmentInfo.organizationalUnit': string;
+  'employeeDashboard.personal.employmentInfo.costCenter': string;
+  'employeeDashboard.personal.employmentInfo.contractType': string;
+  'employeeDashboard.personal.employmentInfo.workTimeFraction': string;
+  'employeeDashboard.personal.employmentInfo.employmentStatus': string;
+  'employeeDashboard.personal.employmentInfo.hireDate': string;
+  'employeeDashboard.personal.employmentInfo.seniority': string;
+
+  // Employee Dashboard – personal data: emergency contact fields
+  'employeeDashboard.personal.emergencyContact.fullName': string;
+  'employeeDashboard.personal.emergencyContact.relationship': string;
+  'employeeDashboard.personal.emergencyContact.phone': string;
+
+  // Employee Dashboard – personal data: change request modal
+  'employeeDashboard.personal.changeRequest.buttonLabel': string;
+  'employeeDashboard.personal.changeRequest.modalTitle': string;
+  'employeeDashboard.personal.changeRequest.changeType': string;
+  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': string;
+  'employeeDashboard.personal.changeRequest.justification': string;
+  'employeeDashboard.personal.changeRequest.justificationPlaceholder': string;
+  'employeeDashboard.personal.changeRequest.attachment': string;
+  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': string;
+  'employeeDashboard.personal.changeRequest.submit': string;
+  'employeeDashboard.personal.changeRequest.cancel': string;
+  'employeeDashboard.personal.changeRequest.submitting': string;
+  'employeeDashboard.personal.changeRequest.successMessage': string;
+
+  // Change request types
+  'employeeDashboard.personal.changeType.residenceAddress': string;
+  'employeeDashboard.personal.changeType.correspondenceAddress': string;
+  'employeeDashboard.personal.changeType.privatePhone': string;
+  'employeeDashboard.personal.changeType.privateEmail': string;
+  'employeeDashboard.personal.changeType.lastName': string;
+  'employeeDashboard.personal.changeType.emergencyContact': string;
+  'employeeDashboard.personal.changeType.other': string;
+
+  // Change request form – dynamic fields
+  'employeeDashboard.personal.changeForm.newPhone': string;
+  'employeeDashboard.personal.changeForm.newEmail': string;
+  'employeeDashboard.personal.changeForm.newLastName': string;
+  'employeeDashboard.personal.changeForm.street': string;
+  'employeeDashboard.personal.changeForm.buildingNumber': string;
+  'employeeDashboard.personal.changeForm.apartmentNumber': string;
+  'employeeDashboard.personal.changeForm.postalCode': string;
+  'employeeDashboard.personal.changeForm.city': string;
+  'employeeDashboard.personal.changeForm.contactFullName': string;
+  'employeeDashboard.personal.changeForm.contactRelationship': string;
+  'employeeDashboard.personal.changeForm.contactPhone': string;
+  'employeeDashboard.personal.changeForm.description': string;
+  'employeeDashboard.personal.changeForm.descriptionPlaceholder': string;
+
+  // Employee Dashboard – personal data: request history table
+  'employeeDashboard.personal.history.title': string;
+  'employeeDashboard.personal.history.empty': string;
+  'employeeDashboard.personal.history.date': string;
+  'employeeDashboard.personal.history.changeType': string;
+  'employeeDashboard.personal.history.status': string;
+  'employeeDashboard.personal.history.comment': string;
+  'employeeDashboard.personal.history.status.pending': string;
+  'employeeDashboard.personal.history.status.approved': string;
+  'employeeDashboard.personal.history.status.rejected': string;
+
   // Address Book
   'addressBook.title': string;
   'addressBook.subtitle': string;

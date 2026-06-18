@@ -711,6 +711,94 @@ export const en: TranslationKeys = {
   'employeeDashboard.quickActions.documents': 'Employee documents',
   'employeeDashboard.quickActions.updatePersonalData': 'Update personal data',
 
+  // Employee Dashboard – personal data: section headers
+  'employeeDashboard.personal.basicInfo.title': 'Basic Information',
+  'employeeDashboard.personal.contactInfo.title': 'Contact Information',
+  'employeeDashboard.personal.employmentInfo.title': 'Employment Details',
+  'employeeDashboard.personal.emergencyContact.title': 'Emergency Contact',
+
+  // Employee Dashboard – personal data: basic info fields
+  'employeeDashboard.personal.basicInfo.firstName': 'First name',
+  'employeeDashboard.personal.basicInfo.lastName': 'Last name',
+  'employeeDashboard.personal.basicInfo.employeeCode': 'Employee code',
+  'employeeDashboard.personal.basicInfo.birthDate': 'Date of birth',
+  'employeeDashboard.personal.basicInfo.position': 'Position',
+  'employeeDashboard.personal.basicInfo.department': 'Department',
+  'employeeDashboard.personal.basicInfo.supervisor': 'Supervisor',
+  'employeeDashboard.personal.basicInfo.hireDate': 'Employment date',
+
+  // Employee Dashboard – personal data: contact info fields
+  'employeeDashboard.personal.contactInfo.workEmail': 'Work email',
+  'employeeDashboard.personal.contactInfo.privateEmail': 'Private email',
+  'employeeDashboard.personal.contactInfo.workPhone': 'Work phone',
+  'employeeDashboard.personal.contactInfo.privatePhone': 'Private phone',
+  'employeeDashboard.personal.contactInfo.residenceAddress': 'Residence address',
+  'employeeDashboard.personal.contactInfo.correspondenceAddress': 'Correspondence address',
+
+  // Employee Dashboard – personal data: employment info fields
+  'employeeDashboard.personal.employmentInfo.company': 'Company',
+  'employeeDashboard.personal.employmentInfo.organizationalUnit': 'Organizational unit',
+  'employeeDashboard.personal.employmentInfo.costCenter': 'Cost center',
+  'employeeDashboard.personal.employmentInfo.contractType': 'Contract type',
+  'employeeDashboard.personal.employmentInfo.workTimeFraction': 'Work time fraction',
+  'employeeDashboard.personal.employmentInfo.employmentStatus': 'Employment status',
+  'employeeDashboard.personal.employmentInfo.hireDate': 'Employment date',
+  'employeeDashboard.personal.employmentInfo.seniority': 'Seniority',
+
+  // Employee Dashboard – personal data: emergency contact fields
+  'employeeDashboard.personal.emergencyContact.fullName': 'Full name',
+  'employeeDashboard.personal.emergencyContact.relationship': 'Relationship',
+  'employeeDashboard.personal.emergencyContact.phone': 'Phone number',
+
+  // Employee Dashboard – personal data: change request modal
+  'employeeDashboard.personal.changeRequest.buttonLabel': 'Request data change',
+  'employeeDashboard.personal.changeRequest.modalTitle': 'Request data change',
+  'employeeDashboard.personal.changeRequest.changeType': 'Change type',
+  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': 'Select change type...',
+  'employeeDashboard.personal.changeRequest.justification': 'Justification',
+  'employeeDashboard.personal.changeRequest.justificationPlaceholder': 'Describe the reason for the data change...',
+  'employeeDashboard.personal.changeRequest.attachment': 'Attachment',
+  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': 'File attachments will be available soon',
+  'employeeDashboard.personal.changeRequest.submit': 'Submit request',
+  'employeeDashboard.personal.changeRequest.cancel': 'Cancel',
+  'employeeDashboard.personal.changeRequest.submitting': 'Submitting...',
+  'employeeDashboard.personal.changeRequest.successMessage': 'Your data change request has been submitted to the HR department.',
+
+  // Change request types
+  'employeeDashboard.personal.changeType.residenceAddress': 'Residence address',
+  'employeeDashboard.personal.changeType.correspondenceAddress': 'Correspondence address',
+  'employeeDashboard.personal.changeType.privatePhone': 'Private phone',
+  'employeeDashboard.personal.changeType.privateEmail': 'Private email',
+  'employeeDashboard.personal.changeType.lastName': 'Last name',
+  'employeeDashboard.personal.changeType.emergencyContact': 'Emergency contact',
+  'employeeDashboard.personal.changeType.other': 'Other',
+
+  // Change request form – dynamic fields
+  'employeeDashboard.personal.changeForm.newPhone': 'New phone number',
+  'employeeDashboard.personal.changeForm.newEmail': 'New email address',
+  'employeeDashboard.personal.changeForm.newLastName': 'New last name',
+  'employeeDashboard.personal.changeForm.street': 'Street',
+  'employeeDashboard.personal.changeForm.buildingNumber': 'Building number',
+  'employeeDashboard.personal.changeForm.apartmentNumber': 'Apartment number',
+  'employeeDashboard.personal.changeForm.postalCode': 'Postal code',
+  'employeeDashboard.personal.changeForm.city': 'City',
+  'employeeDashboard.personal.changeForm.contactFullName': 'Full name',
+  'employeeDashboard.personal.changeForm.contactRelationship': 'Relationship',
+  'employeeDashboard.personal.changeForm.contactPhone': 'Phone number',
+  'employeeDashboard.personal.changeForm.description': 'Change description',
+  'employeeDashboard.personal.changeForm.descriptionPlaceholder': 'Describe in detail what needs to be changed...',
+
+  // Employee Dashboard – personal data: request history table
+  'employeeDashboard.personal.history.title': 'Data Change Request History',
+  'employeeDashboard.personal.history.empty': 'No request history',
+  'employeeDashboard.personal.history.date': 'Date',
+  'employeeDashboard.personal.history.changeType': 'Change type',
+  'employeeDashboard.personal.history.status': 'Status',
+  'employeeDashboard.personal.history.comment': 'Comment',
+  'employeeDashboard.personal.history.status.pending': 'Pending',
+  'employeeDashboard.personal.history.status.approved': 'Approved',
+  'employeeDashboard.personal.history.status.rejected': 'Rejected',
+
   // Address Book
   'addressBook.title': 'Address Book',
   'addressBook.subtitle': 'Manage contacts and contact information',

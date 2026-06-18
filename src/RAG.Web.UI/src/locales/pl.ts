@@ -656,6 +656,94 @@ export const pl: TranslationKeys = {
   'employeeDashboard.quickActions.documents': 'Dokumenty pracownicze',
   'employeeDashboard.quickActions.updatePersonalData': 'Zgłoś zmianę danych',
 
+  // Employee Dashboard – Moje dane osobowe: nagłówki sekcji
+  'employeeDashboard.personal.basicInfo.title': 'Dane podstawowe',
+  'employeeDashboard.personal.contactInfo.title': 'Dane kontaktowe',
+  'employeeDashboard.personal.employmentInfo.title': 'Dane zatrudnienia',
+  'employeeDashboard.personal.emergencyContact.title': 'Osoba do kontaktu',
+
+  // Employee Dashboard – Moje dane osobowe: dane podstawowe
+  'employeeDashboard.personal.basicInfo.firstName': 'Imię',
+  'employeeDashboard.personal.basicInfo.lastName': 'Nazwisko',
+  'employeeDashboard.personal.basicInfo.employeeCode': 'Kod pracownika',
+  'employeeDashboard.personal.basicInfo.birthDate': 'Data urodzenia',
+  'employeeDashboard.personal.basicInfo.position': 'Stanowisko',
+  'employeeDashboard.personal.basicInfo.department': 'Dział',
+  'employeeDashboard.personal.basicInfo.supervisor': 'Przełożony',
+  'employeeDashboard.personal.basicInfo.hireDate': 'Data zatrudnienia',
+
+  // Employee Dashboard – Moje dane osobowe: dane kontaktowe
+  'employeeDashboard.personal.contactInfo.workEmail': 'Email służbowy',
+  'employeeDashboard.personal.contactInfo.privateEmail': 'Email prywatny',
+  'employeeDashboard.personal.contactInfo.workPhone': 'Telefon służbowy',
+  'employeeDashboard.personal.contactInfo.privatePhone': 'Telefon prywatny',
+  'employeeDashboard.personal.contactInfo.residenceAddress': 'Adres zamieszkania',
+  'employeeDashboard.personal.contactInfo.correspondenceAddress': 'Adres korespondencyjny',
+
+  // Employee Dashboard – Moje dane osobowe: dane zatrudnienia
+  'employeeDashboard.personal.employmentInfo.company': 'Spółka',
+  'employeeDashboard.personal.employmentInfo.organizationalUnit': 'Jednostka organizacyjna',
+  'employeeDashboard.personal.employmentInfo.costCenter': 'Centrum kosztowe',
+  'employeeDashboard.personal.employmentInfo.contractType': 'Rodzaj umowy',
+  'employeeDashboard.personal.employmentInfo.workTimeFraction': 'Wymiar etatu',
+  'employeeDashboard.personal.employmentInfo.employmentStatus': 'Status zatrudnienia',
+  'employeeDashboard.personal.employmentInfo.hireDate': 'Data zatrudnienia',
+  'employeeDashboard.personal.employmentInfo.seniority': 'Staż pracy',
+
+  // Employee Dashboard – Moje dane osobowe: osoba do kontaktu
+  'employeeDashboard.personal.emergencyContact.fullName': 'Imię i nazwisko',
+  'employeeDashboard.personal.emergencyContact.relationship': 'Relacja',
+  'employeeDashboard.personal.emergencyContact.phone': 'Numer telefonu',
+
+  // Employee Dashboard – Moje dane osobowe: modal wniosku o zmianę danych
+  'employeeDashboard.personal.changeRequest.buttonLabel': 'Wniosek o zmianę danych',
+  'employeeDashboard.personal.changeRequest.modalTitle': 'Wniosek o zmianę danych',
+  'employeeDashboard.personal.changeRequest.changeType': 'Rodzaj zmiany',
+  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': 'Wybierz rodzaj zmiany...',
+  'employeeDashboard.personal.changeRequest.justification': 'Uzasadnienie',
+  'employeeDashboard.personal.changeRequest.justificationPlaceholder': 'Opisz powód zmiany danych...',
+  'employeeDashboard.personal.changeRequest.attachment': 'Załącznik',
+  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': 'Dodawanie załączników będzie dostępne wkrótce',
+  'employeeDashboard.personal.changeRequest.submit': 'Wyślij wniosek',
+  'employeeDashboard.personal.changeRequest.cancel': 'Anuluj',
+  'employeeDashboard.personal.changeRequest.submitting': 'Wysyłanie...',
+  'employeeDashboard.personal.changeRequest.successMessage': 'Wniosek o zmianę danych został przesłany do działu HR.',
+
+  // Rodzaje zmian
+  'employeeDashboard.personal.changeType.residenceAddress': 'Adres zamieszkania',
+  'employeeDashboard.personal.changeType.correspondenceAddress': 'Adres korespondencyjny',
+  'employeeDashboard.personal.changeType.privatePhone': 'Telefon prywatny',
+  'employeeDashboard.personal.changeType.privateEmail': 'Email prywatny',
+  'employeeDashboard.personal.changeType.lastName': 'Nazwisko',
+  'employeeDashboard.personal.changeType.emergencyContact': 'Dane osoby kontaktowej',
+  'employeeDashboard.personal.changeType.other': 'Inne',
+
+  // Formularz zmiany – pola dynamiczne
+  'employeeDashboard.personal.changeForm.newPhone': 'Nowy numer telefonu',
+  'employeeDashboard.personal.changeForm.newEmail': 'Nowy adres email',
+  'employeeDashboard.personal.changeForm.newLastName': 'Nowe nazwisko',
+  'employeeDashboard.personal.changeForm.street': 'Ulica',
+  'employeeDashboard.personal.changeForm.buildingNumber': 'Numer domu',
+  'employeeDashboard.personal.changeForm.apartmentNumber': 'Numer lokalu',
+  'employeeDashboard.personal.changeForm.postalCode': 'Kod pocztowy',
+  'employeeDashboard.personal.changeForm.city': 'Miasto',
+  'employeeDashboard.personal.changeForm.contactFullName': 'Imię i nazwisko',
+  'employeeDashboard.personal.changeForm.contactRelationship': 'Relacja',
+  'employeeDashboard.personal.changeForm.contactPhone': 'Numer telefonu',
+  'employeeDashboard.personal.changeForm.description': 'Opis zmiany',
+  'employeeDashboard.personal.changeForm.descriptionPlaceholder': 'Opisz szczegółowo, co ma zostać zmienione...',
+
+  // Employee Dashboard – Moje dane osobowe: historia wniosków
+  'employeeDashboard.personal.history.title': 'Historia wniosków o zmianę danych',
+  'employeeDashboard.personal.history.empty': 'Brak historii wniosków',
+  'employeeDashboard.personal.history.date': 'Data',
+  'employeeDashboard.personal.history.changeType': 'Typ zmiany',
+  'employeeDashboard.personal.history.status': 'Status',
+  'employeeDashboard.personal.history.comment': 'Komentarz',
+  'employeeDashboard.personal.history.status.pending': 'Oczekuje',
+  'employeeDashboard.personal.history.status.approved': 'Zaakceptowano',
+  'employeeDashboard.personal.history.status.rejected': 'Odrzucono',
+
   // Address Book
   'addressBook.title': 'Książka Adresowa',
   'addressBook.subtitle': 'Zarządzaj kontaktami i informacjami kontaktowymi',

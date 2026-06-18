@@ -21,11 +21,11 @@ const MOCK_DATA: EmployeeDashboardData = {
     lastName: 'Kowalska',
     fullName: 'Anna Kowalska',
     position: 'Starszy Inżynier Oprogramowania',
-    department: 'IT / Rozwój',
-    supervisor: 'Marek Nowak',
+    department: 'IT / Dział IT',
+    supervisor: 'Jarosław Kłębucki',
     hireDate: '2019-03-01',
     phone: '+48 600 123 456',
-    email: 'anna.kowalska@company.pl',
+    email: 'anna.kowalska@citronex.pl',
     avatarUrl: undefined,
     lastLoginAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 min ago
   },
@@ -41,7 +41,7 @@ const MOCK_DATA: EmployeeDashboardData = {
     grossAmount: 12500,
     netAmount: 8934.5,
     currency: 'PLN',
-    paymentDate: '2025-05-29',
+    paymentDate: '2025-05-09',
     periodLabel: 'Maj 2025',
     downloadUrl: undefined, // set to a real URL when backend is connected
   },
