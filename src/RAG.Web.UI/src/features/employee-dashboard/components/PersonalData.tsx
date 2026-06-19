@@ -16,6 +16,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { Modal } from '@/shared/components/ui/Modal'
@@ -587,16 +589,71 @@ function ContactInfoSection({ data }: { data: EmployeePersonalData['contactInfo'
   )
 }
 
-function EmploymentInfoSection({ data }: { data: EmployeePersonalData['employmentInfo'] }) {
+function EmploymentInfoSection({ employments }: { employments: EmployeePersonalData['employments'] }) {
   const { t } = useI18n()
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const total = employments.length
+  const data = employments[activeIndex]
 
   return (
-    <SectionCard
-      icon={Briefcase}
-      title={t('employeeDashboard.personal.employmentInfo.title')}
-      iconBg="bg-purple-50 dark:bg-purple-900/20"
-      iconColor="text-purple-600 dark:text-purple-400"
-    >
+    <div className="surface p-5 flex flex-col gap-1">
+      {/* Header row with switcher */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <Briefcase className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+        </div>
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 flex-1">
+          {t('employeeDashboard.personal.employmentInfo.title')}
+        </h2>
+
+        {total > 1 && (
+          <div className="flex items-center gap-1.5 ml-auto">
+            <button
+              onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
+              disabled={activeIndex === 0}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              aria-label="Poprzednie zatrudnienie"
+            >
+              <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            </button>
+
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums min-w-[2.5rem] text-center">
+              {activeIndex + 1} / {total}
+            </span>
+
+            <button
+              onClick={() => setActiveIndex((i) => Math.min(total - 1, i + 1))}
+              disabled={activeIndex === total - 1}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              aria-label="Następne zatrudnienie"
+            >
+              <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Company tab pills – clickable when more than one */}
+      {total > 1 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {employments.map((emp, idx) => (
+            <button
+              key={emp.id}
+              onClick={() => setActiveIndex(idx)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                idx === activeIndex
+                  ? 'bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-600'
+                  : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200 dark:bg-slate-800 dark:text-gray-400 dark:border-slate-700 dark:hover:bg-slate-700'
+              }`}
+            >
+              {emp.company}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Data rows for active employment */}
       <DataRow icon={Building2} label={t('employeeDashboard.personal.employmentInfo.company')} value={data.company} />
       <DataRow icon={Building2} label={t('employeeDashboard.personal.employmentInfo.organizationalUnit')} value={data.organizationalUnit} />
       <DataRow icon={Hash} label={t('employeeDashboard.personal.employmentInfo.costCenter')} value={data.costCenter} />
@@ -605,7 +662,7 @@ function EmploymentInfoSection({ data }: { data: EmployeePersonalData['employmen
       <DataRow icon={CheckCircle} label={t('employeeDashboard.personal.employmentInfo.employmentStatus')} value={data.employmentStatus} />
       <DataRow icon={Calendar} label={t('employeeDashboard.personal.employmentInfo.hireDate')} value={formatDate(data.hireDate)} />
       <DataRow icon={Clock} label={t('employeeDashboard.personal.employmentInfo.seniority')} value={computeSeniority(data.hireDate)} />
-    </SectionCard>
+    </div>
   )
 }
 
@@ -711,7 +768,7 @@ export function PersonalData() {
 
       {/* Section 3 + 4 – Employment and Emergency */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <EmploymentInfoSection data={personalData.employmentInfo} />
+        <EmploymentInfoSection employments={personalData.employments} />
         <EmergencyContactSection data={personalData.emergencyContact} />
       </div>
 

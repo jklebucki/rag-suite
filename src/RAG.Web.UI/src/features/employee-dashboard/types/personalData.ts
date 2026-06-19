@@ -34,6 +34,7 @@ export interface ContactInfo {
 }
 
 export interface EmploymentInfo {
+  id: string            // Unique identifier for this employment record
   company: string
   organizationalUnit: string
   costCenter: string
@@ -55,7 +56,8 @@ export interface EmergencyContact {
 export interface EmployeePersonalData {
   basicInfo: BasicInfo
   contactInfo: ContactInfo
-  employmentInfo: EmploymentInfo
+  // Array – employee may have parallel employments across companies
+  employments: EmploymentInfo[]
   emergencyContact: EmergencyContact
 }
 
