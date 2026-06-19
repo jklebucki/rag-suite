@@ -669,6 +669,91 @@ export const en: TranslationKeys = {
   'employeeDashboard.leave.onDemand': 'On-demand leave',
   'employeeDashboard.leave.totalAvailable': '{total} days available in total',
 
+  // Employee Dashboard – leave requests module: tabs
+  'employeeDashboard.leave.tabs.new': 'New request',
+  'employeeDashboard.leave.tabs.history': 'Request history',
+
+  // Employee Dashboard – leave requests module: balance card
+  'employeeDashboard.leave.balance.title': 'Leave Balance',
+  'employeeDashboard.leave.balance.annual': 'Annual leave',
+  'employeeDashboard.leave.balance.carryover': 'Carryover',
+  'employeeDashboard.leave.balance.onDemand': 'On demand',
+  'employeeDashboard.leave.balance.days': 'days',
+  'employeeDashboard.leave.balance.daysUnit': 'days',
+  'employeeDashboard.leave.balance.totalAvailable': '{total} days available in total',
+
+  // Employee Dashboard – leave requests module: leave types
+  'employeeDashboard.leave.type.annual': 'Annual leave',
+  'employeeDashboard.leave.type.onDemand': 'On-demand leave',
+  'employeeDashboard.leave.type.occasional': 'Occasional leave',
+  'employeeDashboard.leave.type.childCare': 'Child care',
+  'employeeDashboard.leave.type.homeOffice': 'Home Office',
+  'employeeDashboard.leave.type.delegation': 'Business trip',
+
+  // Employee Dashboard – leave requests module: statuses
+  'employeeDashboard.leave.status.pending': 'Pending',
+  'employeeDashboard.leave.status.approved': 'Approved',
+  'employeeDashboard.leave.status.rejected': 'Rejected',
+  'employeeDashboard.leave.status.cancelled': 'Cancelled',
+
+  // Employee Dashboard – leave requests module: form
+  'employeeDashboard.leave.form.title': 'Leave request form',
+  'employeeDashboard.leave.form.leaveType': 'Leave type',
+  'employeeDashboard.leave.form.leaveTypePlaceholder': 'Select leave type...',
+  'employeeDashboard.leave.form.dateFrom': 'Date from',
+  'employeeDashboard.leave.form.dateTo': 'Date to',
+  'employeeDashboard.leave.form.daysCount': 'Number of days',
+  'employeeDashboard.leave.form.workingDays': 'working days',
+  'employeeDashboard.leave.form.daysCountHint': 'Calculated automatically based on selected dates (working days).',
+  'employeeDashboard.leave.form.substitute': 'Substitute',
+  'employeeDashboard.leave.form.substitutePlaceholder': 'Select substitute (optional)...',
+  'employeeDashboard.leave.form.comment': 'Comment',
+  'employeeDashboard.leave.form.optional': 'optional',
+  'employeeDashboard.leave.form.commentPlaceholder': 'Add a comment or justification...',
+  'employeeDashboard.leave.form.attachment': 'Attachment',
+  'employeeDashboard.leave.form.attachmentPlaceholder': 'Click or drag a file to attach',
+  'employeeDashboard.leave.form.attachmentNotAvailable': 'Attachment upload will be available once the backend is connected',
+  'employeeDashboard.leave.form.attachmentComingSoon': 'This feature will be available soon',
+  'employeeDashboard.leave.form.cancel': 'Cancel',
+  'employeeDashboard.leave.form.submit': 'Submit request',
+  'employeeDashboard.leave.form.submitting': 'Submitting...',
+  'employeeDashboard.leave.form.submitSuccess': 'Leave request submitted. Awaiting manager approval.',
+
+  // Employee Dashboard – leave requests module: form validation
+  'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Please select a leave type',
+  'employeeDashboard.leave.form.errors.dateFromRequired': 'Please enter a start date',
+  'employeeDashboard.leave.form.errors.dateToRequired': 'Please enter an end date',
+  'employeeDashboard.leave.form.errors.dateToBeforeDateFrom': 'End date cannot be before start date',
+
+  // Employee Dashboard – leave requests module: history table
+  'employeeDashboard.leave.history.title': 'Leave request history',
+  'employeeDashboard.leave.history.empty': 'No leave requests found',
+  'employeeDashboard.leave.history.recordsCount': 'records',
+  'employeeDashboard.leave.history.col.leaveType': 'Leave type',
+  'employeeDashboard.leave.history.col.dateFrom': 'Date from',
+  'employeeDashboard.leave.history.col.dateTo': 'Date to',
+  'employeeDashboard.leave.history.col.daysCount': 'Days',
+  'employeeDashboard.leave.history.col.status': 'Status',
+  'employeeDashboard.leave.history.col.createdAt': 'Submitted',
+  'employeeDashboard.leave.history.col.actions': 'Actions',
+  'employeeDashboard.leave.history.actions.details': 'Details',
+  'employeeDashboard.leave.history.actions.cancel': 'Cancel',
+
+  // Employee Dashboard – leave requests module: detail modal
+  'employeeDashboard.leave.detail.title': 'Leave request details',
+  'employeeDashboard.leave.detail.status': 'Status',
+  'employeeDashboard.leave.detail.leaveType': 'Leave type',
+  'employeeDashboard.leave.detail.dateFrom': 'Date from',
+  'employeeDashboard.leave.detail.dateTo': 'Date to',
+  'employeeDashboard.leave.detail.daysCount': 'Number of days',
+  'employeeDashboard.leave.detail.substitute': 'Substitute',
+  'employeeDashboard.leave.detail.comment': 'Comment',
+  'employeeDashboard.leave.detail.createdAt': 'Submitted',
+  'employeeDashboard.leave.detail.managerSection': 'Manager decision',
+  'employeeDashboard.leave.detail.reviewedBy': 'Reviewed by',
+  'employeeDashboard.leave.detail.reviewedAt': 'Decision date',
+  'employeeDashboard.leave.detail.managerComment': 'Manager comment',
+
   'employeeDashboard.payslip.title': 'Last Payslip',
   'employeeDashboard.payslip.gross': 'Gross',
   'employeeDashboard.payslip.net': 'Net',

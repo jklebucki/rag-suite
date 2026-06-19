@@ -977,4 +977,89 @@ export const pl: TranslationKeys = {
   'forum.subscription.subscribed': 'Powiadomienia włączone.',
   'forum.subscription.unsubscribed': 'Powiadomienia wyłączone.',
   'forum.subscription.error': 'Nie udało się zmienić ustawień powiadomień.',
+
+  // Employee Dashboard – Wnioski urlopowe: zakładki
+  'employeeDashboard.leave.tabs.new': 'Nowy wniosek',
+  'employeeDashboard.leave.tabs.history': 'Historia wniosków',
+
+  // Employee Dashboard – Wnioski urlopowe: saldo
+  'employeeDashboard.leave.balance.title': 'Saldo urlopowe',
+  'employeeDashboard.leave.balance.annual': 'Urlop bieżący',
+  'employeeDashboard.leave.balance.carryover': 'Urlop zaległy',
+  'employeeDashboard.leave.balance.onDemand': 'Na żądanie',
+  'employeeDashboard.leave.balance.days': 'dni',
+  'employeeDashboard.leave.balance.daysUnit': 'dni',
+  'employeeDashboard.leave.balance.totalAvailable': 'Łącznie {total} dni dostępnych do wykorzystania',
+
+  // Employee Dashboard – Wnioski urlopowe: typy urlopu
+  'employeeDashboard.leave.type.annual': 'Urlop wypoczynkowy',
+  'employeeDashboard.leave.type.onDemand': 'Urlop na żądanie',
+  'employeeDashboard.leave.type.occasional': 'Urlop okolicznościowy',
+  'employeeDashboard.leave.type.childCare': 'Opieka nad dzieckiem',
+  'employeeDashboard.leave.type.homeOffice': 'Home Office',
+  'employeeDashboard.leave.type.delegation': 'Delegacja',
+
+  // Employee Dashboard – Wnioski urlopowe: statusy
+  'employeeDashboard.leave.status.pending': 'Oczekuje',
+  'employeeDashboard.leave.status.approved': 'Zaakceptowany',
+  'employeeDashboard.leave.status.rejected': 'Odrzucony',
+  'employeeDashboard.leave.status.cancelled': 'Anulowany',
+
+  // Employee Dashboard – Wnioski urlopowe: formularz
+  'employeeDashboard.leave.form.title': 'Formularz wniosku urlopowego',
+  'employeeDashboard.leave.form.leaveType': 'Typ urlopu',
+  'employeeDashboard.leave.form.leaveTypePlaceholder': 'Wybierz typ urlopu...',
+  'employeeDashboard.leave.form.dateFrom': 'Data od',
+  'employeeDashboard.leave.form.dateTo': 'Data do',
+  'employeeDashboard.leave.form.daysCount': 'Liczba dni',
+  'employeeDashboard.leave.form.workingDays': 'dni robocze',
+  'employeeDashboard.leave.form.daysCountHint': 'Wyliczane automatycznie na podstawie wybranych dat (dni robocze).',
+  'employeeDashboard.leave.form.substitute': 'Zastępca',
+  'employeeDashboard.leave.form.substitutePlaceholder': 'Wybierz zastępcę (opcjonalnie)...',
+  'employeeDashboard.leave.form.comment': 'Komentarz',
+  'employeeDashboard.leave.form.optional': 'opcjonalnie',
+  'employeeDashboard.leave.form.commentPlaceholder': 'Dodaj komentarz lub uzasadnienie...',
+  'employeeDashboard.leave.form.attachment': 'Załącznik',
+  'employeeDashboard.leave.form.attachmentPlaceholder': 'Kliknij lub przeciągnij plik, aby dodać załącznik',
+  'employeeDashboard.leave.form.attachmentNotAvailable': 'Dodawanie załączników będzie dostępne po uruchomieniu backendu',
+  'employeeDashboard.leave.form.attachmentComingSoon': 'Funkcja zostanie udostępniona wkrótce',
+  'employeeDashboard.leave.form.cancel': 'Anuluj',
+  'employeeDashboard.leave.form.submit': 'Wyślij wniosek',
+  'employeeDashboard.leave.form.submitting': 'Wysyłanie...',
+  'employeeDashboard.leave.form.submitSuccess': 'Wniosek urlopowy został złożony. Oczekuje na akceptację przełożonego.',
+
+  // Employee Dashboard – Wnioski urlopowe: walidacja formularza
+  'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Wybierz typ urlopu',
+  'employeeDashboard.leave.form.errors.dateFromRequired': 'Podaj datę początkową',
+  'employeeDashboard.leave.form.errors.dateToRequired': 'Podaj datę końcową',
+  'employeeDashboard.leave.form.errors.dateToBeforeDateFrom': 'Data końcowa nie może być wcześniejsza niż data początkowa',
+
+  // Employee Dashboard – Wnioski urlopowe: historia
+  'employeeDashboard.leave.history.title': 'Historia wniosków urlopowych',
+  'employeeDashboard.leave.history.empty': 'Brak wniosków urlopowych',
+  'employeeDashboard.leave.history.recordsCount': 'rekordów',
+  'employeeDashboard.leave.history.col.leaveType': 'Typ urlopu',
+  'employeeDashboard.leave.history.col.dateFrom': 'Data od',
+  'employeeDashboard.leave.history.col.dateTo': 'Data do',
+  'employeeDashboard.leave.history.col.daysCount': 'Dni',
+  'employeeDashboard.leave.history.col.status': 'Status',
+  'employeeDashboard.leave.history.col.createdAt': 'Data złożenia',
+  'employeeDashboard.leave.history.col.actions': 'Akcje',
+  'employeeDashboard.leave.history.actions.details': 'Szczegóły',
+  'employeeDashboard.leave.history.actions.cancel': 'Anuluj',
+
+  // Employee Dashboard – Wnioski urlopowe: modal szczegółów
+  'employeeDashboard.leave.detail.title': 'Szczegóły wniosku urlopowego',
+  'employeeDashboard.leave.detail.status': 'Status',
+  'employeeDashboard.leave.detail.leaveType': 'Typ urlopu',
+  'employeeDashboard.leave.detail.dateFrom': 'Data od',
+  'employeeDashboard.leave.detail.dateTo': 'Data do',
+  'employeeDashboard.leave.detail.daysCount': 'Liczba dni',
+  'employeeDashboard.leave.detail.substitute': 'Zastępca',
+  'employeeDashboard.leave.detail.comment': 'Komentarz',
+  'employeeDashboard.leave.detail.createdAt': 'Data złożenia',
+  'employeeDashboard.leave.detail.managerSection': 'Decyzja przełożonego',
+  'employeeDashboard.leave.detail.reviewedBy': 'Ocenił',
+  'employeeDashboard.leave.detail.reviewedAt': 'Data decyzji',
+  'employeeDashboard.leave.detail.managerComment': 'Komentarz przełożonego',
 };

@@ -690,6 +690,91 @@ export interface TranslationKeys {
   'employeeDashboard.leave.onDemand': string;
   'employeeDashboard.leave.totalAvailable': string;
 
+  // Employee Dashboard – leave requests module: tabs
+  'employeeDashboard.leave.tabs.new': string;
+  'employeeDashboard.leave.tabs.history': string;
+
+  // Employee Dashboard – leave requests module: balance card
+  'employeeDashboard.leave.balance.title': string;
+  'employeeDashboard.leave.balance.annual': string;
+  'employeeDashboard.leave.balance.carryover': string;
+  'employeeDashboard.leave.balance.onDemand': string;
+  'employeeDashboard.leave.balance.days': string;
+  'employeeDashboard.leave.balance.daysUnit': string;
+  'employeeDashboard.leave.balance.totalAvailable': string;
+
+  // Employee Dashboard – leave requests module: leave types
+  'employeeDashboard.leave.type.annual': string;
+  'employeeDashboard.leave.type.onDemand': string;
+  'employeeDashboard.leave.type.occasional': string;
+  'employeeDashboard.leave.type.childCare': string;
+  'employeeDashboard.leave.type.homeOffice': string;
+  'employeeDashboard.leave.type.delegation': string;
+
+  // Employee Dashboard – leave requests module: statuses
+  'employeeDashboard.leave.status.pending': string;
+  'employeeDashboard.leave.status.approved': string;
+  'employeeDashboard.leave.status.rejected': string;
+  'employeeDashboard.leave.status.cancelled': string;
+
+  // Employee Dashboard – leave requests module: form
+  'employeeDashboard.leave.form.title': string;
+  'employeeDashboard.leave.form.leaveType': string;
+  'employeeDashboard.leave.form.leaveTypePlaceholder': string;
+  'employeeDashboard.leave.form.dateFrom': string;
+  'employeeDashboard.leave.form.dateTo': string;
+  'employeeDashboard.leave.form.daysCount': string;
+  'employeeDashboard.leave.form.workingDays': string;
+  'employeeDashboard.leave.form.daysCountHint': string;
+  'employeeDashboard.leave.form.substitute': string;
+  'employeeDashboard.leave.form.substitutePlaceholder': string;
+  'employeeDashboard.leave.form.comment': string;
+  'employeeDashboard.leave.form.optional': string;
+  'employeeDashboard.leave.form.commentPlaceholder': string;
+  'employeeDashboard.leave.form.attachment': string;
+  'employeeDashboard.leave.form.attachmentPlaceholder': string;
+  'employeeDashboard.leave.form.attachmentNotAvailable': string;
+  'employeeDashboard.leave.form.attachmentComingSoon': string;
+  'employeeDashboard.leave.form.cancel': string;
+  'employeeDashboard.leave.form.submit': string;
+  'employeeDashboard.leave.form.submitting': string;
+  'employeeDashboard.leave.form.submitSuccess': string;
+
+  // Employee Dashboard – leave requests module: form validation
+  'employeeDashboard.leave.form.errors.leaveTypeRequired': string;
+  'employeeDashboard.leave.form.errors.dateFromRequired': string;
+  'employeeDashboard.leave.form.errors.dateToRequired': string;
+  'employeeDashboard.leave.form.errors.dateToBeforeDateFrom': string;
+
+  // Employee Dashboard – leave requests module: history table
+  'employeeDashboard.leave.history.title': string;
+  'employeeDashboard.leave.history.empty': string;
+  'employeeDashboard.leave.history.recordsCount': string;
+  'employeeDashboard.leave.history.col.leaveType': string;
+  'employeeDashboard.leave.history.col.dateFrom': string;
+  'employeeDashboard.leave.history.col.dateTo': string;
+  'employeeDashboard.leave.history.col.daysCount': string;
+  'employeeDashboard.leave.history.col.status': string;
+  'employeeDashboard.leave.history.col.createdAt': string;
+  'employeeDashboard.leave.history.col.actions': string;
+  'employeeDashboard.leave.history.actions.details': string;
+  'employeeDashboard.leave.history.actions.cancel': string;
+
+  // Employee Dashboard – leave requests module: detail modal
+  'employeeDashboard.leave.detail.title': string;
+  'employeeDashboard.leave.detail.status': string;
+  'employeeDashboard.leave.detail.leaveType': string;
+  'employeeDashboard.leave.detail.dateFrom': string;
+  'employeeDashboard.leave.detail.dateTo': string;
+  'employeeDashboard.leave.detail.daysCount': string;
+  'employeeDashboard.leave.detail.substitute': string;
+  'employeeDashboard.leave.detail.comment': string;
+  'employeeDashboard.leave.detail.createdAt': string;
+  'employeeDashboard.leave.detail.managerSection': string;
+  'employeeDashboard.leave.detail.reviewedBy': string;
+  'employeeDashboard.leave.detail.reviewedAt': string;
+  'employeeDashboard.leave.detail.managerComment': string;
+
   // Employee Dashboard – overview: last payslip tile
   'employeeDashboard.payslip.title': string;
   'employeeDashboard.payslip.gross': string;
