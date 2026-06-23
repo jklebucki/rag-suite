@@ -1,7 +1,7 @@
 import React from 'react'
 import { FileCheck } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import type { HrRequestsSummary } from '../types/employeeDashboard'
+import type { HrRequestsSummary } from '../../types/employeeDashboard'
 
 interface Props {
   summary: HrRequestsSummary

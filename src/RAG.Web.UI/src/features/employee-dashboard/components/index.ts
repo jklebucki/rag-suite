@@ -1,4 +1,4 @@
-export { EmployeeDashboard } from './EmployeeDashboard'
+export { EmployeeDashboard } from './dashboard'
 export { EmployeeDashboardLayout } from './EmployeeDashboardLayout'
 export { EmployeeDashboardSidebar } from './EmployeeDashboardSidebar'
 export { ManagerPanel } from './ManagerPanel'
@@ -7,11 +7,13 @@ export { LeaveRequest } from './LeaveRequest'
 export { Salary } from './Salary'
 export { Certificates } from './Certificates'
 export { Documents } from './Documents'
-export { EmployeeSummaryCard } from './EmployeeSummaryCard'
-export { LeaveBalanceTile } from './LeaveBalanceTile'
-export { LastPayslipTile } from './LastPayslipTile'
-export { HrRequestsTile } from './HrRequestsTile'
-export { EmployeeProfileCard } from './EmployeeProfileCard'
-export { NotificationsCenter } from './NotificationsCenter'
-export { UpcomingEvents } from './UpcomingEvents'
-export { QuickActions } from './QuickActions'
+export {
+  EmployeeSummaryCard,
+  LeaveBalanceTile,
+  LastPayslipTile,
+  HrRequestsTile,
+  EmployeeProfileCard,
+  NotificationsCenter,
+  UpcomingEvents,
+  QuickActions,
+} from './dashboard'

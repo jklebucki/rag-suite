@@ -1,7 +1,7 @@
 import React from 'react'
 import { CalendarClock, Stethoscope, ShieldCheck, Plane, Star, MapPin } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import type { UpcomingEvent, UpcomingEventType } from '../types/employeeDashboard'
+import type { UpcomingEvent, UpcomingEventType } from '../../types/employeeDashboard'
 
 interface Props {
   events: UpcomingEvent[]

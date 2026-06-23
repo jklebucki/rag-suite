@@ -2,7 +2,7 @@ import React from 'react'
 import { Banknote, Download } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { Button } from '@/shared/components/ui'
-import type { LastPayslip } from '../types/employeeDashboard'
+import type { LastPayslip } from '../../types/employeeDashboard'
 
 interface Props {
   payslip: LastPayslip

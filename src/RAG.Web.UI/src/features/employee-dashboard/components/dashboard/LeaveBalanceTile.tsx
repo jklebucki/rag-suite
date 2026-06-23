@@ -1,7 +1,7 @@
 import React from 'react'
 import { CalendarDays, TrendingDown } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import type { LeaveBalance } from '../types/employeeDashboard'
+import type { LeaveBalance } from '../../types/employeeDashboard'
 
 interface Props {
   balance: LeaveBalance

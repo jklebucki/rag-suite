@@ -1,7 +1,7 @@
 import React from 'react'
 import { Bell, CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import type { DashboardNotification, NotificationSeverity, NotificationCategory } from '../types/employeeDashboard'
+import type { DashboardNotification, NotificationSeverity, NotificationCategory } from '../../types/employeeDashboard'
 
 interface Props {
   notifications: DashboardNotification[]

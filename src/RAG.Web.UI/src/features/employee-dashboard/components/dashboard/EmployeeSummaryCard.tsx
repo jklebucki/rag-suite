@@ -1,7 +1,7 @@
 import React from 'react'
-import { User, Clock, Building2, Briefcase } from 'lucide-react'
+import { Clock, Building2, Briefcase } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
-import type { EmployeeProfile } from '../types/employeeDashboard'
+import type { EmployeeProfile } from '../../types/employeeDashboard'
 
 interface Props {
   profile: EmployeeProfile
