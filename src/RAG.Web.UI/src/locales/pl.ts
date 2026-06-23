@@ -1007,6 +1007,8 @@ export const pl: TranslationKeys = {
 
   // Employee Dashboard – Wnioski urlopowe: formularz
   'employeeDashboard.leave.form.title': 'Formularz wniosku urlopowego',
+  'employeeDashboard.leave.form.company': 'Firma',
+  'employeeDashboard.leave.form.companyPlaceholder': 'Wybierz firme...',
   'employeeDashboard.leave.form.leaveType': 'Typ urlopu',
   'employeeDashboard.leave.form.leaveTypePlaceholder': 'Wybierz typ urlopu...',
   'employeeDashboard.leave.form.dateFrom': 'Data od',
@@ -1029,6 +1031,7 @@ export const pl: TranslationKeys = {
   'employeeDashboard.leave.form.submitSuccess': 'Wniosek urlopowy został złożony. Oczekuje na akceptację przełożonego.',
 
   // Employee Dashboard – Wnioski urlopowe: walidacja formularza
+  'employeeDashboard.leave.form.errors.companyRequired': 'Wybierz firme',
   'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Wybierz typ urlopu',
   'employeeDashboard.leave.form.errors.dateFromRequired': 'Podaj datę początkową',
   'employeeDashboard.leave.form.errors.dateToRequired': 'Podaj datę końcową',
@@ -1051,6 +1054,7 @@ export const pl: TranslationKeys = {
   // Employee Dashboard – Wnioski urlopowe: modal szczegółów
   'employeeDashboard.leave.detail.title': 'Szczegóły wniosku urlopowego',
   'employeeDashboard.leave.detail.status': 'Status',
+  'employeeDashboard.leave.detail.company': 'Firma',
   'employeeDashboard.leave.detail.leaveType': 'Typ urlopu',
   'employeeDashboard.leave.detail.dateFrom': 'Data od',
   'employeeDashboard.leave.detail.dateTo': 'Data do',

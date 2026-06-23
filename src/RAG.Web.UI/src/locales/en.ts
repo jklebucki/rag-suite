@@ -698,6 +698,8 @@ export const en: TranslationKeys = {
 
   // Employee Dashboard – leave requests module: form
   'employeeDashboard.leave.form.title': 'Leave request form',
+  'employeeDashboard.leave.form.company': 'Company',
+  'employeeDashboard.leave.form.companyPlaceholder': 'Select company...',
   'employeeDashboard.leave.form.leaveType': 'Leave type',
   'employeeDashboard.leave.form.leaveTypePlaceholder': 'Select leave type...',
   'employeeDashboard.leave.form.dateFrom': 'Date from',
@@ -720,6 +722,7 @@ export const en: TranslationKeys = {
   'employeeDashboard.leave.form.submitSuccess': 'Leave request submitted. Awaiting manager approval.',
 
   // Employee Dashboard – leave requests module: form validation
+  'employeeDashboard.leave.form.errors.companyRequired': 'Please select a company',
   'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Please select a leave type',
   'employeeDashboard.leave.form.errors.dateFromRequired': 'Please enter a start date',
   'employeeDashboard.leave.form.errors.dateToRequired': 'Please enter an end date',
@@ -742,6 +745,7 @@ export const en: TranslationKeys = {
   // Employee Dashboard – leave requests module: detail modal
   'employeeDashboard.leave.detail.title': 'Leave request details',
   'employeeDashboard.leave.detail.status': 'Status',
+  'employeeDashboard.leave.detail.company': 'Company',
   'employeeDashboard.leave.detail.leaveType': 'Leave type',
   'employeeDashboard.leave.detail.dateFrom': 'Date from',
   'employeeDashboard.leave.detail.dateTo': 'Date to',

@@ -719,6 +719,8 @@ export interface TranslationKeys {
 
   // Employee Dashboard – leave requests module: form
   'employeeDashboard.leave.form.title': string;
+  'employeeDashboard.leave.form.company': string;
+  'employeeDashboard.leave.form.companyPlaceholder': string;
   'employeeDashboard.leave.form.leaveType': string;
   'employeeDashboard.leave.form.leaveTypePlaceholder': string;
   'employeeDashboard.leave.form.dateFrom': string;
@@ -741,6 +743,7 @@ export interface TranslationKeys {
   'employeeDashboard.leave.form.submitSuccess': string;
 
   // Employee Dashboard – leave requests module: form validation
+  'employeeDashboard.leave.form.errors.companyRequired': string;
   'employeeDashboard.leave.form.errors.leaveTypeRequired': string;
   'employeeDashboard.leave.form.errors.dateFromRequired': string;
   'employeeDashboard.leave.form.errors.dateToRequired': string;
@@ -763,6 +766,7 @@ export interface TranslationKeys {
   // Employee Dashboard – leave requests module: detail modal
   'employeeDashboard.leave.detail.title': string;
   'employeeDashboard.leave.detail.status': string;
+  'employeeDashboard.leave.detail.company': string;
   'employeeDashboard.leave.detail.leaveType': string;
   'employeeDashboard.leave.detail.dateFrom': string;
   'employeeDashboard.leave.detail.dateTo': string;

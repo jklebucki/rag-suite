@@ -38,9 +38,16 @@ export interface LeaveSubstitute {
   position: string
 }
 
+export interface LeaveCompany {
+  id: string
+  name: string
+}
+
 // DTO representing a single leave request record
 export interface LeaveRequestRecord {
   id: string
+  companyId: string
+  companyName: string
   leaveType: LeaveType
   dateFrom: string           // ISO date string
   dateTo: string             // ISO date string
@@ -59,6 +66,7 @@ export interface LeaveRequestRecord {
 
 // Form model – matches the shape the create endpoint will expect
 export interface CreateLeaveRequestPayload {
+  companyId: string
   leaveType: LeaveType
   dateFrom: string           // ISO date string
   dateTo: string             // ISO date string
@@ -71,6 +79,7 @@ export interface CreateLeaveRequestPayload {
 // Aggregated DTO returned by the service / API endpoint
 export interface LeaveRequestPageData {
   leaveBalance: LeaveBalance
+  companies: LeaveCompany[]
   requests: LeaveRequestRecord[]
   substitutes: LeaveSubstitute[]
 }

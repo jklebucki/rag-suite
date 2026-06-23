@@ -51,6 +51,11 @@ const MOCK_DATA: LeaveRequestPageData = {
     total: 20,
   },
 
+  companies: [
+    { id: 'company-citronex', name: 'Citronex Sp. z o.o.' },
+    { id: 'company-polskie-pomidory', name: 'Polskie Pomidory Sp. z o.o.' },
+  ],
+
   substitutes: [
     { id: 'sub-001', fullName: 'Marek Nowak', position: 'Inżynier Oprogramowania' },
     { id: 'sub-002', fullName: 'Katarzyna Wiśniewska', position: 'Starszy Programista' },
@@ -62,6 +67,8 @@ const MOCK_DATA: LeaveRequestPageData = {
   requests: [
     {
       id: 'lr-001',
+      companyId: 'company-citronex',
+      companyName: 'Citronex Sp. z o.o.',
       leaveType: 'annual',
       dateFrom: '2025-06-16',
       dateTo: '2025-06-20',
@@ -77,6 +84,8 @@ const MOCK_DATA: LeaveRequestPageData = {
     },
     {
       id: 'lr-002',
+      companyId: 'company-citronex',
+      companyName: 'Citronex Sp. z o.o.',
       leaveType: 'onDemand',
       dateFrom: '2025-04-07',
       dateTo: '2025-04-07',
@@ -88,6 +97,8 @@ const MOCK_DATA: LeaveRequestPageData = {
     },
     {
       id: 'lr-003',
+      companyId: 'company-polskie-pomidory',
+      companyName: 'Polskie Pomidory Sp. z o.o.',
       leaveType: 'occasional',
       dateFrom: '2025-03-14',
       dateTo: '2025-03-15',
@@ -101,6 +112,8 @@ const MOCK_DATA: LeaveRequestPageData = {
     },
     {
       id: 'lr-004',
+      companyId: 'company-citronex',
+      companyName: 'Citronex Sp. z o.o.',
       leaveType: 'annual',
       dateFrom: '2025-07-21',
       dateTo: '2025-08-01',
@@ -112,6 +125,8 @@ const MOCK_DATA: LeaveRequestPageData = {
     },
     {
       id: 'lr-005',
+      companyId: 'company-polskie-pomidory',
+      companyName: 'Polskie Pomidory Sp. z o.o.',
       leaveType: 'homeOffice',
       dateFrom: '2025-06-25',
       dateTo: '2025-06-25',
@@ -121,6 +136,8 @@ const MOCK_DATA: LeaveRequestPageData = {
     },
     {
       id: 'lr-006',
+      companyId: 'company-citronex',
+      companyName: 'Citronex Sp. z o.o.',
       leaveType: 'delegation',
       dateFrom: '2025-02-10',
       dateTo: '2025-02-12',
@@ -152,9 +169,12 @@ export async function createLeaveRequest(
   const substitute = payload.substituteId
     ? MOCK_DATA.substitutes.find((s) => s.id === payload.substituteId)
     : undefined
+  const company = MOCK_DATA.companies.find((c) => c.id === payload.companyId)
 
   const newRecord: LeaveRequestRecord = {
     id: `lr-${Date.now()}`,
+    companyId: payload.companyId,
+    companyName: company?.name ?? payload.companyId,
     leaveType: payload.leaveType,
     dateFrom: payload.dateFrom,
     dateTo: payload.dateTo,
