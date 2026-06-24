@@ -1,12 +1,12 @@
-export { EmployeeDashboard } from './dashboard'
+export { EmployeeDashboard } from '../dashboard'
 export { EmployeeDashboardLayout } from './EmployeeDashboardLayout'
 export { EmployeeDashboardSidebar } from './EmployeeDashboardSidebar'
-export { ManagerPanel } from './ManagerPanel'
-export { PersonalData } from './personal-data'
-export { LeaveRequest } from './LeaveRequest'
-export { Salary } from './Salary'
-export { Certificates } from './Certificates'
-export { Documents } from './Documents'
+export { ManagerPanel } from '../manager-panel'
+export { PersonalData } from '../personal-data'
+export { LeaveRequest } from '../leave-request'
+export { PayrollPage as Salary } from '../payroll'
+export { Certificates } from '../certificates'
+export { Documents } from '../documents'
 export {
   EmployeeSummaryCard,
   LeaveBalanceTile,
@@ -16,4 +16,4 @@ export {
   NotificationsCenter,
   UpcomingEvents,
   QuickActions,
-} from './dashboard'
+} from '../dashboard/components'

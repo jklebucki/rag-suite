@@ -31,14 +31,14 @@ const QuizDetailPromise = import('@/features/cyberpanel/components/QuizDetail').
 const AttemptDetailPromise = import('@/features/cyberpanel/components/AttemptDetail').then(module => ({ default: module.AttemptDetail }))
 const ForumPagePromise = import('@/features/forum/components/ForumPage').then(module => ({ default: module.ForumPage }))
 const ThreadDetailPagePromise = import('@/features/forum/components/ThreadDetailPage').then(module => ({ default: module.ThreadDetailPage }))
-const EmployeeDashboardPromise = import('@/features/employee-dashboard/components/EmployeeDashboard').then(module => ({ default: module.EmployeeDashboard }))
+const EmployeeDashboardPromise = import('@/features/employee-dashboard/dashboard').then(module => ({ default: module.EmployeeDashboard }))
 const EmployeeDashboardLayoutPromise = import('@/features/employee-dashboard/components/EmployeeDashboardLayout').then(module => ({ default: module.EmployeeDashboardLayout }))
-const ManagerPanelPromise = import('@/features/employee-dashboard/components/ManagerPanel').then(module => ({ default: module.ManagerPanel }))
-const PersonalDataPromise = import('@/features/employee-dashboard/components/PersonalData').then(module => ({ default: module.PersonalData }))
-const LeaveRequestPromise = import('@/features/employee-dashboard/components/LeaveRequest').then(module => ({ default: module.LeaveRequest }))
-const SalaryPromise = import('@/features/employee-dashboard/components/Salary').then(module => ({ default: module.Salary }))
-const CertificatesPromise = import('@/features/employee-dashboard/components/Certificates').then(module => ({ default: module.Certificates }))
-const DocumentsPromise = import('@/features/employee-dashboard/components/Documents').then(module => ({ default: module.Documents }))
+const ManagerPanelPromise = import('@/features/employee-dashboard/manager-panel').then(module => ({ default: module.ManagerPanel }))
+const PersonalDataPromise = import('@/features/employee-dashboard/personal-data').then(module => ({ default: module.PersonalData }))
+const LeaveRequestPromise = import('@/features/employee-dashboard/leave-request').then(module => ({ default: module.LeaveRequest }))
+const SalaryPromise = import('@/features/employee-dashboard/payroll').then(module => ({ default: module.PayrollPage }))
+const CertificatesPromise = import('@/features/employee-dashboard/certificates').then(module => ({ default: module.Certificates }))
+const DocumentsPromise = import('@/features/employee-dashboard/documents').then(module => ({ default: module.Documents }))
 
 // Component loaders using use() hook
 function DashboardLoader() {
