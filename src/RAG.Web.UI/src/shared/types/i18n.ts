@@ -786,6 +786,57 @@ export interface TranslationKeys {
   'employeeDashboard.payslip.paymentDate': string;
   'employeeDashboard.payslip.download': string;
 
+  // Employee Dashboard - salary module
+  'employeeDashboard.salary.summary.title': string;
+  'employeeDashboard.salary.grossAmount': string;
+  'employeeDashboard.salary.netAmount': string;
+  'employeeDashboard.salary.netShort': string;
+  'employeeDashboard.salary.paymentDate': string;
+  'employeeDashboard.salary.period': string;
+  'employeeDashboard.salary.settlementPeriod': string;
+  'employeeDashboard.salary.downloadPayslip': string;
+  'employeeDashboard.salary.readOnly': string;
+  'employeeDashboard.salary.status.paid': string;
+  'employeeDashboard.salary.status.pending': string;
+  'employeeDashboard.salary.status.cancelled': string;
+  'employeeDashboard.salary.status.correction': string;
+  'employeeDashboard.salary.type.baseSalary': string;
+  'employeeDashboard.salary.type.bonus': string;
+  'employeeDashboard.salary.type.correction': string;
+  'employeeDashboard.salary.type.annualBonus': string;
+  'employeeDashboard.salary.bank.title': string;
+  'employeeDashboard.salary.bank.bankName': string;
+  'employeeDashboard.salary.bank.accountNumber': string;
+  'employeeDashboard.salary.bank.payoutMethod': string;
+  'employeeDashboard.salary.bank.lastUpdated': string;
+  'employeeDashboard.salary.history.title': string;
+  'employeeDashboard.salary.history.recordsCount': string;
+  'employeeDashboard.salary.history.col.paymentDate': string;
+  'employeeDashboard.salary.history.col.period': string;
+  'employeeDashboard.salary.history.col.gross': string;
+  'employeeDashboard.salary.history.col.net': string;
+  'employeeDashboard.salary.history.col.type': string;
+  'employeeDashboard.salary.history.col.status': string;
+  'employeeDashboard.salary.history.col.actions': string;
+  'employeeDashboard.salary.actions.details': string;
+  'employeeDashboard.salary.actions.downloadPdf': string;
+  'employeeDashboard.salary.details.title': string;
+  'employeeDashboard.salary.details.baseSalary': string;
+  'employeeDashboard.salary.details.bonus': string;
+  'employeeDashboard.salary.details.allowances': string;
+  'employeeDashboard.salary.details.overtime': string;
+  'employeeDashboard.salary.details.deductions': string;
+  'employeeDashboard.salary.details.socialContributions': string;
+  'employeeDashboard.salary.details.healthContribution': string;
+  'employeeDashboard.salary.details.tax': string;
+  'employeeDashboard.salary.pdf.title': string;
+  'employeeDashboard.salary.pdf.download': string;
+  'employeeDashboard.salary.pdf.closeMessage': string;
+  'employeeDashboard.salary.pdf.backendPlaceholder': string;
+  'employeeDashboard.salary.error.loadFailed': string;
+  'employeeDashboard.salary.error.noData': string;
+  'employeeDashboard.salary.error.noAccess': string;
+
   // Employee Dashboard – overview: HR requests tile
   'employeeDashboard.hrRequests.title': string;
   'employeeDashboard.hrRequests.pending': string;
