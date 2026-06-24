@@ -1,0 +1,644 @@
+import { useI18n } from '@/shared/contexts/I18nContext'
+import type { LanguageCode } from '@/shared/types/i18n'
+
+type ManagerTranslationKey =
+  | 'tabs.dashboard'
+  | 'tabs.team'
+  | 'tabs.requests'
+  | 'tabs.delegation'
+  | 'dashboard.directReports'
+  | 'dashboard.directReportsDesc'
+  | 'dashboard.pendingRequests'
+  | 'dashboard.pendingRequestsDesc'
+  | 'dashboard.absentToday'
+  | 'dashboard.absentTodayDesc'
+  | 'dashboard.absentNextSevenDays'
+  | 'dashboard.absentNextSevenDaysDesc'
+  | 'dashboard.vacationConflicts'
+  | 'dashboard.vacationConflictsDesc'
+  | 'dashboard.conflictAlert'
+  | 'audit.title'
+  | 'audit.date'
+  | 'audit.user'
+  | 'audit.operation'
+  | 'team.title'
+  | 'team.count'
+  | 'team.searchPlaceholder'
+  | 'team.employeeCard'
+  | 'team.col.employee'
+  | 'team.col.position'
+  | 'team.col.seniority'
+  | 'team.col.status'
+  | 'team.col.leave'
+  | 'team.col.absences'
+  | 'team.detail.department'
+  | 'team.detail.seniority'
+  | 'team.detail.remainingLeave'
+  | 'team.detail.absences'
+  | 'team.detail.project'
+  | 'team.mobile.seniority'
+  | 'team.mobile.leave'
+  | 'team.mobile.absences'
+  | 'requests.title'
+  | 'requests.summary'
+  | 'requests.col.employee'
+  | 'requests.col.type'
+  | 'requests.col.dateFrom'
+  | 'requests.col.dateTo'
+  | 'requests.col.days'
+  | 'requests.col.submittedAt'
+  | 'requests.col.status'
+  | 'requests.col.actions'
+  | 'requests.details'
+  | 'requests.approve'
+  | 'requests.reject'
+  | 'requests.submittedShort'
+  | 'details.title'
+  | 'details.status'
+  | 'details.employee'
+  | 'details.leaveType'
+  | 'details.dateFrom'
+  | 'details.dateTo'
+  | 'details.daysCount'
+  | 'details.submittedAt'
+  | 'details.employeeComment'
+  | 'details.conflictTitle'
+  | 'rejection.title'
+  | 'rejection.message'
+  | 'rejection.reason'
+  | 'rejection.placeholder'
+  | 'rejection.required'
+  | 'common.cancel'
+  | 'common.days'
+  | 'delegation.formTitle'
+  | 'delegation.formSubtitle'
+  | 'delegation.substitute'
+  | 'delegation.substitutePlaceholder'
+  | 'delegation.dateFrom'
+  | 'delegation.dateTo'
+  | 'delegation.required'
+  | 'delegation.dateOrder'
+  | 'delegation.save'
+  | 'delegation.activeTitle'
+  | 'delegation.noActive'
+  | 'delegation.logTitle'
+  | 'delegation.col.createdAt'
+  | 'delegation.col.substitute'
+  | 'delegation.col.dateFrom'
+  | 'delegation.col.dateTo'
+  | 'delegation.col.status'
+  | 'status.presence.present'
+  | 'status.presence.vacation'
+  | 'status.presence.delegation'
+  | 'status.presence.homeOffice'
+  | 'status.presence.absence'
+  | 'status.approval.pending'
+  | 'status.approval.approved'
+  | 'status.approval.rejected'
+  | 'status.delegation.active'
+  | 'status.delegation.scheduled'
+  | 'status.delegation.expired'
+  | 'leaveType.annual'
+  | 'leaveType.onDemand'
+  | 'leaveType.occasional'
+  | 'leaveType.childCare'
+  | 'leaveType.homeOffice'
+  | 'leaveType.delegation'
+
+const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> = {
+  en: {
+    'tabs.dashboard': 'Team dashboard',
+    'tabs.team': 'My employees',
+    'tabs.requests': 'Requests for approval',
+    'tabs.delegation': 'Approval delegation',
+    'dashboard.directReports': 'Direct reports',
+    'dashboard.directReportsDesc': 'Active employees in the reporting structure',
+    'dashboard.pendingRequests': 'Pending requests',
+    'dashboard.pendingRequestsDesc': 'Decisions requiring manager action',
+    'dashboard.absentToday': 'Absent today',
+    'dashboard.absentTodayDesc': 'Leaves, absences and business trips today',
+    'dashboard.absentNextSevenDays': 'Absent in 7 days',
+    'dashboard.absentNextSevenDaysDesc': 'Planned absences in the next week',
+    'dashboard.vacationConflicts': 'Leave conflicts',
+    'dashboard.vacationConflictsDesc': 'Requests conflicting with team coverage',
+    'dashboard.conflictAlert': 'A potential leave conflict was detected. Check critical process coverage before approval.',
+    'audit.title': 'Operation log',
+    'audit.date': 'Date',
+    'audit.user': 'User',
+    'audit.operation': 'Operation',
+    'team.title': 'My employees',
+    'team.count': '{count} people in the team',
+    'team.searchPlaceholder': 'Search employee...',
+    'team.employeeCard': 'Employee card',
+    'team.col.employee': 'Employee',
+    'team.col.position': 'Position',
+    'team.col.seniority': 'Seniority',
+    'team.col.status': 'Status',
+    'team.col.leave': 'Leave',
+    'team.col.absences': 'Absences',
+    'team.detail.department': 'Department',
+    'team.detail.seniority': 'Seniority',
+    'team.detail.remainingLeave': 'Remaining leave',
+    'team.detail.absences': 'Year absences',
+    'team.detail.project': 'Project',
+    'team.mobile.seniority': 'Seniority',
+    'team.mobile.leave': 'Leave',
+    'team.mobile.absences': 'Absences',
+    'requests.title': 'Requests for approval',
+    'requests.summary': '{pending} pending out of {total} total',
+    'requests.col.employee': 'Employee',
+    'requests.col.type': 'Request type',
+    'requests.col.dateFrom': 'Date from',
+    'requests.col.dateTo': 'Date to',
+    'requests.col.days': 'Days',
+    'requests.col.submittedAt': 'Submitted at',
+    'requests.col.status': 'Status',
+    'requests.col.actions': 'Actions',
+    'requests.details': 'Details',
+    'requests.approve': 'Approve',
+    'requests.reject': 'Reject',
+    'requests.submittedShort': 'Submitted',
+    'details.title': 'Request details',
+    'details.status': 'Status',
+    'details.employee': 'Employee',
+    'details.leaveType': 'Absence type',
+    'details.dateFrom': 'Date from',
+    'details.dateTo': 'Date to',
+    'details.daysCount': 'Number of days',
+    'details.submittedAt': 'Submitted at',
+    'details.employeeComment': 'Employee comment',
+    'details.conflictTitle': 'Leave conflict',
+    'rejection.title': 'Reject request',
+    'rejection.message': 'The request from {employee} will be marked as rejected.',
+    'rejection.reason': 'Rejection reason',
+    'rejection.placeholder': 'Briefly describe the reason for the decision...',
+    'rejection.required': 'Enter a rejection reason',
+    'common.cancel': 'Cancel',
+    'common.days': 'days',
+    'delegation.formTitle': 'Delegate configuration',
+    'delegation.formSubtitle': 'Select the person who will take over request approvals in the chosen period.',
+    'delegation.substitute': 'Delegate',
+    'delegation.substitutePlaceholder': 'Select employee...',
+    'delegation.dateFrom': 'Date from',
+    'delegation.dateTo': 'Date to',
+    'delegation.required': 'Fill in delegate and date range',
+    'delegation.dateOrder': 'Date to cannot be earlier than date from',
+    'delegation.save': 'Save delegation',
+    'delegation.activeTitle': 'Active delegation',
+    'delegation.noActive': 'No active approval delegation.',
+    'delegation.logTitle': 'Delegation log',
+    'delegation.col.createdAt': 'Created at',
+    'delegation.col.substitute': 'Delegate',
+    'delegation.col.dateFrom': 'Date from',
+    'delegation.col.dateTo': 'Date to',
+    'delegation.col.status': 'Status',
+    'status.presence.present': 'Present',
+    'status.presence.vacation': 'Vacation',
+    'status.presence.delegation': 'Business trip',
+    'status.presence.homeOffice': 'Home Office',
+    'status.presence.absence': 'Absence',
+    'status.approval.pending': 'Pending',
+    'status.approval.approved': 'Approved',
+    'status.approval.rejected': 'Rejected',
+    'status.delegation.active': 'Active',
+    'status.delegation.scheduled': 'Scheduled',
+    'status.delegation.expired': 'Expired',
+    'leaveType.annual': 'Annual leave',
+    'leaveType.onDemand': 'On-demand leave',
+    'leaveType.occasional': 'Occasional leave',
+    'leaveType.childCare': 'Child care',
+    'leaveType.homeOffice': 'Home Office',
+    'leaveType.delegation': 'Business trip',
+  },
+  pl: {
+    'tabs.dashboard': 'Dashboard zespołu',
+    'tabs.team': 'Moi pracownicy',
+    'tabs.requests': 'Wnioski do akceptacji',
+    'tabs.delegation': 'Zastępstwo akceptacyjne',
+    'dashboard.directReports': 'Liczba podwładnych',
+    'dashboard.directReportsDesc': 'Aktywni pracownicy w strukturze raportowania',
+    'dashboard.pendingRequests': 'Wnioski oczekujące',
+    'dashboard.pendingRequestsDesc': 'Decyzje wymagające akcji przełożonego',
+    'dashboard.absentToday': 'Nieobecni dzisiaj',
+    'dashboard.absentTodayDesc': 'Urlopy, absencje i delegacje na dziś',
+    'dashboard.absentNextSevenDays': 'Nieobecni w 7 dniach',
+    'dashboard.absentNextSevenDaysDesc': 'Planowane nieobecności w najbliższym tygodniu',
+    'dashboard.vacationConflicts': 'Konflikty urlopowe',
+    'dashboard.vacationConflictsDesc': 'Wnioski kolidujące z obsadą zespołu',
+    'dashboard.conflictAlert': 'Wykryto potencjalny konflikt urlopowy. Przed akceptacją sprawdź obsadę krytycznych procesów.',
+    'audit.title': 'Log operacji',
+    'audit.date': 'Data',
+    'audit.user': 'Użytkownik',
+    'audit.operation': 'Operacja',
+    'team.title': 'Moi pracownicy',
+    'team.count': '{count} osób w zespole',
+    'team.searchPlaceholder': 'Szukaj pracownika...',
+    'team.employeeCard': 'Karta pracownika',
+    'team.col.employee': 'Pracownik',
+    'team.col.position': 'Stanowisko',
+    'team.col.seniority': 'Staż pracy',
+    'team.col.status': 'Status',
+    'team.col.leave': 'Urlop',
+    'team.col.absences': 'Absencje',
+    'team.detail.department': 'Dział',
+    'team.detail.seniority': 'Staż pracy',
+    'team.detail.remainingLeave': 'Pozostały urlop',
+    'team.detail.absences': 'Absencje w roku',
+    'team.detail.project': 'Projekt',
+    'team.mobile.seniority': 'Staż',
+    'team.mobile.leave': 'Urlop',
+    'team.mobile.absences': 'Absencje',
+    'requests.title': 'Wnioski do akceptacji',
+    'requests.summary': '{pending} oczekujące z {total} wszystkich',
+    'requests.col.employee': 'Pracownik',
+    'requests.col.type': 'Typ wniosku',
+    'requests.col.dateFrom': 'Data od',
+    'requests.col.dateTo': 'Data do',
+    'requests.col.days': 'Dni',
+    'requests.col.submittedAt': 'Data złożenia',
+    'requests.col.status': 'Status',
+    'requests.col.actions': 'Akcje',
+    'requests.details': 'Szczegóły',
+    'requests.approve': 'Akceptuj',
+    'requests.reject': 'Odrzuć',
+    'requests.submittedShort': 'Złożono',
+    'details.title': 'Szczegóły wniosku',
+    'details.status': 'Status',
+    'details.employee': 'Pracownik',
+    'details.leaveType': 'Typ nieobecności',
+    'details.dateFrom': 'Data od',
+    'details.dateTo': 'Data do',
+    'details.daysCount': 'Liczba dni',
+    'details.submittedAt': 'Data złożenia',
+    'details.employeeComment': 'Komentarz pracownika',
+    'details.conflictTitle': 'Kolizja urlopowa',
+    'rejection.title': 'Odrzucenie wniosku',
+    'rejection.message': 'Wniosek pracownika {employee} zostanie oznaczony jako odrzucony.',
+    'rejection.reason': 'Powód odrzucenia',
+    'rejection.placeholder': 'Opisz krótko przyczynę decyzji...',
+    'rejection.required': 'Podaj powód odrzucenia',
+    'common.cancel': 'Anuluj',
+    'common.days': 'dni',
+    'delegation.formTitle': 'Konfiguracja zastępcy',
+    'delegation.formSubtitle': 'Ustaw osobę, która przejmie akceptację wniosków w wybranym okresie.',
+    'delegation.substitute': 'Zastępca',
+    'delegation.substitutePlaceholder': 'Wybierz pracownika...',
+    'delegation.dateFrom': 'Data od',
+    'delegation.dateTo': 'Data do',
+    'delegation.required': 'Uzupełnij zastępcę oraz zakres dat',
+    'delegation.dateOrder': 'Data do nie może być wcześniejsza niż data od',
+    'delegation.save': 'Zapisz zastępstwo',
+    'delegation.activeTitle': 'Aktywne zastępstwo',
+    'delegation.noActive': 'Brak aktywnego zastępstwa akceptacyjnego.',
+    'delegation.logTitle': 'Log zastępstw',
+    'delegation.col.createdAt': 'Data utworzenia',
+    'delegation.col.substitute': 'Zastępca',
+    'delegation.col.dateFrom': 'Data od',
+    'delegation.col.dateTo': 'Data do',
+    'delegation.col.status': 'Status',
+    'status.presence.present': 'Obecny',
+    'status.presence.vacation': 'Urlop',
+    'status.presence.delegation': 'Delegacja',
+    'status.presence.homeOffice': 'Home Office',
+    'status.presence.absence': 'Nieobecność',
+    'status.approval.pending': 'Oczekuje',
+    'status.approval.approved': 'Zaakceptowany',
+    'status.approval.rejected': 'Odrzucony',
+    'status.delegation.active': 'Aktywne',
+    'status.delegation.scheduled': 'Zaplanowane',
+    'status.delegation.expired': 'Zakończone',
+    'leaveType.annual': 'Urlop wypoczynkowy',
+    'leaveType.onDemand': 'Urlop na żądanie',
+    'leaveType.occasional': 'Urlop okolicznościowy',
+    'leaveType.childCare': 'Opieka nad dzieckiem',
+    'leaveType.homeOffice': 'Home Office',
+    'leaveType.delegation': 'Delegacja',
+  },
+  ro: {
+    'tabs.dashboard': 'Dashboard echipă',
+    'tabs.team': 'Angajații mei',
+    'tabs.requests': 'Cereri de aprobat',
+    'tabs.delegation': 'Delegare aprobare',
+    'dashboard.directReports': 'Subordonați',
+    'dashboard.directReportsDesc': 'Angajați activi în structura de raportare',
+    'dashboard.pendingRequests': 'Cereri în așteptare',
+    'dashboard.pendingRequestsDesc': 'Decizii care necesită acțiunea managerului',
+    'dashboard.absentToday': 'Absenți azi',
+    'dashboard.absentTodayDesc': 'Concedii, absențe și delegații de azi',
+    'dashboard.absentNextSevenDays': 'Absenți în 7 zile',
+    'dashboard.absentNextSevenDaysDesc': 'Absențe planificate în următoarea săptămână',
+    'dashboard.vacationConflicts': 'Conflicte concediu',
+    'dashboard.vacationConflictsDesc': 'Cereri care afectează acoperirea echipei',
+    'dashboard.conflictAlert': 'A fost detectat un posibil conflict de concediu. Verifică acoperirea proceselor critice înainte de aprobare.',
+    'audit.title': 'Jurnal operațiuni',
+    'audit.date': 'Data',
+    'audit.user': 'Utilizator',
+    'audit.operation': 'Operațiune',
+    'team.title': 'Angajații mei',
+    'team.count': '{count} persoane în echipă',
+    'team.searchPlaceholder': 'Caută angajat...',
+    'team.employeeCard': 'Fișa angajatului',
+    'team.col.employee': 'Angajat',
+    'team.col.position': 'Funcție',
+    'team.col.seniority': 'Vechime',
+    'team.col.status': 'Status',
+    'team.col.leave': 'Concediu',
+    'team.col.absences': 'Absențe',
+    'team.detail.department': 'Departament',
+    'team.detail.seniority': 'Vechime',
+    'team.detail.remainingLeave': 'Concediu rămas',
+    'team.detail.absences': 'Absențe în an',
+    'team.detail.project': 'Proiect',
+    'team.mobile.seniority': 'Vechime',
+    'team.mobile.leave': 'Concediu',
+    'team.mobile.absences': 'Absențe',
+    'requests.title': 'Cereri de aprobat',
+    'requests.summary': '{pending} în așteptare din {total} total',
+    'requests.col.employee': 'Angajat',
+    'requests.col.type': 'Tip cerere',
+    'requests.col.dateFrom': 'Data de la',
+    'requests.col.dateTo': 'Data până la',
+    'requests.col.days': 'Zile',
+    'requests.col.submittedAt': 'Data depunerii',
+    'requests.col.status': 'Status',
+    'requests.col.actions': 'Acțiuni',
+    'requests.details': 'Detalii',
+    'requests.approve': 'Aprobă',
+    'requests.reject': 'Respinge',
+    'requests.submittedShort': 'Depusă',
+    'details.title': 'Detalii cerere',
+    'details.status': 'Status',
+    'details.employee': 'Angajat',
+    'details.leaveType': 'Tip absență',
+    'details.dateFrom': 'Data de la',
+    'details.dateTo': 'Data până la',
+    'details.daysCount': 'Număr de zile',
+    'details.submittedAt': 'Data depunerii',
+    'details.employeeComment': 'Comentariul angajatului',
+    'details.conflictTitle': 'Conflict de concediu',
+    'rejection.title': 'Respingere cerere',
+    'rejection.message': 'Cererea angajatului {employee} va fi marcată ca respinsă.',
+    'rejection.reason': 'Motivul respingerii',
+    'rejection.placeholder': 'Descrie pe scurt motivul deciziei...',
+    'rejection.required': 'Introdu motivul respingerii',
+    'common.cancel': 'Anulează',
+    'common.days': 'zile',
+    'delegation.formTitle': 'Configurare delegat',
+    'delegation.formSubtitle': 'Alege persoana care va prelua aprobările cererilor în perioada selectată.',
+    'delegation.substitute': 'Delegat',
+    'delegation.substitutePlaceholder': 'Selectează angajat...',
+    'delegation.dateFrom': 'Data de la',
+    'delegation.dateTo': 'Data până la',
+    'delegation.required': 'Completează delegatul și intervalul de date',
+    'delegation.dateOrder': 'Data până la nu poate fi anterioară datei de la',
+    'delegation.save': 'Salvează delegarea',
+    'delegation.activeTitle': 'Delegare activă',
+    'delegation.noActive': 'Nu există delegare activă de aprobare.',
+    'delegation.logTitle': 'Jurnal delegări',
+    'delegation.col.createdAt': 'Creată la',
+    'delegation.col.substitute': 'Delegat',
+    'delegation.col.dateFrom': 'Data de la',
+    'delegation.col.dateTo': 'Data până la',
+    'delegation.col.status': 'Status',
+    'status.presence.present': 'Prezent',
+    'status.presence.vacation': 'Concediu',
+    'status.presence.delegation': 'Delegație',
+    'status.presence.homeOffice': 'Home Office',
+    'status.presence.absence': 'Absență',
+    'status.approval.pending': 'În așteptare',
+    'status.approval.approved': 'Aprobat',
+    'status.approval.rejected': 'Respins',
+    'status.delegation.active': 'Activă',
+    'status.delegation.scheduled': 'Planificată',
+    'status.delegation.expired': 'Încheiată',
+    'leaveType.annual': 'Concediu anual',
+    'leaveType.onDemand': 'Concediu la cerere',
+    'leaveType.occasional': 'Concediu ocazional',
+    'leaveType.childCare': 'Îngrijire copil',
+    'leaveType.homeOffice': 'Home Office',
+    'leaveType.delegation': 'Delegație',
+  },
+  hu: {
+    'tabs.dashboard': 'Csapat dashboard',
+    'tabs.team': 'Munkatársaim',
+    'tabs.requests': 'Jóváhagyandó kérelmek',
+    'tabs.delegation': 'Jóváhagyási helyettesítés',
+    'dashboard.directReports': 'Beosztottak száma',
+    'dashboard.directReportsDesc': 'Aktív munkatársak a jelentési struktúrában',
+    'dashboard.pendingRequests': 'Függő kérelmek',
+    'dashboard.pendingRequestsDesc': 'Vezetői döntést igénylő kérelmek',
+    'dashboard.absentToday': 'Ma hiányzók',
+    'dashboard.absentTodayDesc': 'Mai szabadságok, távollétek és kiküldetések',
+    'dashboard.absentNextSevenDays': 'Hiányzók 7 napon belül',
+    'dashboard.absentNextSevenDaysDesc': 'Tervezett távollétek a következő héten',
+    'dashboard.vacationConflicts': 'Szabadságütközések',
+    'dashboard.vacationConflictsDesc': 'Csapatlefedettséggel ütköző kérelmek',
+    'dashboard.conflictAlert': 'Lehetséges szabadságütközés észlelve. Jóváhagyás előtt ellenőrizd a kritikus folyamatok lefedettségét.',
+    'audit.title': 'Műveleti napló',
+    'audit.date': 'Dátum',
+    'audit.user': 'Felhasználó',
+    'audit.operation': 'Művelet',
+    'team.title': 'Munkatársaim',
+    'team.count': '{count} fő a csapatban',
+    'team.searchPlaceholder': 'Munkatárs keresése...',
+    'team.employeeCard': 'Munkatársi kártya',
+    'team.col.employee': 'Munkatárs',
+    'team.col.position': 'Pozíció',
+    'team.col.seniority': 'Munkaviszony',
+    'team.col.status': 'Státusz',
+    'team.col.leave': 'Szabadság',
+    'team.col.absences': 'Távollétek',
+    'team.detail.department': 'Osztály',
+    'team.detail.seniority': 'Munkaviszony',
+    'team.detail.remainingLeave': 'Fennmaradó szabadság',
+    'team.detail.absences': 'Éves távollétek',
+    'team.detail.project': 'Projekt',
+    'team.mobile.seniority': 'Munkaviszony',
+    'team.mobile.leave': 'Szabadság',
+    'team.mobile.absences': 'Távollétek',
+    'requests.title': 'Jóváhagyandó kérelmek',
+    'requests.summary': '{pending} függő a(z) {total} összesből',
+    'requests.col.employee': 'Munkatárs',
+    'requests.col.type': 'Kérelem típusa',
+    'requests.col.dateFrom': 'Dátum -tól',
+    'requests.col.dateTo': 'Dátum -ig',
+    'requests.col.days': 'Napok',
+    'requests.col.submittedAt': 'Benyújtás dátuma',
+    'requests.col.status': 'Státusz',
+    'requests.col.actions': 'Műveletek',
+    'requests.details': 'Részletek',
+    'requests.approve': 'Jóváhagyás',
+    'requests.reject': 'Elutasítás',
+    'requests.submittedShort': 'Benyújtva',
+    'details.title': 'Kérelem részletei',
+    'details.status': 'Státusz',
+    'details.employee': 'Munkatárs',
+    'details.leaveType': 'Távollét típusa',
+    'details.dateFrom': 'Dátum -tól',
+    'details.dateTo': 'Dátum -ig',
+    'details.daysCount': 'Napok száma',
+    'details.submittedAt': 'Benyújtás dátuma',
+    'details.employeeComment': 'Munkatársi megjegyzés',
+    'details.conflictTitle': 'Szabadságütközés',
+    'rejection.title': 'Kérelem elutasítása',
+    'rejection.message': '{employee} kérelme elutasítottként lesz megjelölve.',
+    'rejection.reason': 'Elutasítás oka',
+    'rejection.placeholder': 'Röviden írd le a döntés okát...',
+    'rejection.required': 'Add meg az elutasítás okát',
+    'common.cancel': 'Mégse',
+    'common.days': 'nap',
+    'delegation.formTitle': 'Helyettes konfigurálása',
+    'delegation.formSubtitle': 'Válaszd ki, ki veszi át a kérelmek jóváhagyását a megadott időszakban.',
+    'delegation.substitute': 'Helyettes',
+    'delegation.substitutePlaceholder': 'Munkatárs kiválasztása...',
+    'delegation.dateFrom': 'Dátum -tól',
+    'delegation.dateTo': 'Dátum -ig',
+    'delegation.required': 'Töltsd ki a helyettest és a dátumtartományt',
+    'delegation.dateOrder': 'A záró dátum nem lehet korábbi a kezdő dátumnál',
+    'delegation.save': 'Helyettesítés mentése',
+    'delegation.activeTitle': 'Aktív helyettesítés',
+    'delegation.noActive': 'Nincs aktív jóváhagyási helyettesítés.',
+    'delegation.logTitle': 'Helyettesítési napló',
+    'delegation.col.createdAt': 'Létrehozva',
+    'delegation.col.substitute': 'Helyettes',
+    'delegation.col.dateFrom': 'Dátum -tól',
+    'delegation.col.dateTo': 'Dátum -ig',
+    'delegation.col.status': 'Státusz',
+    'status.presence.present': 'Jelen',
+    'status.presence.vacation': 'Szabadság',
+    'status.presence.delegation': 'Kiküldetés',
+    'status.presence.homeOffice': 'Home Office',
+    'status.presence.absence': 'Távollét',
+    'status.approval.pending': 'Függőben',
+    'status.approval.approved': 'Jóváhagyva',
+    'status.approval.rejected': 'Elutasítva',
+    'status.delegation.active': 'Aktív',
+    'status.delegation.scheduled': 'Ütemezett',
+    'status.delegation.expired': 'Lejárt',
+    'leaveType.annual': 'Éves szabadság',
+    'leaveType.onDemand': 'Igény szerinti szabadság',
+    'leaveType.occasional': 'Rendkívüli szabadság',
+    'leaveType.childCare': 'Gyermekgondozás',
+    'leaveType.homeOffice': 'Home Office',
+    'leaveType.delegation': 'Kiküldetés',
+  },
+  nl: {
+    'tabs.dashboard': 'Teamdashboard',
+    'tabs.team': 'Mijn medewerkers',
+    'tabs.requests': 'Aanvragen ter goedkeuring',
+    'tabs.delegation': 'Goedkeuringsvervanging',
+    'dashboard.directReports': 'Directe medewerkers',
+    'dashboard.directReportsDesc': 'Actieve medewerkers in de rapportagestructuur',
+    'dashboard.pendingRequests': 'Openstaande aanvragen',
+    'dashboard.pendingRequestsDesc': 'Beslissingen die actie van de manager vereisen',
+    'dashboard.absentToday': 'Vandaag afwezig',
+    'dashboard.absentTodayDesc': 'Verlof, afwezigheden en dienstreizen vandaag',
+    'dashboard.absentNextSevenDays': 'Afwezig in 7 dagen',
+    'dashboard.absentNextSevenDaysDesc': 'Geplande afwezigheden in de komende week',
+    'dashboard.vacationConflicts': 'Verlofconflicten',
+    'dashboard.vacationConflictsDesc': 'Aanvragen die botsen met teambezetting',
+    'dashboard.conflictAlert': 'Er is een mogelijk verlofconflict gedetecteerd. Controleer de bezetting van kritieke processen vóór goedkeuring.',
+    'audit.title': 'Operatielog',
+    'audit.date': 'Datum',
+    'audit.user': 'Gebruiker',
+    'audit.operation': 'Operatie',
+    'team.title': 'Mijn medewerkers',
+    'team.count': '{count} mensen in het team',
+    'team.searchPlaceholder': 'Zoek medewerker...',
+    'team.employeeCard': 'Medewerkerskaart',
+    'team.col.employee': 'Medewerker',
+    'team.col.position': 'Functie',
+    'team.col.seniority': 'Diensttijd',
+    'team.col.status': 'Status',
+    'team.col.leave': 'Verlof',
+    'team.col.absences': 'Afwezigheden',
+    'team.detail.department': 'Afdeling',
+    'team.detail.seniority': 'Diensttijd',
+    'team.detail.remainingLeave': 'Resterend verlof',
+    'team.detail.absences': 'Afwezigheden dit jaar',
+    'team.detail.project': 'Project',
+    'team.mobile.seniority': 'Diensttijd',
+    'team.mobile.leave': 'Verlof',
+    'team.mobile.absences': 'Afwezigheden',
+    'requests.title': 'Aanvragen ter goedkeuring',
+    'requests.summary': '{pending} openstaand van {total} totaal',
+    'requests.col.employee': 'Medewerker',
+    'requests.col.type': 'Aanvraagtype',
+    'requests.col.dateFrom': 'Datum vanaf',
+    'requests.col.dateTo': 'Datum tot',
+    'requests.col.days': 'Dagen',
+    'requests.col.submittedAt': 'Ingediend op',
+    'requests.col.status': 'Status',
+    'requests.col.actions': 'Acties',
+    'requests.details': 'Details',
+    'requests.approve': 'Goedkeuren',
+    'requests.reject': 'Afwijzen',
+    'requests.submittedShort': 'Ingediend',
+    'details.title': 'Aanvraagdetails',
+    'details.status': 'Status',
+    'details.employee': 'Medewerker',
+    'details.leaveType': 'Afwezigheidstype',
+    'details.dateFrom': 'Datum vanaf',
+    'details.dateTo': 'Datum tot',
+    'details.daysCount': 'Aantal dagen',
+    'details.submittedAt': 'Ingediend op',
+    'details.employeeComment': 'Opmerking medewerker',
+    'details.conflictTitle': 'Verlofconflict',
+    'rejection.title': 'Aanvraag afwijzen',
+    'rejection.message': 'De aanvraag van {employee} wordt gemarkeerd als afgewezen.',
+    'rejection.reason': 'Reden van afwijzing',
+    'rejection.placeholder': 'Beschrijf kort de reden van de beslissing...',
+    'rejection.required': 'Voer een reden voor afwijzing in',
+    'common.cancel': 'Annuleren',
+    'common.days': 'dagen',
+    'delegation.formTitle': 'Vervanger configureren',
+    'delegation.formSubtitle': 'Kies wie de aanvraaggoedkeuringen overneemt in de geselecteerde periode.',
+    'delegation.substitute': 'Vervanger',
+    'delegation.substitutePlaceholder': 'Selecteer medewerker...',
+    'delegation.dateFrom': 'Datum vanaf',
+    'delegation.dateTo': 'Datum tot',
+    'delegation.required': 'Vul vervanger en datumbereik in',
+    'delegation.dateOrder': 'Datum tot mag niet vóór datum vanaf liggen',
+    'delegation.save': 'Vervanging opslaan',
+    'delegation.activeTitle': 'Actieve vervanging',
+    'delegation.noActive': 'Geen actieve goedkeuringsvervanging.',
+    'delegation.logTitle': 'Vervangingslog',
+    'delegation.col.createdAt': 'Aangemaakt op',
+    'delegation.col.substitute': 'Vervanger',
+    'delegation.col.dateFrom': 'Datum vanaf',
+    'delegation.col.dateTo': 'Datum tot',
+    'delegation.col.status': 'Status',
+    'status.presence.present': 'Aanwezig',
+    'status.presence.vacation': 'Verlof',
+    'status.presence.delegation': 'Dienstreis',
+    'status.presence.homeOffice': 'Home Office',
+    'status.presence.absence': 'Afwezigheid',
+    'status.approval.pending': 'In behandeling',
+    'status.approval.approved': 'Goedgekeurd',
+    'status.approval.rejected': 'Afgewezen',
+    'status.delegation.active': 'Actief',
+    'status.delegation.scheduled': 'Gepland',
+    'status.delegation.expired': 'Verlopen',
+    'leaveType.annual': 'Jaarlijks verlof',
+    'leaveType.onDemand': 'Verlof op aanvraag',
+    'leaveType.occasional': 'Bijzonder verlof',
+    'leaveType.childCare': 'Kinderzorg',
+    'leaveType.homeOffice': 'Home Office',
+    'leaveType.delegation': 'Dienstreis',
+  },
+}
+
+export function useManagerT() {
+  const { language } = useI18n()
+
+  return (key: ManagerTranslationKey, params?: Record<string, string | number>) => {
+    const template = translations[language]?.[key] ?? translations.en[key] ?? key
+    if (!params) return template
+
+    return Object.entries(params).reduce(
+      (value, [paramKey, paramValue]) =>
+        value.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(paramValue)),
+      template
+    )
+  }
+}

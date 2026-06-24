@@ -1,1 +1,8 @@
 export { ManagerPanel } from './ManagerPanel'
+export { ManagerDashboard } from './ManagerDashboard'
+export { TeamStatisticsCard } from './TeamStatisticsCard'
+export { TeamMembersTable } from './TeamMembersTable'
+export { PendingRequestsTable } from './PendingRequestsTable'
+export { ApprovalRequestDetails } from './ApprovalRequestDetails'
+export { DelegationSettings } from './DelegationSettings'
+export { AuditLogTable } from './AuditLogTable'
