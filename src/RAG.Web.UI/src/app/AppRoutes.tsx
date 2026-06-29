@@ -37,7 +37,6 @@ const ManagerPanelPromise = import('@/features/employee-dashboard/manager-panel'
 const PersonalDataPromise = import('@/features/employee-dashboard/personal-data').then(module => ({ default: module.PersonalData }))
 const LeaveRequestPromise = import('@/features/employee-dashboard/leave-request').then(module => ({ default: module.LeaveRequest }))
 const SalaryPromise = import('@/features/employee-dashboard/payroll').then(module => ({ default: module.PayrollPage }))
-const CertificatesPromise = import('@/features/employee-dashboard/certificates').then(module => ({ default: module.Certificates }))
 const DocumentsPromise = import('@/features/employee-dashboard/documents').then(module => ({ default: module.Documents }))
 
 // Component loaders using use() hook
@@ -164,11 +163,6 @@ function LeaveRequestLoader() {
 function SalaryLoader() {
   const Salary = useAsyncComponent(SalaryPromise)
   return <Salary />
-}
-
-function CertificatesLoader() {
-  const Certificates = useAsyncComponent(CertificatesPromise)
-  return <Certificates />
 }
 
 function DocumentsLoader() {
@@ -311,14 +305,6 @@ export function createAppRouter() {
                 element: (
                   <RouteSuspense>
                     <SalaryLoader />
-                  </RouteSuspense>
-                ),
-              },
-              {
-                path: 'certificates',
-                element: (
-                  <RouteSuspense>
-                    <CertificatesLoader />
                   </RouteSuspense>
                 ),
               },

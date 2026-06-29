@@ -1,1 +1,0 @@
-export { Certificates } from './components'

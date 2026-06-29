@@ -1,5 +1,5 @@
 import React from 'react'
-import { BarChart3, Briefcase, User, CalendarDays, Banknote, FileCheck, FolderOpen } from 'lucide-react'
+import { BarChart3, Briefcase, User, CalendarDays, Banknote, FolderOpen } from 'lucide-react'
 import { PanelSidebar, type PanelSidebarItem } from '@/shared/components/layout'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
@@ -51,12 +51,6 @@ export function EmployeeDashboardSidebar({ isActiveRoute }: Props) {
       visible: true,
     },
     {
-      to: '/employee-dashboard/certificates',
-      icon: FileCheck,
-      label: t('employeeDashboard.certificates'),
-      visible: true,
-    },
-    {
       to: '/employee-dashboard/documents',
       icon: FolderOpen,
       label: t('employeeDashboard.documents'),
@@ -64,7 +58,7 @@ export function EmployeeDashboardSidebar({ isActiveRoute }: Props) {
     },
   ] satisfies EmployeeDashboardNavigationItem[])
     .filter((item) => item.visible)
-    .map(({ visible, ...item }) => item)
+    .map(({ visible: _visible, ...item }) => item)
 
   return (
     <PanelSidebar
