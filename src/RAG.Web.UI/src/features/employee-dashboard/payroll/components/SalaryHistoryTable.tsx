@@ -44,6 +44,9 @@ export function SalaryHistoryTable({
           <thead>
             <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {t('employeeDashboard.salary.history.col.actions')}
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {t('employeeDashboard.salary.history.col.paymentDate')}
               </th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -61,9 +64,6 @@ export function SalaryHistoryTable({
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {t('employeeDashboard.salary.history.col.status')}
               </th>
-              <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                {t('employeeDashboard.salary.history.col.actions')}
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -78,26 +78,8 @@ export function SalaryHistoryTable({
                       : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
                   }`}
                 >
-                  <td className="px-5 py-3.5 text-gray-600 dark:text-gray-300 tabular-nums">
-                    {formatSalaryDate(payment.paymentDate, language)}
-                  </td>
-                  <td className="px-4 py-3.5 font-medium text-gray-900 dark:text-gray-100">
-                    {payment.periodLabel}
-                  </td>
-                  <td className="px-4 py-3.5 text-right text-gray-600 dark:text-gray-300 tabular-nums">
-                    {formatSalaryMoney(payment.grossAmount, payment.currency, language)}
-                  </td>
-                  <td className="px-4 py-3.5 text-right font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
-                    {formatSalaryMoney(payment.netAmount, payment.currency, language)}
-                  </td>
-                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300">
-                    {salaryPaymentTypeLabel(payment.paymentType, t)}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <SalaryStatusBadge status={payment.status} />
-                  </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center justify-end gap-3">
+                    <div className="flex items-center justify-start gap-3">
                       <button
                         type="button"
                         onClick={() => onSelect(payment)}
@@ -117,6 +99,24 @@ export function SalaryHistoryTable({
                       </button>
                     </div>
                   </td>
+                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300 tabular-nums">
+                    {formatSalaryDate(payment.paymentDate, language)}
+                  </td>
+                  <td className="px-4 py-3.5 font-medium text-gray-900 dark:text-gray-100">
+                    {payment.periodLabel}
+                  </td>
+                  <td className="px-4 py-3.5 text-right text-gray-600 dark:text-gray-300 tabular-nums">
+                    {formatSalaryMoney(payment.grossAmount, payment.currency, language)}
+                  </td>
+                  <td className="px-4 py-3.5 text-right font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
+                    {formatSalaryMoney(payment.netAmount, payment.currency, language)}
+                  </td>
+                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300">
+                    {salaryPaymentTypeLabel(payment.paymentType, t)}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <SalaryStatusBadge status={payment.status} />
+                  </td>
                 </tr>
               )
             })}
@@ -127,6 +127,23 @@ export function SalaryHistoryTable({
       <div className="lg:hidden divide-y divide-gray-100 dark:divide-slate-800">
         {payments.map((payment) => (
           <div key={payment.id} className="px-4 py-4 space-y-3">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => onSelect(payment)}
+                className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
+              >
+                {t('employeeDashboard.salary.actions.details')}
+              </button>
+              <button
+                type="button"
+                disabled={!canDownload || isDownloading || payment.status === 'pending'}
+                onClick={() => onDownload(payment.id)}
+                className="text-xs font-medium text-gray-600 dark:text-gray-300 hover:underline disabled:opacity-50"
+              >
+                {t('employeeDashboard.salary.actions.downloadPdf')}
+              </button>
+            </div>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -155,23 +172,6 @@ export function SalaryHistoryTable({
             <p className="text-xs text-gray-600 dark:text-gray-300">
               {salaryPaymentTypeLabel(payment.paymentType, t)}
             </p>
-            <div className="flex items-center gap-4 pt-1">
-              <button
-                type="button"
-                onClick={() => onSelect(payment)}
-                className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
-              >
-                {t('employeeDashboard.salary.actions.details')}
-              </button>
-              <button
-                type="button"
-                disabled={!canDownload || isDownloading || payment.status === 'pending'}
-                onClick={() => onDownload(payment.id)}
-                className="text-xs font-medium text-gray-600 dark:text-gray-300 hover:underline disabled:opacity-50"
-              >
-                {t('employeeDashboard.salary.actions.downloadPdf')}
-              </button>
-            </div>
           </div>
         ))}
       </div>
