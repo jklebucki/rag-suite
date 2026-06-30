@@ -51,11 +51,6 @@ const MOCK_DATA: LeaveRequestPageData = {
     total: 20,
   },
 
-  companies: [
-    { id: 'company-citronex', name: 'Citronex Sp. z o.o.' },
-    { id: 'company-polskie-pomidory', name: 'Polskie Pomidory Sp. z o.o.' },
-  ],
-
   substitutes: [
     { id: 'sub-001', fullName: 'Marek Nowak', position: 'Inżynier Oprogramowania' },
     { id: 'sub-002', fullName: 'Katarzyna Wiśniewska', position: 'Starszy Programista' },
@@ -152,6 +147,11 @@ const MOCK_DATA: LeaveRequestPageData = {
 // In-memory mutable copy for CRUD simulation
 let mockRequests = [...MOCK_DATA.requests]
 
+const DEFAULT_COMPANY = {
+  id: 'company-citronex',
+  name: 'Citronex Sp. z o.o.',
+}
+
 export async function getLeaveRequestPageData(
   _userId: string
 ): Promise<LeaveRequestPageData> {
@@ -169,12 +169,11 @@ export async function createLeaveRequest(
   const substitute = payload.substituteId
     ? MOCK_DATA.substitutes.find((s) => s.id === payload.substituteId)
     : undefined
-  const company = MOCK_DATA.companies.find((c) => c.id === payload.companyId)
 
   const newRecord: LeaveRequestRecord = {
     id: `lr-${Date.now()}`,
-    companyId: payload.companyId,
-    companyName: company?.name ?? payload.companyId,
+    companyId: DEFAULT_COMPANY.id,
+    companyName: DEFAULT_COMPANY.name,
     leaveType: payload.leaveType,
     dateFrom: payload.dateFrom,
     dateTo: payload.dateTo,

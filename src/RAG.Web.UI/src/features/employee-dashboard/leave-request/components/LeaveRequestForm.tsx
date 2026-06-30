@@ -2,12 +2,10 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { CheckCircle, Clock, FileText, Info, Paperclip, Send, X } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
-import { Input } from '@/shared/components/ui/Input'
 import { Textarea } from '@/shared/components/ui/Textarea'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import type {
   CreateLeaveRequestPayload,
-  LeaveCompany,
   LeaveSubstitute,
   LeaveType,
 } from '../types/leaveRequest'
@@ -24,7 +22,6 @@ const LEAVE_TYPES: LeaveType[] = [
 ]
 
 interface FormState {
-  companyId: string
   leaveType: LeaveType | ''
   dateFrom: string
   dateTo: string
@@ -33,7 +30,6 @@ interface FormState {
 }
 
 const INITIAL_FORM: FormState = {
-  companyId: '',
   leaveType: '',
   dateFrom: '',
   dateTo: '',
@@ -42,27 +38,21 @@ const INITIAL_FORM: FormState = {
 }
 
 interface LeaveRequestFormProps {
-  companies: LeaveCompany[]
   substitutes: LeaveSubstitute[]
   isSubmitting: boolean
   onSubmit: (payload: CreateLeaveRequestPayload) => Promise<void>
 }
 
 export function LeaveRequestForm({
-  companies,
   substitutes,
   isSubmitting,
   onSubmit,
 }: LeaveRequestFormProps) {
   const { t } = useI18n()
-  const defaultCompanyId = companies.length === 1 ? companies[0].id : ''
-  const createInitialForm = () => ({ ...INITIAL_FORM, companyId: defaultCompanyId })
 
-  const [form, setForm] = useState<FormState>(() => createInitialForm())
+  const [form, setForm] = useState<FormState>(INITIAL_FORM)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
-  const selectedCompany = companies.find((company) => company.id === form.companyId)
-  const shouldSelectCompany = companies.length > 1
 
   const daysCount = useMemo(
     () => countWorkingDays(form.dateFrom, form.dateTo),
@@ -76,8 +66,6 @@ export function LeaveRequestForm({
 
   function validate(): boolean {
     const next: Partial<Record<keyof FormState, string>> = {}
-    if (companies.length > 0 && !form.companyId)
-      next.companyId = t('employeeDashboard.leave.form.errors.companyRequired')
     if (!form.leaveType)
       next.leaveType = t('employeeDashboard.leave.form.errors.leaveTypeRequired')
     if (!form.dateFrom)
@@ -94,7 +82,6 @@ export function LeaveRequestForm({
     e.preventDefault()
     if (!validate()) return
     await onSubmit({
-      companyId: form.companyId,
       leaveType: form.leaveType as LeaveType,
       dateFrom: form.dateFrom,
       dateTo: form.dateTo,
@@ -102,14 +89,14 @@ export function LeaveRequestForm({
       substituteId: form.substituteId || undefined,
       comment: form.comment || undefined,
     })
-    setForm(createInitialForm())
+    setForm(INITIAL_FORM)
     setErrors({})
     setSubmitted(true)
     setTimeout(() => setSubmitted(false), 4000)
   }
 
   function handleCancel() {
-    setForm(createInitialForm())
+    setForm(INITIAL_FORM)
     setErrors({})
     setSubmitted(false)
   }
@@ -139,39 +126,6 @@ export function LeaveRequestForm({
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {companies.length > 0 && (
-            <div className="md:col-span-2">
-              <label htmlFor="companyId" className={labelClass}>
-                {t('employeeDashboard.leave.form.company')}
-                <span className="text-red-500 ml-1">*</span>
-              </label>
-              {shouldSelectCompany ? (
-                <select
-                  id="companyId"
-                  value={form.companyId}
-                  onChange={(e) => setField('companyId', e.target.value)}
-                  className={`form-select ${errors.companyId ? 'border-red-400 dark:border-red-500' : ''}`}
-                >
-                  <option value="">{t('employeeDashboard.leave.form.companyPlaceholder')}</option>
-                  {companies.map((company) => (
-                    <option key={company.id} value={company.id}>
-                      {company.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <Input
-                  id="companyId"
-                  value={selectedCompany?.name ?? ''}
-                  readOnly
-                  aria-readonly="true"
-                  className="bg-gray-50 dark:bg-slate-800"
-                />
-              )}
-              {errors.companyId && <p className={errorClass}>{errors.companyId}</p>}
-            </div>
-          )}
-
           <div className="md:col-span-2">
             <label htmlFor="leaveType" className={labelClass}>
               {t('employeeDashboard.leave.form.leaveType')}

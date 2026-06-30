@@ -658,6 +658,16 @@ export const en: TranslationKeys = {
   'employeeDashboard.leaveRequest': 'Leave Request',
   'employeeDashboard.salary': 'Salary',
   'employeeDashboard.documents': 'Documents',
+  'employeeDashboard.employmentContext.label': 'Company / employment',
+  'employeeDashboard.employmentContext.menuTitle': 'Select employment context',
+  'employeeDashboard.employmentContext.mockNotice': 'Mock context for future multi-company filtering.',
+  'employeeDashboard.employmentContext.loading': 'Loading employment context...',
+  'employeeDashboard.employmentContext.since': 'from {date}',
+  'employeeDashboard.employmentContext.status.active': 'active',
+  'employeeDashboard.employmentContext.status.ended': 'ended',
+  'employeeDashboard.employmentContext.status.suspended': 'suspended',
+  'employeeDashboard.employmentContext.error.loadFailed': 'Failed to load employment contexts.',
+  'employeeDashboard.employmentContext.error.noData': 'No employment contexts available.',
   'employeeDashboard.documents.subtitle': 'Employee and company documents available in read-only mode.',
   'employeeDashboard.documents.error.loadFailed': 'Failed to load documents.',
   'employeeDashboard.documents.error.noData': 'No document data available.',
@@ -738,8 +748,6 @@ export const en: TranslationKeys = {
 
   // Employee Dashboard – leave requests module: form
   'employeeDashboard.leave.form.title': 'Leave request form',
-  'employeeDashboard.leave.form.company': 'Company',
-  'employeeDashboard.leave.form.companyPlaceholder': 'Select company...',
   'employeeDashboard.leave.form.leaveType': 'Leave type',
   'employeeDashboard.leave.form.leaveTypePlaceholder': 'Select leave type...',
   'employeeDashboard.leave.form.dateFrom': 'Date from',
@@ -762,7 +770,6 @@ export const en: TranslationKeys = {
   'employeeDashboard.leave.form.submitSuccess': 'Leave request submitted. Awaiting manager approval.',
 
   // Employee Dashboard – leave requests module: form validation
-  'employeeDashboard.leave.form.errors.companyRequired': 'Please select a company',
   'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Please select a leave type',
   'employeeDashboard.leave.form.errors.dateFromRequired': 'Please enter a start date',
   'employeeDashboard.leave.form.errors.dateToRequired': 'Please enter an end date',

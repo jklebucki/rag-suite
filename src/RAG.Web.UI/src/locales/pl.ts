@@ -603,6 +603,16 @@ export const pl: TranslationKeys = {
   'employeeDashboard.leaveRequest': 'Wniosek urlopowy',
   'employeeDashboard.salary': 'Wynagrodzenie',
   'employeeDashboard.documents': 'Dokumenty',
+  'employeeDashboard.employmentContext.label': 'Firma / zatrudnienie',
+  'employeeDashboard.employmentContext.menuTitle': 'Wybierz kontekst zatrudnienia',
+  'employeeDashboard.employmentContext.mockNotice': 'Mockowy kontekst pod przyszłe filtrowanie multi-company.',
+  'employeeDashboard.employmentContext.loading': 'Ładowanie kontekstu zatrudnienia...',
+  'employeeDashboard.employmentContext.since': 'od {date}',
+  'employeeDashboard.employmentContext.status.active': 'aktywne',
+  'employeeDashboard.employmentContext.status.ended': 'zakończone',
+  'employeeDashboard.employmentContext.status.suspended': 'zawieszone',
+  'employeeDashboard.employmentContext.error.loadFailed': 'Nie udało się załadować kontekstów zatrudnienia.',
+  'employeeDashboard.employmentContext.error.noData': 'Brak dostępnych kontekstów zatrudnienia.',
   'employeeDashboard.documents.subtitle': 'Dokumenty pracownicze i firmowe dostępne tylko do odczytu.',
   'employeeDashboard.documents.error.loadFailed': 'Nie udało się załadować dokumentów.',
   'employeeDashboard.documents.error.noData': 'Brak danych dokumentów.',
@@ -1097,8 +1107,6 @@ export const pl: TranslationKeys = {
 
   // Employee Dashboard – Wnioski urlopowe: formularz
   'employeeDashboard.leave.form.title': 'Formularz wniosku urlopowego',
-  'employeeDashboard.leave.form.company': 'Firma',
-  'employeeDashboard.leave.form.companyPlaceholder': 'Wybierz firme...',
   'employeeDashboard.leave.form.leaveType': 'Typ urlopu',
   'employeeDashboard.leave.form.leaveTypePlaceholder': 'Wybierz typ urlopu...',
   'employeeDashboard.leave.form.dateFrom': 'Data od',
@@ -1121,7 +1129,6 @@ export const pl: TranslationKeys = {
   'employeeDashboard.leave.form.submitSuccess': 'Wniosek urlopowy został złożony. Oczekuje na akceptację przełożonego.',
 
   // Employee Dashboard – Wnioski urlopowe: walidacja formularza
-  'employeeDashboard.leave.form.errors.companyRequired': 'Wybierz firme',
   'employeeDashboard.leave.form.errors.leaveTypeRequired': 'Wybierz typ urlopu',
   'employeeDashboard.leave.form.errors.dateFromRequired': 'Podaj datę początkową',
   'employeeDashboard.leave.form.errors.dateToRequired': 'Podaj datę końcową',

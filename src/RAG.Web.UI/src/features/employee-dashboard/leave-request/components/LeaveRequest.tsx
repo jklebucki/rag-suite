@@ -38,7 +38,6 @@ export function LeaveRequest() {
 
   const balance = data?.leaveBalance ?? { annual: 0, carryover: 0, onDemand: 0, total: 0 }
   const requests = data?.requests ?? []
-  const companies = data?.companies ?? []
   const substitutes = data?.substitutes ?? []
 
   return (
@@ -59,7 +58,6 @@ export function LeaveRequest() {
             total={balance.total}
           />
           <LeaveRequestForm
-            companies={companies}
             substitutes={substitutes}
             isSubmitting={isSubmitting}
             onSubmit={submitRequest}

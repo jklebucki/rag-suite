@@ -678,6 +678,16 @@ export interface TranslationKeys {
   'employeeDashboard.leaveRequest': string;
   'employeeDashboard.salary': string;
   'employeeDashboard.documents': string;
+  'employeeDashboard.employmentContext.label': string;
+  'employeeDashboard.employmentContext.menuTitle': string;
+  'employeeDashboard.employmentContext.mockNotice': string;
+  'employeeDashboard.employmentContext.loading': string;
+  'employeeDashboard.employmentContext.since': string;
+  'employeeDashboard.employmentContext.status.active': string;
+  'employeeDashboard.employmentContext.status.ended': string;
+  'employeeDashboard.employmentContext.status.suspended': string;
+  'employeeDashboard.employmentContext.error.loadFailed': string;
+  'employeeDashboard.employmentContext.error.noData': string;
   'employeeDashboard.documents.subtitle': string;
   'employeeDashboard.documents.error.loadFailed': string;
   'employeeDashboard.documents.error.noData': string;
@@ -759,8 +769,6 @@ export interface TranslationKeys {
 
   // Employee Dashboard – leave requests module: form
   'employeeDashboard.leave.form.title': string;
-  'employeeDashboard.leave.form.company': string;
-  'employeeDashboard.leave.form.companyPlaceholder': string;
   'employeeDashboard.leave.form.leaveType': string;
   'employeeDashboard.leave.form.leaveTypePlaceholder': string;
   'employeeDashboard.leave.form.dateFrom': string;
@@ -783,7 +791,6 @@ export interface TranslationKeys {
   'employeeDashboard.leave.form.submitSuccess': string;
 
   // Employee Dashboard – leave requests module: form validation
-  'employeeDashboard.leave.form.errors.companyRequired': string;
   'employeeDashboard.leave.form.errors.leaveTypeRequired': string;
   'employeeDashboard.leave.form.errors.dateFromRequired': string;
   'employeeDashboard.leave.form.errors.dateToRequired': string;
