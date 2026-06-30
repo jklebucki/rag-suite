@@ -752,6 +752,11 @@ export interface TranslationKeys {
   'employeeDashboard.leave.balance.days': string;
   'employeeDashboard.leave.balance.daysUnit': string;
   'employeeDashboard.leave.balance.totalAvailable': string;
+  'employeeDashboard.leave.balance.availableDays': string;
+  'employeeDashboard.leave.balance.limitRatio': string;
+  'employeeDashboard.leave.balance.useBy': string;
+  'employeeDashboard.leave.balance.urgency': string;
+  'employeeDashboard.leave.balance.statutoryLimit': string;
 
   // Employee Dashboard – leave requests module: leave types
   'employeeDashboard.leave.type.annual': string;

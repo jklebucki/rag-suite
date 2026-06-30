@@ -731,6 +731,11 @@ export const en: TranslationKeys = {
   'employeeDashboard.leave.balance.days': 'days',
   'employeeDashboard.leave.balance.daysUnit': 'days',
   'employeeDashboard.leave.balance.totalAvailable': '{total} days available in total',
+  'employeeDashboard.leave.balance.availableDays': '{days} days available',
+  'employeeDashboard.leave.balance.limitRatio': '{value} / {limit} days',
+  'employeeDashboard.leave.balance.useBy': 'Use by: {date}',
+  'employeeDashboard.leave.balance.urgency': 'Usage urgency',
+  'employeeDashboard.leave.balance.statutoryLimit': 'On-demand leave limit',
 
   // Employee Dashboard – leave requests module: leave types
   'employeeDashboard.leave.type.annual': 'Annual leave',

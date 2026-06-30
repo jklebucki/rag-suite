@@ -1090,6 +1090,11 @@ export const pl: TranslationKeys = {
   'employeeDashboard.leave.balance.days': 'dni',
   'employeeDashboard.leave.balance.daysUnit': 'dni',
   'employeeDashboard.leave.balance.totalAvailable': 'Łącznie {total} dni dostępnych do wykorzystania',
+  'employeeDashboard.leave.balance.availableDays': '{days} dni dostępnych',
+  'employeeDashboard.leave.balance.limitRatio': '{value} / {limit} dni',
+  'employeeDashboard.leave.balance.useBy': 'Wykorzystaj do: {date}',
+  'employeeDashboard.leave.balance.urgency': 'Pilność wykorzystania',
+  'employeeDashboard.leave.balance.statutoryLimit': 'Limit urlopu na żądanie',
 
   // Employee Dashboard – Wnioski urlopowe: typy urlopu
   'employeeDashboard.leave.type.annual': 'Urlop wypoczynkowy',

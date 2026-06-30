@@ -55,7 +55,6 @@ export function LeaveRequest() {
             annual={balance.annual}
             carryover={balance.carryover}
             onDemand={balance.onDemand}
-            total={balance.total}
           />
           <LeaveRequestForm
             substitutes={substitutes}
