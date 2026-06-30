@@ -42,11 +42,16 @@ function severityConfig(severity: NotificationSeverity) {
 
 function categoryLabelKey(category: NotificationCategory): string {
   switch (category) {
-    case 'leave':      return 'employeeDashboard.notifications.category.leave'
-    case 'payslip':    return 'employeeDashboard.notifications.category.payslip'
-    case 'medical':    return 'employeeDashboard.notifications.category.medical'
-    case 'training':   return 'employeeDashboard.notifications.category.training'
-    default:           return 'employeeDashboard.notifications.category.general'
+    case 'leave':
+      return 'employeeDashboard.notifications.category.leave'
+    case 'payslip':
+      return 'employeeDashboard.notifications.category.payslip'
+    case 'medical':
+      return 'employeeDashboard.notifications.category.medical'
+    case 'training':
+      return 'employeeDashboard.notifications.category.training'
+    default:
+      return 'employeeDashboard.notifications.category.general'
   }
 }
 

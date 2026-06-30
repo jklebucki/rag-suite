@@ -15,8 +15,6 @@ interface QuickActionItem {
   labelKey: string
   colorClass: string
   bgClass: string
-  /** Replace with actual navigation path or action when backend is ready */
-  href?: string
   onClick?: () => void
 }
 

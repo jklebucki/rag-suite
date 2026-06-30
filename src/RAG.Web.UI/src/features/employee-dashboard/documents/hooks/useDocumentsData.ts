@@ -73,6 +73,21 @@ export function useDocumentsData(): UseDocumentsDataResult {
 
   const auditUserName = user?.fullName || user?.userName || user?.email || 'Current user'
 
+  const findDocumentWithCategory = useCallback(
+    (documentId: string) => {
+      if (!data) return null
+
+      const document = data.documents.find((item) => item.id === documentId)
+      if (!document) return null
+
+      const category = data.categories.find((item) => item.id === document.categoryId)
+      if (!category) return null
+
+      return { document, category }
+    },
+    [data]
+  )
+
   const selectDocument = useCallback(
     async (document: EmployeeDocument) => {
       setSelectedDocumentId(document.id)
@@ -96,13 +111,10 @@ export function useDocumentsData(): UseDocumentsDataResult {
 
   const downloadDocument = useCallback(
     async (documentId: string) => {
-      if (!user || !data) return
+      if (!user) return
 
-      const document = data.documents.find((item) => item.id === documentId)
-      if (!document) return
-
-      const category = data.categories.find((item) => item.id === document.categoryId)
-      if (!category) return
+      const documentWithCategory = findDocumentWithCategory(documentId)
+      if (!documentWithCategory) return
 
       setIsDownloading(true)
       setDownloadMessage(null)
@@ -111,8 +123,8 @@ export function useDocumentsData(): UseDocumentsDataResult {
         await downloadDocumentFile(user.id, documentId)
         const log = await saveDocumentAuditLog(
           user.id,
-          document,
-          category,
+          documentWithCategory.document,
+          documentWithCategory.category,
           'download',
           auditUserName
         )
@@ -122,7 +134,7 @@ export function useDocumentsData(): UseDocumentsDataResult {
         setIsDownloading(false)
       }
     },
-    [appendLog, auditUserName, data, user]
+    [appendLog, auditUserName, findDocumentWithCategory, user]
   )
 
   return {

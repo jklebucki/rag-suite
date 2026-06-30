@@ -37,7 +37,7 @@ export function useSalaryData(): UseSalaryDataResult {
           setIsLoading(false)
         }
       })
-      .catch((err: unknown) => {
+      .catch(() => {
         if (!cancelled) {
           setError('employeeDashboard.salary.error.loadFailed')
           setIsLoading(false)
