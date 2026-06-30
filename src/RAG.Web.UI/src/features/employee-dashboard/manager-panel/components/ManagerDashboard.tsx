@@ -17,7 +17,7 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-4">
         <TeamStatisticsCard
           title={t('dashboard.directReports')}
           value={stats.directReports}
