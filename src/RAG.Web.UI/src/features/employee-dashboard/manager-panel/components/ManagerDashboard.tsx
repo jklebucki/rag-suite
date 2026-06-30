@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarClock, ClipboardList, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ClipboardList, HeartPulse, Users, UserX } from 'lucide-react'
 import type { ManagerPanelData } from '../types/managerTypes'
 import { AuditLogTable } from './AuditLogTable'
 import { TeamStatisticsCard } from './TeamStatisticsCard'
@@ -11,6 +11,9 @@ interface ManagerDashboardProps {
 export function ManagerDashboard({ data }: ManagerDashboardProps) {
   const t = useManagerT()
   const stats = data.statistics
+  const sickLeaves = data.teamMembers.filter(
+    (member) => member.presenceStatus === 'absence'
+  ).length
 
   return (
     <div className="space-y-5">
@@ -35,10 +38,11 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
           description={t('dashboard.absentTodayDesc')}
         />
         <TeamStatisticsCard
-          title={t('dashboard.absentNextSevenDays')}
-          value={stats.absentNextSevenDays}
-          icon={CalendarClock}
-          description={t('dashboard.absentNextSevenDaysDesc')}
+          title={t('dashboard.sickLeaves')}
+          value={sickLeaves}
+          icon={HeartPulse}
+          description={t('dashboard.sickLeavesDesc')}
+          tone="muted"
         />
         <TeamStatisticsCard
           title={t('dashboard.vacationConflicts')}
