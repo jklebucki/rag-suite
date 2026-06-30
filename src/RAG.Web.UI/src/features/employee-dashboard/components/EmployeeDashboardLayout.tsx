@@ -16,7 +16,7 @@ export function EmployeeDashboardLayout() {
           />
         }
         header={
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             <EmploymentContextDropdown />
           </div>
         }

@@ -41,8 +41,8 @@ export function EmploymentContextDropdown() {
 
   if (isLoading) {
     return (
-      <div className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 dark:border-slate-800 dark:bg-slate-900 dark:text-gray-400">
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
+      <div className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs text-gray-500 dark:border-slate-800 dark:bg-slate-900 dark:text-gray-400">
+        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
         {t('employeeDashboard.employmentContext.loading')}
       </div>
     )
@@ -50,7 +50,7 @@ export function EmploymentContextDropdown() {
 
   if (error || !activeContext) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-300">
+      <div className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs text-red-700 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-300">
         {error ? t(error as keyof TranslationKeys) : t('employeeDashboard.employmentContext.error.noData')}
       </div>
     )
@@ -61,24 +61,24 @@ export function EmploymentContextDropdown() {
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2 text-left shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 sm:min-w-[360px]"
+        className="flex min-h-9 w-full items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-left shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 sm:min-w-[320px]"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
-        <span className="flex min-w-0 items-center gap-3">
-          <span className="rounded-lg bg-primary-50 p-2 dark:bg-primary-900/20">
-            <Building2 className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="rounded-md bg-primary-50 p-1.5 dark:bg-primary-900/20">
+            <Building2 className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
           </span>
           <span className="min-w-0">
-            <span className="block text-xs font-medium text-gray-500 dark:text-gray-400">
+            <span className="block text-[10px] font-medium leading-3 text-gray-500 dark:text-gray-400">
               {t('employeeDashboard.employmentContext.label')}
             </span>
-            <span className="block truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <span className="block truncate text-sm font-semibold leading-5 text-gray-900 dark:text-gray-100">
               {activeContext.companyName} - {activeContext.position}
             </span>
           </span>
         </span>
-        <ChevronDown className={`h-4 w-4 flex-shrink-0 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-3.5 w-3.5 flex-shrink-0 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
