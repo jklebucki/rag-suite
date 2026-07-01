@@ -395,6 +395,7 @@ export const hu: TranslationKeys = {
   'settings.llm.actions.saving': 'Mentés...',
   'settings.llm.actions.save': 'Beállítások mentése',
   'settings.llm.messages.load_error': 'Az LLM beállítások betöltése sikertelen',
+  'settings.llm.messages.unavailable': 'Az LLM nem érhető el - ellenőrizd az LLM szolgáltatást/szervert.',
   'settings.llm.messages.update_success': 'Az LLM beállítások frissítése sikerült',
   'settings.llm.messages.update_error': 'Az LLM beállítások frissítése sikertelen',
   'settings.llm.validation.url_required': 'Az URL megadása kötelező',

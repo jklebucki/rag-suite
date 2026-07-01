@@ -291,6 +291,7 @@ export const pl: TranslationKeys = {
   'settings.llm.actions.saving': 'Zapisywanie...',
   'settings.llm.actions.save': 'Zapisz ustawienia',
   'settings.llm.messages.load_error': 'Nie udało się wczytać ustawień LLM',
+  'settings.llm.messages.unavailable': 'LLM jest niedostępny - sprawdź usługę/serwer LLM.',
   'settings.llm.messages.update_success': 'Ustawienia LLM zostały zaktualizowane',
   'settings.llm.messages.update_error': 'Nie udało się zaktualizować ustawień LLM',
   'settings.llm.validation.url_required': 'Adres URL jest wymagany',

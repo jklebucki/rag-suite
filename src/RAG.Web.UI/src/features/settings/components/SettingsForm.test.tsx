@@ -12,29 +12,33 @@ import { SettingsForm } from './SettingsForm'
 // Mock dependencies
 vi.mock('@/shared/contexts/I18nContext', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: mockT,
     language: 'en',
   }),
 }))
 
 vi.mock('@/shared/contexts', () => ({
   useToast: () => ({
-    addToast: vi.fn(),
+    addToast: mockAddToast,
   }),
 }))
 
 // Use vi.hoisted to ensure mocks are available in vi.mock
-const { mockGetLlmSettings, mockUpdateLlmSettings, mockGetAvailableLlmModelsFromUrl, mockValidateLlmSettings } = vi.hoisted(() => {
+const { mockAddToast, mockGetLlmSettings, mockUpdateLlmSettings, mockGetAvailableLlmModelsFromUrl, mockValidateLlmSettings, mockT } = vi.hoisted(() => {
+  const mockAddToast = vi.fn()
   const mockGetLlmSettings = vi.fn()
   const mockUpdateLlmSettings = vi.fn()
   const mockGetAvailableLlmModelsFromUrl = vi.fn()
   const mockValidateLlmSettings = vi.fn().mockReturnValue({ isValid: true, errors: {} })
+  const mockT = vi.fn((key: string) => key)
   
   return {
+    mockAddToast,
     mockGetLlmSettings,
     mockUpdateLlmSettings,
     mockGetAvailableLlmModelsFromUrl,
     mockValidateLlmSettings,
+    mockT,
   }
 })
 
@@ -47,7 +51,7 @@ vi.mock('@/features/settings/services/llm.service', () => ({
 }))
 
 vi.mock('@/utils/llmValidation', () => ({
-  validateLlmSettings: (settings: any) => mockValidateLlmSettings(settings),
+  validateLlmSettings: (settings: unknown) => mockValidateLlmSettings(settings),
 }))
 
 vi.mock('@/utils/logger', () => ({
@@ -96,6 +100,46 @@ describe('SettingsForm', () => {
       expect(submitButton).toBeInTheDocument()
       expect(submitButton).toHaveAttribute('type', 'submit')
     })
+  })
+
+  it('should show a single toast when loading settings fails', async () => {
+    mockGetLlmSettings.mockRejectedValue(new Error('load failed'))
+
+    render(<SettingsForm />)
+
+    await waitFor(() => {
+      expect(mockAddToast).toHaveBeenCalledTimes(1)
+    })
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    })
+
+    expect(mockGetLlmSettings).toHaveBeenCalledTimes(1)
+    expect(mockAddToast).toHaveBeenCalledTimes(1)
+    expect(mockAddToast).toHaveBeenCalledWith({
+      type: 'error',
+      title: 'common.error',
+      message: 'settings.llm.messages.load_error',
+    })
+  })
+
+  it('should keep saved model visible when LLM model lookup fails', async () => {
+    mockGetAvailableLlmModelsFromUrl.mockRejectedValue(new Error('LLM unavailable'))
+
+    render(<SettingsForm />)
+
+    await waitFor(() => {
+      expect(mockGetAvailableLlmModelsFromUrl).toHaveBeenCalled()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('settings.llm.messages.unavailable')).toBeInTheDocument()
+      expect(screen.getByRole('option', { name: 'llama2' })).toBeInTheDocument()
+    })
+
+    const modelSelect = document.querySelector('select[name="model"]') as HTMLSelectElement
+    expect(modelSelect.value).toBe('llama2')
   })
 
   it('should use useActionState for form submission', async () => {
@@ -161,7 +205,7 @@ describe('SettingsForm', () => {
     const updatePromise = new Promise((resolve) => {
       resolveUpdate = resolve
     })
-    mockUpdateLlmSettings.mockReturnValue(updatePromise as any)
+    mockUpdateLlmSettings.mockReturnValue(updatePromise)
 
     const user = userEvent.setup()
     render(<SettingsForm />)

@@ -310,6 +310,7 @@ export interface TranslationKeys {
   'settings.llm.actions.saving': string;
   'settings.llm.actions.save': string;
   'settings.llm.messages.load_error': string;
+  'settings.llm.messages.unavailable': string;
   'settings.llm.messages.update_success': string;
   'settings.llm.messages.update_error': string;
   'settings.llm.validation.url_required': string;

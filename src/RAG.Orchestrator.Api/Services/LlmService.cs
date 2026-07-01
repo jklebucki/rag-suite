@@ -120,7 +120,7 @@ public class LlmService : ILlmService
                 }
                 : baseRequest;
 
-            return (request, "/api/generate");
+            return (request, settings.GenerateEndpoint);
         }
         else
         {
@@ -137,7 +137,7 @@ public class LlmService : ILlmService
                     return_full_text = false
                 }
             };
-            return (request, "/generate");
+            return (request, settings.GenerateEndpoint);
         }
     }
 
@@ -264,11 +264,15 @@ public class LlmService : ILlmService
                     ? $"Failed to retrieve Ollama tags from {url}. Status: {response.StatusCode}"
                     : $"Failed to retrieve Ollama tags. Status: {response.StatusCode}";
                 _logger.LogWarning(logMessage);
-                return Array.Empty<string>();
+                throw new LlmServiceUnavailableException("LLM service is unavailable.");
             }
 
             var json = await response.Content.ReadAsStringAsync(cts.Token);
             return ParseOllamaModels(json);
+        }
+        catch (LlmServiceUnavailableException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
@@ -276,7 +280,7 @@ public class LlmService : ILlmService
                 ? $"Error retrieving available models from LLM service at {url}"
                 : "Error retrieving available models from LLM service";
             _logger.LogError(ex, logMessage);
-            return Array.Empty<string>();
+            throw new LlmServiceUnavailableException("LLM service is unavailable.", ex);
         }
     }
 

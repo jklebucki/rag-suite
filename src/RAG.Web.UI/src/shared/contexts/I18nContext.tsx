@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState, useEffect, ReactNode } from 'react';
 import { LanguageCode, TranslationKeys, SUPPORTED_LANGUAGES } from '@/shared/types/i18n';
 import { translations } from '@/locales';
 import { getSavedLanguage, saveLanguage, isLanguageAutoDetected } from '@/utils/language';
@@ -21,13 +21,13 @@ export function I18nProvider({ children }: I18nProviderProps) {
   const [language, setLanguageState] = useState<LanguageCode>(() => getSavedLanguage());
   const [isAutoDetected, setIsAutoDetected] = useState(() => isLanguageAutoDetected());
 
-  const setLanguage = (newLanguage: LanguageCode) => {
+  const setLanguage = useCallback((newLanguage: LanguageCode) => {
     setLanguageState(newLanguage);
     saveLanguage(newLanguage);
     setIsAutoDetected(false);
-  };
+  }, []);
 
-  const t = (key: keyof TranslationKeys, params?: Record<string, string> | string[]): string => {
+  const t = useCallback((key: keyof TranslationKeys, params?: Record<string, string> | string[]): string => {
     const translation = translations[language]?.[key] || translations.en[key] || key;
     
     if (!params) {
@@ -45,20 +45,20 @@ export function I18nProvider({ children }: I18nProviderProps) {
     return params.reduce((str, arg, index) => {
       return str.replace(new RegExp(`\\{${index}\\}`, 'g'), arg);
     }, translation);
-  };
+  }, [language]);
 
   useEffect(() => {
     // Update document lang attribute
     document.documentElement.lang = language;
   }, [language]);
 
-  const value: I18nContextType = {
+  const value = useMemo<I18nContextType>(() => ({
     language,
     setLanguage,
     t,
     languages: SUPPORTED_LANGUAGES,
     isAutoDetected,
-  };
+  }), [isAutoDetected, language, setLanguage, t]);
 
   return (
     <I18nContext.Provider value={value}>

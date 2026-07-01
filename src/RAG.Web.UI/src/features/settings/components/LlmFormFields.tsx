@@ -83,6 +83,7 @@ interface ModelSelectFieldProps {
   isLoading: boolean
   disabled: boolean
   error?: string
+  availabilityError?: string | null
 }
 
 export function ModelSelectField({
@@ -92,7 +93,8 @@ export function ModelSelectField({
   onRefresh,
   isLoading,
   disabled,
-  error
+  error,
+  availabilityError
 }: ModelSelectFieldProps) {
   const { t } = useI18n()
 
@@ -126,6 +128,9 @@ export function ModelSelectField({
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
       </div>
+      {availabilityError && (
+        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{availabilityError}</p>
+      )}
       {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {availableModels.length === 0 && !isLoading && !disabled && (
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

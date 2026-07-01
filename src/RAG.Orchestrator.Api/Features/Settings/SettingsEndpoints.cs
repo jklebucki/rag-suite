@@ -12,11 +12,13 @@ public static class SettingsEndpoints
 
         group.MapGet("/llm", async (ISettingsService service) =>
         {
-            var settings = await service.GetLlmSettingsAsync();
-            if (settings == null)
+            var settings = await service.GetLlmSettingsAsync() ?? new LlmSettings
             {
-                return Results.NotFound(new { Message = "LLM settings not found" });
-            }
+                MaxTokens = 3000,
+                Temperature = 0.7,
+                IsOllama = true,
+                TimeoutMinutes = 15
+            };
 
             var response = new LlmSettingsResponse
             {
@@ -119,6 +121,13 @@ public static class SettingsEndpoints
             {
                 var models = await llmService.GetAvailableModelsAsync(url, isOllama);
                 return Results.Ok(new { Models = models });
+            }
+            catch (LlmServiceUnavailableException)
+            {
+                return Results.Problem(
+                    title: "LLM unavailable",
+                    detail: "LLM jest niedostępny - sprawdź usługę/serwer LLM.",
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
             }
             catch (Exception ex)
             {

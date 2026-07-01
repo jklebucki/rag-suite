@@ -1,6 +1,6 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import React, { useState, useEffect, useCallback, useActionState } from 'react'
+import React, { useState, useEffect, useCallback, useActionState, useRef } from 'react'
 import { Save, Loader2, Settings as SettingsIcon, Shield } from 'lucide-react'
 import { useToast } from '@/shared/contexts'
 import llmService from '@/features/settings/services/llm.service'
@@ -11,6 +11,15 @@ import type { LlmFormErrors } from '@/features/settings/types/settings'
 import { logger } from '@/utils/logger'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { SubmitButton } from '@/shared/components/ui/SubmitButton'
+
+function mergeCurrentModel(currentModel: string, models: string[]) {
+  const normalizedModel = currentModel.trim()
+  const uniqueModels = new Set(models.filter(model => model.trim()))
+  if (normalizedModel) {
+    uniqueModels.add(normalizedModel)
+  }
+  return Array.from(uniqueModels).sort()
+}
 
 interface FormState {
   success: boolean
@@ -38,14 +47,22 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   })
 
   const [availableModels, setAvailableModels] = useState<string[]>([])
+  const [modelAvailabilityError, setModelAvailabilityError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingModels, setLoadingModels] = useState(false)
+  const settingsRef = useRef(settings)
+
+  useEffect(() => {
+    settingsRef.current = settings
+  }, [settings])
 
   const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       const data = await llmService.getLlmSettings()
       setSettings(data)
+      setAvailableModels(mergeCurrentModel(data.model, []))
+      setModelAvailabilityError(null)
       onSettingsChange?.(data)
     } catch (error) {
       logger.error('Failed to load LLM settings:', error)
@@ -60,23 +77,31 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
   }, [addToast, onSettingsChange, t])
 
   const loadAvailableModels = useCallback(async () => {
-    if (!settings.url.trim()) return
+    const currentSettings = settingsRef.current
+    if (!currentSettings.url.trim()) return
+
+    if (!currentSettings.isOllama) {
+      setAvailableModels(mergeCurrentModel(currentSettings.model, []))
+      setModelAvailabilityError(null)
+      return
+    }
 
     try {
       setLoadingModels(true)
       const data: AvailableModelsResponse = await llmService.getAvailableLlmModelsFromUrl(
-        settings.url,
-        settings.isOllama
+        currentSettings.url,
+        currentSettings.isOllama
       )
-      setAvailableModels(data.models || [])
+      setAvailableModels(mergeCurrentModel(currentSettings.model, data.models || []))
+      setModelAvailabilityError(null)
     } catch (error) {
       logger.error('Failed to load available models:', error)
-      setAvailableModels([])
-      // Don't show error toast for model loading as it's expected to fail for invalid URLs
+      setAvailableModels(mergeCurrentModel(currentSettings.model, []))
+      setModelAvailabilityError(t('settings.llm.messages.unavailable'))
     } finally {
       setLoadingModels(false)
     }
-  }, [settings.isOllama, settings.url])
+  }, [t])
 
   // Load settings on component mount
   useEffect(() => {
@@ -88,7 +113,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     if (settings.url.trim()) {
       loadAvailableModels()
     }
-  }, [loadAvailableModels, settings.url])
+  }, [loadAvailableModels, settings.isOllama, settings.url])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -248,6 +273,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             isLoading={loadingModels}
             disabled={!settings.url.trim()}
             error={state?.fieldErrors.model}
+            availabilityError={modelAvailabilityError}
           />
 
           <LlmFormField

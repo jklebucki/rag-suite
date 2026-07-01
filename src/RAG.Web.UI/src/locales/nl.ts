@@ -395,6 +395,7 @@ export const nl: TranslationKeys = {
   'settings.llm.actions.saving': 'Opslaan...',
   'settings.llm.actions.save': 'Instellingen opslaan',
   'settings.llm.messages.load_error': 'LLM-instellingen konden niet worden geladen',
+  'settings.llm.messages.unavailable': 'LLM is niet beschikbaar - controleer de LLM-service/server.',
   'settings.llm.messages.update_success': 'LLM-instellingen zijn succesvol bijgewerkt',
   'settings.llm.messages.update_error': 'LLM-instellingen konden niet worden bijgewerkt',
   'settings.llm.validation.url_required': 'URL is verplicht',

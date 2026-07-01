@@ -119,6 +119,43 @@ public class LlmServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task GenerateResponseAsync_UsesConfiguredGenerateEndpoint()
+    {
+        // Arrange
+        var settings = new LlmSettings
+        {
+            Url = "http://test-ollama.com",
+            Model = "test-model",
+            IsOllama = true,
+            GenerateEndpoint = "/custom/generate",
+            TimeoutMinutes = 5
+        };
+
+        _mockCache.Setup(c => c.GetLlmSettingsAsync()).ReturnsAsync(settings);
+
+        Uri? requestedUri = null;
+        var responseJson = JsonSerializer.Serialize(new { response = "Test response" });
+        _mockHttpHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync((HttpRequestMessage request, CancellationToken cancellationToken) =>
+            {
+                requestedUri = request.RequestUri;
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+                };
+            });
+
+        // Act
+        var result = await _llmService.GenerateResponseAsync("Test prompt");
+
+        // Assert
+        result.Should().Be("Test response");
+        requestedUri?.AbsolutePath.Should().Be("/custom/generate");
+    }
+
+    [Fact]
     public async Task GenerateResponseWithContextAsync_WithHttpError_ReturnsErrorMessage()
     {
         // Arrange
@@ -360,6 +397,27 @@ public class LlmServiceTests : IDisposable
         // Assert
         result.Should().HaveCount(1);
         result.Should().Contain("tgi-model");
+    }
+
+    [Fact]
+    public async Task GetAvailableModelsAsync_WhenOllamaReturnsError_ThrowsUnavailableException()
+    {
+        // Arrange
+        var settings = new LlmSettings
+        {
+            Url = "http://test-ollama.com",
+            IsOllama = true,
+            TimeoutMinutes = 5
+        };
+
+        _mockCache.Setup(c => c.GetLlmSettingsAsync()).ReturnsAsync(settings);
+        SetupHttpResponse(HttpStatusCode.ServiceUnavailable, "Service unavailable");
+
+        // Act
+        var act = () => _llmService.GetAvailableModelsAsync();
+
+        // Assert
+        await act.Should().ThrowAsync<LlmServiceUnavailableException>();
     }
 
     [Fact]

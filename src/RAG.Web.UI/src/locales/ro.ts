@@ -396,6 +396,7 @@ export const ro: TranslationKeys = {
   'settings.llm.actions.saving': 'Se salvează...',
   'settings.llm.actions.save': 'Salvează setările',
   'settings.llm.messages.load_error': 'Nu s-au putut încărca setările LLM',
+  'settings.llm.messages.unavailable': 'LLM nu este disponibil - verifică serviciul/serverul LLM.',
   'settings.llm.messages.update_success': 'Setările LLM au fost actualizate cu succes',
   'settings.llm.messages.update_error': 'Nu s-au putut actualiza setările LLM',
   'settings.llm.validation.url_required': 'URL-ul este obligatoriu',

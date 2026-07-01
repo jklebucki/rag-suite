@@ -291,6 +291,7 @@ export const en: TranslationKeys = {
   'settings.llm.actions.saving': 'Saving...',
   'settings.llm.actions.save': 'Save Settings',
   'settings.llm.messages.load_error': 'Failed to load LLM settings',
+  'settings.llm.messages.unavailable': 'LLM is unavailable - check the LLM service/server.',
   'settings.llm.messages.update_success': 'LLM settings updated successfully',
   'settings.llm.messages.update_error': 'Failed to update LLM settings',
   'settings.llm.validation.url_required': 'URL is required',
