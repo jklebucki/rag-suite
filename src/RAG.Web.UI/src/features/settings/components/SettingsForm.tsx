@@ -25,6 +25,7 @@ interface FormState {
   success: boolean
   error: string | null
   fieldErrors: LlmFormErrors
+  settings?: LlmSettings
 }
 
 interface SettingsFormProps {
@@ -171,8 +172,6 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
 
         await llmService.updateLlmSettings(request)
         
-        // Update local state
-        setSettings(formSettings)
         onSettingsChange?.(formSettings)
         
         addToast({
@@ -184,7 +183,8 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
         return {
           success: true,
           error: null,
-          fieldErrors: {}
+          fieldErrors: {},
+          settings: formSettings
         }
       } catch (error) {
         logger.error('Failed to update LLM settings:', error)
@@ -202,6 +202,15 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     },
     null
   )
+
+  useEffect(() => {
+    if (!state?.success || !state.settings) return
+
+    const savedSettings = state.settings
+    settingsRef.current = savedSettings
+    setSettings(savedSettings)
+    setAvailableModels(prev => mergeCurrentModel(savedSettings.model, prev))
+  }, [state])
 
   const handleRefreshModels = () => {
     loadAvailableModels()

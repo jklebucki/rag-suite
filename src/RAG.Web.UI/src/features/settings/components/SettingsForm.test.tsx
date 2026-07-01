@@ -200,6 +200,33 @@ describe('SettingsForm', () => {
     }, { timeout: 3000 })
   }, 15000)
 
+  it('should keep selected model visible after saving settings', async () => {
+    const user = userEvent.setup()
+    render(<SettingsForm />)
+
+    await waitFor(() => {
+      expect(mockGetAvailableLlmModelsFromUrl).toHaveBeenCalled()
+    }, { timeout: 5000 })
+
+    const modelSelect = document.querySelector('select[name="model"]') as HTMLSelectElement
+    await user.selectOptions(modelSelect, 'mistral')
+
+    expect(modelSelect.value).toBe('mistral')
+
+    const submitButton = screen.getByRole('button', { name: /save/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(mockUpdateLlmSettings).toHaveBeenCalledWith(expect.objectContaining({ model: 'mistral' }))
+    }, { timeout: 3000 })
+
+    await waitFor(() => {
+      const updatedModelSelect = document.querySelector('select[name="model"]') as HTMLSelectElement
+      expect(updatedModelSelect.value).toBe('mistral')
+      expect(screen.getByRole('option', { name: 'mistral' })).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
   it('should disable SubmitButton during form submission', async () => {
     let resolveUpdate: () => void
     const updatePromise = new Promise((resolve) => {

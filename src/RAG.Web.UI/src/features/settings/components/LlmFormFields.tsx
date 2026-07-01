@@ -97,6 +97,9 @@ export function ModelSelectField({
   availabilityError
 }: ModelSelectFieldProps) {
   const { t } = useI18n()
+  const models = value && !availableModels.includes(value)
+    ? [value, ...availableModels]
+    : availableModels
 
   return (
     <div>
@@ -113,7 +116,7 @@ export function ModelSelectField({
           disabled={disabled}
         >
           <option value="">{t('settings.llm.fields.model.placeholder')}</option>
-          {availableModels.map(model => (
+          {models.map(model => (
             <option key={model} value={model}>{model}</option>
           ))}
         </select>
