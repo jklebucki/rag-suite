@@ -176,6 +176,7 @@ class AuthService {
 
       logger.debug('Refresh successful, response received')
       const tokenData = response.data
+      this.setUser(tokenData.user)
       this.setTokens(tokenData.token, tokenData.refreshToken)
       return true
     } catch (error: unknown) {
@@ -371,8 +372,8 @@ class AuthService {
   private setTokens(accessToken: string, refreshToken: string): void {
     try {
       logger.debug('Storing tokens in localStorage')
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, accessToken)
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, accessToken)
       // Dispatch storage event for cross-tab synchronization
       window.dispatchEvent(new StorageEvent('storage', {
         key: STORAGE_KEYS.AUTH_TOKEN,

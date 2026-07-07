@@ -2,6 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+function isPackage(id: string, packageName: string): boolean {
+  const normalizedId = id.replace(/\\/g, '/')
+  return normalizedId.includes(`/node_modules/${packageName}/`)
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -33,60 +38,58 @@ export default defineConfig({
         manualChunks: (id) => {
           // Core React libraries - MUST be bundled together first
           // This ensures React is available before use-sync-external-store-shim tries to use it
-          if (id.includes('node_modules/react') || 
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/react/jsx-runtime') ||
-              id.includes('node_modules/react/jsx-dev-runtime')) {
-            return 'vendor-react'
-          }
-          
-          // use-sync-external-store should be with React Query to ensure React is loaded first
-          if (id.includes('node_modules/use-sync-external-store')) {
+          if (isPackage(id, 'react') ||
+              isPackage(id, 'react-dom') ||
+              isPackage(id, 'scheduler') ||
+              isPackage(id, 'use-sync-external-store')) {
             return 'vendor-react'
           }
           
           // React Router
-          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router')) {
+          if (isPackage(id, 'react-router-dom') || isPackage(id, 'react-router')) {
             return 'vendor-router'
           }
           
           // React Query - depends on React, so it should load after vendor-react
-          if (id.includes('node_modules/@tanstack/react-query')) {
+          if (isPackage(id, '@tanstack/react-query')) {
             return 'vendor-query'
           }
           
           // React Table (large dependency)
-          if (id.includes('node_modules/@tanstack/react-table')) {
+          if (isPackage(id, '@tanstack/react-table')) {
             return 'vendor-table'
           }
           
           // Icons
-          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/@heroicons')) {
+          if (isPackage(id, 'lucide-react') || isPackage(id, '@heroicons/react')) {
             return 'vendor-icons'
           }
           
           // Markdown rendering (heavy)
-          if (id.includes('node_modules/react-markdown') || 
-              id.includes('node_modules/remark-') || 
-              id.includes('node_modules/react-syntax-highlighter') ||
-              id.includes('node_modules/prismjs')) {
+          if (isPackage(id, 'react-markdown') ||
+              isPackage(id, 'remark-gfm') ||
+              isPackage(id, 'remark-parse') ||
+              isPackage(id, 'remark-rehype') ||
+              isPackage(id, 'remark-stringify') ||
+              isPackage(id, 'react-syntax-highlighter') ||
+              isPackage(id, 'prismjs')) {
             return 'vendor-markdown'
           }
           
           // PDF viewer (very large)
-          if (id.includes('node_modules/react-pdf') || id.includes('node_modules/pdfjs-dist')) {
+          if (isPackage(id, 'react-pdf') || isPackage(id, 'pdfjs-dist')) {
             return 'vendor-pdf'
           }
           
           // Utility libraries
-          if (id.includes('node_modules/clsx') || 
-              id.includes('node_modules/tailwind-merge') ||
-              id.includes('node_modules/remove-accents')) {
+          if (isPackage(id, 'clsx') ||
+              isPackage(id, 'tailwind-merge') ||
+              isPackage(id, 'remove-accents')) {
             return 'vendor-utils'
           }
           
           // Axios (HTTP client)
-          if (id.includes('node_modules/axios')) {
+          if (isPackage(id, 'axios')) {
             return 'vendor-http'
           }
           

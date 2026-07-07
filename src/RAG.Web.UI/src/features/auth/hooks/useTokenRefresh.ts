@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { authService } from '@/features/auth/services/auth.service'
 import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus'
 import { logger } from '@/utils/logger'
+import type { User } from '@/features/auth/types/auth'
 
 let refreshInFlight: Promise<void> | null = null
 
@@ -10,7 +11,7 @@ let refreshInFlight: Promise<void> | null = null
  */
 export const useTokenRefresh = (
   isAuthenticated: boolean,
-  onTokenRefresh: (token: string, refreshToken: string) => void,
+  onTokenRefresh: (token: string, refreshToken: string, user: User | null) => void,
   onLogout: () => void,
   onRefreshError?: () => void
 ) => {
@@ -76,9 +77,10 @@ export const useTokenRefresh = (
         if (success) {
           const newToken = authService.getToken()
           const newRefreshToken = authService.getRefreshToken()
+          const user = authService.getUser()
 
           if (newToken && newRefreshToken) {
-            onTokenRefresh(newToken, newRefreshToken)
+            onTokenRefresh(newToken, newRefreshToken, user)
             logger.debug('Token refreshed successfully')
           } else {
             logger.warn('Token refresh succeeded but tokens are missing')

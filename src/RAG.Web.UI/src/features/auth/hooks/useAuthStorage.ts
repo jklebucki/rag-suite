@@ -35,7 +35,12 @@ export const useAuthStorage = (
       // Tab became visible, check if token is still valid
       try {
         const user = await authService.getCurrentUser()
-        if (!user) {
+        if (user) {
+          const token = authService.getToken()
+          if (token) {
+            onLogin(token, authService.getRefreshToken(), user)
+          }
+        } else {
           // Token invalid, logout
           onLogout()
         }
@@ -45,7 +50,7 @@ export const useAuthStorage = (
         // onLogout()
       }
     }
-  }, [onLogout])
+  }, [onLogin, onLogout])
 
   useEffect(() => {
     // Listen for storage changes
@@ -65,13 +70,13 @@ export const useAuthStorage = (
     logger.debug('storeAuthData called with:', { hasToken: !!token, hasRefreshToken: !!refreshToken, hasUser: !!user })
     
     try {
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token)
       if (refreshToken) {
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
       } else {
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
       }
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user))
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token)
       
       logger.debug('Data stored in localStorage successfully')
       

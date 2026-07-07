@@ -118,9 +118,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [])
 
   // Callbacks for token refresh hook
-  const handleTokenRefresh = useCallback((token: string, refreshToken: string) => {
+  const handleTokenRefresh = useCallback((token: string, refreshToken: string, user: User | null) => {
     dispatch({ type: 'SET_TOKEN', payload: token })
     dispatch({ type: 'SET_REFRESH_TOKEN', payload: refreshToken })
+    if (user) {
+      dispatch({ type: 'SET_USER', payload: user })
+    }
   }, [])
 
   const handleLogout = useCallback(() => {
@@ -285,6 +288,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const loginData = await authService.login(credentials)
 
       // Store auth data using our secure storage method
+      clearAuthData()
       storeAuthData(loginData.token, loginData.refreshToken, loginData.user)
 
       // Update context state

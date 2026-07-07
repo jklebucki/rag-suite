@@ -7,6 +7,7 @@ import { authService } from '@/features/auth/services/auth.service'
 import type { User as UserType } from '@/features/auth/types/auth'
 import { useUserFilters } from '@/features/settings/hooks/useUserFilters'
 import { useToast } from '@/shared/hooks/useToast'
+import { useAuth } from '@/shared/contexts/AuthContext'
 import { UserFiltersPanel } from './UserFiltersPanel'
 import { UserTableRow } from './UserTableRow'
 import { SetPasswordModal } from './SetPasswordModal'
@@ -17,6 +18,8 @@ export function UserSettings() {
   const { showSuccess, showError } = useToast()
   const queryClient = useQueryClient()
   const { t } = useI18n()
+  const { user: currentUser, refreshAuth } = useAuth()
+  const isAdmin = currentUser?.roles?.includes('Admin') ?? false
   
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [isSetPasswordModalOpen, setIsSetPasswordModalOpen] = useState(false)
@@ -28,14 +31,14 @@ export function UserSettings() {
   const { data: users = [], isLoading, error: fetchError } = useQuery({
     queryKey: ['users'],
     queryFn: ({ signal }) => authService.getUsers({ signal }),
-    enabled: authService.hasRole('Admin'),
+    enabled: isAdmin,
   })
 
   // Fetch roles
   const { data: availableRoles = [] } = useQuery({
     queryKey: ['roles'],
     queryFn: ({ signal }) => authService.getRoles({ signal }),
-    enabled: authService.hasRole('Admin'),
+    enabled: isAdmin,
   })
 
   // Use filters hook
@@ -51,8 +54,11 @@ export function UserSettings() {
   const assignRoleMutation = useMutation({
     mutationFn: ({ userId, roleName }: { userId: string; roleName: string }) =>
       authService.assignRole(userId, roleName),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      if (variables.userId === currentUser?.id) {
+        void refreshAuth()
+      }
       showSuccess(t('settings.user.toasts.role_assigned'))
     },
     onError: () => {
@@ -64,8 +70,11 @@ export function UserSettings() {
   const removeRoleMutation = useMutation({
     mutationFn: ({ userId, roleName }: { userId: string; roleName: string }) =>
       authService.removeRole(userId, roleName),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      if (variables.userId === currentUser?.id) {
+        void refreshAuth()
+      }
       showSuccess(t('settings.user.toasts.role_removed'))
     },
     onError: () => {
@@ -134,7 +143,7 @@ export function UserSettings() {
     deleteUserMutation.mutate(userToDelete.id)
   }
 
-  if (!authService.hasRole('Admin')) {
+  if (!isAdmin) {
     return (
       <div className="surface p-6 space-y-3">
         <div className="flex items-center gap-3">
