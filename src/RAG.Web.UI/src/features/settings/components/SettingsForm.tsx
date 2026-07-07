@@ -43,6 +43,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     model: '',
     isOllama: true,
     timeoutMinutes: 15,
+    contextWindow: 128000,
     chatEndpoint: '/api/chat',
     generateEndpoint: '/api/generate'
   })
@@ -138,6 +139,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
         model: formData.get('model') as string,
         isOllama: formData.get('isOllama') === 'on',
         timeoutMinutes: parseInt(formData.get('timeoutMinutes') as string, 10) || 0,
+        contextWindow: parseInt(formData.get('contextWindow') as string, 10) || 0,
         chatEndpoint: formData.get('chatEndpoint') as string,
         generateEndpoint: formData.get('generateEndpoint') as string
       }
@@ -166,6 +168,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           model: formSettings.model,
           isOllama: formSettings.isOllama,
           timeoutMinutes: formSettings.timeoutMinutes,
+          contextWindow: formSettings.contextWindow,
           chatEndpoint: formSettings.chatEndpoint,
           generateEndpoint: formSettings.generateEndpoint
         }
@@ -329,6 +332,19 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             error={state?.fieldErrors.timeoutMinutes}
             min={1}
             max={120}
+          />
+
+          <LlmFormField
+            id="contextWindow"
+            name="contextWindow"
+            label={t('settings.llm.fields.context_window.label')}
+            type="number"
+            value={settings.contextWindow}
+            onChange={handleChange}
+            error={state?.fieldErrors.contextWindow}
+            min={1}
+            max={128000}
+            description={t('settings.llm.fields.context_window.description')}
           />
 
           <LlmFormField

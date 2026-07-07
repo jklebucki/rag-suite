@@ -71,6 +71,7 @@ describe('SettingsForm', () => {
       model: 'llama2',
       isOllama: true,
       timeoutMinutes: 15,
+      contextWindow: 128000,
       chatEndpoint: '/api/chat',
       generateEndpoint: '/api/generate',
     })

@@ -5,6 +5,7 @@ export interface LlmSettings {
   model: string
   isOllama: boolean
   timeoutMinutes: number
+  contextWindow: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -16,6 +17,7 @@ export interface LlmSettingsRequest {
   model: string
   isOllama: boolean
   timeoutMinutes: number
+  contextWindow: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -27,6 +29,7 @@ export interface LlmSettingsResponse {
   model: string
   isOllama: boolean
   timeoutMinutes: number
+  contextWindow: number
   chatEndpoint: string
   generateEndpoint: string
 }

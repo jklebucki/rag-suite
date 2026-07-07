@@ -34,6 +34,10 @@ export function validateLlmSettings(settings: LlmSettings): {
     errors.timeoutMinutes = 'settings.llm.validation.timeout'
   }
 
+  if (settings.contextWindow <= 0 || settings.contextWindow > 128000) {
+    errors.contextWindow = 'settings.llm.validation.context_window'
+  }
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors

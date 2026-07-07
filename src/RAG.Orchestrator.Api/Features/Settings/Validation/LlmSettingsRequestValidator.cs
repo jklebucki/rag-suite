@@ -28,6 +28,10 @@ public class LlmSettingsRequestValidator : AbstractValidator<LlmSettingsRequest>
             .GreaterThan(0).WithMessage("TimeoutMinutes must be greater than 0")
             .LessThanOrEqualTo(60).WithMessage("TimeoutMinutes must not exceed 60");
 
+        RuleFor(x => x.ContextWindow)
+            .GreaterThan(0).WithMessage("ContextWindow must be greater than 0")
+            .LessThanOrEqualTo(128000).WithMessage("ContextWindow must not exceed 128000");
+
         RuleFor(x => x.ChatEndpoint)
             .NotEmpty().WithMessage("ChatEndpoint is required")
             .Must(BeValidPath).WithMessage("ChatEndpoint must be a valid path starting with /");

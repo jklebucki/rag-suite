@@ -384,6 +384,8 @@ export const nl: TranslationKeys = {
   'settings.llm.fields.temperature.label': 'Temperatuur (0.0 - 2.0)',
   'settings.llm.fields.is_ollama.label': 'Ollama-service',
   'settings.llm.fields.timeout_minutes.label': 'Time-out (minuten)',
+  'settings.llm.fields.context_window.label': 'Contextvenster',
+  'settings.llm.fields.context_window.description': 'Wordt naar Ollama gestuurd als options.num_ctx. Maximum: 128000.',
   'settings.llm.fields.chat_endpoint.label': 'Chat-endpoint',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generate-endpoint',
@@ -404,6 +406,7 @@ export const nl: TranslationKeys = {
   'settings.llm.validation.temperature': 'Temperatuur moet tussen 0 en 2 liggen',
   'settings.llm.validation.model_required': 'Model is verplicht',
   'settings.llm.validation.timeout': 'Time-out moet groter zijn dan 0',
+  'settings.llm.validation.context_window': 'Contextvenster moet tussen 1 en 128000 liggen',
 
   'settings.user.title': 'Gebruikersbeheer',
   'settings.user.subtitle': 'Beheer gebruikers, rollen en permissies',

@@ -40,6 +40,12 @@ public class LlmEndpointConfig
     public int TimeoutMinutes { get; set; } = 15;
 
     /// <summary>
+    /// Maximum context window sent to Ollama as num_ctx
+    /// </summary>
+    [Range(1, 128000)]
+    public int ContextWindow { get; set; } = 128000;
+
+    /// <summary>
     /// Whether the service is Ollama (affects endpoint format)
     /// </summary>
     public bool IsOllama { get; set; } = true;
@@ -86,5 +92,8 @@ public class LlmEndpointConfig
 
         if (TimeoutMinutes <= 0)
             throw new ArgumentException("TimeoutMinutes must be greater than 0", nameof(TimeoutMinutes));
+
+        if (ContextWindow <= 0 || ContextWindow > 128000)
+            throw new ArgumentException("ContextWindow must be between 1 and 128000", nameof(ContextWindow));
     }
 }

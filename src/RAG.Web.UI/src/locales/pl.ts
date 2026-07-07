@@ -280,6 +280,8 @@ export const pl: TranslationKeys = {
   'settings.llm.fields.temperature.label': 'Temperatura (0.0 - 2.0)',
   'settings.llm.fields.is_ollama.label': 'Usługa Ollama',
   'settings.llm.fields.timeout_minutes.label': 'Limit czasu (minuty)',
+  'settings.llm.fields.context_window.label': 'Okno kontekstu',
+  'settings.llm.fields.context_window.description': 'Wysyłane do Ollama jako options.num_ctx. Maksimum: 128000.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint czatu',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generowania',
@@ -300,6 +302,7 @@ export const pl: TranslationKeys = {
   'settings.llm.validation.temperature': 'Temperatura musi mieścić się w zakresie 0-2',
   'settings.llm.validation.model_required': 'Model jest wymagany',
   'settings.llm.validation.timeout': 'Limit czasu musi być większy niż 0',
+  'settings.llm.validation.context_window': 'Okno kontekstu musi mieścić się w zakresie 1-128000',
 
   'settings.user.title': 'Zarządzanie użytkownikami',
   'settings.user.subtitle': 'Zarządzaj użytkownikami, rolami i uprawnieniami',

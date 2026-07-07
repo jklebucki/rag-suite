@@ -385,6 +385,8 @@ export const ro: TranslationKeys = {
   'settings.llm.fields.temperature.label': 'Temperatură (0.0 - 2.0)',
   'settings.llm.fields.is_ollama.label': 'Serviciu Ollama',
   'settings.llm.fields.timeout_minutes.label': 'Limită de timp (minute)',
+  'settings.llm.fields.context_window.label': 'Fereastră de context',
+  'settings.llm.fields.context_window.description': 'Trimis către Ollama ca options.num_ctx. Maximum: 128000.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint chat',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generare',
@@ -405,6 +407,7 @@ export const ro: TranslationKeys = {
   'settings.llm.validation.temperature': 'Temperatura trebuie să fie între 0 și 2',
   'settings.llm.validation.model_required': 'Modelul este obligatoriu',
   'settings.llm.validation.timeout': 'Limita de timp trebuie să fie mai mare decât 0',
+  'settings.llm.validation.context_window': 'Fereastra de context trebuie să fie între 1 și 128000',
 
   'settings.user.title': 'Administrare utilizatori',
   'settings.user.subtitle': 'Gestionează utilizatorii, rolurile și permisiunile',

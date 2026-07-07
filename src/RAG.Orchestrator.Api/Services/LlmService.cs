@@ -104,7 +104,8 @@ public class LlmService : ILlmService
                 options = new
                 {
                     temperature = settings.Temperature,
-                    num_predict = settings.MaxTokens
+                    num_predict = settings.MaxTokens,
+                    num_ctx = settings.ContextWindow
                 }
             };
 
@@ -341,7 +342,8 @@ public class LlmService : ILlmService
                 options = new
                 {
                     temperature = settings.Temperature,
-                    num_predict = settings.MaxTokens
+                    num_predict = settings.MaxTokens,
+                    num_ctx = settings.ContextWindow
                 }
             };
 

@@ -35,4 +35,5 @@ export interface LlmFormErrors {
   temperature?: string
   model?: string
   timeoutMinutes?: string
+  contextWindow?: string
 }

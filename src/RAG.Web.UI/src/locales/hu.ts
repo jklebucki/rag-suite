@@ -384,6 +384,8 @@ export const hu: TranslationKeys = {
   'settings.llm.fields.temperature.label': 'Temperatúra (0.0 - 2.0)',
   'settings.llm.fields.is_ollama.label': 'Ollama szolgáltatás',
   'settings.llm.fields.timeout_minutes.label': 'Időkorlát (perc)',
+  'settings.llm.fields.context_window.label': 'Kontextusablak',
+  'settings.llm.fields.context_window.description': 'Az Ollama options.num_ctx értékeként lesz elküldve. Maximum: 128000.',
   'settings.llm.fields.chat_endpoint.label': 'Chat végpont',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generálási végpont',
@@ -404,6 +406,7 @@ export const hu: TranslationKeys = {
   'settings.llm.validation.temperature': 'A hőmérsékletnek 0 és 2 között kell lennie',
   'settings.llm.validation.model_required': 'A modell megadása kötelező',
   'settings.llm.validation.timeout': 'Az időkorlátnak nagyobbnak kell lennie 0-nál',
+  'settings.llm.validation.context_window': 'A kontextusablaknak 1 és 128000 között kell lennie',
 
   'settings.user.title': 'Felhasználókezelés',
   'settings.user.subtitle': 'Felhasználók, szerepkörök és jogosultságok kezelése',

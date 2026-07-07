@@ -299,6 +299,8 @@ export interface TranslationKeys {
   'settings.llm.fields.temperature.label': string;
   'settings.llm.fields.is_ollama.label': string;
   'settings.llm.fields.timeout_minutes.label': string;
+  'settings.llm.fields.context_window.label': string;
+  'settings.llm.fields.context_window.description': string;
   'settings.llm.fields.chat_endpoint.label': string;
   'settings.llm.fields.chat_endpoint.placeholder': string;
   'settings.llm.fields.generate_endpoint.label': string;
@@ -319,6 +321,7 @@ export interface TranslationKeys {
   'settings.llm.validation.temperature': string;
   'settings.llm.validation.model_required': string;
   'settings.llm.validation.timeout': string;
+  'settings.llm.validation.context_window': string;
 
   'settings.user.title': string;
   'settings.user.subtitle': string;

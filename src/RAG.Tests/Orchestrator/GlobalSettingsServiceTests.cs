@@ -68,6 +68,7 @@ public class GlobalSettingsServiceTests : IDisposable
         mockSection.Setup(s => s["Model"]).Returns("test-model");
         mockSection.Setup(s => s["IsOllama"]).Returns("true");
         mockSection.Setup(s => s["TimeoutMinutes"]).Returns("15");
+        mockSection.Setup(s => s["ContextWindow"]).Returns("128000");
         mockSection.Setup(s => s["ChatEndpoint"]).Returns("/api/chat");
         mockSection.Setup(s => s["GenerateEndpoint"]).Returns("/api/generate");
         mockConfig.Setup(c => c.GetSection("Services:LlmService")).Returns(mockSection.Object);
@@ -79,6 +80,7 @@ public class GlobalSettingsServiceTests : IDisposable
         var setting = await _context.GlobalSettings.FirstOrDefaultAsync(s => s.Key == "LlmService");
         Assert.NotNull(setting);
         Assert.Contains("http://test.com", setting.Value);
+        Assert.Contains("\"ContextWindow\":128000", setting.Value);
     }
 
     [Fact]

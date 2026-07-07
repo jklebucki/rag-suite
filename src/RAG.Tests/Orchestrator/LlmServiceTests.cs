@@ -431,17 +431,21 @@ public class LlmServiceTests : IDisposable
             IsOllama = true,
             Temperature = 0.7,
             MaxTokens = 100,
+            ContextWindow = 128000,
             ChatEndpoint = "/api/chat",
             TimeoutMinutes = 5
         };
 
         _mockCache.Setup(c => c.GetLlmSettingsAsync()).ReturnsAsync(settings);
 
+        string? requestBody = null;
         var responseJson = JsonSerializer.Serialize(new
         {
             message = new { content = "Chat response" }
         });
-        SetupHttpResponse(HttpStatusCode.OK, responseJson);
+        _mockHttpHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .Returns((HttpRequestMessage request, CancellationToken cancellationToken) => CaptureChatRequestAsync(request, cancellationToken));
 
         var history = new List<LlmChatMessage>
         {
@@ -454,6 +458,21 @@ public class LlmServiceTests : IDisposable
 
         // Assert
         result.Should().Be("Chat response");
+        requestBody.Should().NotBeNullOrWhiteSpace();
+        using var doc = JsonDocument.Parse(requestBody!);
+        doc.RootElement.GetProperty("options").GetProperty("temperature").GetDouble().Should().Be(0.7);
+        doc.RootElement.GetProperty("options").GetProperty("num_predict").GetInt32().Should().Be(100);
+        doc.RootElement.GetProperty("options").GetProperty("num_ctx").GetInt32().Should().Be(128000);
+
+        async Task<HttpResponseMessage> CaptureChatRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            return new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+            };
+        }
     }
 
     [Fact]

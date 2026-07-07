@@ -17,7 +17,8 @@ public static class SettingsEndpoints
                 MaxTokens = 3000,
                 Temperature = 0.7,
                 IsOllama = true,
-                TimeoutMinutes = 15
+                TimeoutMinutes = 15,
+                ContextWindow = 128000
             };
 
             var response = new LlmSettingsResponse
@@ -28,6 +29,7 @@ public static class SettingsEndpoints
                 Model = settings.Model,
                 IsOllama = settings.IsOllama,
                 TimeoutMinutes = settings.TimeoutMinutes,
+                ContextWindow = settings.ContextWindow,
                 ChatEndpoint = settings.ChatEndpoint,
                 GenerateEndpoint = settings.GenerateEndpoint
             };
@@ -57,6 +59,7 @@ public static class SettingsEndpoints
                 Model = request.Model,
                 IsOllama = request.IsOllama,
                 TimeoutMinutes = request.TimeoutMinutes,
+                ContextWindow = request.ContextWindow,
                 ChatEndpoint = request.ChatEndpoint,
                 GenerateEndpoint = request.GenerateEndpoint
             };
