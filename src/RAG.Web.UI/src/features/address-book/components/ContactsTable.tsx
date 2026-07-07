@@ -282,12 +282,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           value={globalFilter ?? ''}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder={t('addressBook.search')}
-          className="form-input lg:flex-1"
+          className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-500 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary-500 lg:flex-1 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100 dark:placeholder:text-slate-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
         />
         <div className="relative">
           <button
             onClick={() => setShowColumnConfig(!showColumnConfig)}
-            className="surface inline-flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+            className="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:border-primary-400 dark:focus:ring-primary-400"
             title={t('addressBook.table.configureColumns')}
           >
             <AdjustmentsHorizontalIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />

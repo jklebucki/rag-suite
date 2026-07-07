@@ -602,6 +602,7 @@ export const ro: TranslationKeys = {
   // Address Book
   'addressBook.title': 'Agendă',
   'addressBook.subtitle': 'Gestionează contactele și informațiile de contact',
+  'addressBook.subtitle.guestSuffix': '(autentifică-te pentru a propune modificări)',
   'addressBook.tabs.contacts': 'Contacte',
   'addressBook.tabs.import': 'Import',
   'addressBook.tabs.proposals': 'Propuneri',
@@ -611,7 +612,6 @@ export const ro: TranslationKeys = {
   'addressBook.loading': 'Se încarcă contactele...',
   'addressBook.permissions.admin': 'Poți crea, edita și șterge contacte direct',
   'addressBook.permissions.user': 'Poți propune modificări care vor fi revizuite de administratori',
-  'addressBook.permissions.guest': 'Răsfoiește contactele (autentifică-te pentru a propune modificări)',
 
   // Contact Table
   'addressBook.table.details': 'Detalii',

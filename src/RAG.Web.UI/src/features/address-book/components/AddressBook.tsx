@@ -1,5 +1,5 @@
 // AddressBook - Main component for managing contacts
-import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import addressBookService from '@/features/address-book/services/addressBook.service'
@@ -53,28 +53,6 @@ export function AddressBook() {
   // Check if user can modify directly (Admin/PowerUser)
   const canModify = !!(isAuthenticated && (user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')))
   const isAdmin = !!(isAuthenticated && user?.roles?.includes('Admin'))
-
-  // Optimistic contacts state using React 19 useOptimistic
-  const [isPending, startTransition] = useTransition()
-  const [optimisticContacts, addOptimisticContact] = useOptimistic(
-    contacts,
-    (state: ContactListItem[], action: ContactListItem | { type: 'update'; contact: ContactListItem }) => {
-      // Handle update action
-      if (typeof action === 'object' && 'type' in action && action.type === 'update') {
-        return state.map(contact =>
-          contact.id === action.contact.id ? action.contact : contact
-        )
-      }
-      // Handle add action (backward compatibility)
-      const newContact = action as ContactListItem
-      // Check if contact already exists (prevent duplicates)
-      if (state.some(contact => contact.id === newContact.id)) {
-        return state
-      }
-      // Add new contact at the beginning
-      return [newContact, ...state]
-    }
-  )
 
   // Load contacts on mount
   useEffect(() => {
@@ -135,9 +113,7 @@ export function AddressBook() {
         }
 
         // Add contact locally (at the beginning, will be sorted by table if needed)
-        startTransition(() => {
-          setContacts(prevContacts => [newContact, ...prevContacts])
-        })
+        setContacts(prevContacts => [newContact, ...prevContacts])
 
         // Navigate to new contact after a short delay to allow DOM update
         setTimeout(() => {
@@ -177,32 +153,29 @@ export function AddressBook() {
       try {
         await addressBookService.updateContact(editingContact.id, data)
 
-        // Update only this specific row locally using form data
-        // API success guarantees data correctness
-        startTransition(() => {
-          setContacts(prevContacts =>
-            prevContacts.map(contact =>
-              contact.id === editingContact.id
-                ? {
-                    ...contact,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    displayName: data.displayName,
-                    department: data.department,
-                    position: data.position,
-                    location: data.location,
-                    company: data.company,
-                    workPhone: data.workPhone,
-                    mobilePhone: data.mobilePhone,
-                    email: data.email,
-                    notes: data.notes,
-                    photoUrl: data.photoUrl,
-                    isActive: data.isActive,
-                  }
-                : contact
-            )
+        // Update only this specific row locally using form data.
+        setContacts(prevContacts =>
+          prevContacts.map(contact =>
+            contact.id === editingContact.id
+              ? {
+                  ...contact,
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  displayName: data.displayName,
+                  department: data.department,
+                  position: data.position,
+                  location: data.location,
+                  company: data.company,
+                  workPhone: data.workPhone,
+                  mobilePhone: data.mobilePhone,
+                  email: data.email,
+                  notes: data.notes,
+                  photoUrl: data.photoUrl,
+                  isActive: data.isActive,
+                }
+              : contact
           )
-        })
+        )
       } catch (error) {
         throw error
       }
@@ -363,6 +336,7 @@ export function AddressBook() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('addressBook.title')}</h1>
         <p className="text-gray-600 dark:text-gray-300 mt-1">
           {t('addressBook.subtitle')}
+          {!isAuthenticated && ` ${t('addressBook.subtitle.guestSuffix')}`}
         </p>
       </div>
 
@@ -377,7 +351,7 @@ export function AddressBook() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-slate-600'
             }`}
           >
-            {t('addressBook.tabs.contacts')} ({optimisticContacts.length})
+            {t('addressBook.tabs.contacts')} ({contacts.length})
           </button>
           {canModify && (
             <>
@@ -421,27 +395,25 @@ export function AddressBook() {
       {/* Tab Content */}
       {activeTab === 'contacts' && (
         <div className="space-y-4 flex-1 min-h-0 overflow-hidden flex flex-col">
-          <div className="flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
-            <div className="text-sm text-gray-600 dark:text-gray-300">
-              {isAuthenticated
-                ? canModify
+          {isAuthenticated && (
+            <div className="flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                {canModify
                   ? t('addressBook.permissions.admin')
-                  : t('addressBook.permissions.user')
-                : t('addressBook.permissions.guest')}
-            </div>
-            {isAuthenticated && (
+                  : t('addressBook.permissions.user')}
+              </div>
               <button
                 onClick={openCreateForm}
                 className="btn-primary"
               >
                 + {t('addressBook.addContact')}
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="flex-1 min-h-0 overflow-y-auto">
             <ContactsTable
-              contacts={optimisticContacts}
+              contacts={contacts}
               onEdit={canModify ? openEditForm : undefined}
               onDelete={canModify ? handleDeleteContact : undefined}
               onProposeChange={!canModify && isAuthenticated ? handleProposeChange : undefined}

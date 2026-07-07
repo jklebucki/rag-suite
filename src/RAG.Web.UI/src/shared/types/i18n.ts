@@ -674,6 +674,7 @@ export interface TranslationKeys {
   // Address Book
   'addressBook.title': string;
   'addressBook.subtitle': string;
+  'addressBook.subtitle.guestSuffix': string;
   'addressBook.tabs.contacts': string;
   'addressBook.tabs.import': string;
   'addressBook.tabs.proposals': string;
@@ -683,7 +684,6 @@ export interface TranslationKeys {
   'addressBook.loading': string;
   'addressBook.permissions.admin': string;
   'addressBook.permissions.user': string;
-  'addressBook.permissions.guest': string;
   'addressBook.table.details': string;
   'addressBook.table.firstName': string;
   'addressBook.table.lastName': string;

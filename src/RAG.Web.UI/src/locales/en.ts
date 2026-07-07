@@ -654,6 +654,7 @@ export const en: TranslationKeys = {
   // Address Book
   'addressBook.title': 'Address Book',
   'addressBook.subtitle': 'Manage contacts and contact information',
+  'addressBook.subtitle.guestSuffix': '(log in to propose changes)',
   'addressBook.tabs.contacts': 'Contacts',
   'addressBook.tabs.import': 'Import',
   'addressBook.tabs.proposals': 'Proposals',
@@ -663,7 +664,6 @@ export const en: TranslationKeys = {
   'addressBook.loading': 'Loading contacts...',
   'addressBook.permissions.admin': 'You can create, edit, and delete contacts directly',
   'addressBook.permissions.user': 'You can propose changes that will be reviewed by administrators',
-  'addressBook.permissions.guest': 'Browse contacts (login to propose changes)',
 
   // Contact Table
   'addressBook.table.details': 'Details',

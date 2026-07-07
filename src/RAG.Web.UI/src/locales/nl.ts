@@ -601,6 +601,7 @@ export const nl: TranslationKeys = {
   // Address Book
   'addressBook.title': 'Adresboek',
   'addressBook.subtitle': 'Contacten en contactinformatie beheren',
+  'addressBook.subtitle.guestSuffix': '(log in om wijzigingen voor te stellen)',
   'addressBook.tabs.contacts': 'Contacten',
   'addressBook.tabs.import': 'Importeren',
   'addressBook.tabs.proposals': 'Voorstellen',
@@ -610,7 +611,6 @@ export const nl: TranslationKeys = {
   'addressBook.loading': 'Contacten laden...',
   'addressBook.permissions.admin': 'Je kunt contacten direct aanmaken, bewerken en verwijderen',
   'addressBook.permissions.user': 'Je kunt wijzigingen voorstellen die door beheerders worden beoordeeld',
-  'addressBook.permissions.guest': 'Contacten doorbladeren (log in om wijzigingen voor te stellen)',
 
   // Contact Table
   'addressBook.table.details': 'Details',

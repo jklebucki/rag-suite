@@ -599,6 +599,7 @@ export const hu: TranslationKeys = {
   // Address Book
   'addressBook.title': 'Címjegyzék',
   'addressBook.subtitle': 'Kezelheti a névjegyeket és kapcsolattartási adatokat',
+  'addressBook.subtitle.guestSuffix': '(jelentkezzen be a változások javaslásához)',
   'addressBook.tabs.contacts': 'Kapcsolatok',
   'addressBook.tabs.import': 'Importálás',
   'addressBook.tabs.proposals': 'Javaslatok',
@@ -608,7 +609,6 @@ export const hu: TranslationKeys = {
   'addressBook.loading': 'Kapcsolatok betöltése...',
   'addressBook.permissions.admin': 'közvetlenül hozhat létre, szerkeszthet és törölhet kapcsolatokat',
   'addressBook.permissions.user': 'változásokat javasolhat, amelyeket az adminisztrátorok felülvizsgálnak',
-  'addressBook.permissions.guest': 'Böngészhet a kapcsolatokban (jelentkezzen be a változások javaslásához)',
   'addressBook.table.details': 'Részletek',
   'addressBook.table.firstName': 'Keresztnév',
   'addressBook.table.lastName': 'Vezetéknév',

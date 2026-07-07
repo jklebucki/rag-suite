@@ -599,6 +599,7 @@ export const pl: TranslationKeys = {
   // Address Book
   'addressBook.title': 'Książka Adresowa',
   'addressBook.subtitle': 'Zarządzaj kontaktami i informacjami kontaktowymi',
+  'addressBook.subtitle.guestSuffix': '(zaloguj się, aby proponować zmiany)',
   'addressBook.tabs.contacts': 'Kontakty',
   'addressBook.tabs.import': 'Import',
   'addressBook.tabs.proposals': 'Propozycje',
@@ -608,7 +609,6 @@ export const pl: TranslationKeys = {
   'addressBook.loading': 'Ładowanie kontaktów...',
   'addressBook.permissions.admin': 'Możesz tworzyć, edytować i usuwać kontakty bezpośrednio',
   'addressBook.permissions.user': 'Możesz proponować zmiany, które zostaną sprawdzone przez administratorów',
-  'addressBook.permissions.guest': 'Przeglądaj kontakty (zaloguj się, aby proponować zmiany)',
   'addressBook.table.details': 'Szczegóły',
   'addressBook.table.firstName': 'Imię',
   'addressBook.table.lastName': 'Nazwisko',
