@@ -791,6 +791,11 @@ export interface TranslationKeys {
   'addressBook.import.skippedLabel': string;
   'addressBook.import.errorsLabel': string;
   'addressBook.import.sampleContacts': string;
+  'addressBook.import.skippedRowsTitle': string;
+  'addressBook.import.skippedRowsDescription': string;
+  'addressBook.import.skippedRowsDownload': string;
+  'addressBook.import.skippedRowsReason': string;
+  'addressBook.import.skippedRowsSourceRow': string;
   'addressBook.import.importing': string;
   'addressBook.import.importContacts': string;
   'addressBook.import.deleteWithoutPhoto.title': string;

@@ -8,6 +8,23 @@ interface ContactImportProps {
   onClose: () => void
 }
 
+const IMPORT_HEADERS = [
+  'Imię',
+  'Nazwisko',
+  'Dział',
+  'Telefon służbowy',
+  'Telefon komórkowy',
+  'Adres e-mail',
+  'Nazwa wyświetlana',
+  'Stanowisko',
+  'Lokalizacja',
+]
+
+const quoteCsvValue = (value: string | null | undefined): string => {
+  const text = value ?? ''
+  return `"${text.replace(/"/g, '""')}"`
+}
+
 export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose }) => {
   const { t } = useI18n()
   const [file, setFile] = useState<File | null>(null)
@@ -74,6 +91,32 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
       setError(null)
       setResult(null)
     }
+  }
+
+  const handleDownloadSkippedRows = () => {
+    if (!result?.skippedRows?.length) return
+
+    const reasonHeader = t('addressBook.import.skippedRowsReason')
+    const rows = [
+      [...IMPORT_HEADERS, reasonHeader],
+      ...result.skippedRows.map((row) => {
+        const values = IMPORT_HEADERS.map((_, index) => row.values[index] ?? '')
+        return [...values, row.reason]
+      }),
+    ]
+    const csvContent = rows
+      .map((row) => row.map(quoteCsvValue).join(';'))
+      .join('\r\n')
+
+    const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'address-book-skipped-rows.csv'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -228,6 +271,58 @@ export const ContactImport: React.FC<ContactImportProps> = ({ onImport, onClose 
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {result.skippedRows?.length > 0 && (
+            <div className="mt-4 border-t border-gray-200 pt-4 dark:border-slate-700">
+              <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                    {t('addressBook.import.skippedRowsTitle')}
+                  </p>
+                  <p className="mt-1 text-xs text-yellow-700 dark:text-yellow-300/80">
+                    {t('addressBook.import.skippedRowsDescription')}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadSkippedRows}
+                  className="btn-secondary shrink-0 text-sm"
+                >
+                  {t('addressBook.import.skippedRowsDownload')}
+                </button>
+              </div>
+              <div className="max-h-80 overflow-auto rounded-lg border border-yellow-200 dark:border-yellow-900/50">
+                <table className="min-w-full divide-y divide-yellow-200 text-xs dark:divide-yellow-900/50">
+                  <thead className="sticky top-0 bg-yellow-50 text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-semibold">{t('addressBook.import.skippedRowsSourceRow')}</th>
+                      {IMPORT_HEADERS.map((header) => (
+                        <th key={header} className="px-3 py-2 text-left font-semibold">
+                          {header}
+                        </th>
+                      ))}
+                      <th className="px-3 py-2 text-left font-semibold">{t('addressBook.import.skippedRowsReason')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-yellow-100 bg-white text-gray-700 dark:divide-yellow-900/40 dark:bg-slate-900 dark:text-gray-200">
+                    {result.skippedRows.map((row) => (
+                      <tr key={`${row.rowNumber}-${row.reason}`}>
+                        <td className="whitespace-nowrap px-3 py-2 font-medium">{row.rowNumber}</td>
+                        {IMPORT_HEADERS.map((header, index) => (
+                          <td key={`${row.rowNumber}-${header}`} className="whitespace-nowrap px-3 py-2">
+                            {row.values[index] || '-'}
+                          </td>
+                        ))}
+                        <td className="min-w-56 px-3 py-2 font-medium text-yellow-800 dark:text-yellow-300">
+                          {row.reason}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

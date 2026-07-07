@@ -14,6 +14,7 @@ public record ImportContactsResponse
     public int ErrorCount { get; init; }
     public List<string> Errors { get; init; } = new();
     public List<ImportedContactDto> ImportedContacts { get; init; } = new();
+    public List<SkippedImportRowDto> SkippedRows { get; init; } = new();
 }
 
 public record ImportedContactDto
@@ -23,4 +24,11 @@ public record ImportedContactDto
     public string LastName { get; init; } = string.Empty;
     public string? Email { get; init; }
     public string? Department { get; init; }
+}
+
+public record SkippedImportRowDto
+{
+    public int RowNumber { get; init; }
+    public List<string?> Values { get; init; } = new();
+    public string Reason { get; init; } = string.Empty;
 }

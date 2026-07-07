@@ -119,6 +119,10 @@ public class ImportContactsHandlerTests : IDisposable
         result.Should().NotBeNull();
         result.SuccessCount.Should().Be(1);
         result.SkippedCount.Should().Be(1);
+        result.SkippedRows.Should().ContainSingle();
+        result.SkippedRows[0].RowNumber.Should().Be(2);
+        result.SkippedRows[0].Reason.Should().Contain("Duplicate email");
+        result.SkippedRows[0].Values[5].Should().Be("existing@example.com");
         result.ImportedContacts.Should().HaveCount(1);
         result.ImportedContacts.First().Email.Should().Be("new@example.com");
     }
@@ -172,6 +176,9 @@ Invalid line without enough fields";
         result.Should().NotBeNull();
         result.SuccessCount.Should().Be(1);
         result.SkippedCount.Should().Be(1);
+        result.SkippedRows.Should().ContainSingle();
+        result.SkippedRows[0].RowNumber.Should().Be(3);
+        result.SkippedRows[0].Reason.Should().Contain("expected 9 columns");
     }
 
     [Fact]
@@ -197,6 +204,9 @@ Invalid line without enough fields";
         result.Should().NotBeNull();
         result.SuccessCount.Should().Be(0);
         result.SkippedCount.Should().Be(2);
+        result.SkippedRows.Should().HaveCount(2);
+        result.SkippedRows[0].Reason.Should().Be("Missing first name");
+        result.SkippedRows[1].Reason.Should().Be("Missing last name");
     }
 
     [Fact]

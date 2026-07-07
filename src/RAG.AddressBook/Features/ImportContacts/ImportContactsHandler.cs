@@ -27,6 +27,7 @@ public class ImportContactsHandler
         var userId = _userContext.GetCurrentUserId() ?? "system";
         var errors = new List<string>();
         var importedContacts = new List<ImportedContactDto>();
+        var skippedRows = new List<SkippedImportRowDto>();
         var existingEmails = new HashSet<string>();
         var existingPhoneNumbers = new HashSet<string>();
 
@@ -74,20 +75,33 @@ public class ImportContactsHandler
 
             try
             {
-                var contact = ParseCsvLine(line, userId);
+                var parseResult = ParseCsvLine(line, userId);
 
-                if (contact == null)
+                if (parseResult.Contact == null)
                 {
                     skippedCount++;
+                    skippedRows.Add(new SkippedImportRowDto
+                    {
+                        RowNumber = rowNumber,
+                        Values = parseResult.Values,
+                        Reason = parseResult.SkipReason ?? "Skipped row"
+                    });
                     continue;
                 }
 
+                var contact = parseResult.Contact;
                 var duplicateFields = GetDuplicateFields(contact, existingEmails, existingPhoneNumbers);
                 if (duplicateFields.Count > 0)
                 {
                     if (request.SkipDuplicates)
                     {
                         skippedCount++;
+                        skippedRows.Add(new SkippedImportRowDto
+                        {
+                            RowNumber = rowNumber,
+                            Values = parseResult.Values,
+                            Reason = $"Duplicate {string.Join(", ", duplicateFields)}"
+                        });
                     }
                     else
                     {
@@ -133,26 +147,40 @@ public class ImportContactsHandler
             SkippedCount = skippedCount,
             ErrorCount = errorCount,
             Errors = errors,
-            ImportedContacts = importedContacts
+            ImportedContacts = importedContacts,
+            SkippedRows = skippedRows
         };
     }
 
     /// <summary>
     /// Parse CSV line with format: "Imię";"Nazwisko";"Dział";"Telefon służbowy";"Telefon komórkowy";"Adres e-mail";"Nazwa wyświetlana";"Stanowisko";"Lokalizacja"
     /// </summary>
-    private Contact? ParseCsvLine(string line, string userId)
+    private ParseContactResult ParseCsvLine(string line, string userId)
     {
         var fields = ParseCsvFields(line);
+        var values = fields.Take(9).Select(CleanField).ToList();
 
         if (fields.Count < 9)
-            return null;
+        {
+            return new ParseContactResult(
+                Contact: null,
+                Values: values,
+                SkipReason: $"Invalid CSV row format - expected 9 columns, found {fields.Count}");
+        }
 
         var firstName = CleanField(fields[0]);
         var lastName = CleanField(fields[1]);
 
         // Skip rows with empty first name or last name
         if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
-            return null;
+        {
+            return new ParseContactResult(
+                Contact: null,
+                Values: values,
+                SkipReason: string.IsNullOrWhiteSpace(firstName)
+                    ? "Missing first name"
+                    : "Missing last name");
+        }
 
         var department = CleanField(fields[2]);
         var workPhone = CleanField(fields[3]);
@@ -173,22 +201,25 @@ public class ImportContactsHandler
             }
         }
 
-        return new Contact
-        {
-            FirstName = firstName,
-            LastName = lastName,
-            DisplayName = displayName,
-            Department = department,
-            Position = position,
-            Location = location,
-            Company = company,
-            WorkPhone = workPhone,
-            MobilePhone = mobilePhone,
-            Email = email,
-            IsActive = true,
-            CreatedByUserId = userId,
-            CreatedAt = DateTime.UtcNow
-        };
+        return new ParseContactResult(
+            Contact: new Contact
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                DisplayName = displayName,
+                Department = department,
+                Position = position,
+                Location = location,
+                Company = company,
+                WorkPhone = workPhone,
+                MobilePhone = mobilePhone,
+                Email = email,
+                IsActive = true,
+                CreatedByUserId = userId,
+                CreatedAt = DateTime.UtcNow
+            },
+            Values: values,
+            SkipReason: null);
     }
 
     /// <summary>
@@ -302,4 +333,6 @@ public class ImportContactsHandler
             set.Add(value);
         }
     }
+
+    private sealed record ParseContactResult(Contact? Contact, List<string?> Values, string? SkipReason);
 }

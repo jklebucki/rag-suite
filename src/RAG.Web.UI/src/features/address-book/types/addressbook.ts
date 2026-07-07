@@ -266,6 +266,7 @@ export interface ImportContactsResponse {
   errorCount: number
   errors: string[]
   importedContacts: ImportedContact[]
+  skippedRows: SkippedImportRow[]
 }
 
 export interface DeleteContactsWithoutPhotoResponse {
@@ -278,6 +279,12 @@ export interface ImportedContact {
   lastName: string
   email?: string | null
   department?: string | null
+}
+
+export interface SkippedImportRow {
+  rowNumber: number
+  values: Array<string | null>
+  reason: string
 }
 
 // ============================================================================
