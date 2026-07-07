@@ -831,6 +831,7 @@ export const en: TranslationKeys = {
   'addressBook.messages.unknownError': 'Unknown error',
   'addressBook.messages.failedToReview': 'Failed to review proposal',
   'addressBook.messages.importFailed': 'Import failed',
+  'addressBook.messages.saving': 'Saving...',
   'addressBook.messages.submitting': 'Submitting...',
   'addressBook.messages.update': 'Update',
   'addressBook.messages.create': 'Create',

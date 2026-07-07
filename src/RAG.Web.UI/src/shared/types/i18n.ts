@@ -841,6 +841,7 @@ export interface TranslationKeys {
   'addressBook.messages.unknownError': string;
   'addressBook.messages.failedToReview': string;
   'addressBook.messages.importFailed': string;
+  'addressBook.messages.saving': string;
   'addressBook.messages.submitting': string;
   'addressBook.messages.update': string;
   'addressBook.messages.create': string;

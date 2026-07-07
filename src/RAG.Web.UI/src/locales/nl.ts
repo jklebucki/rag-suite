@@ -778,6 +778,7 @@ export const nl: TranslationKeys = {
   'addressBook.messages.unknownError': 'Onbekende fout',
   'addressBook.messages.failedToReview': 'Beoordeling voorstel mislukt',
   'addressBook.messages.importFailed': 'Import mislukt',
+  'addressBook.messages.saving': 'Opslaan...',
   'addressBook.messages.submitting': 'Indienen...',
   'addressBook.messages.update': 'Bijwerken',
   'addressBook.messages.create': 'Aanmaken',

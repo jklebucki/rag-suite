@@ -766,6 +766,7 @@ export const hu: TranslationKeys = {
   'addressBook.messages.unknownError': 'Ismeretlen hiba',
   'addressBook.messages.failedToReview': 'Nem sikerült felülvizsgálni a javaslatot',
   'addressBook.messages.importFailed': 'Az importálás nem sikerült',
+  'addressBook.messages.saving': 'Mentés...',
   'addressBook.messages.submitting': 'Küldés...',
   'addressBook.messages.update': 'Frissítés',
   'addressBook.messages.create': 'Létrehozás',

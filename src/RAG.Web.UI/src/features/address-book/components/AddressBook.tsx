@@ -43,6 +43,7 @@ export function AddressBook() {
   const [proposingContact, setProposingContact] = useState<ContactListItem | null>(null)
   const [alertState, setAlertState] = useState<AlertState | null>(null)
   const [contactToDelete, setContactToDelete] = useState<ContactListItem | null>(null)
+  const [isContactSaving, setIsContactSaving] = useState(false)
   const [isDeleteProcessing, setIsDeleteProcessing] = useState(false)
   const [isDeleteWithoutPhotoModalOpen, setIsDeleteWithoutPhotoModalOpen] = useState(false)
   const [isDeleteWithoutPhotoProcessing, setIsDeleteWithoutPhotoProcessing] = useState(false)
@@ -94,8 +95,9 @@ export function AddressBook() {
   }
 
   const handleCreateContact = async (data: CreateContactRequest) => {
-    if (canModify) {
-      try {
+    setIsContactSaving(true)
+    try {
+      if (canModify) {
         const response = await addressBookService.createContact(data)
 
         // Create full ContactListItem from form data + API response id
@@ -127,30 +129,31 @@ export function AddressBook() {
             }, 2000)
           }
         }, 100)
-      } catch (error) {
-        throw error
+      } else {
+        // Propose change
+        await addressBookService.proposeChange({
+          proposalType: ChangeProposalType.Create,
+          proposedData: data,
+          reason: 'New contact proposal'
+        })
+        showAlert({
+          title: t('common.success'),
+          message: t('addressBook.messages.proposalSubmitted'),
+          variant: 'success'
+        })
       }
-    } else {
-      // Propose change
-      await addressBookService.proposeChange({
-        proposalType: ChangeProposalType.Create,
-        proposedData: data,
-        reason: 'New contact proposal'
-      })
-      showAlert({
-        title: t('common.success'),
-        message: t('addressBook.messages.proposalSubmitted'),
-        variant: 'success'
-      })
+      setIsFormOpen(false)
+    } finally {
+      setIsContactSaving(false)
     }
-    setIsFormOpen(false)
   }
 
   const handleUpdateContact = async (data: UpdateContactRequest) => {
     if (!editingContact) return
 
-    if (canModify) {
-      try {
+    setIsContactSaving(true)
+    try {
+      if (canModify) {
         await addressBookService.updateContact(editingContact.id, data)
 
         // Update only this specific row locally using form data.
@@ -176,25 +179,25 @@ export function AddressBook() {
               : contact
           )
         )
-      } catch (error) {
-        throw error
+      } else {
+        // Propose change
+        await addressBookService.proposeChange({
+          contactId: editingContact.id,
+          proposalType: ChangeProposalType.Update,
+          proposedData: data,
+          reason: 'Contact update proposal'
+        })
+        showAlert({
+          title: t('common.success'),
+          message: t('addressBook.messages.proposalSubmitted'),
+          variant: 'success'
+        })
       }
-    } else {
-      // Propose change
-      await addressBookService.proposeChange({
-        contactId: editingContact.id,
-        proposalType: ChangeProposalType.Update,
-        proposedData: data,
-        reason: 'Contact update proposal'
-      })
-      showAlert({
-        title: t('common.success'),
-        message: t('addressBook.messages.proposalSubmitted'),
-        variant: 'success'
-      })
+      setIsFormOpen(false)
+      setEditingContact(null)
+    } finally {
+      setIsContactSaving(false)
     }
-    setIsFormOpen(false)
-    setEditingContact(null)
   }
 
   const handleDeleteContact = (contact: ContactListItem) => {
@@ -525,6 +528,20 @@ export function AddressBook() {
           variant={alertState.variant}
           size="sm"
         />
+      )}
+
+      {isContactSaving && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+          aria-label={t('addressBook.messages.saving')}
+        >
+          <div className="flex min-w-56 flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white px-6 py-5 text-gray-900 shadow-xl dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-100 border-t-primary-600 dark:border-slate-700 dark:border-t-primary-400" />
+            <span className="text-sm font-medium">{t('addressBook.messages.saving')}</span>
+          </div>
+        </div>
       )}
     </div>
   )

@@ -766,6 +766,7 @@ export const pl: TranslationKeys = {
   'addressBook.messages.unknownError': 'Nieznany błąd',
   'addressBook.messages.failedToReview': 'Nie udało się zweryfikować propozycji',
   'addressBook.messages.importFailed': 'Import nieudany',
+  'addressBook.messages.saving': 'Zapisywanie...',
   'addressBook.messages.submitting': 'Przesyłanie...',
   'addressBook.messages.update': 'Aktualizuj',
   'addressBook.messages.create': 'Utwórz',

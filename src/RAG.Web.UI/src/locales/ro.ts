@@ -779,6 +779,7 @@ export const ro: TranslationKeys = {
   'addressBook.messages.unknownError': 'Eroare necunoscută',
   'addressBook.messages.failedToReview': 'Eșuat la revizuirea propunerii',
   'addressBook.messages.importFailed': 'Import eșuat',
+  'addressBook.messages.saving': 'Se salvează...',
   'addressBook.messages.submitting': 'Se trimite...',
   'addressBook.messages.update': 'Actualizează',
   'addressBook.messages.create': 'Creează',
