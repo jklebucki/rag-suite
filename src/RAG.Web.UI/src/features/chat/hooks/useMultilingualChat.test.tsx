@@ -29,7 +29,10 @@ vi.mock('@/shared/contexts/I18nContext', () => ({
 const {
   mockGetChatSessions,
   mockGetChatSession,
+  mockGetChatContext,
   mockSendMultilingualMessage,
+  mockUploadChatAttachments,
+  mockDeleteChatAttachment,
   mockCreateChatSession,
   mockDeleteChatSession,
 } = vi.hoisted(() => {
@@ -38,14 +41,20 @@ const {
     id: 'session1',
     messages: [],
   })
+  const mockGetChatContext = vi.fn()
   const mockSendMultilingualMessage = vi.fn()
+  const mockUploadChatAttachments = vi.fn()
+  const mockDeleteChatAttachment = vi.fn()
   const mockCreateChatSession = vi.fn()
   const mockDeleteChatSession = vi.fn()
   
   return {
     mockGetChatSessions,
     mockGetChatSession,
+    mockGetChatContext,
     mockSendMultilingualMessage,
+    mockUploadChatAttachments,
+    mockDeleteChatAttachment,
     mockCreateChatSession,
     mockDeleteChatSession,
   }
@@ -55,7 +64,10 @@ vi.mock('@/features/chat/services/chat.service', () => ({
   default: {
     getChatSessions: mockGetChatSessions,
     getChatSession: mockGetChatSession,
+    getChatContext: mockGetChatContext,
     sendMultilingualMessage: mockSendMultilingualMessage,
+    uploadChatAttachments: mockUploadChatAttachments,
+    deleteChatAttachment: mockDeleteChatAttachment,
     createChatSession: mockCreateChatSession,
     deleteChatSession: mockDeleteChatSession,
   },
@@ -89,6 +101,15 @@ describe('useMultilingualChat - useOptimistic integration', () => {
     mockGetChatSession.mockResolvedValue({
       id: 'session1',
       messages: [],
+    })
+    mockGetChatContext.mockResolvedValue({
+      usedTokens: 0,
+      limitTokens: 9600,
+      percentUsed: 0,
+      isLimitExceeded: false,
+      attachmentTokens: 0,
+      attachmentLimitTokens: 12000,
+      attachments: [],
     })
     mockSendMultilingualMessage.mockResolvedValue({
       message: { id: '2', role: 'assistant', content: 'Response', timestamp: new Date().toISOString() },

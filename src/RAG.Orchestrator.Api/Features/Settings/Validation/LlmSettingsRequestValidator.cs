@@ -32,6 +32,14 @@ public class LlmSettingsRequestValidator : AbstractValidator<LlmSettingsRequest>
             .GreaterThan(0).WithMessage("ContextWindow must be greater than 0")
             .LessThanOrEqualTo(128000).WithMessage("ContextWindow must not exceed 128000");
 
+        RuleFor(x => x.AttachmentContextLimitTokens)
+            .GreaterThan(0).WithMessage("AttachmentContextLimitTokens must be greater than 0")
+            .LessThanOrEqualTo(x => x.ContextWindow).WithMessage("AttachmentContextLimitTokens must not exceed ContextWindow");
+
+        RuleFor(x => x.SessionContextLimitTokens)
+            .GreaterThan(0).WithMessage("SessionContextLimitTokens must be greater than 0")
+            .LessThanOrEqualTo(x => x.ContextWindow).WithMessage("SessionContextLimitTokens must not exceed ContextWindow");
+
         RuleFor(x => x.ChatEndpoint)
             .NotEmpty().WithMessage("ChatEndpoint is required")
             .Must(BeValidPath).WithMessage("ChatEndpoint must be a valid path starting with /");

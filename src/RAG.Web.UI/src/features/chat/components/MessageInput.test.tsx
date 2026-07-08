@@ -85,4 +85,58 @@ describe('MessageInput', () => {
     expect(textarea.style.height).toBe('200px')
     expect(textarea.style.overflowY).toBe('auto')
   })
+
+  it('renders attachment chips only when attachments are provided', () => {
+    const onRemoveAttachment = vi.fn()
+
+    const { rerender } = render(<MessageInput {...defaultProps} />)
+    expect(screen.queryByText('notes.md')).not.toBeInTheDocument()
+
+    rerender(
+      <MessageInput
+        {...defaultProps}
+        attachments={[
+          {
+            id: 'attachment-1',
+            fileName: 'notes.md',
+            contentType: 'text/markdown',
+            sizeBytes: 128,
+            tokenCount: 42,
+            uploadedAt: new Date().toISOString(),
+          },
+        ]}
+        onRemoveAttachment={onRemoveAttachment}
+      />
+    )
+
+    expect(screen.getByText('notes.md')).toBeInTheDocument()
+    expect(screen.getByText('42')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByLabelText('chat.attachments.remove'))
+    expect(onRemoveAttachment).toHaveBeenCalledWith('attachment-1')
+  })
+
+  it('shows context usage and disables composer when session limit is reached', () => {
+    render(
+      <MessageInput
+        {...defaultProps}
+        message="blocked"
+        contextUsage={{
+          usedTokens: 9600,
+          limitTokens: 9600,
+          percentUsed: 100,
+          isLimitExceeded: true,
+          attachmentTokens: 0,
+          attachmentLimitTokens: 12000,
+          attachments: [],
+        }}
+      />
+    )
+
+    expect(screen.getByText('100%')).toBeInTheDocument()
+    expect(screen.getByText('chat.context_limit_reached')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('chat.context_limit_reached')).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'chat.send' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'chat.attachments.add' })).toBeDisabled()
+  })
 })

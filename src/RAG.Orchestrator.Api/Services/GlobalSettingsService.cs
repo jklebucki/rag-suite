@@ -53,7 +53,9 @@ public class GlobalSettingsService : IGlobalSettingsService
             Model = llmSection["Model"] ?? string.Empty,
             IsOllama = bool.TryParse(llmSection["IsOllama"], out var isOllama) ? isOllama : true,
             TimeoutMinutes = int.TryParse(llmSection["TimeoutMinutes"], out var timeout) ? timeout : 15,
-            ContextWindow = int.TryParse(llmSection["ContextWindow"], out var contextWindow) ? contextWindow : 128000,
+            ContextWindow = int.TryParse(llmSection["ContextWindow"], out var contextWindow) ? contextWindow : 98000,
+            AttachmentContextLimitTokens = int.TryParse(llmSection["AttachmentContextLimitTokens"], out var attachmentContextLimitTokens) ? attachmentContextLimitTokens : 12000,
+            SessionContextLimitTokens = int.TryParse(llmSection["SessionContextLimitTokens"], out var sessionContextLimitTokens) ? sessionContextLimitTokens : 9600,
             ChatEndpoint = llmSection["ChatEndpoint"] ?? "/api/chat",
             GenerateEndpoint = llmSection["GenerateEndpoint"] ?? "/api/generate"
         };

@@ -38,6 +38,14 @@ export function validateLlmSettings(settings: LlmSettings): {
     errors.contextWindow = 'settings.llm.validation.context_window'
   }
 
+  if (settings.attachmentContextLimitTokens <= 0 || settings.attachmentContextLimitTokens > settings.contextWindow) {
+    errors.attachmentContextLimitTokens = 'settings.llm.validation.attachment_context_limit'
+  }
+
+  if (settings.sessionContextLimitTokens <= 0 || settings.sessionContextLimitTokens > settings.contextWindow) {
+    errors.sessionContextLimitTokens = 'settings.llm.validation.session_context_limit'
+  }
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors

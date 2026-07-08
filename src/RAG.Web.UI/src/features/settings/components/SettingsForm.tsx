@@ -43,7 +43,9 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     model: '',
     isOllama: true,
     timeoutMinutes: 15,
-    contextWindow: 128000,
+    contextWindow: 98000,
+    attachmentContextLimitTokens: 12000,
+    sessionContextLimitTokens: 9600,
     chatEndpoint: '/api/chat',
     generateEndpoint: '/api/generate'
   })
@@ -140,6 +142,8 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
         isOllama: formData.get('isOllama') === 'on',
         timeoutMinutes: parseInt(formData.get('timeoutMinutes') as string, 10) || 0,
         contextWindow: parseInt(formData.get('contextWindow') as string, 10) || 0,
+        attachmentContextLimitTokens: parseInt(formData.get('attachmentContextLimitTokens') as string, 10) || 0,
+        sessionContextLimitTokens: parseInt(formData.get('sessionContextLimitTokens') as string, 10) || 0,
         chatEndpoint: formData.get('chatEndpoint') as string,
         generateEndpoint: formData.get('generateEndpoint') as string
       }
@@ -169,6 +173,8 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           isOllama: formSettings.isOllama,
           timeoutMinutes: formSettings.timeoutMinutes,
           contextWindow: formSettings.contextWindow,
+          attachmentContextLimitTokens: formSettings.attachmentContextLimitTokens,
+          sessionContextLimitTokens: formSettings.sessionContextLimitTokens,
           chatEndpoint: formSettings.chatEndpoint,
           generateEndpoint: formSettings.generateEndpoint
         }
@@ -345,6 +351,32 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             min={1}
             max={128000}
             description={t('settings.llm.fields.context_window.description')}
+          />
+
+          <LlmFormField
+            id="attachmentContextLimitTokens"
+            name="attachmentContextLimitTokens"
+            label={t('settings.llm.fields.attachment_context_limit.label')}
+            type="number"
+            value={settings.attachmentContextLimitTokens}
+            onChange={handleChange}
+            error={state?.fieldErrors.attachmentContextLimitTokens}
+            min={1}
+            max={settings.contextWindow}
+            description={t('settings.llm.fields.attachment_context_limit.description')}
+          />
+
+          <LlmFormField
+            id="sessionContextLimitTokens"
+            name="sessionContextLimitTokens"
+            label={t('settings.llm.fields.session_context_limit.label')}
+            type="number"
+            value={settings.sessionContextLimitTokens}
+            onChange={handleChange}
+            error={state?.fieldErrors.sessionContextLimitTokens}
+            min={1}
+            max={settings.contextWindow}
+            description={t('settings.llm.fields.session_context_limit.description')}
           />
 
           <LlmFormField

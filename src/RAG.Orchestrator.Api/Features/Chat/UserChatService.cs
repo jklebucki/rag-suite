@@ -3,6 +3,7 @@ using Microsoft.SemanticKernel;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Data;
+using RAG.Orchestrator.Api.Features.Chat.Attachments;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Localization;
@@ -26,6 +27,7 @@ public class UserChatService : IUserChatService
     private readonly IGlobalSettingsService _globalSettingsService;
     private readonly ISessionManager _sessionManager;
     private readonly IPromptBuilder _promptBuilder;
+    private readonly IChatAttachmentService _chatAttachmentService;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -38,7 +40,8 @@ public class UserChatService : IUserChatService
         ILlmService llmService,
         IGlobalSettingsService globalSettingsService,
         ISessionManager sessionManager,
-        IPromptBuilder promptBuilder)
+        IPromptBuilder promptBuilder,
+        IChatAttachmentService chatAttachmentService)
     {
         _chatDbContext = chatDbContext;
         _securityDbContext = securityDbContext;
@@ -51,6 +54,7 @@ public class UserChatService : IUserChatService
         _globalSettingsService = globalSettingsService;
         _sessionManager = sessionManager;
         _promptBuilder = promptBuilder;
+        _chatAttachmentService = chatAttachmentService;
     }
 
     private async Task<LlmUserContext?> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
@@ -132,6 +136,13 @@ public class UserChatService : IUserChatService
             throw new ArgumentException($"Message too long. Maximum length is {maxMessageLength} characters.");
         }
 
+        var preparedAttachments = await _chatAttachmentService.PrepareForMessageAsync(
+            userId,
+            sessionId,
+            request.Message,
+            request.AttachmentIds,
+            cancellationToken);
+
         // Detect language if not provided, but prefer UI language
         var detectedLanguage = string.IsNullOrEmpty(request.Language)
             ? _languageService.DetectLanguage(request.Message)
@@ -161,6 +172,27 @@ public class UserChatService : IUserChatService
             ))
             .ToListAsync(cancellationToken);
 
+        var userMetadata = new Dictionary<string, object>
+        {
+            ["detectedLanguage"] = detectedLanguage ?? "unknown",
+            ["originalLanguage"] = detectedLanguage ?? "unknown"
+        };
+
+        if (preparedAttachments.Files.Length > 0)
+        {
+            userMetadata["attachments"] = preparedAttachments.Files
+                .Select(file => new
+                {
+                    file.Id,
+                    file.FileName,
+                    file.ContentType,
+                    file.SizeBytes,
+                    file.TokenCount
+                })
+                .ToArray();
+            userMetadata["attachmentsTokenCount"] = preparedAttachments.TokenCount;
+        }
+
         // Add user message to database
         var userDbMessage = new ChatMessage
         {
@@ -169,11 +201,7 @@ public class UserChatService : IUserChatService
             Role = ChatRoles.User,
             Content = request.Message,
             Timestamp = DateTime.UtcNow,
-            Metadata = new Dictionary<string, object>
-            {
-                ["detectedLanguage"] = detectedLanguage ?? "unknown",
-                ["originalLanguage"] = detectedLanguage ?? "unknown"
-            }
+            Metadata = userMetadata
         };
 
         _chatDbContext.ChatMessages.Add(userDbMessage);
@@ -232,6 +260,7 @@ public class UserChatService : IUserChatService
             int[]? newOllamaContext = null;
 
             var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
+            var attachmentsContext = ChatAttachmentService.BuildAttachmentsPromptBlock(preparedAttachments.Files);
             if (llmSettings != null && llmSettings.IsOllama)
             {
                 // Inject documents into user message if document search is enabled and results found
@@ -258,6 +287,13 @@ public class UserChatService : IUserChatService
                     };
                     enhancedUserMessage = _promptBuilder.BuildMultilingualContextualPrompt(promptContext);
                     _logger.LogWarning("No documents found for multilingual user message, but document search was requested");
+                }
+
+                if (!string.IsNullOrWhiteSpace(attachmentsContext))
+                {
+                    enhancedUserMessage = $"{attachmentsContext}\n\n{enhancedUserMessage}";
+                    _logger.LogDebug("Enhanced multilingual user message with {AttachmentCount} temporary attachments, attachment tokens: {AttachmentTokens}",
+                        preparedAttachments.Files.Length, preparedAttachments.TokenCount);
                 }
 
                 // Extract sources from conversation history and add to prompt
@@ -289,10 +325,14 @@ public class UserChatService : IUserChatService
             }
             else
             {
+                var userMessageForPrompt = !string.IsNullOrWhiteSpace(attachmentsContext)
+                    ? $"{attachmentsContext}\n\n{request.Message}"
+                    : request.Message;
+
                 // Fallback to Semantic Kernel for non-Ollama providers
                 var promptContext = new PromptContext
                 {
-                    UserMessage = request.Message,
+                    UserMessage = userMessageForPrompt,
                     SearchResults = searchResults.Results,
                     ConversationHistory = conversationHistory.Select(m => new MessageContext
                     {
@@ -357,6 +397,8 @@ public class UserChatService : IUserChatService
             dbSession.UpdatedAt = DateTime.UtcNow;
 
             await _chatDbContext.SaveChangesAsync(cancellationToken);
+            await _chatAttachmentService.CommitMessageAttachmentsAsync(userId, sessionId, request.AttachmentIds, cancellationToken);
+            var contextUsage = await _chatAttachmentService.GetContextAsync(userId, sessionId, cancellationToken);
 
             return new MultilingualChatResponse
             {
@@ -372,7 +414,9 @@ public class UserChatService : IUserChatService
                 Metadata = new Dictionary<string, object>
                 {
                     ["useDocumentSearch"] = request.UseDocumentSearch,
-                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0
+                    ["documentsUsed"] = request.UseDocumentSearch ? searchResults.Results.Length : 0,
+                    ["attachmentsUsed"] = preparedAttachments.Files.Length,
+                    ["contextUsage"] = contextUsage ?? preparedAttachments.ContextUsage
                 }
             };
         }
@@ -392,6 +436,8 @@ public class UserChatService : IUserChatService
 
             _chatDbContext.ChatMessages.Add(errorDbMessage);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
+            await _chatAttachmentService.CommitMessageAttachmentsAsync(userId, sessionId, request.AttachmentIds, cancellationToken);
+            var contextUsage = await _chatAttachmentService.GetContextAsync(userId, sessionId, cancellationToken);
 
             return new MultilingualChatResponse
             {
@@ -403,14 +449,25 @@ public class UserChatService : IUserChatService
                 ResponseLanguage = normalizedResponseLanguage,
                 WasTranslated = false,
                 Sources = null,
-                ProcessingTimeMs = 0
+                ProcessingTimeMs = 0,
+                Metadata = new Dictionary<string, object>
+                {
+                    ["attachmentsUsed"] = preparedAttachments.Files.Length,
+                    ["contextUsage"] = contextUsage ?? preparedAttachments.ContextUsage
+                }
             };
         }
     }
 
     public async Task<bool> DeleteUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
     {
-        return await _sessionManager.DeleteUserSessionAsync(userId, sessionId, cancellationToken);
+        var deleted = await _sessionManager.DeleteUserSessionAsync(userId, sessionId, cancellationToken);
+        if (deleted)
+        {
+            await _chatAttachmentService.ClearSessionAsync(userId, sessionId, cancellationToken);
+        }
+
+        return deleted;
     }
 
     /// <summary>

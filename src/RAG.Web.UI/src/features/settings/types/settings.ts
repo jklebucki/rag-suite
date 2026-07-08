@@ -36,4 +36,6 @@ export interface LlmFormErrors {
   model?: string
   timeoutMinutes?: string
   contextWindow?: string
+  attachmentContextLimitTokens?: string
+  sessionContextLimitTokens?: string
 }

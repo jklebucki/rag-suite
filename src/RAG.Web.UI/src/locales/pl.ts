@@ -83,6 +83,11 @@ export const pl: TranslationKeys = {
   'chat.sources.summary': 'Wyświetlanie {0} dokumentów źródłowych',
   'chat.useDocumentSearch': 'Przeszukaj dokumenty',
   'chat.assistant_typing': 'Asystent pisze...',
+  'chat.context_usage': 'Kontekst sesji: {percent}% · {used} / {limit} tokenów',
+  'chat.context_limit_reached': 'Limit kontekstu tej sesji został wykorzystany. Rozpocznij nowy czat.',
+  'chat.attachments.add': 'Dodaj pliki tekstowe',
+  'chat.attachments.add_hint': 'Dodaj pliki tekstowe lub kod do prompta',
+  'chat.attachments.remove': 'Usuń załącznik {fileName}',
 
   // Document database status
   'chat.documents_unavailable': 'Baza dokumentów niedostępna',
@@ -281,7 +286,11 @@ export const pl: TranslationKeys = {
   'settings.llm.fields.is_ollama.label': 'Usługa Ollama',
   'settings.llm.fields.timeout_minutes.label': 'Limit czasu (minuty)',
   'settings.llm.fields.context_window.label': 'Okno kontekstu',
-  'settings.llm.fields.context_window.description': 'Wysyłane do Ollama jako options.num_ctx. Maksimum: 128000.',
+  'settings.llm.fields.context_window.description': 'Wysyłane do Ollama jako options.num_ctx. Maksimum: 128000. Domyślnie: 98000.',
+  'settings.llm.fields.attachment_context_limit.label': 'Limit kontekstu załączników',
+  'settings.llm.fields.attachment_context_limit.description': 'Maksymalna liczba tokenów dla plików tekstowych dodanych do jednej wiadomości. Domyślnie: 12000.',
+  'settings.llm.fields.session_context_limit.label': 'Limit kontekstu sesji',
+  'settings.llm.fields.session_context_limit.description': 'Po przekroczeniu tego limitu użytkownik musi rozpocząć nową sesję czatu. Domyślnie: 9600.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint czatu',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generowania',
@@ -303,6 +312,8 @@ export const pl: TranslationKeys = {
   'settings.llm.validation.model_required': 'Model jest wymagany',
   'settings.llm.validation.timeout': 'Limit czasu musi być większy niż 0',
   'settings.llm.validation.context_window': 'Okno kontekstu musi mieścić się w zakresie 1-128000',
+  'settings.llm.validation.attachment_context_limit': 'Limit załączników musi być większy niż 0 i nie może przekraczać okna kontekstu',
+  'settings.llm.validation.session_context_limit': 'Limit sesji musi być większy niż 0 i nie może przekraczać okna kontekstu',
 
   'settings.user.title': 'Zarządzanie użytkownikami',
   'settings.user.subtitle': 'Zarządzaj użytkownikami, rolami i uprawnieniami',

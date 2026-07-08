@@ -71,7 +71,9 @@ describe('SettingsForm', () => {
       model: 'llama2',
       isOllama: true,
       timeoutMinutes: 15,
-      contextWindow: 128000,
+      contextWindow: 98000,
+      attachmentContextLimitTokens: 12000,
+      sessionContextLimitTokens: 9600,
       chatEndpoint: '/api/chat',
       generateEndpoint: '/api/generate',
     })

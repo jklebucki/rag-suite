@@ -7,6 +7,7 @@ using RAG.Forum.Services;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Chat.Attachments;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Features.Chat.Validation;
@@ -88,6 +89,7 @@ public static class ServiceCollectionExtensions
     {
         // Add HttpClient factory
         services.AddHttpClient();
+        services.AddMemoryCache();
 
         // Configure LLM endpoint configuration  
         services.AddOptions<LlmEndpointConfig>()
@@ -149,6 +151,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPromptBuilder, PromptBuilder>();
         services.AddScoped<ISessionManager, SessionManager>();
         services.AddScoped<IUserChatService, UserChatService>();
+        services.AddSingleton<IContextTokenCounter, ContextTokenCounter>();
+        services.AddSingleton<IChatAttachmentStore, MemoryChatAttachmentStore>();
+        services.AddScoped<IChatAttachmentService, ChatAttachmentService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();

@@ -36,6 +36,11 @@ public class MultilingualChatRequest
     public bool UseDocumentSearch { get; set; } = true;
 
     /// <summary>
+    /// Temporary text attachment identifiers to inject into the prompt.
+    /// </summary>
+    public string[]? AttachmentIds { get; set; }
+
+    /// <summary>
     /// Additional context or metadata
     /// </summary>
     public Dictionary<string, object>? Metadata { get; set; }

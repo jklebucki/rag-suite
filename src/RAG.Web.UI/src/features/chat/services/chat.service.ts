@@ -4,6 +4,8 @@ import type { ApiResponse } from '@/shared/types/api'
 import type {
   ChatRequest,
   ChatMessage,
+  ChatAttachmentUploadResponse,
+  ChatContextUsage,
   MultilingualChatRequest,
   MultilingualChatResponse,
   ChatSession,
@@ -73,6 +75,38 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
   await apiHttpClient.delete(`/user-chat/sessions/${sessionId}`)
 }
 
+export async function getChatContext(sessionId: string, options: RequestOptions = {}): Promise<ChatContextUsage> {
+  const response = await apiHttpClient.get<ApiResponse<ChatContextUsage>>(
+    `/user-chat/sessions/${sessionId}/context`,
+    {
+      signal: options.signal,
+    },
+  )
+  return response.data.data
+}
+
+export async function uploadChatAttachments(
+  sessionId: string,
+  files: File[],
+  options: RequestOptions = {},
+): Promise<ChatAttachmentUploadResponse> {
+  const formData = new FormData()
+  files.forEach(file => formData.append('files', file))
+
+  const response = await apiHttpClient.post<ApiResponse<ChatAttachmentUploadResponse>>(
+    `/user-chat/sessions/${sessionId}/attachments`,
+    formData,
+    {
+      signal: options.signal,
+    },
+  )
+  return response.data.data
+}
+
+export async function deleteChatAttachment(sessionId: string, attachmentId: string): Promise<void> {
+  await apiHttpClient.delete(`/user-chat/sessions/${sessionId}/attachments/${attachmentId}`)
+}
+
 const chatService = {
   sendMessage,
   sendMultilingualMessage,
@@ -80,6 +114,9 @@ const chatService = {
   getChatSession,
   createChatSession,
   deleteChatSession,
+  getChatContext,
+  uploadChatAttachments,
+  deleteChatAttachment,
 }
 
 export default chatService

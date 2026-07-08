@@ -23,6 +23,10 @@ public class MultilingualChatRequestValidator : AbstractValidator<MultilingualCh
         RuleFor(x => x.ResponseLanguage)
             .Must(BeValidLanguageCode).When(x => !string.IsNullOrEmpty(x.ResponseLanguage))
             .WithMessage($"Invalid response language code. Supported languages: {string.Join(", ", SupportedLanguages.All)}");
+
+        RuleFor(x => x.AttachmentIds)
+            .Must(ids => ids == null || ids.Length <= 5)
+            .WithMessage("A message can include up to 5 attachments");
     }
 
     private static bool BeValidLanguageCode(string? language)

@@ -27,12 +27,17 @@ export function ChatInterface() {
     translationStatus,
     documentsAvailable,
     useDocumentSearch,
+    contextUsage,
+    attachments,
     sendMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
+    uploadAttachmentsMutation,
     handleSendMessage,
     handleNewSession,
     handleDeleteSession,
+    handleAttachFiles,
+    handleRemoveAttachment,
     confirmDeleteSession,
     cancelDeleteSession,
     setMessage,
@@ -134,6 +139,11 @@ export function ChatInterface() {
               isSending={sendMessageMutation.isPending}
               useDocumentSearch={useDocumentSearch}
               onUseDocumentSearchChange={setUseDocumentSearch}
+              contextUsage={contextUsage}
+              attachments={attachments}
+              onAttachFiles={handleAttachFiles}
+              onRemoveAttachment={handleRemoveAttachment}
+              isUploadingAttachments={uploadAttachmentsMutation.isPending}
             />
           </>
         ) : (

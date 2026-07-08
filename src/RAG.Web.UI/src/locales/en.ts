@@ -108,6 +108,11 @@ export const en: TranslationKeys = {
   'chat.sources.summary': 'Showing {0} source documents',
   'chat.useDocumentSearch': 'Search documents',
   'chat.assistant_typing': 'Assistant is typing...',
+  'chat.context_usage': 'Session context: {percent}% · {used} / {limit} tokens',
+  'chat.context_limit_reached': 'This session has reached its context limit. Start a new chat.',
+  'chat.attachments.add': 'Add text files',
+  'chat.attachments.add_hint': 'Attach text files or code to the prompt',
+  'chat.attachments.remove': 'Remove attachment {fileName}',
 
   // Document database status
   'chat.documents_unavailable': 'Document database unavailable',
@@ -281,7 +286,11 @@ export const en: TranslationKeys = {
   'settings.llm.fields.is_ollama.label': 'Is Ollama Service',
   'settings.llm.fields.timeout_minutes.label': 'Timeout Minutes',
   'settings.llm.fields.context_window.label': 'Context Window',
-  'settings.llm.fields.context_window.description': 'Sent to Ollama as options.num_ctx. Maximum: 128000.',
+  'settings.llm.fields.context_window.description': 'Sent to Ollama as options.num_ctx. Maximum: 128000. Default: 98000.',
+  'settings.llm.fields.attachment_context_limit.label': 'Attachment context limit',
+  'settings.llm.fields.attachment_context_limit.description': 'Maximum tokens for text files attached to one message. Default: 12000.',
+  'settings.llm.fields.session_context_limit.label': 'Session context limit',
+  'settings.llm.fields.session_context_limit.description': 'After this limit is reached, the user must start a new chat session. Default: 9600.',
   'settings.llm.fields.chat_endpoint.label': 'Chat Endpoint',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generate Endpoint',
@@ -303,6 +312,8 @@ export const en: TranslationKeys = {
   'settings.llm.validation.model_required': 'Model is required',
   'settings.llm.validation.timeout': 'Timeout must be greater than 0',
   'settings.llm.validation.context_window': 'Context window must be between 1 and 128000',
+  'settings.llm.validation.attachment_context_limit': 'Attachment limit must be greater than 0 and cannot exceed the context window',
+  'settings.llm.validation.session_context_limit': 'Session limit must be greater than 0 and cannot exceed the context window',
 
   'settings.user.title': 'User Management',
   'settings.user.subtitle': 'Manage users, roles, and permissions',

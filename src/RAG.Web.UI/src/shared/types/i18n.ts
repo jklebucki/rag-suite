@@ -127,6 +127,11 @@ export interface TranslationKeys {
   'chat.sources.summary': string;
   'chat.useDocumentSearch': string;
   'chat.assistant_typing': string;
+  'chat.context_usage': string;
+  'chat.context_limit_reached': string;
+  'chat.attachments.add': string;
+  'chat.attachments.add_hint': string;
+  'chat.attachments.remove': string;
 
   // Document database status
   'chat.documents_unavailable': string;
@@ -301,6 +306,10 @@ export interface TranslationKeys {
   'settings.llm.fields.timeout_minutes.label': string;
   'settings.llm.fields.context_window.label': string;
   'settings.llm.fields.context_window.description': string;
+  'settings.llm.fields.attachment_context_limit.label': string;
+  'settings.llm.fields.attachment_context_limit.description': string;
+  'settings.llm.fields.session_context_limit.label': string;
+  'settings.llm.fields.session_context_limit.description': string;
   'settings.llm.fields.chat_endpoint.label': string;
   'settings.llm.fields.chat_endpoint.placeholder': string;
   'settings.llm.fields.generate_endpoint.label': string;
@@ -322,6 +331,8 @@ export interface TranslationKeys {
   'settings.llm.validation.model_required': string;
   'settings.llm.validation.timeout': string;
   'settings.llm.validation.context_window': string;
+  'settings.llm.validation.attachment_context_limit': string;
+  'settings.llm.validation.session_context_limit': string;
 
   'settings.user.title': string;
   'settings.user.subtitle': string;

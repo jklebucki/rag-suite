@@ -213,6 +213,11 @@ export const ro: TranslationKeys = {
   'chat.sources.summary': 'Afișează {0} documente sursă',
   'chat.useDocumentSearch': 'Caută în documente',
   'chat.assistant_typing': 'Asistentul scrie...',
+  'chat.context_usage': 'Context sesiune: {percent}% · {used} / {limit} tokeni',
+  'chat.context_limit_reached': 'Această sesiune a atins limita de context. Pornește un chat nou.',
+  'chat.attachments.add': 'Adaugă fișiere text',
+  'chat.attachments.add_hint': 'Atașează fișiere text sau cod la prompt',
+  'chat.attachments.remove': 'Elimină atașamentul {fileName}',
 
   // Document database status
   'chat.documents_unavailable': 'Baza de date documentelor indisponibilă',
@@ -386,7 +391,11 @@ export const ro: TranslationKeys = {
   'settings.llm.fields.is_ollama.label': 'Serviciu Ollama',
   'settings.llm.fields.timeout_minutes.label': 'Limită de timp (minute)',
   'settings.llm.fields.context_window.label': 'Fereastră de context',
-  'settings.llm.fields.context_window.description': 'Trimis către Ollama ca options.num_ctx. Maximum: 128000.',
+  'settings.llm.fields.context_window.description': 'Trimis către Ollama ca options.num_ctx. Maximum: 128000. Implicit: 98000.',
+  'settings.llm.fields.attachment_context_limit.label': 'Limită context atașamente',
+  'settings.llm.fields.attachment_context_limit.description': 'Numărul maxim de tokeni pentru fișiere text atașate la un mesaj. Implicit: 12000.',
+  'settings.llm.fields.session_context_limit.label': 'Limită context sesiune',
+  'settings.llm.fields.session_context_limit.description': 'După atingerea acestei limite, utilizatorul trebuie să înceapă o sesiune nouă. Implicit: 9600.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint chat',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generare',
@@ -408,6 +417,8 @@ export const ro: TranslationKeys = {
   'settings.llm.validation.model_required': 'Modelul este obligatoriu',
   'settings.llm.validation.timeout': 'Limita de timp trebuie să fie mai mare decât 0',
   'settings.llm.validation.context_window': 'Fereastra de context trebuie să fie între 1 și 128000',
+  'settings.llm.validation.attachment_context_limit': 'Limita atașamentelor trebuie să fie mai mare decât 0 și să nu depășească fereastra de context',
+  'settings.llm.validation.session_context_limit': 'Limita sesiunii trebuie să fie mai mare decât 0 și să nu depășească fereastra de context',
 
   'settings.user.title': 'Administrare utilizatori',
   'settings.user.subtitle': 'Gestionează utilizatorii, rolurile și permisiunile',

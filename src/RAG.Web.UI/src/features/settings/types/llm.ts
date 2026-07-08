@@ -6,6 +6,8 @@ export interface LlmSettings {
   isOllama: boolean
   timeoutMinutes: number
   contextWindow: number
+  attachmentContextLimitTokens: number
+  sessionContextLimitTokens: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -18,6 +20,8 @@ export interface LlmSettingsRequest {
   isOllama: boolean
   timeoutMinutes: number
   contextWindow: number
+  attachmentContextLimitTokens: number
+  sessionContextLimitTokens: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -30,6 +34,8 @@ export interface LlmSettingsResponse {
   isOllama: boolean
   timeoutMinutes: number
   contextWindow: number
+  attachmentContextLimitTokens: number
+  sessionContextLimitTokens: number
   chatEndpoint: string
   generateEndpoint: string
 }

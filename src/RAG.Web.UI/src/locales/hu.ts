@@ -108,6 +108,11 @@ export const hu: TranslationKeys = {
   'chat.sources.summary': '{0} forrásdokumentum megjelenítése',
   'chat.useDocumentSearch': 'Dokumentumok keresése',
   'chat.assistant_typing': 'Az asszisztens ír...',
+  'chat.context_usage': 'Munkamenet kontextusa: {percent}% · {used} / {limit} token',
+  'chat.context_limit_reached': 'Ez a munkamenet elérte a kontextuskorlátot. Indíts új chatet.',
+  'chat.attachments.add': 'Szövegfájlok hozzáadása',
+  'chat.attachments.add_hint': 'Szövegfájlok vagy kód csatolása a prompthoz',
+  'chat.attachments.remove': '{fileName} melléklet eltávolítása',
 
   // Document database status
   'chat.documents_unavailable': 'Dokumentum adatbázis nem elérhető',
@@ -385,7 +390,11 @@ export const hu: TranslationKeys = {
   'settings.llm.fields.is_ollama.label': 'Ollama szolgáltatás',
   'settings.llm.fields.timeout_minutes.label': 'Időkorlát (perc)',
   'settings.llm.fields.context_window.label': 'Kontextusablak',
-  'settings.llm.fields.context_window.description': 'Az Ollama options.num_ctx értékeként lesz elküldve. Maximum: 128000.',
+  'settings.llm.fields.context_window.description': 'Az Ollama options.num_ctx értékeként lesz elküldve. Maximum: 128000. Alapértelmezett: 98000.',
+  'settings.llm.fields.attachment_context_limit.label': 'Mellékletek kontextuskorlátja',
+  'settings.llm.fields.attachment_context_limit.description': 'Egy üzenethez csatolt szövegfájlok maximális tokenszáma. Alapértelmezett: 12000.',
+  'settings.llm.fields.session_context_limit.label': 'Munkamenet kontextuskorlátja',
+  'settings.llm.fields.session_context_limit.description': 'A korlát elérése után a felhasználónak új chat munkamenetet kell indítania. Alapértelmezett: 9600.',
   'settings.llm.fields.chat_endpoint.label': 'Chat végpont',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generálási végpont',
@@ -407,6 +416,8 @@ export const hu: TranslationKeys = {
   'settings.llm.validation.model_required': 'A modell megadása kötelező',
   'settings.llm.validation.timeout': 'Az időkorlátnak nagyobbnak kell lennie 0-nál',
   'settings.llm.validation.context_window': 'A kontextusablaknak 1 és 128000 között kell lennie',
+  'settings.llm.validation.attachment_context_limit': 'A mellékletkorlátnak nagyobbnak kell lennie 0-nál, és nem haladhatja meg a kontextusablakot',
+  'settings.llm.validation.session_context_limit': 'A munkamenet-korlátnak nagyobbnak kell lennie 0-nál, és nem haladhatja meg a kontextusablakot',
 
   'settings.user.title': 'Felhasználókezelés',
   'settings.user.subtitle': 'Felhasználók, szerepkörök és jogosultságok kezelése',

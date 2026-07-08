@@ -26,6 +26,29 @@ export interface ChatRequest {
   context?: string[]
 }
 
+export interface ChatAttachmentDraft {
+  id: string
+  fileName: string
+  contentType: string
+  sizeBytes: number
+  tokenCount: number
+  uploadedAt: string
+}
+
+export interface ChatContextUsage {
+  usedTokens: number
+  limitTokens: number
+  percentUsed: number
+  isLimitExceeded: boolean
+  attachmentTokens: number
+  attachmentLimitTokens: number
+  attachments: ChatAttachmentDraft[]
+}
+
+export interface ChatAttachmentUploadResponse {
+  contextUsage: ChatContextUsage
+}
+
 export interface MultilingualChatRequest {
   message: string
   sessionId?: string
@@ -33,6 +56,7 @@ export interface MultilingualChatRequest {
   responseLanguage?: string
   enableTranslation?: boolean
   useDocumentSearch?: boolean
+  attachmentIds?: string[]
   metadata?: Record<string, unknown>
 }
 

@@ -43,7 +43,19 @@ public class LlmEndpointConfig
     /// Maximum context window sent to Ollama as num_ctx
     /// </summary>
     [Range(1, 128000)]
-    public int ContextWindow { get; set; } = 128000;
+    public int ContextWindow { get; set; } = 98000;
+
+    /// <summary>
+    /// Maximum estimated tokens allowed for temporary user attachments in one chat draft
+    /// </summary>
+    [Range(1, 128000)]
+    public int AttachmentContextLimitTokens { get; set; } = 12000;
+
+    /// <summary>
+    /// Maximum estimated tokens allowed for one persisted chat session
+    /// </summary>
+    [Range(1, 128000)]
+    public int SessionContextLimitTokens { get; set; } = 9600;
 
     /// <summary>
     /// Whether the service is Ollama (affects endpoint format)
@@ -95,5 +107,11 @@ public class LlmEndpointConfig
 
         if (ContextWindow <= 0 || ContextWindow > 128000)
             throw new ArgumentException("ContextWindow must be between 1 and 128000", nameof(ContextWindow));
+
+        if (AttachmentContextLimitTokens <= 0 || AttachmentContextLimitTokens > ContextWindow)
+            throw new ArgumentException("AttachmentContextLimitTokens must be between 1 and ContextWindow", nameof(AttachmentContextLimitTokens));
+
+        if (SessionContextLimitTokens <= 0 || SessionContextLimitTokens > ContextWindow)
+            throw new ArgumentException("SessionContextLimitTokens must be between 1 and ContextWindow", nameof(SessionContextLimitTokens));
     }
 }

@@ -9,6 +9,7 @@ import type {
   MultilingualChatResponse,
   ChatSession,
   ChatMessage,
+  ChatContextUsage,
 } from '@/features/chat/types/chat'
 
 export function useMultilingualChat() {
@@ -36,6 +37,12 @@ export function useMultilingualChat() {
   const { data: currentSession } = useQuery({
     queryKey: ['chat-session', currentSessionId],
     queryFn: ({ signal }) => (currentSessionId ? chatService.getChatSession(currentSessionId, { signal }) : null),
+    enabled: !!currentSessionId,
+  })
+
+  const { data: contextUsage = null } = useQuery<ChatContextUsage | null>({
+    queryKey: ['chat-context', currentSessionId],
+    queryFn: ({ signal }) => (currentSessionId ? chatService.getChatContext(currentSessionId, { signal }) : null),
     enabled: !!currentSessionId,
   })
 
@@ -74,6 +81,7 @@ export function useMultilingualChat() {
       // Refresh queries to get updated messages from server
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
       queryClient.invalidateQueries({ queryKey: ['chat-sessions'] })
+      queryClient.invalidateQueries({ queryKey: ['chat-context', currentSessionId] })
 
       setIsTyping(false)
 
@@ -87,11 +95,37 @@ export function useMultilingualChat() {
     },
     onError: (error) => {
       logger.error('Failed to send multilingual message:', error)
-      showError('Failed to send message', 'Please check your connection and try again')
+      showError('Failed to send message', extractApiErrorMessage(error, 'Please check your connection and try again'))
       setIsTyping(false)
       // Clear pending messages on error
       setPendingMessages([])
       queryClient.invalidateQueries({ queryKey: ['chat-session', currentSessionId] })
+      queryClient.invalidateQueries({ queryKey: ['chat-context', currentSessionId] })
+    },
+  })
+
+  const uploadAttachmentsMutation = useMutation({
+    mutationFn: ({ sessionId, files }: { sessionId: string; files: File[] }) =>
+      chatService.uploadChatAttachments(sessionId, files),
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData(['chat-context', variables.sessionId], response.contextUsage)
+    },
+    onError: (error) => {
+      logger.error('Failed to upload chat attachments:', error)
+      showError('Attachment not added', extractApiErrorMessage(error, 'The selected file could not be attached.'))
+      queryClient.invalidateQueries({ queryKey: ['chat-context', currentSessionId] })
+    },
+  })
+
+  const deleteAttachmentMutation = useMutation({
+    mutationFn: ({ sessionId, attachmentId }: { sessionId: string; attachmentId: string }) =>
+      chatService.deleteChatAttachment(sessionId, attachmentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['chat-context', variables.sessionId] })
+    },
+    onError: (error) => {
+      logger.error('Failed to delete chat attachment:', error)
+      showError('Attachment not removed', extractApiErrorMessage(error, 'Please try again.'))
     },
   })
 
@@ -124,6 +158,7 @@ export function useMultilingualChat() {
         setCurrentSessionId(null)
         // Also clear the current session data from cache
         queryClient.setQueryData(['chat-session', deletedSessionId], null)
+        queryClient.setQueryData(['chat-context', deletedSessionId], null)
       }
       showSuccess('Session deleted', 'Chat session has been deleted successfully')
     },
@@ -148,6 +183,11 @@ export function useMultilingualChat() {
 
     if (!currentSessionId) {
       logger.debug('No current session, aborting')
+      return
+    }
+
+    if (contextUsage?.isLimitExceeded) {
+      showError('Context limit reached', 'Start a new chat to continue the conversation.')
       return
     }
 
@@ -181,6 +221,7 @@ export function useMultilingualChat() {
       responseLanguage: currentLanguage,
       enableTranslation: true,
       useDocumentSearch: useDocumentSearch,
+      attachmentIds: (contextUsage?.attachments ?? []).map(attachment => attachment.id),
       metadata: {
         uiLanguage: currentLanguage,
         timestamp: messageTimestamp.toISOString()
@@ -204,6 +245,28 @@ export function useMultilingualChat() {
 
   const handleDeleteSession = (sessionId: string) => {
     setSessionToDelete(sessionId)
+  }
+
+  const handleAttachFiles = (files: File[]) => {
+    if (!currentSessionId || files.length === 0 || contextUsage?.isLimitExceeded) {
+      return
+    }
+
+    uploadAttachmentsMutation.mutate({
+      sessionId: currentSessionId,
+      files,
+    })
+  }
+
+  const handleRemoveAttachment = (attachmentId: string) => {
+    if (!currentSessionId) {
+      return
+    }
+
+    deleteAttachmentMutation.mutate({
+      sessionId: currentSessionId,
+      attachmentId,
+    })
   }
 
   const confirmDeleteSession = () => {
@@ -284,17 +347,23 @@ export function useMultilingualChat() {
     translationStatus: lastResponse?.wasTranslated ? 'translated' : 'original',
     documentsAvailable,
     useDocumentSearch,
+    contextUsage,
+    attachments: contextUsage?.attachments ?? [],
 
     // Mutations for compatibility with ChatInterface
     sendMessageMutation: sendMultilingualMessageMutation,
     createSessionMutation,
     deleteSessionMutation,
+    uploadAttachmentsMutation,
+    deleteAttachmentMutation,
 
     // Actions
     handleSendMessage,
     handleCreateSession,
     handleNewSession,
     handleDeleteSession,
+    handleAttachFiles,
+    handleRemoveAttachment,
     confirmDeleteSession,
     cancelDeleteSession,
     handleKeyPress,
@@ -304,5 +373,22 @@ export function useMultilingualChat() {
     isCreatingSession: createSessionMutation.isPending,
     isDeletingSession: deleteSessionMutation.isPending,
     isSendingMessage: sendMultilingualMessageMutation.isPending,
+    isUploadingAttachments: uploadAttachmentsMutation.isPending,
+    isRemovingAttachment: deleteAttachmentMutation.isPending,
   }
+}
+
+function extractApiErrorMessage(error: unknown, fallback: string): string {
+  const maybeResponse = error as { response?: { data?: { message?: unknown; errors?: unknown } } }
+  const message = maybeResponse.response?.data?.message
+  if (typeof message === 'string' && message.trim()) {
+    return message
+  }
+
+  const errors = maybeResponse.response?.data?.errors
+  if (Array.isArray(errors) && errors.length > 0 && typeof errors[0] === 'string') {
+    return errors[0]
+  }
+
+  return fallback
 }
