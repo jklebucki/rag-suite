@@ -11,6 +11,29 @@ import type {
 } from '@/features/auth/types/auth'
 import type { ApiResponse } from '@/shared/types/api'
 
+interface ApiErrorPayload {
+  message?: string
+  errors?: string[] | Record<string, string[]>
+}
+
+function getApiErrorMessage(error: unknown, fallback: string): string {
+  const apiError = error as {
+    response?: {
+      data?: ApiErrorPayload
+    }
+    message?: string
+  }
+  const message = apiError.response?.data?.message ?? apiError.message ?? fallback
+  const rawErrors = apiError.response?.data?.errors
+  const errors = Array.isArray(rawErrors)
+    ? rawErrors.filter(Boolean)
+    : rawErrors
+      ? Object.values(rawErrors).flat().filter(Boolean)
+      : []
+
+  return errors.length > 0 ? `${message}: ${errors.join('; ')}` : message
+}
+
 class AuthService {
   private client: AxiosInstance
 
@@ -230,15 +253,23 @@ class AuthService {
   }
 
   async confirmPasswordReset(token: string, newPassword: string, confirmPassword: string): Promise<void> {
-    await this.client.post<ApiResponse<void>>('/reset-password', {
-      Token: token,
-      NewPassword: newPassword,
-      ConfirmNewPassword: confirmPassword
-    })
+    try {
+      await this.client.post<ApiResponse<void>>('/reset-password', {
+        Token: token,
+        NewPassword: newPassword,
+        ConfirmNewPassword: confirmPassword
+      })
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error, 'Failed to reset password'))
+    }
   }
 
   async changePassword(request: ChangePasswordRequest): Promise<void> {
-    await this.client.post<ApiResponse<void>>('/change-password', request)
+    try {
+      await this.client.post<ApiResponse<void>>('/change-password', request)
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error, 'Failed to change password'))
+    }
   }
 
   async getUsers(options: { signal?: AbortSignal } = {}): Promise<User[]> {
@@ -257,7 +288,11 @@ class AuthService {
   }
 
   async setPassword(userId: string, newPassword: string): Promise<void> {
-    await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
+    try {
+      await this.client.post<ApiResponse<void>>('/set-password', { userId, newPassword })
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error, 'Failed to set password'))
+    }
   }
 
   async deleteUser(userId: string): Promise<void> {

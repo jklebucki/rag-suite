@@ -460,7 +460,7 @@ export const nl: TranslationKeys = {
   'settings.user.password.strength.fair': 'Matig',
   'settings.user.password.strength.good': 'Goed',
   'settings.user.password.strength.strong': 'Zeer goed',
-  'settings.user.password.requirements.length': 'Minimaal 8 tekens',
+  'settings.user.password.requirements.length': 'Minimaal {length} tekens',
   'settings.user.password.requirements.uppercase': 'Hoofdletter',
   'settings.user.password.requirements.lowercase': 'Kleine letter',
   'settings.user.password.requirements.number': 'Cijfer',

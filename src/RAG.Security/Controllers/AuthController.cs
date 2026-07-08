@@ -116,10 +116,14 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var success = await _authService.ChangePasswordAsync(userId, request);
-        if (!success)
+        var result = await _authService.ChangePasswordAsync(userId, request);
+        if (!result.Succeeded)
         {
-            return BadRequest(new { message = "Failed to change password. Check your current password." });
+            return BadRequest(new
+            {
+                message = "Failed to change password. Check your current password.",
+                errors = result.Errors
+            });
         }
 
         return Ok(new { message = "Password changed successfully" });
@@ -134,10 +138,14 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var success = await _authService.SetPasswordAsync(request.UserId, request.NewPassword);
-        if (!success)
+        var result = await _authService.SetPasswordAsync(request.UserId, request.NewPassword);
+        if (!result.Succeeded)
         {
-            return BadRequest(new { message = "Failed to set password" });
+            return BadRequest(new
+            {
+                message = "Failed to set password",
+                errors = result.Errors
+            });
         }
 
         return Ok(new { message = "Password set successfully" });
@@ -235,10 +243,16 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var success = await _authService.ResetPasswordAsync(request);
-        if (!success)
+        var result = await _authService.ResetPasswordAsync(request);
+        if (!result.Succeeded)
         {
-            return BadRequest(new { message = "Invalid or expired reset token" });
+            return BadRequest(new
+            {
+                message = result.Errors.Contains("Invalid or expired reset token")
+                    ? "Invalid or expired reset token"
+                    : "Failed to reset password",
+                errors = result.Errors
+            });
         }
 
         return Ok(new { message = "Password has been reset successfully" });

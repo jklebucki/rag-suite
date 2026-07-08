@@ -96,6 +96,10 @@ public record AssignRoleRequest
 
 public record SetPasswordRequest
 {
+    [Required]
     public string UserId { get; init; } = string.Empty;
+
+    [Required]
+    [MinLength(6)]
     public string NewPassword { get; init; } = string.Empty;
 }

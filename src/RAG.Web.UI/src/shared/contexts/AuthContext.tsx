@@ -24,6 +24,7 @@ interface ApiError {
   response?: {
     data?: {
       message?: string
+      errors?: string[] | Record<string, string[]>
     }
   }
   message?: string
@@ -32,7 +33,15 @@ interface ApiError {
 const getErrorMessage = (error: unknown, fallback: string): string => {
   if (typeof error === 'object' && error !== null) {
     const apiError = error as ApiError
-    return apiError.response?.data?.message ?? apiError.message ?? fallback
+    const message = apiError.response?.data?.message ?? apiError.message ?? fallback
+    const rawErrors = apiError.response?.data?.errors
+    const errors = Array.isArray(rawErrors)
+      ? rawErrors.filter(Boolean)
+      : rawErrors
+        ? Object.values(rawErrors).flat().filter(Boolean)
+        : []
+
+    return errors.length > 0 ? `${message}: ${errors.join('; ')}` : message
   }
 
   return fallback

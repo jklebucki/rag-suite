@@ -91,8 +91,8 @@ export function UserSettings() {
       setSelectedUser(null)
       showSuccess(t('settings.user.toasts.password_set'))
     },
-    onError: () => {
-      showError(t('settings.user.toasts.password_set_error'))
+    onError: (error) => {
+      showError(error instanceof Error ? error.message : t('settings.user.toasts.password_set_error'))
     }
   })
 

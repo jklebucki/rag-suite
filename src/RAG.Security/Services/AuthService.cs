@@ -187,16 +187,18 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordRequest request)
+    public async Task<PasswordOperationResult> ChangePasswordAsync(string userId, ChangePasswordRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return false;
+            return PasswordOperationResult.Failure("User was not found");
         }
 
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
-        return result.Succeeded;
+        return result.Succeeded
+            ? PasswordOperationResult.Success()
+            : PasswordOperationResult.Failure(result.Errors.Select(error => error.Description).ToArray());
     }
 
     public async Task<UserInfo?> GetUserInfoAsync(string userId)
@@ -293,20 +295,20 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+    public async Task<PasswordOperationResult> ResetPasswordAsync(ResetPasswordRequest request)
     {
         var passwordResetToken = await _context.PasswordResetTokens
             .FirstOrDefaultAsync(prt => prt.Token == request.Token && !prt.IsUsed && prt.ExpiresAt > DateTime.UtcNow);
 
         if (passwordResetToken == null)
         {
-            return false;
+            return PasswordOperationResult.Failure("Invalid or expired reset token");
         }
 
         var user = await _userManager.FindByIdAsync(passwordResetToken.UserId);
         if (user == null || !user.IsActive)
         {
-            return false;
+            return PasswordOperationResult.Failure("User was not found or is inactive");
         }
 
         // Reset password
@@ -318,23 +320,25 @@ public class AuthService : IAuthService
             // Mark token as used
             passwordResetToken.IsUsed = true;
             await _context.SaveChangesAsync();
-            return true;
+            return PasswordOperationResult.Success();
         }
 
-        return false;
+        return PasswordOperationResult.Failure(result.Errors.Select(error => error.Description).ToArray());
     }
 
-    public async Task<bool> SetPasswordAsync(string userId, string newPassword)
+    public async Task<PasswordOperationResult> SetPasswordAsync(string userId, string newPassword)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null || !user.IsActive)
         {
-            return false;
+            return PasswordOperationResult.Failure("User was not found or is inactive");
         }
 
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
-        return result.Succeeded;
+        return result.Succeeded
+            ? PasswordOperationResult.Success()
+            : PasswordOperationResult.Failure(result.Errors.Select(error => error.Description).ToArray());
     }
 
     public async Task<List<UserInfo>> GetAllUsersAsync()

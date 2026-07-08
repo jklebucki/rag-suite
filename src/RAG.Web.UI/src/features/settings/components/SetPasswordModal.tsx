@@ -4,9 +4,10 @@ import React, { useState } from 'react'
 import { User, Key } from 'lucide-react'
 import { Modal } from '@/shared/components/ui/Modal'
 import { PasswordInput } from './PasswordInput'
-import { getPasswordStrength } from '@/utils/passwordValidation'
+import { getPasswordStrength, validatePasswordRequirements } from '@/utils/passwordValidation'
 import type { User as UserType } from '@/features/auth/types/auth'
 import { useI18n } from '@/shared/contexts/I18nContext'
+import { usePasswordValidation } from '@/shared/contexts/ConfigurationContext'
 
 interface SetPasswordModalProps {
   isOpen: boolean
@@ -24,17 +25,20 @@ export function SetPasswordModal({
   isLoading
 }: SetPasswordModalProps) {
   const { t } = useI18n()
+  const { passwordRequirements } = usePasswordValidation()
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const passwordStrength = getPasswordStrength(newPassword)
+  const passwordStrength = getPasswordStrength(newPassword, passwordRequirements)
+  const passwordValidation = validatePasswordRequirements(newPassword, passwordRequirements)
   const passwordsMatch = newPassword && confirmPassword && newPassword === confirmPassword
   const passwordsMismatch = newPassword && confirmPassword && newPassword !== confirmPassword
+  const canSubmit = !isLoading && Boolean(passwordsMatch) && passwordValidation.isValid
 
   const handleSubmit = () => {
-    if (!passwordsMatch || passwordStrength.score < 3) return
+    if (!canSubmit) return
     onSetPassword(newPassword)
   }
 
@@ -104,6 +108,7 @@ export function SetPasswordModal({
               placeholder={t('settings.user.password.modal.placeholder_new')}
               label={t('settings.user.password.modal.label_new')}
               strength={passwordStrength}
+              passwordRequirements={passwordRequirements}
             />
 
             {/* Confirm Password Field */}
@@ -127,7 +132,7 @@ export function SetPasswordModal({
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={isLoading || !newPassword || !confirmPassword || passwordsMismatch || passwordStrength.score < 3}
+                disabled={!canSubmit || Boolean(passwordsMismatch)}
                 className="btn-primary text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (

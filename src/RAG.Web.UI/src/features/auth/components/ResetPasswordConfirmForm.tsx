@@ -4,7 +4,9 @@ import { Lock, ArrowLeft, CheckCircle } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useToast } from '@/shared/contexts/ToastContext'
-import { validatePassword, validatePasswordMatch } from '@/utils/validation'
+import { PasswordInput } from '@/features/settings/components/PasswordInput'
+import { getPasswordStrength, validatePasswordRequirements } from '@/utils/passwordValidation'
+import { usePasswordValidation } from '@/shared/contexts/ConfigurationContext'
 
 interface ResetPasswordConfirmData {
   newPassword: string
@@ -22,6 +24,7 @@ export function ResetPasswordConfirmForm() {
   const { t } = useI18n()
   const { confirmPasswordReset } = useAuth()
   const { addToast } = useToast()
+  const { passwordRequirements } = usePasswordValidation()
 
   const [formData, setFormData] = useState<ResetPasswordConfirmData>({
     newPassword: '',
@@ -30,10 +33,15 @@ export function ResetPasswordConfirmForm() {
 
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [token, setToken] = useState<string>('')
-  const baseInputClasses =
-    'appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 focus:z-10 sm:text-sm'
+  const passwordStrength = getPasswordStrength(formData.newPassword, passwordRequirements)
+  const passwordValidation = validatePasswordRequirements(formData.newPassword, passwordRequirements)
+  const passwordsMatch = formData.newPassword && formData.confirmPassword && formData.newPassword === formData.confirmPassword
+  const passwordsMismatch = formData.newPassword && formData.confirmPassword && formData.newPassword !== formData.confirmPassword
+  const canSubmit = !loading && Boolean(token) && Boolean(passwordsMatch) && passwordValidation.isValid
 
   useEffect(() => {
     const tokenParam = searchParams.get('token')
@@ -52,28 +60,21 @@ export function ResetPasswordConfirmForm() {
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {}
 
-    // New password validation using utility
-    const passwordValidation = validatePassword(formData.newPassword, 6)
     if (!passwordValidation.isValid) {
-      newErrors.newPassword = passwordValidation.error || t('auth.validation.password_required')
+      newErrors.newPassword = passwordRequirements?.validationMessage || t('auth.validation.password_required')
     }
 
-    // Confirm password validation using utility
     if (!formData.confirmPassword.trim()) {
       newErrors.confirmPassword = t('auth.validation.confirm_password_required')
-    } else {
-      const matchValidation = validatePasswordMatch(formData.newPassword, formData.confirmPassword)
-      if (!matchValidation.isValid) {
-        newErrors.confirmPassword = matchValidation.error || t('auth.validation.passwords_do_not_match')
-      }
+    } else if (!passwordsMatch) {
+      newErrors.confirmPassword = t('auth.validation.passwords_do_not_match')
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+  const handlePasswordChange = (name: keyof ResetPasswordConfirmData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -83,6 +84,11 @@ export function ResetPasswordConfirmForm() {
     if (errors[name as keyof ValidationErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }))
     }
+  }
+
+  const getConfirmPasswordStatus = () => {
+    if (!formData.confirmPassword) return 'none'
+    return passwordsMatch ? 'match' : 'mismatch'
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -174,50 +180,32 @@ export function ResetPasswordConfirmForm() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="newPassword" className="sr-only">
-              {t('auth.fields.new_password')}
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-              </div>
-              <input
-                id="newPassword"
-                name="newPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={formData.newPassword}
-                onChange={handleInputChange}
-                className={`${baseInputClasses} pl-10 pr-3 ${errors.newPassword ? 'form-input-error' : ''}`}
-                placeholder={t('auth.placeholders.new_password')}
-              />
-            </div>
+            <PasswordInput
+              value={formData.newPassword}
+              onChange={(value) => handlePasswordChange('newPassword', value)}
+              showPassword={showPassword}
+              onToggleShow={() => setShowPassword(!showPassword)}
+              placeholder={t('auth.placeholders.new_password')}
+              label={t('auth.fields.new_password')}
+              strength={passwordStrength}
+              passwordRequirements={passwordRequirements}
+            />
             {errors.newPassword && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.newPassword}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="sr-only">
-              {t('auth.fields.confirm_password')}
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-              </div>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className={`${baseInputClasses} pl-10 pr-3 ${errors.confirmPassword ? 'form-input-error' : ''}`}
-                placeholder={t('auth.placeholders.confirm_password')}
-              />
-            </div>
+            <PasswordInput
+              value={formData.confirmPassword}
+              onChange={(value) => handlePasswordChange('confirmPassword', value)}
+              showPassword={showConfirmPassword}
+              onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+              placeholder={t('auth.placeholders.confirm_password')}
+              label={t('auth.fields.confirm_password')}
+              matchStatus={getConfirmPasswordStatus()}
+              showRequirements={false}
+            />
             {errors.confirmPassword && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>
             )}
@@ -226,7 +214,7 @@ export function ResetPasswordConfirmForm() {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={!canSubmit || Boolean(passwordsMismatch)}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (

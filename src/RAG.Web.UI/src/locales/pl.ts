@@ -356,7 +356,7 @@ export const pl: TranslationKeys = {
   'settings.user.password.strength.fair': 'Średnie',
   'settings.user.password.strength.good': 'Dobre',
   'settings.user.password.strength.strong': 'Bardzo dobre',
-  'settings.user.password.requirements.length': 'Minimum 8 znaków',
+  'settings.user.password.requirements.length': 'Minimum {length} znaków',
   'settings.user.password.requirements.uppercase': 'Wielka litera',
   'settings.user.password.requirements.lowercase': 'Mała litera',
   'settings.user.password.requirements.number': 'Cyfra',

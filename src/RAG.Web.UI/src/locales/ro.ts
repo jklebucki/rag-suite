@@ -461,7 +461,7 @@ export const ro: TranslationKeys = {
   'settings.user.password.strength.fair': 'Acceptabilă',
   'settings.user.password.strength.good': 'Bună',
   'settings.user.password.strength.strong': 'Foarte bună',
-  'settings.user.password.requirements.length': 'Minimum 8 caractere',
+  'settings.user.password.requirements.length': 'Minimum {length} caractere',
   'settings.user.password.requirements.uppercase': 'Literă mare',
   'settings.user.password.requirements.lowercase': 'Literă mică',
   'settings.user.password.requirements.number': 'Cifră',

@@ -460,7 +460,7 @@ export const hu: TranslationKeys = {
   'settings.user.password.strength.fair': 'Közepes',
   'settings.user.password.strength.good': 'Jó',
   'settings.user.password.strength.strong': 'Nagyon jó',
-  'settings.user.password.requirements.length': 'Legalább 8 karakter',
+  'settings.user.password.requirements.length': 'Legalább {length} karakter',
   'settings.user.password.requirements.uppercase': 'Nagybetű',
   'settings.user.password.requirements.lowercase': 'Kisbetű',
   'settings.user.password.requirements.number': 'Szám',

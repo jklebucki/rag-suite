@@ -3,6 +3,7 @@
 import React from 'react'
 import { Eye, EyeOff, Lock, CheckCircle, XCircle } from 'lucide-react'
 import type { PasswordStrength } from '@/features/settings/types/settings'
+import type { PasswordRequirements } from '@/features/settings/types/configuration'
 import { useI18n } from '@/shared/contexts/I18nContext'
 
 interface PasswordInputProps {
@@ -13,6 +14,8 @@ interface PasswordInputProps {
   placeholder: string
   label: string
   strength?: PasswordStrength
+  passwordRequirements?: PasswordRequirements | null
+  showRequirements?: boolean
   matchStatus?: 'match' | 'mismatch' | 'none'
 }
 
@@ -24,6 +27,8 @@ export function PasswordInput({
   placeholder,
   label,
   strength,
+  passwordRequirements = null,
+  showRequirements = true,
   matchStatus = 'none'
 }: PasswordInputProps) {
   const getStateClasses = () => {
@@ -45,6 +50,9 @@ export function PasswordInput({
     Good: t('settings.user.password.strength.good'),
     Strong: t('settings.user.password.strength.strong')
   }
+  const requiredLength = passwordRequirements?.requiredLength ?? 8
+  const shouldShowRequirement = (requirement: keyof Pick<PasswordRequirements, 'requireUppercase' | 'requireLowercase' | 'requireDigit' | 'requireNonAlphanumeric'>) =>
+    passwordRequirements ? passwordRequirements[requirement] : true
   
   return (
     <div className="space-y-2">
@@ -73,35 +81,47 @@ export function PasswordInput({
       </div>
 
       {/* Password Strength Indicator */}
-      {strength && value && (
+      {strength && showRequirements && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-300">{t('settings.user.password.strength.label')}</span>
-            <span className={`font-medium ${
-              strength.score <= 2 ? 'text-red-600' :
-              strength.score <= 3 ? 'text-yellow-600' :
-              strength.score <= 4 ? 'text-blue-600' : 'text-green-500'
-            }`}>
-              {strengthLabels[strength.label]}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2 relative overflow-hidden">
-            <div
-              className={`absolute left-0 top-0 h-2 rounded-full transition-all duration-300 ${
-                strength.score <= 2 ? 'bg-red-500 w-2/5' :
-                strength.score <= 3 ? 'bg-yellow-500 w-3/5' :
-                strength.score <= 4 ? 'bg-blue-500 w-4/5' : 'bg-green-500 w-full'
-              }`}
-            ></div>
-          </div>
+          {value && (
+            <>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-300">{t('settings.user.password.strength.label')}</span>
+                <span className={`font-medium ${
+                  strength.score <= 2 ? 'text-red-600' :
+                  strength.score <= 3 ? 'text-yellow-600' :
+                  strength.score <= 4 ? 'text-blue-600' : 'text-green-500'
+                }`}>
+                  {strengthLabels[strength.label]}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2 relative overflow-hidden">
+                <div
+                  className={`absolute left-0 top-0 h-2 rounded-full transition-all duration-300 ${
+                    strength.score <= 2 ? 'bg-red-500 w-2/5' :
+                    strength.score <= 3 ? 'bg-yellow-500 w-3/5' :
+                    strength.score <= 4 ? 'bg-blue-500 w-4/5' : 'bg-green-500 w-full'
+                  }`}
+                ></div>
+              </div>
+            </>
+          )}
 
           {/* Password Requirements */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <PasswordRequirement met={strength.checks.length} label={t('settings.user.password.requirements.length')} />
-            <PasswordRequirement met={strength.checks.uppercase} label={t('settings.user.password.requirements.uppercase')} />
-            <PasswordRequirement met={strength.checks.lowercase} label={t('settings.user.password.requirements.lowercase')} />
-            <PasswordRequirement met={strength.checks.number} label={t('settings.user.password.requirements.number')} />
-            <PasswordRequirement met={strength.checks.special} label={t('settings.user.password.requirements.special')} />
+            <PasswordRequirement met={strength.checks.length} label={t('settings.user.password.requirements.length', { length: requiredLength.toString() })} />
+            {shouldShowRequirement('requireUppercase') && (
+              <PasswordRequirement met={strength.checks.uppercase} label={t('settings.user.password.requirements.uppercase')} />
+            )}
+            {shouldShowRequirement('requireLowercase') && (
+              <PasswordRequirement met={strength.checks.lowercase} label={t('settings.user.password.requirements.lowercase')} />
+            )}
+            {shouldShowRequirement('requireDigit') && (
+              <PasswordRequirement met={strength.checks.number} label={t('settings.user.password.requirements.number')} />
+            )}
+            {shouldShowRequirement('requireNonAlphanumeric') && (
+              <PasswordRequirement met={strength.checks.special} label={t('settings.user.password.requirements.special')} />
+            )}
           </div>
         </div>
       )}
