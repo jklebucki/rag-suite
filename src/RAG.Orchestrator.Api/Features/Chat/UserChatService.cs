@@ -28,6 +28,7 @@ public class UserChatService : IUserChatService
     private readonly ISessionManager _sessionManager;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IChatAttachmentService _chatAttachmentService;
+    private readonly IContextTokenCounter _tokenCounter;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -41,7 +42,8 @@ public class UserChatService : IUserChatService
         IGlobalSettingsService globalSettingsService,
         ISessionManager sessionManager,
         IPromptBuilder promptBuilder,
-        IChatAttachmentService chatAttachmentService)
+        IChatAttachmentService chatAttachmentService,
+        IContextTokenCounter tokenCounter)
     {
         _chatDbContext = chatDbContext;
         _securityDbContext = securityDbContext;
@@ -55,6 +57,7 @@ public class UserChatService : IUserChatService
         _sessionManager = sessionManager;
         _promptBuilder = promptBuilder;
         _chatAttachmentService = chatAttachmentService;
+        _tokenCounter = tokenCounter;
     }
 
     private async Task<LlmUserContext?> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
@@ -260,6 +263,31 @@ public class UserChatService : IUserChatService
             int[]? newOllamaContext = null;
 
             var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
+
+            // Tokenize retrieved documents and persist their token count on the user message so that
+            // the injected knowledge-base context is accounted for by the session context control.
+            if (request.UseDocumentSearch && searchResults.Results.Length > 0)
+            {
+                var documentsForTokenization = string.Join(
+                    "\n\n",
+                    searchResults.Results
+                        .Select(result => result.Content)
+                        .Where(content => !string.IsNullOrWhiteSpace(content)));
+
+                if (!string.IsNullOrWhiteSpace(documentsForTokenization))
+                {
+                    var documentTokenCount = _tokenCounter.CountTokens(documentsForTokenization, llmSettings?.Model);
+                    if (documentTokenCount > 0)
+                    {
+                        userMetadata["documentsTokenCount"] = documentTokenCount;
+                        userDbMessage.Metadata = userMetadata;
+                        _logger.LogDebug(
+                            "Counted {DocumentTokens} document tokens from {DocumentCount} results for session context control",
+                            documentTokenCount, searchResults.Results.Length);
+                    }
+                }
+            }
+
             var attachmentsContext = ChatAttachmentService.BuildAttachmentsPromptBlock(preparedAttachments.Files);
             if (llmSettings != null && llmSettings.IsOllama)
             {

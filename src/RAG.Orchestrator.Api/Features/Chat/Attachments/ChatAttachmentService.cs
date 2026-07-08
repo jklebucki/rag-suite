@@ -185,7 +185,7 @@ public class ChatAttachmentService : IChatAttachmentService
         foreach (var message in messages)
         {
             total += _tokenCounter.CountTokens(message.Content, model);
-            total += ExtractAttachmentTokens(message.MetadataJson);
+            total += ExtractInjectedContextTokens(message.MetadataJson);
         }
 
         return total;
@@ -342,7 +342,7 @@ public class ChatAttachmentService : IChatAttachmentService
         return controlCount > 0 && controlCount / (double)content.Length > 0.01;
     }
 
-    private static int ExtractAttachmentTokens(string? metadataJson)
+    private static int ExtractInjectedContextTokens(string? metadataJson)
     {
         if (string.IsNullOrWhiteSpace(metadataJson))
         {
@@ -352,17 +352,25 @@ public class ChatAttachmentService : IChatAttachmentService
         try
         {
             using var document = JsonDocument.Parse(metadataJson);
-            if (document.RootElement.TryGetProperty("attachmentsTokenCount", out var tokenElement) &&
-                tokenElement.TryGetInt32(out var tokenCount))
+            var total = 0;
+
+            if (document.RootElement.TryGetProperty("attachmentsTokenCount", out var attachmentElement) &&
+                attachmentElement.TryGetInt32(out var attachmentTokens))
             {
-                return tokenCount;
+                total += attachmentTokens;
             }
+
+            if (document.RootElement.TryGetProperty("documentsTokenCount", out var documentElement) &&
+                documentElement.TryGetInt32(out var documentTokens))
+            {
+                total += documentTokens;
+            }
+
+            return total;
         }
         catch
         {
             return 0;
         }
-
-        return 0;
     }
 }
