@@ -395,6 +395,8 @@ export const nl: TranslationKeys = {
   'settings.llm.fields.attachment_context_limit.description': 'Maximaal aantal tokens voor tekstbestanden bij één bericht. Standaard: 12000.',
   'settings.llm.fields.session_context_limit.label': 'Contextlimiet voor sessie',
   'settings.llm.fields.session_context_limit.description': 'Na het bereiken van deze limiet moet de gebruiker een nieuwe chatsessie starten. Standaard: 9600.',
+  'settings.llm.fields.document_search_limit.label': 'Aantal geïnjecteerde documenten per bericht',
+  'settings.llm.fields.document_search_limit.description': 'Hoeveel best scorende kennisbankdocumenten worden opgehaald en in de prompt geïnjecteerd. Een hogere waarde vergroot de kans dat het relevante document wordt meegenomen, maar gebruikt meer context. Standaard: 4.',
   'settings.llm.fields.chat_endpoint.label': 'Chat-endpoint',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generate-endpoint',
@@ -418,6 +420,7 @@ export const nl: TranslationKeys = {
   'settings.llm.validation.context_window': 'Contextvenster moet tussen 1 en 128000 liggen',
   'settings.llm.validation.attachment_context_limit': 'Bijlagelimiet moet groter zijn dan 0 en mag het contextvenster niet overschrijden',
   'settings.llm.validation.session_context_limit': 'Sessielimiet moet groter zijn dan 0 en mag het contextvenster niet overschrijden',
+  'settings.llm.validation.document_search_limit': 'Aantal documenten per bericht moet tussen 1 en 20 liggen',
 
   'settings.user.title': 'Gebruikersbeheer',
   'settings.user.subtitle': 'Beheer gebruikers, rollen en permissies',

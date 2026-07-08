@@ -396,6 +396,8 @@ export const ro: TranslationKeys = {
   'settings.llm.fields.attachment_context_limit.description': 'Numărul maxim de tokeni pentru fișiere text atașate la un mesaj. Implicit: 12000.',
   'settings.llm.fields.session_context_limit.label': 'Limită context sesiune',
   'settings.llm.fields.session_context_limit.description': 'După atingerea acestei limite, utilizatorul trebuie să înceapă o sesiune nouă. Implicit: 9600.',
+  'settings.llm.fields.document_search_limit.label': 'Documente injectate per mesaj',
+  'settings.llm.fields.document_search_limit.description': 'Câte documente cu cel mai bun scor din baza de cunoștințe sunt preluate și injectate în prompt. O valoare mai mare crește șansa ca documentul relevant să fie inclus, dar folosește mai mult context. Implicit: 4.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint chat',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generare',
@@ -419,6 +421,7 @@ export const ro: TranslationKeys = {
   'settings.llm.validation.context_window': 'Fereastra de context trebuie să fie între 1 și 128000',
   'settings.llm.validation.attachment_context_limit': 'Limita atașamentelor trebuie să fie mai mare decât 0 și să nu depășească fereastra de context',
   'settings.llm.validation.session_context_limit': 'Limita sesiunii trebuie să fie mai mare decât 0 și să nu depășească fereastra de context',
+  'settings.llm.validation.document_search_limit': 'Numărul de documente per mesaj trebuie să fie între 1 și 20',
 
   'settings.user.title': 'Administrare utilizatori',
   'settings.user.subtitle': 'Gestionează utilizatorii, rolurile și permisiunile',

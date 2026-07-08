@@ -38,4 +38,5 @@ export interface LlmFormErrors {
   contextWindow?: string
   attachmentContextLimitTokens?: string
   sessionContextLimitTokens?: string
+  documentSearchLimit?: string
 }

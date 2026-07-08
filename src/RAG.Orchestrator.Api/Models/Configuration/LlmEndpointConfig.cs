@@ -58,6 +58,12 @@ public class LlmEndpointConfig
     public int SessionContextLimitTokens { get; set; } = 9600;
 
     /// <summary>
+    /// Number of top-ranked documents retrieved from the knowledge base and injected into the chat prompt
+    /// </summary>
+    [Range(1, 20)]
+    public int DocumentSearchLimit { get; set; } = 4;
+
+    /// <summary>
     /// Whether the service is Ollama (affects endpoint format)
     /// </summary>
     public bool IsOllama { get; set; } = true;
@@ -113,5 +119,8 @@ public class LlmEndpointConfig
 
         if (SessionContextLimitTokens <= 0 || SessionContextLimitTokens > ContextWindow)
             throw new ArgumentException("SessionContextLimitTokens must be between 1 and ContextWindow", nameof(SessionContextLimitTokens));
+
+        if (DocumentSearchLimit < 1 || DocumentSearchLimit > 20)
+            throw new ArgumentException("DocumentSearchLimit must be between 1 and 20", nameof(DocumentSearchLimit));
     }
 }

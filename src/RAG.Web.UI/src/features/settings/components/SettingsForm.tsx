@@ -46,6 +46,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
     contextWindow: 98000,
     attachmentContextLimitTokens: 12000,
     sessionContextLimitTokens: 9600,
+    documentSearchLimit: 4,
     chatEndpoint: '/api/chat',
     generateEndpoint: '/api/generate'
   })
@@ -144,6 +145,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
         contextWindow: parseInt(formData.get('contextWindow') as string, 10) || 0,
         attachmentContextLimitTokens: parseInt(formData.get('attachmentContextLimitTokens') as string, 10) || 0,
         sessionContextLimitTokens: parseInt(formData.get('sessionContextLimitTokens') as string, 10) || 0,
+        documentSearchLimit: parseInt(formData.get('documentSearchLimit') as string, 10) || 0,
         chatEndpoint: formData.get('chatEndpoint') as string,
         generateEndpoint: formData.get('generateEndpoint') as string
       }
@@ -175,6 +177,7 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
           contextWindow: formSettings.contextWindow,
           attachmentContextLimitTokens: formSettings.attachmentContextLimitTokens,
           sessionContextLimitTokens: formSettings.sessionContextLimitTokens,
+          documentSearchLimit: formSettings.documentSearchLimit,
           chatEndpoint: formSettings.chatEndpoint,
           generateEndpoint: formSettings.generateEndpoint
         }
@@ -377,6 +380,19 @@ export function SettingsForm({ onSettingsChange }: SettingsFormProps) {
             min={1}
             max={settings.contextWindow}
             description={t('settings.llm.fields.session_context_limit.description')}
+          />
+
+          <LlmFormField
+            id="documentSearchLimit"
+            name="documentSearchLimit"
+            label={t('settings.llm.fields.document_search_limit.label')}
+            type="number"
+            value={settings.documentSearchLimit}
+            onChange={handleChange}
+            error={state?.fieldErrors.documentSearchLimit}
+            min={1}
+            max={20}
+            description={t('settings.llm.fields.document_search_limit.description')}
           />
 
           <LlmFormField

@@ -395,6 +395,8 @@ export const hu: TranslationKeys = {
   'settings.llm.fields.attachment_context_limit.description': 'Egy üzenethez csatolt szövegfájlok maximális tokenszáma. Alapértelmezett: 12000.',
   'settings.llm.fields.session_context_limit.label': 'Munkamenet kontextuskorlátja',
   'settings.llm.fields.session_context_limit.description': 'A korlát elérése után a felhasználónak új chat munkamenetet kell indítania. Alapértelmezett: 9600.',
+  'settings.llm.fields.document_search_limit.label': 'Üzenetenként beszúrt dokumentumok száma',
+  'settings.llm.fields.document_search_limit.description': 'Hány legrelevánsabb tudásbázis-dokumentumot kérünk le és szúrunk be a promptba. A magasabb érték növeli az esélyt, hogy a megfelelő dokumentum bekerül, de több kontextust használ. Alapértelmezett: 4.',
   'settings.llm.fields.chat_endpoint.label': 'Chat végpont',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generálási végpont',
@@ -418,6 +420,7 @@ export const hu: TranslationKeys = {
   'settings.llm.validation.context_window': 'A kontextusablaknak 1 és 128000 között kell lennie',
   'settings.llm.validation.attachment_context_limit': 'A mellékletkorlátnak nagyobbnak kell lennie 0-nál, és nem haladhatja meg a kontextusablakot',
   'settings.llm.validation.session_context_limit': 'A munkamenet-korlátnak nagyobbnak kell lennie 0-nál, és nem haladhatja meg a kontextusablakot',
+  'settings.llm.validation.document_search_limit': 'Az üzenetenkénti dokumentumok számának 1 és 20 között kell lennie',
 
   'settings.user.title': 'Felhasználókezelés',
   'settings.user.subtitle': 'Felhasználók, szerepkörök és jogosultságok kezelése',

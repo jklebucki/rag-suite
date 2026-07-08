@@ -46,6 +46,10 @@ export function validateLlmSettings(settings: LlmSettings): {
     errors.sessionContextLimitTokens = 'settings.llm.validation.session_context_limit'
   }
 
+  if (settings.documentSearchLimit < 1 || settings.documentSearchLimit > 20) {
+    errors.documentSearchLimit = 'settings.llm.validation.document_search_limit'
+  }
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors

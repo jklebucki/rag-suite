@@ -28,7 +28,6 @@ public class UserChatService : IUserChatService
     private readonly ISessionManager _sessionManager;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IChatAttachmentService _chatAttachmentService;
-    private readonly IContextTokenCounter _tokenCounter;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -42,8 +41,7 @@ public class UserChatService : IUserChatService
         IGlobalSettingsService globalSettingsService,
         ISessionManager sessionManager,
         IPromptBuilder promptBuilder,
-        IChatAttachmentService chatAttachmentService,
-        IContextTokenCounter tokenCounter)
+        IChatAttachmentService chatAttachmentService)
     {
         _chatDbContext = chatDbContext;
         _securityDbContext = securityDbContext;
@@ -57,7 +55,6 @@ public class UserChatService : IUserChatService
         _sessionManager = sessionManager;
         _promptBuilder = promptBuilder;
         _chatAttachmentService = chatAttachmentService;
-        _tokenCounter = tokenCounter;
     }
 
     private async Task<LlmUserContext?> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
@@ -222,16 +219,22 @@ public class UserChatService : IUserChatService
         );
         conversationHistory.Add(userMessage);
 
+        var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
+
         try
         {
             // Search for relevant context only if document search is enabled
             SearchResponse searchResults;
             if (request.UseDocumentSearch)
             {
+                // Retrieve the top-N documents so the relevant one is included even when a
+                // marginally-related document (e.g. keyword-stuffed) outranks it as the single top hit.
+                // The limit is configurable from the LLM settings in the UI.
+                var documentSearchLimit = Math.Max(1, llmSettings?.DocumentSearchLimit ?? 4);
                 searchResults = await _searchService.SearchAsync(new SearchRequest(
                     request.Message,
                     Filters: null,
-                    Limit: 1, // Get only one document with the highest rating
+                    Limit: documentSearchLimit,
                     Offset: 0
                 ), cancellationToken);
             }
@@ -261,32 +264,6 @@ public class UserChatService : IUserChatService
             // Check if Ollama is configured, if so use LLM service with context support
             string aiResponseContent;
             int[]? newOllamaContext = null;
-
-            var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
-
-            // Tokenize retrieved documents and persist their token count on the user message so that
-            // the injected knowledge-base context is accounted for by the session context control.
-            if (request.UseDocumentSearch && searchResults.Results.Length > 0)
-            {
-                var documentsForTokenization = string.Join(
-                    "\n\n",
-                    searchResults.Results
-                        .Select(result => result.Content)
-                        .Where(content => !string.IsNullOrWhiteSpace(content)));
-
-                if (!string.IsNullOrWhiteSpace(documentsForTokenization))
-                {
-                    var documentTokenCount = _tokenCounter.CountTokens(documentsForTokenization, llmSettings?.Model);
-                    if (documentTokenCount > 0)
-                    {
-                        userMetadata["documentsTokenCount"] = documentTokenCount;
-                        userDbMessage.Metadata = userMetadata;
-                        _logger.LogDebug(
-                            "Counted {DocumentTokens} document tokens from {DocumentCount} results for session context control",
-                            documentTokenCount, searchResults.Results.Length);
-                    }
-                }
-            }
 
             var attachmentsContext = ChatAttachmentService.BuildAttachmentsPromptBlock(preparedAttachments.Files);
             if (llmSettings != null && llmSettings.IsOllama)

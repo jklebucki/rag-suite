@@ -310,6 +310,8 @@ export interface TranslationKeys {
   'settings.llm.fields.attachment_context_limit.description': string;
   'settings.llm.fields.session_context_limit.label': string;
   'settings.llm.fields.session_context_limit.description': string;
+  'settings.llm.fields.document_search_limit.label': string;
+  'settings.llm.fields.document_search_limit.description': string;
   'settings.llm.fields.chat_endpoint.label': string;
   'settings.llm.fields.chat_endpoint.placeholder': string;
   'settings.llm.fields.generate_endpoint.label': string;
@@ -333,6 +335,7 @@ export interface TranslationKeys {
   'settings.llm.validation.context_window': string;
   'settings.llm.validation.attachment_context_limit': string;
   'settings.llm.validation.session_context_limit': string;
+  'settings.llm.validation.document_search_limit': string;
 
   'settings.user.title': string;
   'settings.user.subtitle': string;

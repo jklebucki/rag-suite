@@ -291,6 +291,8 @@ export const en: TranslationKeys = {
   'settings.llm.fields.attachment_context_limit.description': 'Maximum tokens for text files attached to one message. Default: 12000.',
   'settings.llm.fields.session_context_limit.label': 'Session context limit',
   'settings.llm.fields.session_context_limit.description': 'After this limit is reached, the user must start a new chat session. Default: 9600.',
+  'settings.llm.fields.document_search_limit.label': 'Documents injected per message',
+  'settings.llm.fields.document_search_limit.description': 'How many top-ranked knowledge-base documents are retrieved and injected into the prompt. Higher values improve the chance the relevant document is included, but use more context. Default: 4.',
   'settings.llm.fields.chat_endpoint.label': 'Chat Endpoint',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Generate Endpoint',
@@ -314,6 +316,7 @@ export const en: TranslationKeys = {
   'settings.llm.validation.context_window': 'Context window must be between 1 and 128000',
   'settings.llm.validation.attachment_context_limit': 'Attachment limit must be greater than 0 and cannot exceed the context window',
   'settings.llm.validation.session_context_limit': 'Session limit must be greater than 0 and cannot exceed the context window',
+  'settings.llm.validation.document_search_limit': 'Documents per message must be between 1 and 20',
 
   'settings.user.title': 'User Management',
   'settings.user.subtitle': 'Manage users, roles, and permissions',

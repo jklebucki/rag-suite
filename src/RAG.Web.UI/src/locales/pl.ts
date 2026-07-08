@@ -291,6 +291,8 @@ export const pl: TranslationKeys = {
   'settings.llm.fields.attachment_context_limit.description': 'Maksymalna liczba tokenów dla plików tekstowych dodanych do jednej wiadomości. Domyślnie: 12000.',
   'settings.llm.fields.session_context_limit.label': 'Limit kontekstu sesji',
   'settings.llm.fields.session_context_limit.description': 'Po przekroczeniu tego limitu użytkownik musi rozpocząć nową sesję czatu. Domyślnie: 9600.',
+  'settings.llm.fields.document_search_limit.label': 'Liczba dokumentów wstrzykiwanych do wiadomości',
+  'settings.llm.fields.document_search_limit.description': 'Ile najlepiej dopasowanych dokumentów z bazy wiedzy jest pobieranych i wstrzykiwanych do promptu. Wyższa wartość zwiększa szansę, że właściwy dokument zostanie uwzględniony, ale zużywa więcej kontekstu. Domyślnie: 4.',
   'settings.llm.fields.chat_endpoint.label': 'Endpoint czatu',
   'settings.llm.fields.chat_endpoint.placeholder': '/api/chat',
   'settings.llm.fields.generate_endpoint.label': 'Endpoint generowania',
@@ -314,6 +316,7 @@ export const pl: TranslationKeys = {
   'settings.llm.validation.context_window': 'Okno kontekstu musi mieścić się w zakresie 1-128000',
   'settings.llm.validation.attachment_context_limit': 'Limit załączników musi być większy niż 0 i nie może przekraczać okna kontekstu',
   'settings.llm.validation.session_context_limit': 'Limit sesji musi być większy niż 0 i nie może przekraczać okna kontekstu',
+  'settings.llm.validation.document_search_limit': 'Liczba dokumentów na wiadomość musi być z zakresu 1–20',
 
   'settings.user.title': 'Zarządzanie użytkownikami',
   'settings.user.subtitle': 'Zarządzaj użytkownikami, rolami i uprawnieniami',

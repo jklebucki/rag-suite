@@ -8,6 +8,7 @@ export interface LlmSettings {
   contextWindow: number
   attachmentContextLimitTokens: number
   sessionContextLimitTokens: number
+  documentSearchLimit: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -22,6 +23,7 @@ export interface LlmSettingsRequest {
   contextWindow: number
   attachmentContextLimitTokens: number
   sessionContextLimitTokens: number
+  documentSearchLimit: number
   chatEndpoint: string
   generateEndpoint: string
 }
@@ -36,6 +38,7 @@ export interface LlmSettingsResponse {
   contextWindow: number
   attachmentContextLimitTokens: number
   sessionContextLimitTokens: number
+  documentSearchLimit: number
   chatEndpoint: string
   generateEndpoint: string
 }

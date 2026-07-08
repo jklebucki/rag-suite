@@ -20,7 +20,8 @@ public static class SettingsEndpoints
                 TimeoutMinutes = 15,
                 ContextWindow = 98000,
                 AttachmentContextLimitTokens = 12000,
-                SessionContextLimitTokens = 9600
+                SessionContextLimitTokens = 9600,
+                DocumentSearchLimit = 4
             };
 
             var response = new LlmSettingsResponse
@@ -34,6 +35,7 @@ public static class SettingsEndpoints
                 ContextWindow = settings.ContextWindow,
                 AttachmentContextLimitTokens = settings.AttachmentContextLimitTokens,
                 SessionContextLimitTokens = settings.SessionContextLimitTokens,
+                DocumentSearchLimit = settings.DocumentSearchLimit,
                 ChatEndpoint = settings.ChatEndpoint,
                 GenerateEndpoint = settings.GenerateEndpoint
             };
@@ -66,6 +68,7 @@ public static class SettingsEndpoints
                 ContextWindow = request.ContextWindow,
                 AttachmentContextLimitTokens = request.AttachmentContextLimitTokens,
                 SessionContextLimitTokens = request.SessionContextLimitTokens,
+                DocumentSearchLimit = request.DocumentSearchLimit,
                 ChatEndpoint = request.ChatEndpoint,
                 GenerateEndpoint = request.GenerateEndpoint
             };
