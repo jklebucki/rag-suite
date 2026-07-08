@@ -64,7 +64,9 @@ Citronex is een internationale, familiebezit groep van bedrijven met het hoofdka
 
 ## Gebruikersinformatie
 U spreekt met de gebruiker: {FirstName} {LastName} ({Email})  
-Rol: {Role}
+Gebruikersnaam: {UserName}  
+Primaire rol: {Role}  
+Gebruikersrollen: {Roles}
 
 ## 4. Organisatiestructuur bij Citronex I
 

@@ -322,6 +322,24 @@ public class LlmService : ILlmService
         string? role,
         CancellationToken cancellationToken = default)
     {
+        var userContext = new LlmUserContext
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Roles = string.IsNullOrWhiteSpace(role) ? Array.Empty<string>() : new[] { role }
+        };
+
+        return await ChatWithHistoryAsync(messageHistory, userMessage, language, userContext, cancellationToken);
+    }
+
+    public async Task<string> ChatWithHistoryAsync(
+        IEnumerable<LlmChatMessage> messageHistory,
+        string userMessage,
+        string language,
+        LlmUserContext? userContext,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
             var settings = await GetSettingsAsync();
@@ -332,7 +350,7 @@ public class LlmService : ILlmService
                 return await GenerateResponseAsync(userMessage, cancellationToken);
             }
 
-            var messages = await BuildChatMessagesAsync(messageHistory, userMessage, language, firstName, lastName, email, role, cancellationToken);
+            var messages = await BuildChatMessagesAsync(messageHistory, userMessage, language, userContext, cancellationToken);
 
             var request = new
             {
@@ -398,9 +416,27 @@ public class LlmService : ILlmService
         string? role,
         CancellationToken cancellationToken)
     {
+        var userContext = new LlmUserContext
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Roles = string.IsNullOrWhiteSpace(role) ? Array.Empty<string>() : new[] { role }
+        };
+
+        return await BuildChatMessagesAsync(messageHistory, userMessage, language, userContext, cancellationToken);
+    }
+
+    private async Task<List<LlmChatMessage>> BuildChatMessagesAsync(
+        IEnumerable<LlmChatMessage> messageHistory,
+        string userMessage,
+        string language,
+        LlmUserContext? userContext,
+        CancellationToken cancellationToken)
+    {
         var messages = new List<LlmChatMessage>();
 
-        var systemMessage = await GetSystemMessageAsync(language, firstName, lastName, email, role, cancellationToken);
+        var systemMessage = await GetSystemMessageAsync(language, userContext, cancellationToken);
         if (!string.IsNullOrEmpty(systemMessage))
         {
             messages.Add(new LlmChatMessage { Role = "system", Content = systemMessage });
@@ -408,6 +444,11 @@ public class LlmService : ILlmService
         }
 
         messages.AddRange(messageHistory);
+        messages.Add(new LlmChatMessage
+        {
+            Role = "system",
+            Content = BuildRuntimeSystemContext(userContext)
+        });
         messages.Add(new LlmChatMessage { Role = "user", Content = userMessage });
 
         return messages;
@@ -445,10 +486,26 @@ public class LlmService : ILlmService
         string? role,
         CancellationToken cancellationToken = default)
     {
+        var userContext = new LlmUserContext
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Roles = string.IsNullOrWhiteSpace(role) ? Array.Empty<string>() : new[] { role }
+        };
+
+        return await GetSystemMessageAsync(language, userContext, cancellationToken);
+    }
+
+    public async Task<string> GetSystemMessageAsync(
+        string language,
+        LlmUserContext? userContext,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
             var targetLanguage = _supportedLanguages.Contains(language.ToLower()) ? language.ToLower() : "en";
-            var cacheKey = $"{targetLanguage}_{firstName}_{lastName}_{email}_{role}";
+            var cacheKey = BuildSystemMessageCacheKey(targetLanguage, userContext);
 
             // Check cache first
             if (_systemMessageCache.TryGetValue(cacheKey, out var cachedMessage))
@@ -456,7 +513,7 @@ public class LlmService : ILlmService
                 return AppendRuntimeServerContext(cachedMessage);
             }
 
-            var message = await LoadSystemMessageAsync(targetLanguage, firstName, lastName, email, role, cancellationToken);
+            var message = await LoadSystemMessageAsync(targetLanguage, userContext, cancellationToken);
 
             // Cache the loaded message
             _systemMessageCache.TryAdd(cacheKey, message);
@@ -472,10 +529,7 @@ public class LlmService : ILlmService
 
     private async Task<string> LoadSystemMessageAsync(
         string targetLanguage,
-        string? firstName,
-        string? lastName,
-        string? email,
-        string? role,
+        LlmUserContext? userContext,
         CancellationToken cancellationToken)
     {
         var fileName = $"system_{targetLanguage}.md";
@@ -495,15 +549,15 @@ public class LlmService : ILlmService
             return DefaultSystemMessage;
         }
 
-        // Replace user information placeholders if any are provided
-        if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName) ||
-            !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(role))
+        if (userContext != null)
         {
             systemMessage = systemMessage
-                .Replace("{FirstName}", firstName ?? string.Empty)
-                .Replace("{LastName}", lastName ?? string.Empty)
-                .Replace("{Email}", email ?? string.Empty)
-                .Replace("{Role}", role ?? string.Empty);
+                .Replace("{FirstName}", userContext.FirstName ?? string.Empty)
+                .Replace("{LastName}", userContext.LastName ?? string.Empty)
+                .Replace("{Email}", userContext.Email ?? string.Empty)
+                .Replace("{UserName}", userContext.UserName ?? string.Empty)
+                .Replace("{Role}", userContext.Roles.FirstOrDefault() ?? string.Empty)
+                .Replace("{Roles}", string.Join(", ", userContext.Roles));
         }
 
         _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
@@ -517,5 +571,58 @@ public class LlmService : ILlmService
             : systemMessage.TrimEnd();
 
         return $"{baseMessage}{Environment.NewLine}{Environment.NewLine}{RuntimePromptContextBuilder.BuildServerDateTimeContext()}";
+    }
+
+    private static string BuildRuntimeSystemContext(LlmUserContext? userContext)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine(RuntimePromptContextBuilder.BuildServerDateTimeContext());
+
+        var userSection = BuildAuthenticatedUserContext(userContext);
+        if (!string.IsNullOrWhiteSpace(userSection))
+        {
+            builder.AppendLine();
+            builder.Append(userSection);
+        }
+
+        return builder.ToString();
+    }
+
+    private static string BuildAuthenticatedUserContext(LlmUserContext? userContext)
+    {
+        if (userContext == null)
+            return string.Empty;
+
+        var builder = new StringBuilder();
+        builder.AppendLine("=== AUTHENTICATED USER CONTEXT (RAG SUITE) ===");
+        builder.AppendLine($"- User ID: {FormatContextValue(userContext.UserId)}");
+        builder.AppendLine($"- Username: {FormatContextValue(userContext.UserName)}");
+        builder.AppendLine($"- Display name: {FormatContextValue(userContext.DisplayName)}");
+        builder.AppendLine($"- First name: {FormatContextValue(userContext.FirstName)}");
+        builder.AppendLine($"- Last name: {FormatContextValue(userContext.LastName)}");
+        builder.AppendLine($"- Email: {FormatContextValue(userContext.Email)}");
+        builder.AppendLine($"- Roles: {FormatRoles(userContext.Roles)}");
+        builder.AppendLine("- Use this authenticated user context when interpreting mentions of the current user in documents, permissions, ownership, assignments, or organizational references.");
+        builder.Append("- Do not reveal unrelated private profile data unless directly relevant to the user's request.");
+        return builder.ToString();
+    }
+
+    private static string BuildSystemMessageCacheKey(string targetLanguage, LlmUserContext? userContext)
+    {
+        if (userContext == null)
+            return targetLanguage;
+
+        var roles = string.Join("|", userContext.Roles.OrderBy(role => role));
+        return $"{targetLanguage}_{userContext.UserId}_{userContext.UserName}_{userContext.FirstName}_{userContext.LastName}_{userContext.Email}_{roles}";
+    }
+
+    private static string FormatContextValue(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "not available" : value;
+    }
+
+    private static string FormatRoles(string[] roles)
+    {
+        return roles.Length == 0 ? "none" : string.Join(", ", roles);
     }
 }

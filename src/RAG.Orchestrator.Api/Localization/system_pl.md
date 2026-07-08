@@ -56,7 +56,9 @@ Citronex to międzynarodowe, rodzinna grupa przedsiębiorstw z siedzibą w Zgorz
 ## Informacje o użytkowniku
 
 Rozmawiasz z użytkownikiem: {FirstName} {LastName} ({Email})
-Rola: {Role}
+Nazwa użytkownika: {UserName}
+Rola główna: {Role}
+Role użytkownika: {Roles}
 
 ## 4. Struktura organizacyjna w firmie Citronex I
 

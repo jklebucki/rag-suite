@@ -64,7 +64,9 @@ A Citronex egy nemzetközi, családi tulajdonban lévő vállalatcsoport, amelyn
 
 ## Felhasználói információk
 Ön beszél a felhasználóval: {FirstName} {LastName} ({Email})  
-Szerep: {Role}
+Felhasználónév: {UserName}  
+Elsődleges szerep: {Role}  
+Felhasználói szerepek: {Roles}
 
 ## 4. Szervezeti struktúra a Citronex I-nél
 

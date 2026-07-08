@@ -64,7 +64,9 @@ Citronex is an international, family-owned group of companies headquartered in Z
 
 ## User Information
 You are talking to the user: {FirstName} {LastName} ({Email})  
-Role: {Role}
+Username: {UserName}  
+Primary role: {Role}  
+User roles: {Roles}
 
 ## 4. Organizational Structure at Citronex I
 

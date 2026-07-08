@@ -64,7 +64,9 @@ Citronex este un grup internațional de companii de familie cu sediul în Zgorze
 
 ## Informații despre utilizator
 Vorbești cu utilizatorul: {FirstName} {LastName} ({Email})  
-Rol: {Role}
+Nume utilizator: {UserName}  
+Rol principal: {Role}  
+Roluri utilizator: {Roles}
 
 ## 4. Structura Organizațională la Citronex I
 

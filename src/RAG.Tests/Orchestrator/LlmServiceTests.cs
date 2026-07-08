@@ -463,6 +463,80 @@ public class LlmServiceTests : IDisposable
         doc.RootElement.GetProperty("options").GetProperty("temperature").GetDouble().Should().Be(0.7);
         doc.RootElement.GetProperty("options").GetProperty("num_predict").GetInt32().Should().Be(100);
         doc.RootElement.GetProperty("options").GetProperty("num_ctx").GetInt32().Should().Be(128000);
+        var messages = doc.RootElement.GetProperty("messages").EnumerateArray().ToArray();
+        messages.Should().HaveCount(5);
+        messages[^2].GetProperty("role").GetString().Should().Be("system");
+        messages[^2].GetProperty("content").GetString().Should().Contain("Current server local day of week:");
+        messages[^1].GetProperty("role").GetString().Should().Be("user");
+        messages[^1].GetProperty("content").GetString().Should().Be("How are you?");
+
+        async Task<HttpResponseMessage> CaptureChatRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            return new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+            };
+        }
+    }
+
+    [Fact]
+    public async Task ChatWithHistoryAsync_WithUserContext_AddsAuthenticatedUserContextBeforeCurrentMessage()
+    {
+        // Arrange
+        var settings = new LlmSettings
+        {
+            Url = "http://test-ollama.com",
+            Model = "test-model",
+            IsOllama = true,
+            Temperature = 0.7,
+            MaxTokens = 100,
+            ContextWindow = 128000,
+            ChatEndpoint = "/api/chat",
+            TimeoutMinutes = 5
+        };
+
+        _mockCache.Setup(c => c.GetLlmSettingsAsync()).ReturnsAsync(settings);
+
+        string? requestBody = null;
+        var responseJson = JsonSerializer.Serialize(new
+        {
+            message = new { content = "Chat response" }
+        });
+        _mockHttpHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .Returns((HttpRequestMessage request, CancellationToken cancellationToken) => CaptureChatRequestAsync(request, cancellationToken));
+
+        var userContext = new LlmUserContext
+        {
+            UserId = "user-123",
+            UserName = "jklebucki",
+            FirstName = "Jarosław",
+            LastName = "Kłębucki",
+            Email = "jklebucki@example.com",
+            Roles = new[] { "Admin", "PowerUser" }
+        };
+
+        // Act
+        var result = await _llmService.ChatWithHistoryAsync(Array.Empty<LlmChatMessage>(), "Who am I?", "pl", userContext);
+
+        // Assert
+        result.Should().Be("Chat response");
+        requestBody.Should().NotBeNullOrWhiteSpace();
+        using var doc = JsonDocument.Parse(requestBody!);
+        var messages = doc.RootElement.GetProperty("messages").EnumerateArray().ToArray();
+        messages.Should().HaveCount(3);
+
+        var runtimeSystemMessage = messages[^2];
+        runtimeSystemMessage.GetProperty("role").GetString().Should().Be("system");
+        var runtimeContent = runtimeSystemMessage.GetProperty("content").GetString();
+        runtimeContent.Should().Contain("AUTHENTICATED USER CONTEXT");
+        runtimeContent.Should().Contain("User ID: user-123");
+        runtimeContent.Should().Contain("Username: jklebucki");
+        runtimeContent.Should().Contain("Display name: Jarosław Kłębucki");
+        runtimeContent.Should().Contain("Email: jklebucki@example.com");
+        runtimeContent.Should().Contain("Roles: Admin, PowerUser");
 
         async Task<HttpResponseMessage> CaptureChatRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

@@ -53,7 +53,7 @@ public class UserChatService : IUserChatService
         _promptBuilder = promptBuilder;
     }
 
-    private async Task<(string? FirstName, string? LastName, string? Email, string? Role)> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
+    private async Task<LlmUserContext?> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
     {
         try
         {
@@ -63,15 +63,30 @@ public class UserChatService : IUserChatService
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user == null)
-                return (null, null, null, null);
+                return null;
 
-            var role = user.UserRoles.FirstOrDefault()?.Role?.Name;
-            return (user.FirstName, user.LastName, user.Email, role);
+            var roles = user.UserRoles
+                .Select(userRole => userRole.Role?.Name)
+                .OfType<string>()
+                .Where(roleName => !string.IsNullOrWhiteSpace(roleName))
+                .Distinct()
+                .OrderBy(roleName => roleName)
+                .ToArray();
+
+            return new LlmUserContext
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Roles = roles
+            };
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to retrieve user info for user {UserId}", userId);
-            return (null, null, null, null);
+            return null;
         }
     }
 
@@ -100,7 +115,7 @@ public class UserChatService : IUserChatService
     public async Task<MultilingualChatResponse> SendUserMultilingualMessageAsync(string userId, string sessionId, Models.MultilingualChatRequest request, CancellationToken cancellationToken = default)
     {
         // Get user information for system message personalization
-        var (firstName, lastName, email, role) = await GetUserInfoAsync(userId, cancellationToken);
+        var userContext = await GetUserInfoAsync(userId, cancellationToken);
 
         // Check if user has access to this session
         var dbSession = await _chatDbContext.ChatSessions
@@ -264,10 +279,7 @@ public class UserChatService : IUserChatService
                     messageHistory,
                     enhancedUserMessage,
                     normalizedResponseLanguage, // Let ChatService handle system message
-                    firstName,
-                    lastName,
-                    email,
-                    role,
+                    userContext,
                     cancellationToken);
 
                 _logger.LogDebug("Generated multilingual user response using Chat API with {HistoryCount} previous messages", messageHistory.Count());
