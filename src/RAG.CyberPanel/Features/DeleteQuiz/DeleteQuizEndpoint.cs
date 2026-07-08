@@ -12,7 +12,6 @@ public static class DeleteQuizEndpoint
     {
         app.MapDelete("/{quizId:guid}", DeleteQuiz)
             .WithName("DeleteQuiz")
-            .WithOpenApi()
             .Produces<DeleteQuizResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status401Unauthorized);

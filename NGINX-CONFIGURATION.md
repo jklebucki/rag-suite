@@ -50,7 +50,7 @@ sudo ./production-setup.sh
 ```
 
 **Funkcje:**
-- Instaluje .NET 8 (używa `install-dotnet8.sh`)
+- Instaluje .NET 10 (używa `install-dotnet10.sh`)
 - Instaluje Node.js 20
 - Instaluje nginx
 - Tworzy systemd service dla API

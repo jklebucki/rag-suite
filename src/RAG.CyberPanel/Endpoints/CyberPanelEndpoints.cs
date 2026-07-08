@@ -24,8 +24,7 @@ public static class CyberPanelEndpoints
     public static RouteGroupBuilder MapCyberPanelEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/cyberpanel/quizzes")
-            .WithTags("CyberPanel")
-            .WithOpenApi();
+            .WithTags("CyberPanel");
 
         // Map feature endpoints following Vertical Slice Architecture
         group.MapListQuizzes();

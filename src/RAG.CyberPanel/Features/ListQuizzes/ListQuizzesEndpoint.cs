@@ -19,7 +19,6 @@ public static class ListQuizzesEndpoint
             return Results.Ok(result);
         })
         .WithName("ListQuizzes")
-        .WithOpenApi()
         .RequireAuthorization();
 
         return group;

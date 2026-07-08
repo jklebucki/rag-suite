@@ -9,7 +9,7 @@ This guide helps you set up RAG Suite on any operating system - Windows, macOS, 
 ### Required Tools
 
 - **Docker & Docker Compose**: For running Elasticsearch, Ollama, and other services
-- **.NET 8 SDK**: For building and running the application
+- **.NET 10 SDK**: For building and running the application
 - **PowerShell** (Optional): For using the cross-platform setup script
 
 ### Platform-Specific Installation
@@ -18,7 +18,7 @@ This guide helps you set up RAG Suite on any operating system - Windows, macOS, 
 ```powershell
 # Install via winget
 winget install Docker.DockerDesktop
-winget install Microsoft.DotNet.SDK.8
+winget install Microsoft.DotNet.SDK.10
 
 # Or download from:
 # - Docker: https://docker.com/products/docker-desktop
@@ -41,10 +41,10 @@ brew install dotnet
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
-# Install .NET 8
+# Install .NET 10
 wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
-sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0
+sudo apt-get update && sudo apt-get install -y dotnet-sdk-10.0
 ```
 
 ## Quick Start

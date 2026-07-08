@@ -33,20 +33,20 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-echo -e "${BLUE}[1/7] Instalacja .NET 8 SDK...${NC}"
+echo -e "${BLUE}[1/7] Instalacja .NET 10 SDK...${NC}"
 
-# Use dedicated .NET 8 installation script
-if [ -f "./install-dotnet8.sh" ]; then
-    echo -e "${YELLOW}Uruchamianie install-dotnet8.sh...${NC}"
-    ./install-dotnet8.sh
+# Use dedicated .NET 10 installation script
+if [ -f "./install-dotnet10.sh" ]; then
+    echo -e "${YELLOW}Uruchamianie install-dotnet10.sh...${NC}"
+    ./install-dotnet10.sh
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓ .NET 8 zainstalowany pomyślnie${NC}"
+        echo -e "${GREEN}✓ .NET 10 zainstalowany pomyślnie${NC}"
     else
-        echo -e "${RED}✗ Błąd instalacji .NET 8${NC}"
+        echo -e "${RED}✗ Błąd instalacji .NET 10${NC}"
         exit 1
     fi
 else
-    echo -e "${RED}✗ Brak pliku install-dotnet8.sh${NC}"
+    echo -e "${RED}✗ Brak pliku install-dotnet10.sh${NC}"
     exit 1
 fi
 

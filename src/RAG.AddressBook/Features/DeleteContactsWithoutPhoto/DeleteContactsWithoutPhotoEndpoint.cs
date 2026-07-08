@@ -12,7 +12,6 @@ public static class DeleteContactsWithoutPhotoEndpoint
         return app.MapDelete("/without-photo", DeleteContactsWithoutPhotoAsync)
             .WithName("DeleteContactsWithoutPhoto")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization("AdminOnly");
     }
 

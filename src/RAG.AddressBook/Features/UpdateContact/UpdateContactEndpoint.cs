@@ -12,7 +12,6 @@ public static class UpdateContactEndpoint
         return app.MapPut("/{id:guid}", UpdateContactAsync)
             .WithName("UpdateContact")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization("AdminOrPowerUser");
     }
 

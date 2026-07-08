@@ -46,7 +46,6 @@ public static class SubmitAttemptEndpoint
             }
         })
         .WithName("SubmitQuizAttempt")
-        .WithOpenApi()
         .RequireAuthorization();
 
         return group;

@@ -11,7 +11,6 @@ public static class FeedbackEndpoints
     {
         var group = app.MapGroup("/api/feedback")
             .WithTags("Feedback")
-            .WithOpenApi()
             .RequireAuthorization();
 
         group.MapPost("/", async (

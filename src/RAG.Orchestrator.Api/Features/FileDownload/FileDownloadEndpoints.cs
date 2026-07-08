@@ -5,8 +5,7 @@ public static class FileDownloadEndpoints
     public static IEndpointRouteBuilder MapFileDownloadEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/filedownload")
-            .WithTags("FileDownload")
-            .WithOpenApi();
+            .WithTags("FileDownload");
 
         group.MapGet("/{*filePath}", async (string filePath, IFileDownloadService fileDownloadService) =>
         {

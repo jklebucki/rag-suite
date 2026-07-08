@@ -139,7 +139,7 @@ Features/
 ```
 
 ### Zgodność z zasadami projektu
-✅ Minimal APIs (.NET 8)
+✅ Minimal APIs (.NET 10)
 ✅ TypedResults
 ✅ FluentValidation
 ✅ RFC7807 ProblemDetails

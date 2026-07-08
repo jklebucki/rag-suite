@@ -12,7 +12,6 @@ public static class SearchContactsEndpoint
         return app.MapGet("/search", SearchContactsAsync)
             .WithName("SearchContacts")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization();
     }
 

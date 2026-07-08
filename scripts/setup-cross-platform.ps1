@@ -49,7 +49,7 @@ function Test-RequiredTools {
     $tools = @(
         @{ Name = "Docker"; Command = "docker --version" },
         @{ Name = "Docker Compose"; Command = "docker-compose --version" },
-        @{ Name = ".NET 8 SDK"; Command = "dotnet --version" }
+        @{ Name = ".NET 10 SDK"; Command = "dotnet --version" }
     )
     
     $missing = @()

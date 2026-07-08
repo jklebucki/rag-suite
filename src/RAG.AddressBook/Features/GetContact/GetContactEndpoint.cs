@@ -13,7 +13,6 @@ public static class GetContactEndpoint
         return app.MapGet("/{id:guid}", GetContactAsync)
             .WithName("GetContact")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization();
     }
 

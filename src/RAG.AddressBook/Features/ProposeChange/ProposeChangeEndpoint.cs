@@ -13,7 +13,6 @@ public static class ProposeChangeEndpoint
         return app.MapPost("/proposals", ProposeChangeAsync)
             .WithName("ProposeContactChange")
             .WithTags("AddressBook", "Proposals")
-            .WithOpenApi()
             .RequireAuthorization();
     }
 

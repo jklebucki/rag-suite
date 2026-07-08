@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# RAG Suite - Instalacja .NET 8 SDK
-# Bezpieczna instalacja .NET 8 z autodetekcją Ubuntu
+# RAG Suite - Instalacja .NET 10 SDK
+# Bezpieczna Instalacja .NET 10 z autodetekcją Ubuntu
 # Nie usuwa istniejących wersji .NET
 
 set -e
@@ -15,7 +15,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}    .NET 8 SDK Installation${NC}"
+echo -e "${BLUE}    .NET 10 SDK Installation${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo
 
@@ -55,10 +55,10 @@ if command -v dotnet &> /dev/null; then
     dotnet --list-runtimes 2>/dev/null || echo "Brak informacji o Runtime"
     echo
     
-    # Sprawdź czy .NET 8 już jest
-    if dotnet --list-sdks 2>/dev/null | grep -q "8\.0\."; then
-        echo -e "${GREEN}✓ .NET 8 SDK już jest zainstalowany!${NC}"
-        dotnet --list-sdks | grep "8\.0\."
+    # Sprawdź czy .NET 10 już jest
+    if dotnet --list-sdks 2>/dev/null | grep -q "10\.0\."; then
+        echo -e "${GREEN}✓ .NET 10 SDK już jest zainstalowany!${NC}"
+        dotnet --list-sdks | grep "10\.0\."
         echo -e "${CYAN}Sprawdź czy aplikacja teraz się buduje:${NC}"
         echo -e "  cd /var/www/rag-suite"
         echo -e "  dotnet build src/RAG.Orchestrator.Api/RAG.Orchestrator.Api.csproj"
@@ -68,7 +68,7 @@ else
     echo -e "${YELLOW}Nie wykryto żadnych instalacji .NET${NC}"
 fi
 
-echo -e "${BLUE}=== INSTALACJA .NET 8 SDK ===${NC}"
+echo -e "${BLUE}=== Instalacja .NET 10 SDK ===${NC}"
 
 # Konfiguracja repozytorium Microsoft na podstawie wersji Ubuntu
 case $UBUNTU_VERSION in
@@ -134,9 +134,9 @@ case $UBUNTU_VERSION in
             # Ubuntu 24.04+ - próbuj Ubuntu backports lub wbudowany feed
             echo -e "${CYAN}Ubuntu 24.04+ - próba instalacji z Ubuntu feeds...${NC}"
             
-            # Sprawdź czy dotnet-sdk-8.0 jest dostępny w Ubuntu feeds
-            if apt-cache search dotnet-sdk-8.0 | grep -q "dotnet-sdk-8.0"; then
-                echo -e "${GREEN}✓ .NET 8 SDK dostępny w Ubuntu feeds${NC}"
+            # Sprawdź czy dotnet-sdk-10.0 jest dostępny w Ubuntu feeds
+            if apt-cache search dotnet-sdk-10.0 | grep -q "dotnet-sdk-10.0"; then
+                echo -e "${GREEN}✓ .NET 10 SDK dostępny w Ubuntu feeds${NC}"
             else
                 echo -e "${YELLOW}Dodawanie Ubuntu .NET backports repository...${NC}"
                 apt-get install -y software-properties-common
@@ -151,7 +151,7 @@ case $UBUNTU_VERSION in
         
         # Uniwersalna metoda przez .NET install script
         echo -e "${CYAN}Pobieranie .NET install script...${NC}"
-        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 8.0 --install-dir /usr/share/dotnet
+        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 10.0 --install-dir /usr/share/dotnet
         
         # Dodaj do PATH jeśli nie ma - bezpieczne dodanie
         if ! echo $PATH | grep -q "/usr/share/dotnet"; then
@@ -170,7 +170,7 @@ case $UBUNTU_VERSION in
         
         # Sprawdź instalację
         if /usr/share/dotnet/dotnet --version &>/dev/null; then
-            echo -e "${GREEN}✓ .NET 8 zainstalowany przez install script${NC}"
+            echo -e "${GREEN}✓ .NET 10 zainstalowany przez install script${NC}"
             /usr/share/dotnet/dotnet --version
             exit 0
         else
@@ -185,16 +185,16 @@ echo -e "${CYAN}Aktualizacja listy pakietów...${NC}"
 apt-get update
 check_command "Aktualizacja listy pakietów"
 
-# Zainstaluj .NET 8 SDK
-echo -e "${CYAN}Instalacja .NET 8 SDK...${NC}"
+# Zainstaluj .NET 10 SDK
+echo -e "${CYAN}Instalacja .NET 10 SDK...${NC}"
 
 # Dla Ubuntu 18.04 i 20.04 - dodaj fallback w przypadku problemów z Microsoft repo
 if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; then
-    if ! apt-get install -y dotnet-sdk-8.0; then
+    if ! apt-get install -y dotnet-sdk-10.0; then
         echo -e "${YELLOW}Instalacja przez Microsoft repository nie powiodła się. Próbuję .NET install script...${NC}"
         
         # Fallback - manual install script
-        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 8.0 --install-dir /usr/share/dotnet
+        curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version latest --channel 10.0 --install-dir /usr/share/dotnet
         
         # Dodaj do PATH globalnie - bezpieczne dodanie
         if ! echo $PATH | grep -q "/usr/share/dotnet"; then
@@ -222,18 +222,18 @@ if [[ "$UBUNTU_VERSION" == "18.04" ]] || [[ "$UBUNTU_VERSION" == "20.04" ]]; the
         
         # Sprawdź czy działa
         if dotnet --version &>/dev/null; then
-            echo -e "${GREEN}✓ .NET 8 zainstalowany przez install script${NC}"
+            echo -e "${GREEN}✓ .NET 10 zainstalowany przez install script${NC}"
         else
             echo -e "${RED}✗ Instalacja nie powiodła się${NC}"
             exit 1
         fi
     else
-        check_command "Instalacja .NET 8 SDK przez Microsoft repository"
+        check_command "Instalacja .NET 10 SDK przez Microsoft repository"
     fi
 else
     # Dla nowszych wersji Ubuntu
-    apt-get install -y dotnet-sdk-8.0
-    check_command "Instalacja .NET 8 SDK"
+    apt-get install -y dotnet-sdk-10.0
+    check_command "Instalacja .NET 10 SDK"
 fi
 
 # Sprawdź instalację
@@ -248,9 +248,9 @@ if command -v dotnet &> /dev/null; then
     echo -e "${YELLOW}Wszystkie zainstalowane Runtime:${NC}"
     dotnet --list-runtimes
     
-    # Sprawdź czy .NET 8 jest dostępny
-    if dotnet --list-sdks | grep -q "8\.0\."; then
-        echo -e "${GREEN}✓ .NET 8 SDK jest dostępny!${NC}"
+    # Sprawdź czy .NET 10 jest dostępny
+    if dotnet --list-sdks | grep -q "10\.0\."; then
+        echo -e "${GREEN}✓ .NET 10 SDK jest dostępny!${NC}"
         
         # Test kompilacji
         echo
@@ -274,7 +274,7 @@ if command -v dotnet &> /dev/null; then
             echo -e "  dotnet build src/RAG.Orchestrator.Api/RAG.Orchestrator.Api.csproj"
         fi
     else
-        echo -e "${RED}✗ .NET 8 SDK nie został zainstalowany${NC}"
+        echo -e "${RED}✗ .NET 10 SDK nie został zainstalowany${NC}"
         exit 1
     fi
 else
@@ -284,7 +284,7 @@ fi
 
 echo
 echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}    .NET 8 SDK został zainstalowany!${NC}"
+echo -e "${GREEN}    .NET 10 SDK został zainstalowany!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo
 echo -e "${BLUE}Następne kroki:${NC}"

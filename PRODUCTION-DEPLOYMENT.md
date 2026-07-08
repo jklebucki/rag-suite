@@ -37,7 +37,7 @@ sudo ./production-setup.sh asystent.ad.citronex.pl
 **Ten skrypt automatycznie:**
 - ✅ Tworzy katalog `/var/www/rag-suite`
 - ✅ Klonuje repozytorium z GitHub
-- ✅ Instaluje .NET 8 SDK, Node.js 20, Nginx, Git
+- ✅ Instaluje .NET 10 SDK, Node.js 20, Nginx, Git
 - ✅ Tworzy serwis systemd `rag-api.service`
 - ✅ Konfiguruje Nginx z rate limiting i security headers
 - ✅ Ustawia odpowiednie uprawnienia
@@ -177,8 +177,8 @@ Skrypt deployment/aktualizacji - używany do aktualizacji
 ### `ssl-setup.sh`
 Skrypt konfiguracji SSL/HTTPS z istniejącymi certyfikatami wildcard *.ad.citronex.pl
 
-### `install-dotnet8.sh`
-Bezpieczna instalacja .NET 8 SDK z autodetekcją wersji Ubuntu - nie usuwa istniejących wersji .NET
+### `install-dotnet10.sh`
+Bezpieczna instalacja .NET 10 SDK z autodetekcją wersji Ubuntu - nie usuwa istniejących wersji .NET
 
 ### `install-nodejs-alternative.sh`
 Skrypt instalacji Node.js przez Snap dla Ubuntu 18.04 (rozwiązuje problemy z libc6)
@@ -195,11 +195,11 @@ cd /var/www/rag-suite
 sudo ./diagnose.sh
 ```
 
-### Instalacja .NET 8 (jeśli brakuje)
+### Instalacja .NET 10 (jeśli brakuje)
 
 ```bash
 cd /var/www/rag-suite
-sudo ./install-dotnet8.sh
+sudo ./install-dotnet10.sh
 ```
 
 ### Sprawdzanie statusu

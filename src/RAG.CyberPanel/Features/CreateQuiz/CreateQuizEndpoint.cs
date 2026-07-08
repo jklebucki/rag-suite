@@ -34,7 +34,6 @@ public static class CreateQuizEndpoint
             });
         })
         .WithName("CreateQuiz")
-        .WithOpenApi()
         .RequireAuthorization();
 
         return group;

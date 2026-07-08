@@ -13,7 +13,6 @@ public static class ReviewProposalEndpoint
         return app.MapPost("/proposals/{id:guid}/review", ReviewProposalAsync)
             .WithName("ReviewProposal")
             .WithTags("AddressBook", "Proposals")
-            .WithOpenApi()
             .RequireAuthorization("AdminOrPowerUser");
     }
 

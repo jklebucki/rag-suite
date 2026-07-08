@@ -12,7 +12,6 @@ public static class GetProposalEndpoint
         return app.MapGet("/proposals/{id:guid}", GetProposalAsync)
             .WithName("GetProposal")
             .WithTags("AddressBook", "Proposals")
-            .WithOpenApi()
             .RequireAuthorization();
     }
 

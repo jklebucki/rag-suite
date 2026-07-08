@@ -11,7 +11,7 @@ curl -sSL https://raw.githubusercontent.com/jklebucki/rag-suite/main/quick-insta
 
 1. **Automatycznie tworzy** `/var/www/rag-suite`
 2. **Klonuje** repozytorium z GitHub
-3. **Instaluje** .NET 8, Node.js 20, Nginx
+3. **Instaluje** .NET 10, Node.js 20, Nginx
 4. **Konfiguruje** serwis systemd dla API
 5. **Buduje** aplikację .NET i React
 6. **Konfiguruje** Nginx z rate limiting

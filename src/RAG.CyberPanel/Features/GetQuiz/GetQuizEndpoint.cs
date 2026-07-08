@@ -22,7 +22,6 @@ public static class GetQuizEndpoint
                 : ApiResponseExtensions.ToApiNotFoundResponse<GetQuizResponse>("Quiz not found");
         })
         .WithName("GetQuiz")
-        .WithOpenApi()
         .RequireAuthorization();
 
         return group;

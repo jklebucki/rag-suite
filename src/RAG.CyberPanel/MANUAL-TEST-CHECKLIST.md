@@ -383,5 +383,5 @@ All tests should pass with:
 
 **Tester:** _________________
 **Date:** _________________
-**Build:** Frontend v1.0.0, Backend .NET 8
+**Build:** Frontend v1.0.0, Backend .NET 10
 **Status:** ⏳ Pending / ✅ Passed / ❌ Failed

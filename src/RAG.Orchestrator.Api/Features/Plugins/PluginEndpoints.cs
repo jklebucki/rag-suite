@@ -7,8 +7,7 @@ public static class PluginEndpoints
     public static IEndpointRouteBuilder MapPluginEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/plugins")
-            .WithTags("Plugins")
-            .WithOpenApi();
+            .WithTags("Plugins");
 
         group.MapGet("/", async (IPluginService pluginService) =>
         {

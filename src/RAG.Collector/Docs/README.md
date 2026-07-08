@@ -6,7 +6,7 @@
 
 ### Wymagania
 - Windows Server 2019+ lub Windows 10/11
-- .NET 8.0 Runtime
+- .NET 10.0 Runtime
 - Dostęp do udziałów SMB/NTFS
 - Elasticsearch 8.x (opcjonalnie z autoryzacją)
 

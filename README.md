@@ -1,6 +1,6 @@
 # RAG Suite
 
- ![.NET 8](https://img.shields.io/badge/.NET-8-blueviolet?style=for-the-badge&logo=dotnet)
+ ![.NET 10](https://img.shields.io/badge/.NET-10-blueviolet?style=for-the-badge&logo=dotnet)
  ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
  ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)
  ![Semantic Kernel](https://img.shields.io/badge/Semantic-Kernel-lightgrey?style=for-the-badge&logo=microsoft)
@@ -10,7 +10,7 @@
 
 ## Project Goal
 
-**RAG Suite** is a .NET 8 monorepo designed to implement a **Retrieval-Augmented Generation (RAG)** system using **Semantic Kernel** in conjunction with **BGE-M3 (1024D)** embeddings, stored and searched efficiently in **Elasticsearch**.
+**RAG Suite** is a .NET 10 monorepo designed to implement a **Retrieval-Augmented Generation (RAG)** system using **Semantic Kernel** in conjunction with **BGE-M3 (1024D)** embeddings, stored and searched efficiently in **Elasticsearch**.
 
 
 ---
@@ -72,7 +72,7 @@ Complete security infrastructure with:
 
 Core API orchestrating the RAG system:
 
-* **🧠 Semantic Kernel 1.24 Integration**: AI-powered response generation
+* **🧠 Semantic Kernel 1.78 Integration**: AI-powered response generation
 * **💬 Per-User Chat Sessions**: Isolated chat sessions for each user
 * **🌍 Multilingual Support**: Auto-detection and translation
 * **🔍 Vector Search**: BGE-M3 embeddings with Elasticsearch

@@ -18,8 +18,7 @@ public static class ExportQuizEndpoint
             .WithSummary("Export quiz to JSON format")
             .WithDescription("Exports a complete quiz including all questions, options, images (base64 or URLs), and metadata.")
             .Produces<ExportQuizResponse>(StatusCodes.Status200OK)
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
-            .WithOpenApi();
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         return group;
     }

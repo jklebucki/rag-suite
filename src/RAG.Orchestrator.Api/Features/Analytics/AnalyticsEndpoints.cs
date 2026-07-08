@@ -7,8 +7,7 @@ public static class AnalyticsEndpoints
     public static IEndpointRouteBuilder MapAnalyticsEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/analytics")
-            .WithTags("Analytics")
-            .WithOpenApi();
+            .WithTags("Analytics");
 
         // Usage Statistics
         group.MapGet("/usage", async (IAnalyticsService analyticsService,

@@ -12,7 +12,6 @@ public static class ListContactsEndpoint
         return app.MapGet("/", ListContactsAsync)
             .WithName("ListContacts")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .AllowAnonymous();
     }
 

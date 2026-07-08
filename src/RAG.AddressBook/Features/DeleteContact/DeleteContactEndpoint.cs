@@ -12,7 +12,6 @@ public static class DeleteContactEndpoint
         return app.MapDelete("/{id:guid}", DeleteContactAsync)
             .WithName("DeleteContact")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization("AdminOrPowerUser");
     }
 

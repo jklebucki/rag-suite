@@ -521,7 +521,7 @@ If applicable
 **Environment:**
 - Browser: Chrome 120
 - OS: macOS 14
-- Backend Version: .NET 8.0
+- Backend Version: .NET 10.0
 - Frontend Version: React 18
 
 **Additional Context:**

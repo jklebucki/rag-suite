@@ -12,7 +12,6 @@ public static class CreateContactEndpoint
         return app.MapPost("/", CreateContactAsync)
             .WithName("CreateContact")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization("AdminOrPowerUser");
     }
 

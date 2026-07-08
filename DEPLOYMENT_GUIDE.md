@@ -29,7 +29,7 @@ sudo cp -r /opt/rag-suite /opt/rag-suite.backup.$(date +%Y%m%d_%H%M%S)
 ### 2. **Wdrożenie Nowej Wersji**
 ```bash
 # Skopiuj nowe pliki
-sudo cp -r src/RAG.Orchestrator.Api/bin/Release/net8.0/* /opt/rag-suite/
+sudo cp -r src/RAG.Orchestrator.Api/bin/Release/net10.0/* /opt/rag-suite/
 
 # Uprawnienia
 sudo chown -R rag-user:rag-user /opt/rag-suite

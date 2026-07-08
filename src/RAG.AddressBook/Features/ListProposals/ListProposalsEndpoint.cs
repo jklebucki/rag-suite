@@ -12,7 +12,6 @@ public static class ListProposalsEndpoint
         return app.MapGet("/proposals", ListProposalsAsync)
             .WithName("ListProposals")
             .WithTags("AddressBook", "Proposals")
-            .WithOpenApi()
             .RequireAuthorization();
     }
 

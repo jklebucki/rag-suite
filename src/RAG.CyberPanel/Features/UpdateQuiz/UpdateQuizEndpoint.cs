@@ -13,7 +13,6 @@ public static class UpdateQuizEndpoint
     {
         group.MapPut("/{quizId:guid}", UpdateQuiz)
             .WithName("UpdateQuiz")
-            .WithOpenApi()
             .RequireAuthorization()
             .Produces<UpdateQuizResponse>()
             .Produces(404)

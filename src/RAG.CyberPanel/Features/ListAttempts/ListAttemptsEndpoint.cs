@@ -18,7 +18,6 @@ public static class ListAttemptsEndpoint
             return Results.Ok(result);
         })
         .WithName("ListQuizAttempts")
-        .WithOpenApi()
         .WithDescription("Get all quiz attempts/results for the current user")
         .RequireAuthorization();
 

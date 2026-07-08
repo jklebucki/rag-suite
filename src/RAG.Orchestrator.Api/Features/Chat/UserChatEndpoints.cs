@@ -11,7 +11,6 @@ public static class UserChatEndpoints
     {
         var group = endpoints.MapGroup("/api/user-chat")
             .WithTags("User Chat")
-            .WithOpenApi()
             .RequireAuthorization(); // Require authentication for all endpoints
 
         group.MapGet("/sessions", async (ClaimsPrincipal user, IUserChatService chatService) =>

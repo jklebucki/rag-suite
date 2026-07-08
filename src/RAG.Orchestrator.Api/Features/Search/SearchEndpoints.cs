@@ -7,8 +7,7 @@ public static class SearchEndpoints
     public static IEndpointRouteBuilder MapSearchEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/search")
-            .WithTags("Search")
-            .WithOpenApi();
+            .WithTags("Search");
 
         group.MapPost("/", async (RAG.Abstractions.Search.SearchRequest request, RAG.Abstractions.Search.ISearchService searchService) =>
         {

@@ -13,7 +13,6 @@ public static class ImportContactsEndpoint
         return app.MapPost("/import", ImportContactsAsync)
             .WithName("ImportContacts")
             .WithTags("AddressBook")
-            .WithOpenApi()
             .RequireAuthorization("AdminOrPowerUser")
             .DisableAntiforgery(); // For file upload
     }

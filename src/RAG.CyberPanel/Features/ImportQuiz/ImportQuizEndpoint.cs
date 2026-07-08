@@ -21,8 +21,7 @@ public static class ImportQuizEndpoint
             .Produces<ImportQuizResponse>(StatusCodes.Status201Created)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
-            .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)
-            .WithOpenApi();
+            .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity);
 
         return group;
     }

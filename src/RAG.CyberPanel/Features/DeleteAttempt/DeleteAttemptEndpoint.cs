@@ -12,7 +12,6 @@ public static class DeleteAttemptEndpoint
     {
         app.MapDelete("/attempts/{attemptId:guid}", DeleteAttempt)
             .WithName("DeleteAttempt")
-            .WithOpenApi()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status403Forbidden);
