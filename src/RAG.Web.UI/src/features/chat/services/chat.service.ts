@@ -98,6 +98,11 @@ export async function uploadChatAttachments(
     formData,
     {
       signal: options.signal,
+      // Override the client's default application/json header so axios detects the
+      // FormData body and emits multipart/form-data with the correct boundary.
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     },
   )
   return response.data.data
