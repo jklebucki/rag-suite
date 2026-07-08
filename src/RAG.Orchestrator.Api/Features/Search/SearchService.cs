@@ -5,6 +5,7 @@ using RAG.Orchestrator.Api.Features.Embeddings;
 using RAG.Orchestrator.Api.Features.Reconstruction;
 using RAG.Orchestrator.Api.Features.Search.DocumentReconstruction;
 using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
+using RAG.Orchestrator.Api.Features.Search.Reranking;
 using RAG.Orchestrator.Api.Features.Search.ResultMapping;
 using System.Text;
 using System.Text.Json;
@@ -42,6 +43,7 @@ public class SearchService : ISearchService
     private readonly IDocumentReconstructor _documentReconstructor;
     private readonly IResultMapper _resultMapper;
     private readonly IDocumentReconstructionService _reconstructionService;
+    private readonly IRerankService _rerankService;
     private readonly ElasticsearchOptions _options;
     private readonly string _indexName;
 
@@ -56,6 +58,7 @@ public class SearchService : ISearchService
         IDocumentReconstructor documentReconstructor,
         IResultMapper resultMapper,
         IDocumentReconstructionService reconstructionService,
+        IRerankService rerankService,
         IOptions<ElasticsearchOptions> options)
     {
         _client = client;
@@ -68,6 +71,7 @@ public class SearchService : ISearchService
         _documentReconstructor = documentReconstructor;
         _resultMapper = resultMapper;
         _reconstructionService = reconstructionService;
+        _rerankService = rerankService;
         _options = options.Value;
         _indexName = _options.DefaultIndexName;
 
@@ -666,8 +670,14 @@ public class SearchService : ISearchService
             var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(embeddingQuery);
             _logger.LogDebug("Generated query embedding with {Dimensions} dimensions", queryEmbedding.Length);
 
+            // When reranking is enabled, retrieve a larger candidate pool (top-N) and let the
+            // cross-encoder narrow it down to the caller's requested limit.
+            var rerankEnabled = _rerankService.IsEnabled;
+            var retrieveLimit = rerankEnabled ? Math.Max(request.Limit, _rerankService.RetrieveTopN) : request.Limit;
+            var retrieveRequest = request with { Limit = retrieveLimit };
+
             // Build hybrid query using QueryBuilder
-            var elasticQuery = _queryBuilder.BuildHybridQuery(searchQuery, queryEmbedding, queryProcessing, request.Limit, request.Offset);
+            var elasticQuery = _queryBuilder.BuildHybridQuery(searchQuery, queryEmbedding, queryProcessing, retrieveLimit, request.Offset);
 
             var json = JsonSerializer.Serialize(elasticQuery);
             _logger.LogDebug("Hybrid search query: {Query}", json);
@@ -684,7 +694,14 @@ public class SearchService : ISearchService
             }
 
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            return await _resultMapper.MapSearchResponseAsync(responseBody, request, cancellationToken);
+            var mapped = await _resultMapper.MapSearchResponseAsync(responseBody, retrieveRequest, cancellationToken);
+
+            if (rerankEnabled)
+            {
+                return await RerankResponseAsync(request.Query, mapped, request.Limit, cancellationToken);
+            }
+
+            return mapped;
         }
         catch (Exception ex)
         {
@@ -694,6 +711,42 @@ public class SearchService : ISearchService
             _logger.LogInformation("Falling back to traditional search");
             return await SearchAsync(request, cancellationToken);
         }
+    }
+
+    /// <summary>
+    /// Second-stage reranking: scores the retrieved (reconstructed) documents against the query with a
+    /// cross-encoder and returns the best <paramref name="topK"/>. On any reranker problem it falls back
+    /// to the original retrieval order (truncated), so search never fails because of reranking.
+    /// </summary>
+    private async Task<SearchResponse> RerankResponseAsync(
+        string query,
+        SearchResponse mapped,
+        int topK,
+        CancellationToken cancellationToken)
+    {
+        var results = mapped.Results;
+        if (results.Length <= 1)
+        {
+            return mapped with { Results = results.Take(topK).ToArray() };
+        }
+
+        var documents = results.Select(r => r.Content ?? string.Empty).ToList();
+        var hits = await _rerankService.RerankAsync(query, documents, cancellationToken);
+
+        if (hits.Count == 0)
+        {
+            // Reranker disabled/unavailable — keep original order.
+            return mapped with { Results = results.Take(topK).ToArray() };
+        }
+
+        var reordered = hits
+            .Where(h => h.Index >= 0 && h.Index < results.Length)
+            .Select(h => results[h.Index])
+            .Take(topK)
+            .ToArray();
+
+        _logger.LogInformation("Reranked {CandidateCount} candidates to top {TopK}", results.Length, reordered.Length);
+        return mapped with { Results = reordered };
     }
 
     /// <summary>

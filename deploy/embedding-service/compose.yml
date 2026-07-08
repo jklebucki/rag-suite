@@ -23,5 +23,30 @@ services:
       retries: 3
       start_period: 60s
 
+  # Cross-encoder reranker (second-stage). Multilingual, on-prem, exposes POST /rerank.
+  # Point the orchestrator at it via Services:RerankService:Url = http://<host>:8581 and Enabled=true.
+  rerank-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    container_name: rerank-service-srv
+    restart: unless-stopped
+    ports: ["8581:80"]
+    volumes:
+      - rerank-srv-data:/data
+    environment:
+      - MODEL_ID=BAAI/bge-reranker-v2-m3
+      - OMP_NUM_THREADS=4
+      - MKL_NUM_THREADS=4
+    command:
+      - --model-id
+      - "BAAI/bge-reranker-v2-m3"
+      - --auto-truncate
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
 volumes:
   embedding-srv-data:
+  rerank-srv-data:

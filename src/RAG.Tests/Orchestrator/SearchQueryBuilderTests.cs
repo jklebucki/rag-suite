@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using RAG.Orchestrator.Api.Features.Search;
 using RAG.Orchestrator.Api.Features.Search.QueryBuilding;
@@ -271,6 +272,42 @@ public class SearchQueryBuilderTests
         source!.Should().Contain("content");
         source.Should().Contain("sourceFile");
         source.Should().Contain("position");
+        source.Should().Contain("fileName");
+        source.Should().Contain("title");
+    }
+
+    [Fact]
+    public void BuildBm25Query_BoostsFileNameAndTitle()
+    {
+        // Act
+        var json = JsonSerializer.Serialize(_builder.BuildBm25Query("zamówienie zakupu", 10, 0));
+
+        // Assert - the analyzed file name / title / folded content fields are boosted
+        json.Should().Contain("fileName");
+        json.Should().Contain("title");
+        json.Should().Contain("content.folded");
+    }
+
+    [Fact]
+    public void BuildHybridQuery_BoostsFileNameAndTitle()
+    {
+        // Arrange
+        var embedding = new float[] { 0.1f, 0.2f, 0.3f };
+        var queryProcessing = new QueryProcessingResult
+        {
+            ProcessedQuery = "zamówienie zakupu",
+            Type = QueryType.Question,
+            KeywordWeight = 0.6,
+            SemanticWeight = 0.4
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(_builder.BuildHybridQuery("zamówienie zakupu", embedding, queryProcessing, 10, 0));
+
+        // Assert
+        json.Should().Contain("fileName");
+        json.Should().Contain("title");
+        json.Should().Contain("content.folded");
     }
 
     [Fact]

@@ -40,23 +40,72 @@ public class IndexManagementService : IIndexManagementService
     {
         try
         {
+            // This mapping MUST stay aligned with the document written by RAG.Collector
+            // (RAG.Collector/Elasticsearch/ElasticsearchService.CreateIndexMapping + ChunkDocument).
+            // The Collector is the primary owner of the index; this is a consistent fallback so that
+            // the admin endpoint / auto-create never produces a divergent (and broken) mapping.
             var indexMapping = new
             {
                 mappings = new
                 {
                     properties = new
                     {
-                        fileName = new { type = "text", analyzer = "standard" },
-                        content = new { type = "text", analyzer = "standard" },
-                        fileType = new { type = "keyword" },
-                        chunkIndex = new { type = "integer" },
-                        documentId = new { type = "keyword" },
-                        createdAt = new { type = "date" },
-                        contentVector = new
+                        id = new { type = "keyword" },
+                        content = new
+                        {
+                            type = "text",
+                            analyzer = "standard",
+                            fields = new
+                            {
+                                folded = new { type = "text", analyzer = "rag_folded" }
+                            }
+                        },
+                        fileName = new
+                        {
+                            type = "text",
+                            analyzer = "rag_filename",
+                            fields = new
+                            {
+                                keyword = new { type = "keyword", ignore_above = 1024 }
+                            }
+                        },
+                        title = new { type = "text", analyzer = "rag_filename" },
+                        embedding = new
                         {
                             type = "dense_vector",
                             dims = 768,
+                            index = true,
                             similarity = "cosine"
+                        },
+                        sourceFile = new { type = "keyword" },
+                        fileExtension = new { type = "keyword" },
+                        fileSize = new { type = "long" },
+                        lastModified = new { type = "date" },
+                        position = new
+                        {
+                            properties = new
+                            {
+                                startIndex = new { type = "integer" },
+                                endIndex = new { type = "integer" },
+                                chunkIndex = new { type = "integer" },
+                                totalChunks = new { type = "integer" },
+                                page = new { type = "integer" },
+                                section = new { type = "keyword" }
+                            }
+                        },
+                        metadata = new { type = "object", enabled = true },
+                        aclGroups = new { type = "keyword" },
+                        contentHash = new { type = "keyword" },
+                        indexedAt = new { type = "date" },
+                        estimatedTokens = new { type = "integer" },
+                        embeddingDetails = new
+                        {
+                            properties = new
+                            {
+                                modelName = new { type = "keyword" },
+                                dimensions = new { type = "integer" },
+                                generatedAt = new { type = "date" }
+                            }
                         }
                     }
                 },
@@ -66,11 +115,29 @@ public class IndexManagementService : IIndexManagementService
                     number_of_replicas = 0,
                     analysis = new
                     {
+                        char_filter = new
+                        {
+                            filename_separators = new
+                            {
+                                type = "pattern_replace",
+                                pattern = "[_.\\-]",
+                                replacement = " "
+                            }
+                        },
                         analyzer = new
                         {
-                            standard = new
+                            rag_folded = new
                             {
-                                type = "standard"
+                                type = "custom",
+                                tokenizer = "standard",
+                                filter = new[] { "lowercase", "asciifolding" }
+                            },
+                            rag_filename = new
+                            {
+                                type = "custom",
+                                char_filter = new[] { "filename_separators" },
+                                tokenizer = "standard",
+                                filter = new[] { "lowercase", "asciifolding" }
                             }
                         }
                     }

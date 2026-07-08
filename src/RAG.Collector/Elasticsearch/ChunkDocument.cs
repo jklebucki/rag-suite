@@ -28,6 +28,16 @@ public class ChunkDocument
     public string SourceFile { get; set; } = string.Empty;
 
     /// <summary>
+    /// File name (without directory), analyzed for full-text search and boosting
+    /// </summary>
+    public string FileName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Human-readable document title (from document metadata, fallback = file name without extension)
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
     /// File extension
     /// </summary>
     public string FileExtension { get; set; } = string.Empty;
@@ -90,6 +100,8 @@ public class ChunkDocument
             Content = chunk.Content,
             Embedding = embedding,
             SourceFile = sourceFile?.Path ?? "unknown",
+            FileName = sourceFile?.FileName ?? "",
+            Title = ResolveTitle(sourceFile),
             FileExtension = sourceFile?.Extension ?? "",
             FileSize = sourceFile?.Size ?? 0,
             LastModified = sourceFile?.LastWriteTimeUtc ?? DateTime.MinValue,
@@ -113,6 +125,25 @@ public class ChunkDocument
                 GeneratedAt = DateTime.UtcNow
             }
         };
+    }
+
+    /// <summary>
+    /// Resolves a human-readable title: prefers a "Title" from extracted document metadata,
+    /// falling back to the file name without extension.
+    /// </summary>
+    private static string ResolveTitle(FileItem? sourceFile)
+    {
+        if (sourceFile == null)
+        {
+            return string.Empty;
+        }
+
+        if (sourceFile.ContentMetadata.TryGetValue("Title", out var title) && !string.IsNullOrWhiteSpace(title))
+        {
+            return title.Trim();
+        }
+
+        return sourceFile.FileNameWithoutExtension;
     }
 }
 

@@ -38,7 +38,7 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
         {
             var request = new
             {
-                inputs = chunk.Content,
+                inputs = BuildEmbeddingInput(chunk),
                 truncate = true
             };
 
@@ -100,6 +100,39 @@ public class HttpEmbeddingProvider : IEmbeddingProvider
             _logger.LogError(ex, "Unexpected error while generating embedding for chunk {ChunkId}", chunk.Id);
             return EmbeddingResult.CreateFailure($"Unexpected error: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Builds the text sent to the embedding service: an optional passage prefix (required by e5 models),
+    /// an optional deterministic file/section context prepend, and the chunk content.
+    /// The stored content is unchanged; this only affects the embedded representation.
+    /// </summary>
+    private string BuildEmbeddingInput(TextChunk chunk)
+    {
+        var builder = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(_options.EmbeddingPassagePrefix))
+        {
+            builder.Append(_options.EmbeddingPassagePrefix);
+        }
+
+        if (_options.PrependFileContextToEmbedding)
+        {
+            var fileName = chunk.SourceFile?.FileName;
+            var section = chunk.Position?.Section;
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                builder.Append("Dokument: ").Append(fileName);
+                if (!string.IsNullOrWhiteSpace(section))
+                {
+                    builder.Append(" › ").Append(section);
+                }
+                builder.Append('\n');
+            }
+        }
+
+        builder.Append(chunk.Content);
+        return builder.ToString();
     }
 
     public async Task<IList<EmbeddingResult>> GenerateBatchEmbeddingsAsync(IList<TextChunk> chunks, CancellationToken cancellationToken = default)

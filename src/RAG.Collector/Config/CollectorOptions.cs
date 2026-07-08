@@ -83,6 +83,26 @@ public class CollectorOptions
     public string EmbeddingModelName { get; set; } = "intfloat/multilingual-e5-small";
 
     /// <summary>
+    /// Prefix prepended to passage text before generating embeddings.
+    /// Required by e5 models ("passage: "); leave empty for models that do not use prefixes (e.g. BGE-M3).
+    /// Must match the query-side prefix configured in the orchestrator.
+    /// </summary>
+    public string EmbeddingPassagePrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When true, the file name / section is prepended to the chunk text used for embedding generation
+    /// (not to the stored content). Cheap, deterministic contextualization that improves dense retrieval.
+    /// </summary>
+    public bool PrependFileContextToEmbedding { get; set; } = true;
+
+    /// <summary>
+    /// Elasticsearch analyzer applied to the content field. Defaults to the language-agnostic "standard".
+    /// For the Polish corpus set this to "polish" (requires the analysis-stempel plugin installed in the
+    /// ES image) to enable Polish stemming/stopwords — recommended for production.
+    /// </summary>
+    public string ContentAnalyzer { get; set; } = "standard";
+
+    /// <summary>
     /// Processing interval in minutes
     /// </summary>
     [Range(1, 1440, ErrorMessage = "Processing interval must be between 1 and 1440 minutes (24 hours)")]

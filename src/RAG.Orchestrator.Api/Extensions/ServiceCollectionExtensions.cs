@@ -137,6 +137,10 @@ public static class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromMinutes(2); // Reasonable timeout for search operations
         });
 
+        // Add HttpClient for the reranker service (TEI /rerank, e.g. bge-reranker-v2-m3)
+        services.AddHttpClient<RAG.Orchestrator.Api.Features.Search.Reranking.IRerankService,
+                               RAG.Orchestrator.Api.Features.Search.Reranking.RerankService>();
+
         // Add HttpClient for GotenbergClient
         services.AddHttpClient<RAG.Abstractions.Conversion.IGotenbergClient, GotenbergService>((serviceProvider, client) =>
         {

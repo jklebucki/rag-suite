@@ -251,6 +251,11 @@ public class ElasticsearchService : IElasticsearchService
 
     private string CreateIndexMapping()
     {
+        // Content analyzer: "polish" (requires analysis-stempel plugin) for stemming/stopwords,
+        // or "standard" as a language-agnostic fallback. A diacritic-folded multi-field bridges
+        // queries with diacritics (e.g. "zamówienie") to ASCII-ized document/file text ("zamowienie").
+        var contentAnalyzer = string.IsNullOrWhiteSpace(_options.ContentAnalyzer) ? "standard" : _options.ContentAnalyzer.Trim();
+
         var mapping = new
         {
             mappings = new
@@ -258,7 +263,26 @@ public class ElasticsearchService : IElasticsearchService
                 properties = new
                 {
                     id = new { type = "keyword" },
-                    content = new { type = "text", analyzer = "standard" },
+                    content = new
+                    {
+                        type = "text",
+                        analyzer = contentAnalyzer,
+                        fields = new
+                        {
+                            folded = new { type = "text", analyzer = "rag_folded" }
+                        }
+                    },
+                    // File name and title are analyzed so that lexical matches on them can be boosted.
+                    fileName = new
+                    {
+                        type = "text",
+                        analyzer = "rag_filename",
+                        fields = new
+                        {
+                            keyword = new { type = "keyword", ignore_above = 1024 }
+                        }
+                    },
+                    title = new { type = "text", analyzer = "rag_filename" },
                     embedding = new
                     {
                         type = "dense_vector",
@@ -304,12 +328,34 @@ public class ElasticsearchService : IElasticsearchService
                 number_of_replicas = 0,
                 analysis = new
                 {
+                    char_filter = new
+                    {
+                        // Split file names on separators so "Zamowienie_zakupu_instrukcja.docx" tokenizes into words.
+                        // pattern_replace is used (instead of a mapping char filter) so the separator set is
+                        // matched unambiguously via a regex character class.
+                        filename_separators = new
+                        {
+                            type = "pattern_replace",
+                            pattern = "[_.\\-]",
+                            replacement = " "
+                        }
+                    },
                     analyzer = new
                     {
-                        standard = new
+                        // Diacritic-folding analyzer for the content.folded multi-field.
+                        rag_folded = new
                         {
-                            type = "standard",
-                            stopwords = "_english_"
+                            type = "custom",
+                            tokenizer = "standard",
+                            filter = new[] { "lowercase", "asciifolding" }
+                        },
+                        // File-name / title analyzer: split on separators + fold diacritics.
+                        rag_filename = new
+                        {
+                            type = "custom",
+                            char_filter = new[] { "filename_separators" },
+                            tokenizer = "standard",
+                            filter = new[] { "lowercase", "asciifolding" }
                         }
                     }
                 }
