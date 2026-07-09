@@ -26,6 +26,8 @@ public class RerankService : IRerankService
     private readonly bool _enabled;
     private readonly bool _cohereApi;
     private readonly string? _model;
+    private readonly string _endpoint;
+    private readonly int _timeoutSeconds;
 
     public RerankService(HttpClient httpClient, IConfiguration configuration, ILogger<RerankService> logger)
     {
@@ -36,7 +38,7 @@ public class RerankService : IRerankService
         var url = section["Url"];
         var enabledSetting = section.GetValue<bool?>("Enabled");
         RetrieveTopN = section.GetValue<int?>("RetrieveTopN") ?? 40;
-        var timeoutSeconds = section.GetValue<int?>("TimeoutSeconds") ?? 30;
+        _timeoutSeconds = section.GetValue<int?>("TimeoutSeconds") ?? 30;
         _cohereApi = string.Equals(section["Api"], "cohere", StringComparison.OrdinalIgnoreCase);
         _model = section["Model"];
 
@@ -44,10 +46,18 @@ public class RerankService : IRerankService
 
         if (_enabled)
         {
-            _httpClient.BaseAddress = new Uri(url!);
-            _httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            var baseUri = new Uri(url!);
+            _httpClient.BaseAddress = baseUri;
+            _httpClient.Timeout = TimeSpan.FromSeconds(_timeoutSeconds);
+            _endpoint = new Uri(baseUri, "/rerank").ToString();
+        }
+        else
+        {
+            _endpoint = string.Empty;
         }
     }
+
+    private string ApiName => _cohereApi ? "cohere" : "tei";
 
     public bool IsEnabled => _enabled;
 
@@ -63,6 +73,10 @@ public class RerankService : IRerankService
             return Array.Empty<RerankHit>();
         }
 
+        _logger.LogInformation(
+            "Reranking {Count} candidates via {Endpoint} (api={Api}, model={Model}, timeout={Timeout}s)",
+            documents.Count, _endpoint, ApiName, string.IsNullOrWhiteSpace(_model) ? "(none)" : _model, _timeoutSeconds);
+
         try
         {
             var json = JsonSerializer.Serialize(BuildRequestPayload(query, documents));
@@ -71,7 +85,8 @@ public class RerankService : IRerankService
             var response = await _httpClient.PostAsync("/rerank", content, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Reranker returned {StatusCode}; falling back to original order", response.StatusCode);
+                _logger.LogWarning("Reranker {Endpoint} returned {StatusCode}; falling back to original order",
+                    _endpoint, (int)response.StatusCode);
                 return Array.Empty<RerankHit>();
             }
 
@@ -79,7 +94,8 @@ public class RerankService : IRerankService
             var hits = ParseHits(body);
             if (hits.Count == 0)
             {
-                _logger.LogWarning("Reranker returned no parseable results; falling back to original order");
+                _logger.LogWarning("Reranker {Endpoint} returned no parseable results; falling back to original order",
+                    _endpoint);
             }
 
             return hits;
@@ -87,7 +103,7 @@ public class RerankService : IRerankService
         catch (Exception ex)
         {
             // Reranking is a best-effort quality boost: never fail the search because of it.
-            _logger.LogWarning(ex, "Reranking failed; falling back to original retrieval order");
+            _logger.LogWarning(ex, "Reranking via {Endpoint} failed; falling back to original retrieval order", _endpoint);
             return Array.Empty<RerankHit>();
         }
     }
