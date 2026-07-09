@@ -23,29 +23,32 @@ services:
       retries: 3
       start_period: 60s
 
-  # Cross-encoder reranker (second-stage). Multilingual, on-prem, exposes POST /rerank.
-  # Point the orchestrator at it via Services:RerankService:Url = http://<host>:8582 and Enabled=true.
+  # Cross-encoder reranker (second-stage). Multilingual, on-prem, exposes a Cohere-compatible POST /rerank.
+  # Served via Infinity because the TEI CPU build could not load the reranker (candle exits silently on
+  # the XLM-RoBERTa sequence-classification head). Orchestrator config: Services:RerankService with
+  # Url=http://<host>:8582, Enabled=true, Api="cohere", Model="BAAI/bge-reranker-v2-m3".
   rerank-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    image: michaelf34/infinity:latest
     container_name: rerank-service-srv
     restart: unless-stopped
     ports: ["8582:80"]
     volumes:
-      - rerank-srv-data:/data
+      - rerank-srv-data:/app/.cache
     environment:
-      - MODEL_ID=BAAI/bge-reranker-v2-m3
       - OMP_NUM_THREADS=4
       - MKL_NUM_THREADS=4
     command:
+      - v2
       - --model-id
       - "BAAI/bge-reranker-v2-m3"
-      - --auto-truncate
+      - --port
+      - "80"
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 120s
 
 volumes:
   embedding-srv-data:

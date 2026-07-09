@@ -36,15 +36,29 @@ working unchanged until you perform the steps below. The code plan lives in the 
 The reranker fixes the exact failure you hit (a keyword-stuffed "Przyjęcie towaru" outranking the real
 "Zamówienie zakupu"): it rescores the retrieved candidates by true query-document relevance.
 
-1. Deploy the reranker container (added to `deploy/embedding-service/compose.yml`):
+The reranker is served via **Infinity** (`michaelf34/infinity`), not TEI: the TEI CPU build (`cpu-1.8`)
+loads e5 embeddings fine but its candle backend exits silently when loading a reranker's XLM-RoBERTa
+sequence-classification head (`bge-reranker-v2-m3` reaches "Starting Bert model on Cpu" then exits 0;
+`jina-reranker-v2` fails config parsing). Infinity serves `bge-reranker-v2-m3` reliably on CPU and
+exposes a Cohere-compatible `/rerank`. `RerankService` supports both APIs via `Services:RerankService:Api`
+(`"tei"` or `"cohere"`).
+
+1. Start the reranker container (Infinity, in `deploy/embedding-service/compose.yml`):
    ```bash
    docker compose -f deploy/embedding-service/compose.yml up -d rerank-service
-   curl -s http://<host>:8581/health
+   curl -s http://<host>:8582/health && echo OK
+   # functional check (expect a higher relevance_score for index 1):
+   curl -s http://<host>:8582/rerank -H 'Content-Type: application/json' \
+     -d '{"model":"BAAI/bge-reranker-v2-m3","query":"jak zrobić zamówienie zakupu","documents":["instrukcja przyjęcia towaru na magazyn","instrukcja tworzenia zamówienia zakupu w IFS"]}'
    ```
 2. Point the orchestrator at it (appsettings / env):
    ```json
    "Services": {
-     "RerankService": { "Url": "http://<host>:8581", "Enabled": true, "RetrieveTopN": 40, "TimeoutSeconds": 30 }
+     "RerankService": {
+       "Url": "http://<host>:8582", "Enabled": true,
+       "Api": "cohere", "Model": "BAAI/bge-reranker-v2-m3",
+       "RetrieveTopN": 40, "TimeoutSeconds": 30
+     }
    }
    ```
 3. Restart the orchestrator. Hybrid search now retrieves top-40 and reranks down to the caller's limit

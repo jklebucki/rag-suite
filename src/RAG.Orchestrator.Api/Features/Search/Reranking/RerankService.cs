@@ -1,16 +1,21 @@
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace RAG.Orchestrator.Api.Features.Search.Reranking;
 
 /// <summary>
-/// Cross-encoder reranker backed by a Text-Embeddings-Inference (TEI) "/rerank" endpoint
-/// (e.g. serving BAAI/bge-reranker-v2-m3). Fully on-prem; no external API calls.
+/// Cross-encoder reranker over an on-prem HTTP endpoint. Two API flavors are supported so the
+/// serving backend can be chosen freely (no external/cloud calls in either case):
+///
+///   Api = "tei"    -> Text-Embeddings-Inference: POST /rerank {query, texts}       -> [{index, score}]
+///   Api = "cohere" -> Infinity / Cohere-style:   POST /rerank {model, query, documents}
+///                     -> {results: [{index, relevance_score}]}
 ///
 /// Configuration (appsettings "Services:RerankService"):
 ///   Url            - base URL of the reranker service (required to enable)
 ///   Enabled        - master on/off switch (default: true when Url is set)
+///   Api            - "tei" (default) or "cohere"
+///   Model          - model id, sent in the request body for the "cohere" flavor
 ///   RetrieveTopN   - candidates fetched before reranking (default: 40)
 ///   TimeoutSeconds - request timeout (default: 30)
 /// </summary>
@@ -19,6 +24,8 @@ public class RerankService : IRerankService
     private readonly HttpClient _httpClient;
     private readonly ILogger<RerankService> _logger;
     private readonly bool _enabled;
+    private readonly bool _cohereApi;
+    private readonly string? _model;
 
     public RerankService(HttpClient httpClient, IConfiguration configuration, ILogger<RerankService> logger)
     {
@@ -30,6 +37,8 @@ public class RerankService : IRerankService
         var enabledSetting = section.GetValue<bool?>("Enabled");
         RetrieveTopN = section.GetValue<int?>("RetrieveTopN") ?? 40;
         var timeoutSeconds = section.GetValue<int?>("TimeoutSeconds") ?? 30;
+        _cohereApi = string.Equals(section["Api"], "cohere", StringComparison.OrdinalIgnoreCase);
+        _model = section["Model"];
 
         _enabled = !string.IsNullOrWhiteSpace(url) && (enabledSetting ?? true);
 
@@ -56,14 +65,7 @@ public class RerankService : IRerankService
 
         try
         {
-            var payload = new RerankRequest
-            {
-                Query = query,
-                Texts = documents.ToArray(),
-                Truncate = true
-            };
-
-            var json = JsonSerializer.Serialize(payload);
+            var json = JsonSerializer.Serialize(BuildRequestPayload(query, documents));
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("/rerank", content, cancellationToken);
@@ -90,9 +92,36 @@ public class RerankService : IRerankService
         }
     }
 
+    private Dictionary<string, object> BuildRequestPayload(string query, IReadOnlyList<string> documents)
+    {
+        if (_cohereApi)
+        {
+            // Infinity / Cohere-compatible rerank API.
+            var payload = new Dictionary<string, object>
+            {
+                ["query"] = query,
+                ["documents"] = documents,
+                ["return_documents"] = false
+            };
+            if (!string.IsNullOrWhiteSpace(_model))
+            {
+                payload["model"] = _model!;
+            }
+            return payload;
+        }
+
+        // Text-Embeddings-Inference rerank API.
+        return new Dictionary<string, object>
+        {
+            ["query"] = query,
+            ["texts"] = documents,
+            ["truncate"] = true
+        };
+    }
+
     /// <summary>
-    /// Parses the TEI /rerank response, which is a JSON array of {index, score} objects
-    /// (optionally wrapped in a "results" property). Returns hits sorted by descending score.
+    /// Parses a /rerank response. Handles both TEI (a JSON array of {index, score}) and
+    /// Infinity/Cohere ({results: [{index, relevance_score}]}). Returns hits sorted by descending score.
     /// </summary>
     private static List<RerankHit> ParseHits(string body)
     {
@@ -122,8 +151,14 @@ public class RerankService : IRerankService
                 continue;
             }
 
-            if (item.TryGetProperty("index", out var indexElement) && indexElement.TryGetInt32(out var index) &&
-                item.TryGetProperty("score", out var scoreElement) && scoreElement.TryGetDouble(out var score))
+            if (!item.TryGetProperty("index", out var indexElement) || !indexElement.TryGetInt32(out var index))
+            {
+                continue;
+            }
+
+            // TEI uses "score"; Infinity/Cohere use "relevance_score".
+            if ((item.TryGetProperty("score", out var scoreElement) && scoreElement.TryGetDouble(out var score)) ||
+                (item.TryGetProperty("relevance_score", out scoreElement) && scoreElement.TryGetDouble(out score)))
             {
                 hits.Add(new RerankHit(index, score));
             }
@@ -131,17 +166,5 @@ public class RerankService : IRerankService
 
         hits.Sort((a, b) => b.Score.CompareTo(a.Score));
         return hits;
-    }
-
-    private sealed class RerankRequest
-    {
-        [JsonPropertyName("query")]
-        public string Query { get; init; } = string.Empty;
-
-        [JsonPropertyName("texts")]
-        public string[] Texts { get; init; } = Array.Empty<string>();
-
-        [JsonPropertyName("truncate")]
-        public bool Truncate { get; init; } = true;
     }
 }

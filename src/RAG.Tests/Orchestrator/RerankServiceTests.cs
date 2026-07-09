@@ -125,6 +125,47 @@ public class RerankServiceTests
     }
 
     [Fact]
+    public async Task RerankAsync_CohereApi_ParsesRelevanceScore_AndSendsDocuments()
+    {
+        // Infinity / Cohere-style response uses "relevance_score" wrapped in "results".
+        var body = "{\"results\":[{\"index\":1,\"relevance_score\":0.91},{\"index\":0,\"relevance_score\":0.12}]}";
+        var handler = new Mock<HttpMessageHandler>();
+        string? capturedBody = null;
+        handler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .Returns(async (HttpRequestMessage req, CancellationToken _) =>
+            {
+                capturedBody = req.Content is null ? null : await req.Content.ReadAsStringAsync();
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(body, Encoding.UTF8, "application/json")
+                };
+            });
+
+        var config = BuildConfig(new Dictionary<string, string?>
+        {
+            ["Services:RerankService:Url"] = "http://rerank:80",
+            ["Services:RerankService:Api"] = "cohere",
+            ["Services:RerankService:Model"] = "BAAI/bge-reranker-v2-m3"
+        });
+        var service = CreateService(config, handler.Object);
+
+        var hits = await service.RerankAsync("zamówienie zakupu", new[] { "przyjęcie towaru", "zamówienie zakupu" });
+
+        hits.Select(h => h.Index).Should().ContainInOrder(1, 0);
+        hits[0].Score.Should().Be(0.91);
+        // Cohere flavor must use "documents" and include the model, not TEI's "texts".
+        capturedBody.Should().NotBeNull();
+        capturedBody!.Should().Contain("\"documents\"");
+        capturedBody.Should().Contain("BAAI/bge-reranker-v2-m3");
+        capturedBody.Should().NotContain("\"texts\"");
+    }
+
+    [Fact]
     public async Task RerankAsync_OnHttpError_ReturnsEmptyForFallback()
     {
         var config = BuildConfig(new Dictionary<string, string?>

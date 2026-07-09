@@ -37,18 +37,31 @@ Reranker naprawia dokładnie ten błąd, który wystąpił (keyword-stuffed „P
 właściwe „Zamówienie zakupu"): przelicza trafność pobranych kandydatów względem rzeczywistej relacji
 zapytanie–dokument.
 
+Reranker jest serwowany przez **Infinity** (`michaelf34/infinity`), a nie TEI: build TEI CPU (`cpu-1.8`)
+poprawnie ładuje embeddingi e5, ale jego backend candle **cicho kończy działanie** przy ładowaniu głowicy
+klasyfikacji XLM-RoBERTa rerankera (`bge-reranker-v2-m3` dochodzi do „Starting Bert model on Cpu" i wychodzi
+z kodem 0; `jina-reranker-v2` wywala się na parsowaniu config). Infinity serwuje `bge-reranker-v2-m3`
+niezawodnie na CPU i wystawia Cohere-zgodne `/rerank`. `RerankService` obsługuje oba API przez
+`Services:RerankService:Api` (`"tei"` lub `"cohere"`).
 
-1. Wdróż kontener rerankera (dodany do `deploy/embedding-service/compose.yml`):
+1. Uruchom kontener rerankera (Infinity, w `deploy/embedding-service/compose.yml`):
 
    ```bash
    docker compose -f deploy/embedding-service/compose.yml up -d rerank-service
-   curl -s http://<host>:8581/health
+   curl -s http://<host>:8582/health && echo OK
+   # test funkcjonalny (oczekiwany wyższy relevance_score dla indeksu 1):
+   curl -s http://<host>:8582/rerank -H 'Content-Type: application/json' \
+     -d '{"model":"BAAI/bge-reranker-v2-m3","query":"jak zrobić zamówienie zakupu","documents":["instrukcja przyjęcia towaru na magazyn","instrukcja tworzenia zamówienia zakupu w IFS"]}'
    ```
 2. Wskaż go orchestratorowi (appsettings / env):
 
    ```json
    "Services": {
-     "RerankService": { "Url": "http://<host>:8581", "Enabled": true, "RetrieveTopN": 40, "TimeoutSeconds": 30 }
+     "RerankService": {
+       "Url": "http://<host>:8582", "Enabled": true,
+       "Api": "cohere", "Model": "BAAI/bge-reranker-v2-m3",
+       "RetrieveTopN": 40, "TimeoutSeconds": 30
+     }
    }
    ```
 3. Zrestartuj orchestrator. Wyszukiwanie hybrydowe pobiera teraz top-40 i rerankuje w dół do limitu
