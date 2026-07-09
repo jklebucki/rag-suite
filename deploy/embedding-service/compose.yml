@@ -1,6 +1,7 @@
 services:
   embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-ipex-latest
+    # CPU-only embedding service
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     container_name: embedding-service-srv
     restart: unless-stopped
     ports:
@@ -8,27 +9,27 @@ services:
     volumes:
       - embedding-srv-data:/data
     environment:
-      OMP_NUM_THREADS: "4"
-      MKL_NUM_THREADS: "4"
-      TOKENIZERS_PARALLELISM: "false"
+      - MODEL_ID=intfloat/multilingual-e5-base
+
+      # CPU tuning
+      - OMP_NUM_THREADS=8
+      - MKL_NUM_THREADS=8
+      - OPENBLAS_NUM_THREADS=8
+      - NUMEXPR_NUM_THREADS=8
+      - MALLOC_ARENA_MAX=4
     command:
       - --model-id
-      - intfloat/multilingual-e5-base
+      - "intfloat/multilingual-e5-base"
       - --auto-truncate
-      - --dtype
-      - float32
-      - --max-batch-tokens
-      - "8192"
-      - --max-client-batch-size
-      - "32"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 300s
+      retries: 3
+      start_period: 60s
 
   rerank-service:
+    # CPU-only Infinity reranker
     image: michaelf34/infinity:latest-cpu
     container_name: rerank-service-srv
     restart: unless-stopped
@@ -37,27 +38,41 @@ services:
     volumes:
       - rerank-srv-data:/app/.cache
     environment:
-      OMP_NUM_THREADS: "4"
-      MKL_NUM_THREADS: "4"
-      TOKENIZERS_PARALLELISM: "false"
+      - HF_HOME=/app/.cache
+      - INFINITY_ANONYMOUS_USAGE_STATS=0
+      - DO_NOT_TRACK=1
+
+      # Hide GPU completely from this container
+      - CUDA_VISIBLE_DEVICES=
+      - NVIDIA_VISIBLE_DEVICES=void
+
+      # CPU tuning for 20-core host - safe starting point
+      - OMP_NUM_THREADS=8
+      - MKL_NUM_THREADS=8
+      - OPENBLAS_NUM_THREADS=8
+      - NUMEXPR_NUM_THREADS=8
+      - MALLOC_ARENA_MAX=4
     command:
       - v2
       - --model-id
-      - BAAI/bge-reranker-v2-m3
+      - "BAAI/bge-reranker-v2-m3"
       - --engine
-      - torch
-      - --dtype
-      - float32
+      - "torch"
+      - --device
+      - "cpu"
       - --batch-size
-      - "4"
+      - "2"
+      - --no-model-warmup
+      - --no-bettertransformer
+      - --no-compile
       - --port
       - "80"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:80/health', timeout=5).read()\" || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 300s
+      start_period: 180s
 
 volumes:
   embedding-srv-data:

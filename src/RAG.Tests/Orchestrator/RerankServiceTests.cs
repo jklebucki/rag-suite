@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.Protected;
 using RAG.Orchestrator.Api.Features.Search.Reranking;
@@ -19,7 +20,7 @@ public class RerankServiceTests
     private static RerankService CreateService(IConfiguration config, HttpMessageHandler handler)
     {
         var httpClient = new HttpClient(handler);
-        return new RerankService(httpClient, config, Mock.Of<ILogger<RerankService>>());
+        return new RerankService(httpClient, config, NullLoggerFactory.Instance);
     }
 
     private static Mock<HttpMessageHandler> HandlerReturning(HttpStatusCode status, string body)
@@ -163,6 +164,44 @@ public class RerankServiceTests
         capturedBody!.Should().Contain("\"documents\"");
         capturedBody.Should().Contain("BAAI/bge-reranker-v2-m3");
         capturedBody.Should().NotContain("\"texts\"");
+    }
+
+    [Fact]
+    public async Task RerankAsync_TruncatesDocumentsToMaxChars()
+    {
+        var body = "[{\"index\":0,\"score\":0.5}]";
+        string? capturedBody = null;
+        var handler = new Mock<HttpMessageHandler>();
+        handler
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .Returns(async (HttpRequestMessage req, CancellationToken _) =>
+            {
+                capturedBody = req.Content is null ? null : await req.Content.ReadAsStringAsync();
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(body, Encoding.UTF8, "application/json")
+                };
+            });
+
+        var config = BuildConfig(new Dictionary<string, string?>
+        {
+            ["Services:RerankService:Url"] = "http://rerank:80",
+            ["Services:RerankService:MaxDocumentChars"] = "10"
+        });
+        var service = CreateService(config, handler.Object);
+
+        var longDoc = new string('a', 500);
+        var hits = await service.RerankAsync("q", new[] { longDoc });
+
+        hits.Should().HaveCount(1);
+        capturedBody.Should().NotBeNull();
+        // The 500-char doc must be capped to 10 chars in the sent payload.
+        capturedBody!.Should().Contain(new string('a', 10));
+        capturedBody.Should().NotContain(new string('a', 11));
     }
 
     [Fact]

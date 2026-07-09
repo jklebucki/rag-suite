@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -23,16 +24,23 @@ public class RerankService : IRerankService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RerankService> _logger;
+    // Dedicated channel for reproducible curl requests + latency (routed to its own log file).
+    private readonly ILogger _curlLogger;
     private readonly bool _enabled;
     private readonly bool _cohereApi;
     private readonly string? _model;
     private readonly string _endpoint;
     private readonly int _timeoutSeconds;
+    // Cap the characters of each document sent to the cross-encoder. Full reconstructed documents
+    // overwhelm a CPU reranker; the head of an instruction doc (title/scope/purpose) carries the
+    // key relevance signal. 0 = no cap.
+    private readonly int _maxDocumentChars;
 
-    public RerankService(HttpClient httpClient, IConfiguration configuration, ILogger<RerankService> logger)
+    public RerankService(HttpClient httpClient, IConfiguration configuration, ILoggerFactory loggerFactory)
     {
         _httpClient = httpClient;
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<RerankService>();
+        _curlLogger = loggerFactory.CreateLogger("RerankCurl");
 
         var section = configuration.GetSection("Services:RerankService");
         var url = section["Url"];
@@ -41,6 +49,7 @@ public class RerankService : IRerankService
         _timeoutSeconds = section.GetValue<int?>("TimeoutSeconds") ?? 30;
         _cohereApi = string.Equals(section["Api"], "cohere", StringComparison.OrdinalIgnoreCase);
         _model = section["Model"];
+        _maxDocumentChars = section.GetValue<int?>("MaxDocumentChars") ?? 1800;
 
         _enabled = !string.IsNullOrWhiteSpace(url) && (enabledSetting ?? true);
 
@@ -73,20 +82,29 @@ public class RerankService : IRerankService
             return Array.Empty<RerankHit>();
         }
 
+        // Cap each document so the CPU cross-encoder isn't fed full multi-thousand-char documents.
+        var trimmedDocuments = TruncateDocuments(documents);
+
         _logger.LogInformation(
-            "Reranking {Count} candidates via {Endpoint} (api={Api}, model={Model}, timeout={Timeout}s)",
-            documents.Count, _endpoint, ApiName, string.IsNullOrWhiteSpace(_model) ? "(none)" : _model, _timeoutSeconds);
+            "Reranking {Count} candidates via {Endpoint} (api={Api}, model={Model}, timeout={Timeout}s, maxDocChars={MaxDocChars})",
+            documents.Count, _endpoint, ApiName, string.IsNullOrWhiteSpace(_model) ? "(none)" : _model, _timeoutSeconds, _maxDocumentChars);
+
+        var payloadJson = JsonSerializer.Serialize(BuildRequestPayload(query, trimmedDocuments));
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
-            var json = JsonSerializer.Serialize(BuildRequestPayload(query, documents));
-            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("/rerank", content, cancellationToken);
+            stopwatch.Stop();
+
+            LogRerankCurl(payloadJson, documents.Count, stopwatch.ElapsedMilliseconds, ((int)response.StatusCode).ToString());
+
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Reranker {Endpoint} returned {StatusCode}; falling back to original order",
-                    _endpoint, (int)response.StatusCode);
+                _logger.LogWarning("Reranker {Endpoint} returned {StatusCode} in {ElapsedMs} ms; falling back to original order",
+                    _endpoint, (int)response.StatusCode, stopwatch.ElapsedMilliseconds);
                 return Array.Empty<RerankHit>();
             }
 
@@ -94,18 +112,54 @@ public class RerankService : IRerankService
             var hits = ParseHits(body);
             if (hits.Count == 0)
             {
-                _logger.LogWarning("Reranker {Endpoint} returned no parseable results; falling back to original order",
-                    _endpoint);
+                _logger.LogWarning("Reranker {Endpoint} returned no parseable results in {ElapsedMs} ms; falling back to original order",
+                    _endpoint, stopwatch.ElapsedMilliseconds);
             }
 
             return hits;
         }
         catch (Exception ex)
         {
+            stopwatch.Stop();
+            LogRerankCurl(payloadJson, documents.Count, stopwatch.ElapsedMilliseconds, $"ERROR:{ex.GetType().Name}");
             // Reranking is a best-effort quality boost: never fail the search because of it.
-            _logger.LogWarning(ex, "Reranking via {Endpoint} failed; falling back to original retrieval order", _endpoint);
+            _logger.LogWarning(ex, "Reranking via {Endpoint} failed after {ElapsedMs} ms; falling back to original retrieval order",
+                _endpoint, stopwatch.ElapsedMilliseconds);
             return Array.Empty<RerankHit>();
         }
+    }
+
+    /// <summary>
+    /// Writes a reproducible curl command (exact request body) plus the measured latency to the
+    /// dedicated "RerankCurl" channel, so reranker response times can be analysed per query.
+    /// </summary>
+    private void LogRerankCurl(string payloadJson, int docCount, long elapsedMs, string status)
+    {
+        // Escape single quotes for a bash single-quoted -d '...' argument.
+        var escapedBody = payloadJson.Replace("'", "'\\''");
+        _curlLogger.LogInformation(
+            "elapsed={ElapsedMs}ms status={Status} docs={DocCount} bytes={Bytes} :: curl -s -X POST '{Endpoint}' -H 'Content-Type: application/json' -d '{Body}'",
+            elapsedMs, status, docCount, payloadJson.Length, _endpoint, escapedBody);
+    }
+
+    /// <summary>
+    /// Truncates each document to at most <see cref="_maxDocumentChars"/> characters (0 = no cap).
+    /// Index order is preserved so rerank result indices still map back to the original candidates.
+    /// </summary>
+    private IReadOnlyList<string> TruncateDocuments(IReadOnlyList<string> documents)
+    {
+        if (_maxDocumentChars <= 0)
+        {
+            return documents;
+        }
+
+        var trimmed = new List<string>(documents.Count);
+        foreach (var doc in documents)
+        {
+            trimmed.Add(doc.Length > _maxDocumentChars ? doc[.._maxDocumentChars] : doc);
+        }
+
+        return trimmed;
     }
 
     private Dictionary<string, object> BuildRequestPayload(string query, IReadOnlyList<string> documents)

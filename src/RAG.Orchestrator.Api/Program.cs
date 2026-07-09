@@ -19,6 +19,7 @@ using RAG.Security.Extensions;
 using RAG.Security.Middleware;
 using Serilog;
 using Serilog.Events;
+using Serilog.Filters;
 
 // Configure Serilog so key backend operations are persisted to a rolling log file
 // (the default console-only provider is invisible when the API runs as a service/container).
@@ -36,6 +37,8 @@ var logRollingInterval = Enum.TryParse<RollingInterval>(fileLogSection["RollingI
     ? parsedInterval
     : RollingInterval.Day; // roll daily by default
 var logRetainedFileCountLimit = fileLogSection.GetValue<int?>("RetainedFileCountLimit") ?? 7; // keep 7 days by default
+// Dedicated reranker request log (reproducible curl + latency) — separate file for latency analysis.
+var rerankCurlPath = fileLogSection["RerankCurlPath"] ?? "logs/rerank-curl-.txt";
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -47,12 +50,23 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("RAG.Orchestrator.Api.Features.Search", LogEventLevel.Information)
     .MinimumLevel.Override("RAG.Orchestrator.Api.Features.Chat", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File(logPath,
-        rollingInterval: logRollingInterval,
-        retainedFileCountLimit: logRetainedFileCountLimit,
-        shared: true,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    // Main application log (console + rolling file), excluding the dedicated rerank-curl channel.
+    .WriteTo.Logger(lc => lc
+        .Filter.ByExcluding(Matching.FromSource("RerankCurl"))
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+        .WriteTo.File(logPath,
+            rollingInterval: logRollingInterval,
+            retainedFileCountLimit: logRetainedFileCountLimit,
+            shared: true,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"))
+    // Dedicated reranker request log: one reproducible curl line + latency per call.
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Matching.FromSource("RerankCurl"))
+        .WriteTo.File(rerankCurlPath,
+            rollingInterval: logRollingInterval,
+            retainedFileCountLimit: logRetainedFileCountLimit,
+            shared: true,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Message:lj}{NewLine}"))
     .CreateLogger();
 
 try
