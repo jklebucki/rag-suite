@@ -22,6 +22,21 @@ using Serilog.Events;
 
 // Configure Serilog so key backend operations are persisted to a rolling log file
 // (the default console-only provider is invisible when the API runs as a service/container).
+// File logging is configurable via the "FileLogging" section in appsettings.
+var logConfiguration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables()
+    .Build();
+
+var fileLogSection = logConfiguration.GetSection("FileLogging");
+var logPath = fileLogSection["Path"] ?? "logs/rag-orchestrator-.txt";
+var logRollingInterval = Enum.TryParse<RollingInterval>(fileLogSection["RollingInterval"], ignoreCase: true, out var parsedInterval)
+    ? parsedInterval
+    : RollingInterval.Day; // roll daily by default
+var logRetainedFileCountLimit = fileLogSection.GetValue<int?>("RetainedFileCountLimit") ?? 7; // keep 7 days by default
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -33,9 +48,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("RAG.Orchestrator.Api.Features.Chat", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("logs/rag-orchestrator-.txt",
-        rollingInterval: RollingInterval.Day,
-        retainedFileCountLimit: 30,
+    .WriteTo.File(logPath,
+        rollingInterval: logRollingInterval,
+        retainedFileCountLimit: logRetainedFileCountLimit,
         shared: true,
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
