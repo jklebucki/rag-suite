@@ -18,6 +18,9 @@ public interface IRerankService
     /// <summary>Number of candidates to retrieve before reranking down to the requested top-k.</summary>
     int RetrieveTopN { get; }
 
+    /// <summary>Number of top reranked documents to keep (e.g. inject into the LLM prompt) when reranking is enabled.</summary>
+    int TopK { get; }
+
     /// <summary>
     /// Scores each candidate document against the query using the reranker model.
     /// Returns hits sorted by descending score. Returns an empty list if reranking is

@@ -702,7 +702,9 @@ public class SearchService : ISearchService
 
             if (rerankEnabled)
             {
-                return await RerankResponseAsync(request.Query, mapped, request.Limit, cancellationToken);
+                // When reranking is enabled, inject only the top-K reranked documents (fewer, higher-quality
+                // documents), independent of the requested limit used for the non-reranked path.
+                return await RerankResponseAsync(request.Query, mapped, _rerankService.TopK, cancellationToken);
             }
 
             return mapped;

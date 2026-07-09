@@ -46,6 +46,7 @@ public class RerankService : IRerankService
         var url = section["Url"];
         var enabledSetting = section.GetValue<bool?>("Enabled");
         RetrieveTopN = section.GetValue<int?>("RetrieveTopN") ?? 40;
+        TopK = Math.Max(1, section.GetValue<int?>("TopK") ?? 2);
         _timeoutSeconds = section.GetValue<int?>("TimeoutSeconds") ?? 30;
         _cohereApi = string.Equals(section["Api"], "cohere", StringComparison.OrdinalIgnoreCase);
         _model = section["Model"];
@@ -71,6 +72,8 @@ public class RerankService : IRerankService
     public bool IsEnabled => _enabled;
 
     public int RetrieveTopN { get; }
+
+    public int TopK { get; }
 
     public async Task<IReadOnlyList<RerankHit>> RerankAsync(
         string query,

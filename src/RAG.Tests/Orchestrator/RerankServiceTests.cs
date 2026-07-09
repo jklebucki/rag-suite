@@ -76,6 +76,20 @@ public class RerankServiceTests
     }
 
     [Fact]
+    public void TopK_DefaultsTo2_AndHonorsConfig()
+    {
+        var defaultService = CreateService(BuildConfig(new Dictionary<string, string?>()), new Mock<HttpMessageHandler>().Object);
+        defaultService.TopK.Should().Be(2);
+
+        var configured = CreateService(BuildConfig(new Dictionary<string, string?>
+        {
+            ["Services:RerankService:Url"] = "http://rerank:80",
+            ["Services:RerankService:TopK"] = "3"
+        }), new Mock<HttpMessageHandler>().Object);
+        configured.TopK.Should().Be(3);
+    }
+
+    [Fact]
     public async Task RerankAsync_WhenDisabled_ReturnsEmptyWithoutCallingService()
     {
         var handler = HandlerReturning(HttpStatusCode.OK, "[]");
