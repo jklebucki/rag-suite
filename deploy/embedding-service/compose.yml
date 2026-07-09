@@ -24,12 +24,12 @@ services:
       start_period: 60s
 
   # Cross-encoder reranker (second-stage). Multilingual, on-prem, exposes POST /rerank.
-  # Point the orchestrator at it via Services:RerankService:Url = http://<host>:8581 and Enabled=true.
+  # Point the orchestrator at it via Services:RerankService:Url = http://<host>:8582 and Enabled=true.
   rerank-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
     container_name: rerank-service-srv
     restart: unless-stopped
-    ports: ["8581:80"]
+    ports: ["8582:80"]
     volumes:
       - rerank-srv-data:/data
     environment:
