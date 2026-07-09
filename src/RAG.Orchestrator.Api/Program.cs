@@ -17,8 +17,37 @@ using RAG.Orchestrator.Api.Features.Settings;
 using RAG.Orchestrator.Api.Services;
 using RAG.Security.Extensions;
 using RAG.Security.Middleware;
+using Serilog;
+using Serilog.Events;
+
+// Configure Serilog so key backend operations are persisted to a rolling log file
+// (the default console-only provider is invisible when the API runs as a service/container).
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
+    // Feature areas we want to trace end-to-end (search/rerank/chat) at Information.
+    .MinimumLevel.Override("RAG.Orchestrator.Api.Features.Search", LogEventLevel.Information)
+    .MinimumLevel.Override("RAG.Orchestrator.Api.Features.Chat", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File("logs/rag-orchestrator-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        shared: true,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+try
+{
+Log.Information("Starting RAG Orchestrator API");
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Route all ILogger<T> output through Serilog (console + rolling file).
+builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddRAGSecurity(builder.Configuration);
@@ -124,3 +153,12 @@ app.MapAddressBookEndpoints();
 app.MapForumEndpoints();
 
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "RAG Orchestrator API terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

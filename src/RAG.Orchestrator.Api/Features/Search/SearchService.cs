@@ -676,6 +676,10 @@ public class SearchService : ISearchService
             var retrieveLimit = rerankEnabled ? Math.Max(request.Limit, _rerankService.RetrieveTopN) : request.Limit;
             var retrieveRequest = request with { Limit = retrieveLimit };
 
+            _logger.LogInformation(
+                "Hybrid search for '{Query}': rerankEnabled={RerankEnabled}, retrieveLimit={RetrieveLimit}, requestedLimit={RequestedLimit}",
+                request.Query, rerankEnabled, retrieveLimit, request.Limit);
+
             // Build hybrid query using QueryBuilder
             var elasticQuery = _queryBuilder.BuildHybridQuery(searchQuery, queryEmbedding, queryProcessing, retrieveLimit, request.Offset);
 
@@ -735,7 +739,10 @@ public class SearchService : ISearchService
 
         if (hits.Count == 0)
         {
-            // Reranker disabled/unavailable — keep original order.
+            // Reranker returned nothing (unavailable/parse error) — keep original hybrid order.
+            _logger.LogWarning(
+                "Reranker returned no ordering for '{Query}'; keeping hybrid order ({CandidateCount} candidates)",
+                query, results.Length);
             return mapped with { Results = results.Take(topK).ToArray() };
         }
 
