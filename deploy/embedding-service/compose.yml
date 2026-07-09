@@ -1,54 +1,62 @@
 services:
   embedding-service:
-    # na razie CPU (bo GPU na RTX 50xx i tak nie przejdzie w TEI 1.8)
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-ipex-latest
     container_name: embedding-service-srv
     restart: unless-stopped
-    ports: ["8580:80"]
+    ports:
+      - "8580:80"
     volumes:
       - embedding-srv-data:/data
     environment:
-      - MODEL_ID=intfloat/multilingual-e5-base
-      # (opcjonalnie) ogranicz wątki, by uniknąć konfliktów blas/mkl:
-      - OMP_NUM_THREADS=4
-      - MKL_NUM_THREADS=4
+      OMP_NUM_THREADS: "4"
+      MKL_NUM_THREADS: "4"
+      TOKENIZERS_PARALLELISM: "false"
     command:
       - --model-id
-      - "intfloat/multilingual-e5-base"
+      - intfloat/multilingual-e5-base
       - --auto-truncate
+      - --dtype
+      - float32
+      - --max-batch-tokens
+      - "8192"
+      - --max-client-batch-size
+      - "32"
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 300s
 
-  # Cross-encoder reranker (second-stage). Multilingual, on-prem, exposes a Cohere-compatible POST /rerank.
-  # Served via Infinity because the TEI CPU build could not load the reranker (candle exits silently on
-  # the XLM-RoBERTa sequence-classification head). Orchestrator config: Services:RerankService with
-  # Url=http://<host>:8582, Enabled=true, Api="cohere", Model="BAAI/bge-reranker-v2-m3".
   rerank-service:
-    image: michaelf34/infinity:latest
+    image: michaelf34/infinity:latest-cpu
     container_name: rerank-service-srv
     restart: unless-stopped
-    ports: ["8582:80"]
+    ports:
+      - "8582:80"
     volumes:
       - rerank-srv-data:/app/.cache
     environment:
-      - OMP_NUM_THREADS=4
-      - MKL_NUM_THREADS=4
+      OMP_NUM_THREADS: "4"
+      MKL_NUM_THREADS: "4"
+      TOKENIZERS_PARALLELISM: "false"
     command:
       - v2
       - --model-id
-      - "BAAI/bge-reranker-v2-m3"
+      - BAAI/bge-reranker-v2-m3
+      - --engine
+      - torch
+      - --dtype
+      - float32
+      - --batch-size
+      - "4"
       - --port
       - "80"
-      - "optimum-intel"
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 300s
 
 volumes:
