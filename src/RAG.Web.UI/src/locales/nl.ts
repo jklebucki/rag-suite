@@ -802,6 +802,14 @@ export const nl: TranslationKeys = {
   'employeeDashboard.hrRequests.rejected': 'Afgewezen',
   'employeeDashboard.hrRequests.total': '{total} totaal',
 
+  'employeeDashboard.expiringDocuments.title': 'Verlopende documenten',
+  'employeeDashboard.expiringDocuments.attention': 'Urgent',
+  'employeeDashboard.expiringDocuments.validTo': 'Geldig tot',
+  'employeeDashboard.expiringDocuments.status.expiresIn': 'Verloopt over {days} dagen',
+  'employeeDashboard.expiringDocuments.status.ok': 'OK',
+  'employeeDashboard.expiringDocuments.emptyTitle': 'Geen documenten vragen aandacht',
+  'employeeDashboard.expiringDocuments.emptyDescription': 'Aankomende geldigheidsdatums zijn onder controle.',
+
   'employeeDashboard.profile.title': 'Mijn gegevens',
   'employeeDashboard.profile.fullName': 'Volledige naam',
   'employeeDashboard.profile.position': 'Functie',

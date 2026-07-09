@@ -3,7 +3,7 @@ import { useEmployeeDashboardOverview } from '../hooks/useEmployeeDashboardOverv
 import { EmployeeSummaryCard } from './EmployeeSummaryCard'
 import { LeaveBalanceTile } from './LeaveBalanceTile'
 import { LastPayslipTile } from './LastPayslipTile'
-import { HrRequestsTile } from './HrRequestsTile'
+import { ExpiringDocumentsTile } from './ExpiringDocumentsTile'
 import { EmployeeProfileCard } from './EmployeeProfileCard'
 import { NotificationsCenter } from './NotificationsCenter'
 import { UpcomingEvents } from './UpcomingEvents'
@@ -36,7 +36,7 @@ export function EmployeeDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <LeaveBalanceTile balance={data.leaveBalance} />
         <LastPayslipTile payslip={data.lastPayslip} />
-        <HrRequestsTile summary={data.hrRequestsSummary} />
+        <ExpiringDocumentsTile documents={data.expiringDocuments} />
       </div>
 
       <QuickActions />

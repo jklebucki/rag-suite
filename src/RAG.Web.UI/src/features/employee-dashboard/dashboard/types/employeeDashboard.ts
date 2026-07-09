@@ -44,6 +44,19 @@ export interface HrRequestsSummary {
   total: number
 }
 
+export type ExpiringDocumentStatus = 'critical' | 'warning' | 'ok'
+
+export interface ExpiringDocument {
+  id: string
+  documentType: string
+  documentName: string
+  validFrom?: string      // ISO date string
+  validTo: string         // ISO date string
+  requiresAction: boolean
+  daysUntilExpiry: number
+  status: ExpiringDocumentStatus
+}
+
 export type NotificationSeverity = 'info' | 'warning' | 'error' | 'success'
 
 export type NotificationCategory =
@@ -87,6 +100,7 @@ export interface EmployeeDashboardData {
   leaveBalance: LeaveBalance
   lastPayslip: LastPayslip
   hrRequestsSummary: HrRequestsSummary
+  expiringDocuments: ExpiringDocument[]
   notifications: DashboardNotification[]
   upcomingEvents: UpcomingEvent[]
 }

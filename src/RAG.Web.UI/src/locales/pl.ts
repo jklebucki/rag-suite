@@ -726,6 +726,14 @@ export const pl: TranslationKeys = {
   'employeeDashboard.hrRequests.rejected': 'Odrzucone',
   'employeeDashboard.hrRequests.total': '{total} łącznie',
 
+  'employeeDashboard.expiringDocuments.title': 'Wygasające dokumenty',
+  'employeeDashboard.expiringDocuments.attention': 'Pilne',
+  'employeeDashboard.expiringDocuments.validTo': 'Ważne do',
+  'employeeDashboard.expiringDocuments.status.expiresIn': 'Wygasa za {days} dni',
+  'employeeDashboard.expiringDocuments.status.ok': 'OK',
+  'employeeDashboard.expiringDocuments.emptyTitle': 'Brak dokumentów wymagających uwagi',
+  'employeeDashboard.expiringDocuments.emptyDescription': 'Najbliższe terminy są pod kontrolą.',
+
   'employeeDashboard.profile.title': 'Moje dane',
   'employeeDashboard.profile.fullName': 'Imię i nazwisko',
   'employeeDashboard.profile.position': 'Stanowisko',

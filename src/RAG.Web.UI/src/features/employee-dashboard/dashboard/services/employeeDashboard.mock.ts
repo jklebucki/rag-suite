@@ -14,6 +14,13 @@
 
 import type { EmployeeDashboardData } from '../types/employeeDashboard'
 
+function dateFromToday(days: number): string {
+  const date = new Date()
+  date.setHours(12, 0, 0, 0)
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
 const MOCK_DATA: EmployeeDashboardData = {
   profile: {
     id: 'emp-001',
@@ -52,6 +59,39 @@ const MOCK_DATA: EmployeeDashboardData = {
     rejected: 2,
     total: 11,
   },
+
+  expiringDocuments: [
+    {
+      id: 'doc-exp-1',
+      documentType: 'medical_exam',
+      documentName: 'Badania okresowe',
+      validFrom: dateFromToday(-362),
+      validTo: dateFromToday(3),
+      requiresAction: true,
+      daysUntilExpiry: 3,
+      status: 'critical',
+    },
+    {
+      id: 'doc-exp-2',
+      documentType: 'health_safety_training',
+      documentName: 'Szkolenie BHP',
+      validFrom: dateFromToday(-339),
+      validTo: dateFromToday(26),
+      requiresAction: true,
+      daysUntilExpiry: 26,
+      status: 'warning',
+    },
+    {
+      id: 'doc-exp-4',
+      documentType: 'machine_authorization',
+      documentName: 'Uprawnienia operatora',
+      validFrom: dateFromToday(-120),
+      validTo: dateFromToday(220),
+      requiresAction: false,
+      daysUntilExpiry: 220,
+      status: 'ok',
+    },
+  ],
 
   notifications: [
     {

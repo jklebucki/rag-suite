@@ -1,4 +1,5 @@
 export { EmployeeDashboard } from './EmployeeDashboard'
+export { ExpiringDocumentsTile } from './ExpiringDocumentsTile'
 export { EmployeeProfileCard } from './EmployeeProfileCard'
 export { EmployeeSummaryCard } from './EmployeeSummaryCard'
 export { HrRequestsTile } from './HrRequestsTile'

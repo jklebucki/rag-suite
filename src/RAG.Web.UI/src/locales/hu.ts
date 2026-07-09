@@ -802,6 +802,14 @@ export const hu: TranslationKeys = {
   'employeeDashboard.hrRequests.rejected': 'Elutasítva',
   'employeeDashboard.hrRequests.total': '{total} összesen',
 
+  'employeeDashboard.expiringDocuments.title': 'Lejáró dokumentumok',
+  'employeeDashboard.expiringDocuments.attention': 'Sürgős',
+  'employeeDashboard.expiringDocuments.validTo': 'Érvényes eddig',
+  'employeeDashboard.expiringDocuments.status.expiresIn': '{days} nap múlva lejár',
+  'employeeDashboard.expiringDocuments.status.ok': 'OK',
+  'employeeDashboard.expiringDocuments.emptyTitle': 'Nincs figyelmet igénylő dokumentum',
+  'employeeDashboard.expiringDocuments.emptyDescription': 'A közelgő határidők rendben vannak.',
+
   'employeeDashboard.profile.title': 'Adataim',
   'employeeDashboard.profile.fullName': 'Teljes név',
   'employeeDashboard.profile.position': 'Beosztás',

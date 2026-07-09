@@ -803,6 +803,14 @@ export const ro: TranslationKeys = {
   'employeeDashboard.hrRequests.rejected': 'Respinse',
   'employeeDashboard.hrRequests.total': '{total} total',
 
+  'employeeDashboard.expiringDocuments.title': 'Documente care expira',
+  'employeeDashboard.expiringDocuments.attention': 'Urgent',
+  'employeeDashboard.expiringDocuments.validTo': 'Valabil pana la',
+  'employeeDashboard.expiringDocuments.status.expiresIn': 'Expira in {days} zile',
+  'employeeDashboard.expiringDocuments.status.ok': 'OK',
+  'employeeDashboard.expiringDocuments.emptyTitle': 'Niciun document nu necesita atentie',
+  'employeeDashboard.expiringDocuments.emptyDescription': 'Termenele urmatoare sunt sub control.',
+
   'employeeDashboard.profile.title': 'Datele mele',
   'employeeDashboard.profile.fullName': 'Nume complet',
   'employeeDashboard.profile.position': 'Funcție',

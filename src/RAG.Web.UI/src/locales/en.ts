@@ -872,6 +872,14 @@ export const en: TranslationKeys = {
   'employeeDashboard.hrRequests.rejected': 'Rejected',
   'employeeDashboard.hrRequests.total': '{total} total',
 
+  'employeeDashboard.expiringDocuments.title': 'Expiring documents',
+  'employeeDashboard.expiringDocuments.attention': 'Urgent',
+  'employeeDashboard.expiringDocuments.validTo': 'Valid until',
+  'employeeDashboard.expiringDocuments.status.expiresIn': 'Expires in {days} days',
+  'employeeDashboard.expiringDocuments.status.ok': 'OK',
+  'employeeDashboard.expiringDocuments.emptyTitle': 'No documents need attention',
+  'employeeDashboard.expiringDocuments.emptyDescription': 'Upcoming validity dates are under control.',
+
   'employeeDashboard.profile.title': 'My Data',
   'employeeDashboard.profile.fullName': 'Full name',
   'employeeDashboard.profile.position': 'Position',

@@ -896,6 +896,14 @@ export interface TranslationKeys {
   'employeeDashboard.hrRequests.rejected': string;
   'employeeDashboard.hrRequests.total': string;
 
+  'employeeDashboard.expiringDocuments.title': string;
+  'employeeDashboard.expiringDocuments.attention': string;
+  'employeeDashboard.expiringDocuments.validTo': string;
+  'employeeDashboard.expiringDocuments.status.expiresIn': string;
+  'employeeDashboard.expiringDocuments.status.ok': string;
+  'employeeDashboard.expiringDocuments.emptyTitle': string;
+  'employeeDashboard.expiringDocuments.emptyDescription': string;
+
   // Employee Dashboard – overview: profile card
   'employeeDashboard.profile.title': string;
   'employeeDashboard.profile.fullName': string;
