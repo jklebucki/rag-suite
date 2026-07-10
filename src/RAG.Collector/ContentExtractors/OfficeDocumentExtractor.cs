@@ -114,8 +114,7 @@ public class OfficeDocumentExtractor : IContentExtractor
         foreach (var worksheetPart in workbookPart.WorksheetParts)
         {
             worksheetCount++;
-            var worksheet = worksheetPart.Worksheet;
-            var sheetData = worksheet.GetFirstChild<SheetData>();
+            var sheetData = worksheetPart.Worksheet?.GetFirstChild<SheetData>();
 
             if (sheetData != null)
             {
@@ -162,7 +161,10 @@ public class OfficeDocumentExtractor : IContentExtractor
             contentBuilder.AppendLine($"\n--- Slide {slideCount} ---");
 
             var slide = slidePart.Slide;
-            ExtractTextFromSlide(slide, contentBuilder);
+            if (slide != null)
+            {
+                ExtractTextFromSlide(slide, contentBuilder);
+            }
         }
 
         var content = contentBuilder.ToString();

@@ -62,7 +62,7 @@ public class WordDocumentParser : IDocumentParser
             var text = new StringBuilder();
 
             using var wordDocument = WordprocessingDocument.Open(filePath, false);
-            var body = wordDocument.MainDocumentPart?.Document.Body;
+            var body = wordDocument.MainDocumentPart?.Document?.Body;
 
             if (body != null)
             {

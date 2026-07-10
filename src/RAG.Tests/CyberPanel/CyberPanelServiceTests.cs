@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using RAG.CyberPanel.Domain;
 using RAG.CyberPanel.Services;
 

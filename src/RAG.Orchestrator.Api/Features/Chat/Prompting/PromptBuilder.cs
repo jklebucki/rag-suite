@@ -367,8 +367,7 @@ public class PromptBuilder : IPromptBuilder
                     "Zwracaj wyłącznie poprawny Markdown.",
                     "Nie zwracaj HTML, JSON ani XML.",
                     "Treść odpowiedzi musi zawierać co najmniej jeden jawny znacznik Markdown (np. nagłówek `##`, lista `-`, `**pogrubienie**` lub blok kodu).",
-                    "Ostatnia linia ma być w nawiasach klamrowych i zawierać dokładnie 5 słów podsumowania tej odpowiedzi, np. `{reset hasła i odzyskanie dostępu}`. Nie kopiuj przykładu dosłownie.",
-                    "Po linii z `{}` nie dodawaj żadnego tekstu."
+                    "OBOWIĄZKOWO: w OSTATNIEJ linii odpowiedzi dodaj temat rozmowy DOKŁADNIE w formacie: `CHAT_TITLE: krótki temat (3–6 słów)`, np. `CHAT_TITLE: tworzenie zamówienia zakupu w IFS`. Nie tłumacz słowa `CHAT_TITLE`, nie kopiuj przykładu dosłownie, nigdy nie pomijaj tej linii i nie dodawaj po niej żadnego tekstu."
                 ];
                 break;
             case "hu":
@@ -378,8 +377,7 @@ public class PromptBuilder : IPromptBuilder
                     "Csak érvényes Markdown formátumot használj.",
                     "Ne adj vissza HTML-, JSON- vagy XML-kimenetet.",
                     "A válasz tartalmazzon legalább egy egyértelmű Markdown elemet (pl. `##` címsor, `-` lista, `**félkövér**`, vagy kódblokk).",
-                    "Az utolsó sor kapcsos zárójelben tartalmazzon pontosan 5 szavas összefoglalót, pl. `{jelszó visszaállítás és fiók helyreállítás}`. A példát ne másold szó szerint.",
-                    "A `{}` sor után ne írj több szöveget."
+                    "KÖTELEZŐ: a válasz UTOLSÓ soraként add meg a beszélgetés címét PONTOSAN ebben a formában: `CHAT_TITLE: rövid téma (3–6 szó)`, pl. `CHAT_TITLE: beszerzési rendelés létrehozása IFS-ben`. Ne fordítsd le a `CHAT_TITLE` szót, ne másold szó szerint a példát, soha ne hagyd ki ezt a sort, és ne írj utána semmit."
                 ];
                 break;
             case "nl":
@@ -389,8 +387,7 @@ public class PromptBuilder : IPromptBuilder
                     "Geef uitsluitend geldige Markdown terug.",
                     "Geef geen HTML, JSON of XML terug.",
                     "Het antwoord moet minimaal één expliciet Markdown-element bevatten (bijv. `##` kop, `-` lijst, `**vet**` of codeblok).",
-                    "De laatste regel moet tussen accolades staan en exact 5 woorden bevatten als samenvatting, bijv. `{wachtwoord reset en account herstel}`. Kopieer het voorbeeld niet letterlijk.",
-                    "Voeg geen tekst toe na de regel met `{}`."
+                    "VERPLICHT: voeg als LAATSTE regel van je antwoord de gesprekstitel toe, EXACT in dit formaat: `CHAT_TITLE: kort onderwerp (3–6 woorden)`, bijv. `CHAT_TITLE: inkooporder aanmaken in IFS`. Vertaal `CHAT_TITLE` niet, kopieer het voorbeeld niet letterlijk, laat deze regel nooit weg en zet er niets achter."
                 ];
                 break;
             case "ro":
@@ -400,8 +397,7 @@ public class PromptBuilder : IPromptBuilder
                     "Răspunde exclusiv în Markdown valid.",
                     "Nu returna HTML, JSON sau XML.",
                     "Răspunsul trebuie să conțină cel puțin un element Markdown explicit (de ex. titlu `##`, listă `-`, `**bold**` sau bloc de cod).",
-                    "Ultima linie trebuie să fie între acolade și să conțină exact 5 cuvinte ca rezumat, de exemplu `{resetare parolă și recuperare cont}`. Nu copia exemplul literal.",
-                    "Nu adăuga text după linia cu `{}`."
+                    "OBLIGATORIU: pe ULTIMA linie a răspunsului adaugă titlul conversației EXACT în acest format: `CHAT_TITLE: subiect scurt (3–6 cuvinte)`, de ex. `CHAT_TITLE: creare comandă de achiziție în IFS`. Nu traduce `CHAT_TITLE`, nu copia exemplul literal, nu omite niciodată această linie și nu scrie nimic după ea."
                 ];
                 break;
             default:
@@ -411,8 +407,7 @@ public class PromptBuilder : IPromptBuilder
                     "Return valid Markdown only.",
                     "Do not return HTML, JSON, or XML.",
                     "The response body must include at least one explicit Markdown construct (for example: `##` heading, `-` list, `**bold**`, or a fenced code block).",
-                    "The last line must be inside curly braces and contain exactly 5 words summarizing this answer, for example `{password reset and account recovery}`. Do not copy the example literally.",
-                    "Do not add any text after the `{}` line."
+                    "MANDATORY: as the LAST line of your answer, add the conversation title EXACTLY in this format: `CHAT_TITLE: short topic (3–6 words)`, for example `CHAT_TITLE: creating a purchase order in IFS`. Do not translate `CHAT_TITLE`, do not copy the example literally, never omit this line, and write nothing after it."
                 ];
                 break;
         }

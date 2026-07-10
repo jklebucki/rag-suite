@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Feedback;

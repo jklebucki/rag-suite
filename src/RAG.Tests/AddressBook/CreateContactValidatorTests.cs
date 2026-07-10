@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using RAG.AddressBook.Features.CreateContact;
 
 namespace RAG.Tests.AddressBook;

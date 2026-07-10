@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using RAG.AddressBook.Services;
 using RAG.Security.Services;

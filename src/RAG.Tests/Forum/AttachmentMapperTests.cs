@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using RAG.Forum.Features.Shared;
 
 namespace RAG.Tests.Forum;

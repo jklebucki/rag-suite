@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using RAG.Orchestrator.Api.Common.Prompting;
 
 namespace RAG.Tests.Orchestrator;

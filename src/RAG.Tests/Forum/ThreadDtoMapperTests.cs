@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using RAG.Forum.Domain;
 using RAG.Forum.Features.Threads;
 

@@ -66,15 +66,14 @@ public class ExcelDocumentParser : IDocumentParser
             var sharedStringTablePart = workbookPart?.SharedStringTablePart;
             var sharedStringTable = sharedStringTablePart?.SharedStringTable;
 
-            if (workbookPart?.Workbook.Sheets != null)
+            if (workbookPart?.Workbook?.Sheets != null)
             {
                 foreach (Sheet sheet in workbookPart.Workbook.Sheets)
                 {
                     text.AppendLine($"=== {sheet.Name} ===");
 
                     var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id!);
-                    var worksheet = worksheetPart.Worksheet;
-                    var sheetData = worksheet.GetFirstChild<SheetData>();
+                    var sheetData = worksheetPart.Worksheet?.GetFirstChild<SheetData>();
 
                     if (sheetData != null)
                     {

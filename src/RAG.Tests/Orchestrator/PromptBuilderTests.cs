@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Common.Constants;
