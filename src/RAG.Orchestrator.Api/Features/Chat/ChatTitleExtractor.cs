@@ -22,9 +22,11 @@ public static class ChatTitleExtractor
     private const int MaxTitleWords = 12;
     private const int MaxFallbackChars = 60;
 
-    // Matches a final marker line like "CHAT_TITLE: tworzenie zamówienia zakupu" (case-insensitive).
-    private static readonly Regex MarkerLineRegex = new(
-        @"^\s*" + TitleMarker + @"\s*[:\-–—]\s*(?<title>.+?)\s*$",
+    // Matches the CHAT_TITLE marker ANYWHERE (its own line or inline with preceding text),
+    // capturing to the end of that line. Not anchored to line start, because subsequent turns
+    // sometimes emit the marker attached to the last sentence instead of on a fresh line.
+    private static readonly Regex MarkerRegex = new(
+        TitleMarker + @"\s*[:\-–—]\s*(?<title>[^\r\n]+)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     // Legacy secondary marker: a line that is entirely "{ ... }".
@@ -43,22 +45,21 @@ public static class ChatTitleExtractor
             return (response ?? string.Empty, null);
         }
 
-        var normalized = response.Replace("\r\n", "\n").Replace("\r", "\n");
-        var lines = normalized.Split('\n');
-
-        // Primary: the last line carrying the explicit CHAT_TITLE marker, anywhere in the response
-        // (tolerant to a stray trailing line the model might append after it).
-        for (var i = lines.Length - 1; i >= 0; i--)
+        // Primary: the CHAT_TITLE marker anywhere in the response (own line or inline). The title comes
+        // from the last occurrence; every marker span is stripped from the saved answer.
+        var markerMatches = MarkerRegex.Matches(response);
+        if (markerMatches.Count > 0)
         {
-            var marker = MarkerLineRegex.Match(lines[i]);
-            if (marker.Success)
-            {
-                return BuildResult(lines, i, marker.Groups["title"].Value);
-            }
+            var title = Sanitize(markerMatches[^1].Groups["title"].Value);
+            var cleaned = MarkerRegex.Replace(response, string.Empty).TrimEnd();
+            return string.IsNullOrWhiteSpace(title) || IsPlaceholder(title)
+                ? (cleaned, null)
+                : (cleaned, title);
         }
 
         // Secondary (legacy): a lone "{ ... }" as the last non-empty line only, to limit collisions
         // with braces that appear inside code/JSON in the body.
+        var lines = response.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
         for (var i = lines.Length - 1; i >= 0; i--)
         {
             if (string.IsNullOrWhiteSpace(lines[i]))
@@ -67,9 +68,16 @@ public static class ChatTitleExtractor
             }
 
             var brace = LegacyBraceLineRegex.Match(lines[i]);
-            return brace.Success
-                ? BuildResult(lines, i, brace.Groups["title"].Value)
-                : (response, null);
+            if (!brace.Success)
+            {
+                break;
+            }
+
+            var cleanedBrace = string.Join("\n", lines.Where((_, idx) => idx != i)).TrimEnd();
+            var braceTitle = Sanitize(brace.Groups["title"].Value);
+            return string.IsNullOrWhiteSpace(braceTitle) || IsPlaceholder(braceTitle)
+                ? (cleanedBrace, null)
+                : (cleanedBrace, braceTitle);
         }
 
         return (response, null);
@@ -95,32 +103,6 @@ public static class ChatTitleExtractor
         }
 
         return firstLine;
-    }
-
-    private static (string CleanedResponse, string? Title) BuildResult(string[] lines, int index, string rawTitle)
-    {
-        var cleaned = RemoveLine(lines, index);
-        var title = Sanitize(rawTitle);
-        if (string.IsNullOrWhiteSpace(title) || IsPlaceholder(title))
-        {
-            return (cleaned, null);
-        }
-
-        return (cleaned, title);
-    }
-
-    private static string RemoveLine(string[] lines, int index)
-    {
-        var kept = new List<string>(lines.Length);
-        for (var i = 0; i < lines.Length; i++)
-        {
-            if (i != index)
-            {
-                kept.Add(lines[i]);
-            }
-        }
-
-        return string.Join("\n", kept).TrimEnd();
     }
 
     private static string Sanitize(string value)

@@ -49,6 +49,32 @@ public class ChatTitleExtractorTests
     }
 
     [Fact]
+    public void Extract_InlineMarkerNotAtLineStart_IsStrippedFromContent()
+    {
+        // Reproduces the reported bug: on later turns the model appends the marker to the last
+        // sentence instead of on its own line, so it must still be extracted and removed.
+        var response = "Aby uruchomić aplikację, wykonaj kroki. Gotowe. CHAT_TITLE: uruchomienie aplikacji RAG Suite";
+
+        var (cleaned, title) = ChatTitleExtractor.Extract(response);
+
+        title.Should().Be("uruchomienie aplikacji RAG Suite");
+        cleaned.Should().NotContain("CHAT_TITLE");
+        cleaned.Should().EndWith("Gotowe.");
+    }
+
+    [Fact]
+    public void Extract_UsesLastMarker_WhenMultiplePresent()
+    {
+        var response = "CHAT_TITLE: stary temat\nTreść odpowiedzi.\nCHAT_TITLE: właściwy temat";
+
+        var (cleaned, title) = ChatTitleExtractor.Extract(response);
+
+        title.Should().Be("właściwy temat");
+        cleaned.Should().Contain("Treść odpowiedzi.");
+        cleaned.Should().NotContain("CHAT_TITLE");
+    }
+
+    [Fact]
     public void Extract_LegacyBraceLine_IsStillSupported()
     {
         var response = "Body text\n{reset hasła i odzyskanie dostępu}";
