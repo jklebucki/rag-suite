@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { Components } from 'react-markdown'
+import { MermaidDiagram } from './MermaidDiagram'
 
 interface MarkdownMessageProps {
   content: string
@@ -40,6 +41,10 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
       const language = match ? match[1] : ''
       const isInline = !className
       const codeString = String(children).replace(/\n$/, '')
+
+      if (!isInline && language.toLowerCase() === 'mermaid') {
+        return <MermaidDiagram chart={codeString} />
+      }
 
       return isInline ? (
         <code

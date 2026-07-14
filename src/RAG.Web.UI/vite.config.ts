@@ -7,6 +7,47 @@ function isPackage(id: string, packageName: string): boolean {
   return normalizedId.includes(`/node_modules/${packageName}/`)
 }
 
+const mermaidPackages = [
+  'mermaid',
+  '@mermaid-js/parser',
+  '@braintree/sanitize-url',
+  '@iconify/types',
+  '@iconify/utils',
+  '@upsetjs/venn.js',
+  'cose-base',
+  'cytoscape',
+  'cytoscape-cose-bilkent',
+  'cytoscape-fcose',
+  'd3',
+  'd3-sankey',
+  'dagre-d3-es',
+  'dayjs',
+  'delaunator',
+  'dompurify',
+  'es-toolkit',
+  'hachure-fill',
+  'internmap',
+  'katex',
+  'khroma',
+  'layout-base',
+  'marked',
+  'path-data-parser',
+  'points-on-curve',
+  'points-on-path',
+  'robust-predicates',
+  'roughjs',
+  'rw',
+  'stylis',
+  'ts-dedent',
+  'uuid',
+]
+
+function isMermaidPackage(id: string): boolean {
+  const normalizedId = id.replace(/\\/g, '/')
+  return mermaidPackages.some(packageName => isPackage(normalizedId, packageName)) ||
+    normalizedId.includes('/node_modules/d3-')
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -63,6 +104,11 @@ export default defineConfig({
           // Icons
           if (isPackage(id, 'lucide-react') || isPackage(id, '@heroicons/react')) {
             return 'vendor-icons'
+          }
+
+          // Mermaid is loaded dynamically only when a chat response contains a diagram.
+          if (isMermaidPackage(id)) {
+            return 'vendor-mermaid'
           }
           
           // Markdown rendering (heavy)
