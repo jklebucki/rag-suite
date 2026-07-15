@@ -367,6 +367,10 @@ public class PromptBuilder : IPromptBuilder
                     "Zwracaj wyłącznie poprawny Markdown.",
                     "Nie zwracaj HTML, JSON ani XML.",
                     "Treść odpowiedzi musi zawierać co najmniej jeden jawny znacznik Markdown (np. nagłówek `##`, lista `-`, `**pogrubienie**` lub blok kodu).",
+                    "Gdy użytkownik prosi o narysowanie, pokazanie lub wizualizację schematu procesu, zawsze umieść co najmniej jeden fenced block Mermaid z samym poprawnym kodem Mermaid. Linia otwierająca ma składać się dokładnie z trzech znaków backtick natychmiast połączonych ze słowem `mermaid`, bez spacji i wcięcia. Użyj `flowchart LR` albo `flowchart TD`; nie zastępuj diagramu zwykłym blokiem kodu ani opisem tekstowym.",
+                    "Schemat Mermaid ma być jasny i bardzo techniczny: pokazuj odpowiednie komponenty lub usługi, kroki procesu, decyzje z opisanymi gałęziami, magazyny danych, interfejsy lub protokoły, kolejki, walidację oraz ścieżki błędów i ponowień, jeśli wynikają z kontekstu. Nie wymyślaj niepotwierdzonych elementów.",
+                    "Koloruj węzły semantycznie za pomocą `classDef` i jawnych przypisań `class`: start/koniec — zielony, proces lub integracja — niebieski, decyzja — bursztynowy, dane — fioletowy, błąd — czerwony, system zewnętrzny — szary. Stosuj kontrastowe kolory HEX i spójną paletę w całym diagramie.",
+                    "W bloku Mermaid nie używaj HTML ani Markdown, dyrektyw `click`, zewnętrznych odnośników ani dyrektyw inicjalizacyjnych. Używaj zwięzłych etykiet, jawnych kierunków strzałek i przed wysłaniem sprawdź poprawność składni Mermaid.",
                     "OBOWIĄZKOWO: w OSTATNIEJ linii odpowiedzi dodaj temat rozmowy DOKŁADNIE w formacie: `CHAT_TITLE: krótki temat (3–6 słów)`, np. `CHAT_TITLE: tworzenie zamówienia zakupu w IFS`. Nie tłumacz słowa `CHAT_TITLE`, nie kopiuj przykładu dosłownie, nigdy nie pomijaj tej linii i nie dodawaj po niej żadnego tekstu."
                 ];
                 break;
@@ -377,6 +381,10 @@ public class PromptBuilder : IPromptBuilder
                     "Csak érvényes Markdown formátumot használj.",
                     "Ne adj vissza HTML-, JSON- vagy XML-kimenetet.",
                     "A válasz tartalmazzon legalább egy egyértelmű Markdown elemet (pl. `##` címsor, `-` lista, `**félkövér**`, vagy kódblokk).",
+                    "Ha a felhasználó folyamatábra rajzolását, megjelenítését vagy vizualizálását kéri, mindig adj meg legalább egy fenced Mermaid blokkot, amely csak érvényes Mermaid kódot tartalmaz. A nyitósor pontosan három backtick karakterből és az azokat szóköz vagy behúzás nélkül azonnal követő `mermaid` szóból álljon. Használj `flowchart LR` vagy `flowchart TD` típust; ne helyettesítsd általános kódblokkal vagy szöveges leírással.",
+                    "A Mermaid diagram legyen világos és nagyon technikai: jelenítse meg a releváns komponenseket vagy szolgáltatásokat, folyamatlépéseket, címkézett döntési ágakat, adattárakat, interfészeket vagy protokollokat, sorokat, validációt, valamint a hiba- és újrapróbálkozási útvonalakat, ha azok a kontextusból következnek. Ne találj ki nem igazolt elemeket.",
+                    "A csomópontokat szemantikusan színezd `classDef` és explicit `class` hozzárendelésekkel: kezdés/befejezés — zöld, folyamat vagy integráció — kék, döntés — borostyán, adat — lila, hiba — piros, külső rendszer — szürke. Használj kontrasztos HEX színeket és egységes palettát.",
+                    "A Mermaid blokkon belül ne használj HTML-t vagy Markdown-t, `click` direktívát, külső hivatkozást vagy inicializálási direktívát. Használj tömör címkéket és egyértelmű nyílirányokat, majd küldés előtt ellenőrizd a Mermaid szintaxist.",
                     "KÖTELEZŐ: a válasz UTOLSÓ soraként add meg a beszélgetés címét PONTOSAN ebben a formában: `CHAT_TITLE: rövid téma (3–6 szó)`, pl. `CHAT_TITLE: beszerzési rendelés létrehozása IFS-ben`. Ne fordítsd le a `CHAT_TITLE` szót, ne másold szó szerint a példát, soha ne hagyd ki ezt a sort, és ne írj utána semmit."
                 ];
                 break;
@@ -387,6 +395,10 @@ public class PromptBuilder : IPromptBuilder
                     "Geef uitsluitend geldige Markdown terug.",
                     "Geef geen HTML, JSON of XML terug.",
                     "Het antwoord moet minimaal één expliciet Markdown-element bevatten (bijv. `##` kop, `-` lijst, `**vet**` of codeblok).",
+                    "Wanneer de gebruiker vraagt om een processchema te tekenen, tonen of visualiseren, voeg dan altijd minimaal één fenced Mermaid-block toe dat uitsluitend geldige Mermaid-code bevat. De openingsregel moet bestaan uit exact drie backticks, direct gevolgd door het woord `mermaid`, zonder spatie of inspringing. Gebruik `flowchart LR` of `flowchart TD`; vervang dit niet door een algemeen codeblok of alleen een tekstuele beschrijving.",
+                    "Het Mermaid-diagram moet helder en zeer technisch zijn: toon relevante componenten of services, processtappen, beslissingen met benoemde vertakkingen, gegevensopslag, interfaces of protocollen, wachtrijen, validatie en fout- of retrypaden wanneer die uit de context volgen. Verzin geen onbevestigde onderdelen.",
+                    "Kleur knooppunten semantisch met `classDef` en expliciete `class`-toewijzingen: start/einde — groen, proces of integratie — blauw, beslissing — amber, gegevens — paars, fout — rood, extern systeem — grijs. Gebruik contrasterende HEX-kleuren en één consistente palet.",
+                    "Gebruik binnen het Mermaid-blok geen HTML of Markdown, `click`-instructies, externe links of initialisatiedirectieven. Gebruik korte labels en duidelijke pijlrichtingen en controleer vóór verzending de Mermaid-syntaxis.",
                     "VERPLICHT: voeg als LAATSTE regel van je antwoord de gesprekstitel toe, EXACT in dit formaat: `CHAT_TITLE: kort onderwerp (3–6 woorden)`, bijv. `CHAT_TITLE: inkooporder aanmaken in IFS`. Vertaal `CHAT_TITLE` niet, kopieer het voorbeeld niet letterlijk, laat deze regel nooit weg en zet er niets achter."
                 ];
                 break;
@@ -397,6 +409,10 @@ public class PromptBuilder : IPromptBuilder
                     "Răspunde exclusiv în Markdown valid.",
                     "Nu returna HTML, JSON sau XML.",
                     "Răspunsul trebuie să conțină cel puțin un element Markdown explicit (de ex. titlu `##`, listă `-`, `**bold**` sau bloc de cod).",
+                    "Când utilizatorul cere desenarea, afișarea sau vizualizarea unei scheme de proces, include întotdeauna cel puțin un bloc fenced Mermaid care conține numai cod Mermaid valid. Linia de deschidere trebuie să conțină exact trei caractere backtick urmate imediat de cuvântul `mermaid`, fără spațiu sau indentare. Folosește `flowchart LR` sau `flowchart TD`; nu îl înlocui cu un bloc de cod generic sau doar cu o descriere textuală.",
+                    "Diagrama Mermaid trebuie să fie clară și foarte tehnică: arată componentele sau serviciile relevante, pașii procesului, deciziile cu ramuri etichetate, depozitele de date, interfețele sau protocoalele, cozile, validarea și traseele de eroare sau reîncercare atunci când rezultă din context. Nu inventa elemente neconfirmate.",
+                    "Colorează semantic nodurile folosind `classDef` și atribuiri explicite `class`: început/sfârșit — verde, proces sau integrare — albastru, decizie — chihlimbar, date — violet, eroare — roșu, sistem extern — gri. Folosește culori HEX contrastante și o paletă consecventă.",
+                    "În blocul Mermaid nu folosi HTML sau Markdown, directive `click`, linkuri externe sau directive de inițializare. Folosește etichete concise și direcții clare ale săgeților și verifică sintaxa Mermaid înainte de trimitere.",
                     "OBLIGATORIU: pe ULTIMA linie a răspunsului adaugă titlul conversației EXACT în acest format: `CHAT_TITLE: subiect scurt (3–6 cuvinte)`, de ex. `CHAT_TITLE: creare comandă de achiziție în IFS`. Nu traduce `CHAT_TITLE`, nu copia exemplul literal, nu omite niciodată această linie și nu scrie nimic după ea."
                 ];
                 break;
@@ -407,6 +423,10 @@ public class PromptBuilder : IPromptBuilder
                     "Return valid Markdown only.",
                     "Do not return HTML, JSON, or XML.",
                     "The response body must include at least one explicit Markdown construct (for example: `##` heading, `-` list, `**bold**`, or a fenced code block).",
+                    "When the user asks to draw, show, or visualize a process diagram, always include at least one fenced Mermaid block containing valid Mermaid code only. Its opening line must be exactly three backtick characters immediately followed by the word `mermaid`, with no spaces or indentation. Use `flowchart LR` or `flowchart TD`; do not replace it with a generic code block or a text-only description.",
+                    "Make the Mermaid diagram clear and highly technical: show relevant components or services, process steps, decisions with labeled branches, data stores, interfaces or protocols, queues, validation, and error or retry paths when supported by the context. Do not invent unsupported elements.",
+                    "Color nodes semantically with `classDef` and explicit `class` assignments: start/end — green, process or integration — blue, decision — amber, data — purple, error — red, external system — gray. Use high-contrast HEX colors and one consistent palette throughout the diagram.",
+                    "Inside the Mermaid block, do not use HTML or Markdown, `click` directives, external links, or initialization directives. Use concise labels and explicit arrow directions, and validate Mermaid syntax before sending.",
                     "MANDATORY: as the LAST line of your answer, add the conversation title EXACTLY in this format: `CHAT_TITLE: short topic (3–6 words)`, for example `CHAT_TITLE: creating a purchase order in IFS`. Do not translate `CHAT_TITLE`, do not copy the example literally, never omit this line, and write nothing after it."
                 ];
                 break;

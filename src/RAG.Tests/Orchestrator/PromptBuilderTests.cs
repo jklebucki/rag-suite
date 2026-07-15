@@ -436,5 +436,29 @@ public class PromptBuilderTests
         // Assert
         result.Should().Contain("[source1]");
     }
-}
 
+    [Theory]
+    [InlineData("en")]
+    [InlineData("pl")]
+    [InlineData("hu")]
+    [InlineData("nl")]
+    [InlineData("ro")]
+    public void BuildContextualPrompt_ForSupportedLanguage_IncludesMermaidProcessDiagramContract(string language)
+    {
+        var context = new PromptContext
+        {
+            UserMessage = "Draw a process diagram",
+            SearchResults = Array.Empty<SearchResult>(),
+            ResponseLanguage = language,
+            UseDocumentSearch = false
+        };
+
+        var result = _promptBuilder.BuildContextualPrompt(context);
+
+        result.Should().Contain("mermaid");
+        result.Should().Contain("flowchart LR");
+        result.Should().Contain("flowchart TD");
+        result.Should().Contain("classDef");
+        result.Should().Contain("click");
+    }
+}

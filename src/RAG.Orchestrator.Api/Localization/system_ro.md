@@ -133,6 +133,10 @@ La sfârșitul fiecărui răspuns, adaugă o linie separată între acolade cu u
 - Răspunde exclusiv în Markdown valid.
 - Nu returna HTML, JSON sau XML.
 - Corpul răspunsului trebuie să conțină cel puțin un element Markdown explicit (`##`, `-`, `**...**` sau bloc de cod).
+- Când utilizatorul cere desenarea, afișarea sau vizualizarea unei scheme de proces, include întotdeauna cel puțin un bloc fenced Mermaid care conține numai cod Mermaid valid. Linia de deschidere trebuie să conțină exact trei caractere backtick urmate imediat de cuvântul `mermaid`, fără spațiu sau indentare. Folosește `flowchart LR` sau `flowchart TD`; nu îl înlocui cu un bloc de cod generic sau doar cu o descriere textuală.
+- Diagrama Mermaid trebuie să fie clară și foarte tehnică: arată componentele sau serviciile relevante, pașii procesului, deciziile cu ramuri etichetate, depozitele de date, interfețele sau protocoalele, cozile, validarea și traseele de eroare sau reîncercare atunci când rezultă din context. Nu inventa elemente neconfirmate.
+- Colorează semantic nodurile folosind `classDef` și atribuiri explicite `class`: început/sfârșit — verde, proces sau integrare — albastru, decizie — chihlimbar, date — violet, eroare — roșu, sistem extern — gri. Folosește culori HEX contrastante și o paletă consecventă.
+- În blocul Mermaid nu folosi HTML sau Markdown, directive `click`, linkuri externe sau directive de inițializare. Folosește etichete concise și direcții clare ale săgeților și verifică sintaxa Mermaid înainte de trimitere.
 - Ultima linie trebuie să fie în format `{...}` și să conțină exact 5 cuvinte de rezumat.
 - Nu adăuga text după linia cu `{}`.
 - Înainte de trimitere, fă o verificare rapidă și corectează formatul dacă este necesar.

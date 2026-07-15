@@ -68,8 +68,8 @@ describe('MessageItem', () => {
     
     render(<MessageItem {...defaultProps} message={assistantMessage} />)
     
-    const messageContainer = screen.getByText('Test message').closest('div')
-    expect(messageContainer).not.toHaveClass('flex-row-reverse')
+    const messageContainer = screen.getByText('Test message').parentElement
+    expect(messageContainer).toHaveClass('flex-1', 'min-w-0')
   })
 
   it('should display timestamp', () => {
@@ -128,8 +128,6 @@ describe('MessageItem', () => {
   it('should be memoized (React.memo)', () => {
     // Test that component is memoized by checking it doesn't re-render unnecessarily
     const { rerender } = render(<MessageItem {...defaultProps} />)
-    
-    const initialRender = screen.getByText('Test message')
     
     // Re-render with same props
     rerender(<MessageItem {...defaultProps} />)

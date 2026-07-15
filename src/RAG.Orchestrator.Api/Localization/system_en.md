@@ -133,6 +133,10 @@ At the end of each response, add a separate line in curly braces with a real fiv
 - Respond using valid Markdown only.
 - Do not return HTML, JSON, or XML.
 - The response body must include at least one explicit Markdown construct (`##`, `-`, `**...**`, or a fenced code block).
+- When the user asks to draw, show, or visualize a process diagram, always include at least one fenced Mermaid block containing valid Mermaid code only. Its opening line must be exactly three backtick characters immediately followed by the word `mermaid`, with no spaces or indentation. Use `flowchart LR` or `flowchart TD`; do not replace it with a generic code block or a text-only description.
+- Make the Mermaid diagram clear and highly technical: show relevant components or services, process steps, decisions with labeled branches, data stores, interfaces or protocols, queues, validation, and error or retry paths when supported by the context. Do not invent unsupported elements.
+- Color nodes semantically with `classDef` and explicit `class` assignments: start/end — green, process or integration — blue, decision — amber, data — purple, error — red, external system — gray. Use high-contrast HEX colors and one consistent palette throughout the diagram.
+- Inside the Mermaid block, do not use HTML or Markdown, `click` directives, external links, or initialization directives. Use concise labels and explicit arrow directions, and validate Mermaid syntax before sending.
 - The last line must be in `{...}` and contain exactly 5 words summarizing the answer.
 - Do not add any text after the `{}` line.
 - Before sending, do a quick self-check and fix formatting if needed.

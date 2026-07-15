@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from 'react'
+import { Modal } from '@/shared/components/ui/Modal'
 
 interface MermaidDiagramProps {
   chart: string
@@ -8,6 +9,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const reactId = useId()
   const [svg, setSvg] = useState('')
   const [error, setError] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -71,13 +73,41 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
     )
   }
 
+  const diagramClasses = 'w-full overflow-auto [&_svg]:!h-auto [&_svg]:!w-full [&_svg]:!max-w-none'
+
   return (
-    <div
-      className="my-3 overflow-x-auto rounded-md border border-gray-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-950"
-      role="img"
-      aria-label="Mermaid diagram"
-      // Mermaid returns sanitized SVG when securityLevel is set to strict.
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <>
+      <button
+        type="button"
+        className="my-3 block w-full cursor-zoom-in rounded-md border border-gray-200 bg-white p-3 text-left transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-950"
+        onClick={() => setIsExpanded(true)}
+        aria-label="Open Mermaid diagram in a larger view"
+      >
+        <div
+          className={diagramClasses}
+          role="img"
+          aria-label="Mermaid diagram"
+          // Mermaid returns sanitized SVG when securityLevel is set to strict.
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      </button>
+
+      <Modal
+        isOpen={isExpanded}
+        onClose={() => setIsExpanded(false)}
+        title="Mermaid diagram"
+        size="screen"
+      >
+        <div className="flex h-full w-full items-center justify-center overflow-auto bg-white p-4 dark:bg-slate-950 sm:p-6">
+          <div
+            className={diagramClasses}
+            role="img"
+            aria-label="Expanded Mermaid diagram"
+            // Mermaid returns sanitized SVG when securityLevel is set to strict.
+            dangerouslySetInnerHTML={{ __html: svg }}
+          />
+        </div>
+      </Modal>
+    </>
   )
 }

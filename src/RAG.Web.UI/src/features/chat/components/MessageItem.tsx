@@ -29,7 +29,7 @@ export const MessageItem = React.memo<MessageItemProps>(({
   isLastMessage,
 }) => {
   return (
-    <div className={`flex items-start gap-2 md:gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex w-full items-start gap-2 md:gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
       <div className={`p-1.5 md:p-2 rounded-full shrink-0 shadow-sm ${message.role === 'user' ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
         {message.role === 'user' ? (
           <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-300" />
@@ -38,10 +38,10 @@ export const MessageItem = React.memo<MessageItemProps>(({
         )}
       </div>
       <div
-        className={`max-w-[85%] md:max-w-5xl rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${
+        className={`rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${
           message.role === 'user'
-            ? 'bg-blue-600 text-white'
-            : 'bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-gray-100'
+            ? 'max-w-[85%] md:max-w-5xl bg-blue-600 text-white'
+            : 'min-w-0 flex-1 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-gray-900 dark:text-gray-100'
         }`}
       >
         <MarkdownMessage content={message.content} isUserMessage={message.role === 'user'} />

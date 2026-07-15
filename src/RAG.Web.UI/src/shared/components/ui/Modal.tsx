@@ -8,7 +8,7 @@ interface ModalProps {
   onClose: () => void
   title: React.ReactNode
   children: React.ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'screen'
   fullscreen?: boolean
 }
 
@@ -42,7 +42,8 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
     sm: 'max-w-md',
     md: 'max-w-2xl',
     lg: 'max-w-4xl',
-    xl: 'max-w-6xl'
+    xl: 'max-w-6xl',
+    screen: '!w-[80vw] max-w-none h-[80vh]'
   }
 
   const closeLabel = t('common.close')
@@ -63,6 +64,9 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
       {/* Modal wrapper */}
       <div className={modalWrapperClasses}>
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={typeof title === 'string' ? title : undefined}
           className={`relative bg-white dark:bg-gray-800 w-full overflow-hidden ${
             fullscreen
               ? 'h-full rounded-none'
@@ -87,7 +91,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg', fullscree
           {/* Content */}
           <div
             className={`overflow-y-auto ${
-              fullscreen ? 'h-full' : 'max-h-[calc(90vh-120px)]'
+              fullscreen
+                ? 'h-full'
+                : size === 'screen'
+                  ? 'h-[calc(80vh-73px)]'
+                  : 'max-h-[calc(90vh-120px)]'
             }`}
           >
             {children}

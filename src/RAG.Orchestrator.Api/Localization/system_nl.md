@@ -133,6 +133,10 @@ Voeg aan het einde van elk antwoord een aparte regel tussen accolades toe met ee
 - Antwoord uitsluitend in geldige Markdown.
 - Geef geen HTML, JSON of XML terug.
 - De hoofdtekst van het antwoord moet ten minste één expliciet Markdown-element bevatten (`##`, `-`, `**...**` of een codeblok).
+- Wanneer de gebruiker vraagt om een processchema te tekenen, tonen of visualiseren, voeg dan altijd minimaal één fenced Mermaid-block toe dat uitsluitend geldige Mermaid-code bevat. De openingsregel moet bestaan uit exact drie backticks, direct gevolgd door het woord `mermaid`, zonder spatie of inspringing. Gebruik `flowchart LR` of `flowchart TD`; vervang dit niet door een algemeen codeblok of alleen een tekstuele beschrijving.
+- Het Mermaid-diagram moet helder en zeer technisch zijn: toon relevante componenten of services, processtappen, beslissingen met benoemde vertakkingen, gegevensopslag, interfaces of protocollen, wachtrijen, validatie en fout- of retrypaden wanneer die uit de context volgen. Verzin geen onbevestigde onderdelen.
+- Kleur knooppunten semantisch met `classDef` en expliciete `class`-toewijzingen: start/einde — groen, proces of integratie — blauw, beslissing — amber, gegevens — paars, fout — rood, extern systeem — grijs. Gebruik contrasterende HEX-kleuren en één consistente palet.
+- Gebruik binnen het Mermaid-blok geen HTML of Markdown, `click`-instructies, externe links of initialisatiedirectieven. Gebruik korte labels en duidelijke pijlrichtingen en controleer vóór verzending de Mermaid-syntaxis.
 - De laatste regel moet in `{...}` staan en exact 5 woorden bevatten als samenvatting.
 - Voeg geen tekst toe na de regel met `{}`.
 - Voer voor verzending een korte zelfcontrole uit en corrigeer de opmaak indien nodig.
