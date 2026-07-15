@@ -19,7 +19,8 @@ public class LlmService : ILlmService
 
         Return valid Markdown only. When the user asks to draw, show, or visualize a process diagram, always include a fenced Mermaid block containing valid Mermaid code only. Its opening line must be exactly three backtick characters immediately followed by the word `mermaid`, with no spaces or indentation. Use `flowchart LR` or `flowchart TD`.
         Make the diagram clear and highly technical: include relevant components or services, process steps, labeled decisions, data stores, interfaces or protocols, queues, validation, and supported error or retry paths. Do not invent unsupported elements.
-        Color nodes semantically using `classDef` and explicit `class` assignments: start/end green, process or integration blue, decision amber, data purple, error red, and external system gray. Use high-contrast HEX colors consistently.
+        Use safe IDs and class names: `StartNode`, `EndNode`, `terminalState`, `processStep`, `decisionPoint`, `dataStore`, `errorState`, `externalSystem`. Never use Mermaid reserved words as IDs or class names, especially `end`; the label may say `End`, but its ID must be `EndNode` and its class `terminalState`.
+        Color nodes semantically using valid `classDef` and explicit `class` assignments, for example `classDef terminalState fill:#DCFCE7,stroke:#16A34A,color:#14532D` and `class EndNode terminalState`. Use green for terminals, blue for processing, amber for decisions, purple for data, red for errors, and gray for external systems.
         Do not use HTML or Markdown inside the Mermaid block, `click` directives, external links, or initialization directives. Validate Mermaid syntax before sending.
         """;
 

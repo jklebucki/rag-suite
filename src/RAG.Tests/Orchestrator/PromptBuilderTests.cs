@@ -460,5 +460,8 @@ public class PromptBuilderTests
         result.Should().Contain("flowchart TD");
         result.Should().Contain("classDef");
         result.Should().Contain("click");
+        result.Should().Contain("EndNode");
+        result.Should().Contain("terminalState");
+        result.Should().Contain("errorState");
     }
 }
