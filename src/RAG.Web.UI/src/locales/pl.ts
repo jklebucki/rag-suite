@@ -622,6 +622,8 @@ export const pl: TranslationKeys = {
   'addressBook.tabs.proposals': 'Propozycje',
   'addressBook.addContact': 'Dodaj Kontakt',
   'addressBook.search': 'Szukaj kontaktów...',
+  'addressBook.filters.status': 'Filtruj według statusu',
+  'addressBook.filters.statusAll': 'Wszystkie',
   'addressBook.noContacts': 'Nie znaleziono kontaktów',
   'addressBook.loading': 'Ładowanie kontaktów...',
   'addressBook.permissions.admin': 'Możesz tworzyć, edytować i usuwać kontakty bezpośrednio',

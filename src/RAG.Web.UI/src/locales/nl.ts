@@ -624,6 +624,8 @@ export const nl: TranslationKeys = {
   'addressBook.tabs.proposals': 'Voorstellen',
   'addressBook.addContact': 'Contact Toevoegen',
   'addressBook.search': 'Contacten zoeken...',
+  'addressBook.filters.status': 'Filteren op status',
+  'addressBook.filters.statusAll': 'Alle',
   'addressBook.noContacts': 'Geen contacten gevonden',
   'addressBook.loading': 'Contacten laden...',
   'addressBook.permissions.admin': 'Je kunt contacten direct aanmaken, bewerken en verwijderen',

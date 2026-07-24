@@ -625,6 +625,8 @@ export const ro: TranslationKeys = {
   'addressBook.tabs.proposals': 'Propuneri',
   'addressBook.addContact': 'Adaugă Contact',
   'addressBook.search': 'Caută contacte...',
+  'addressBook.filters.status': 'Filtrează după status',
+  'addressBook.filters.statusAll': 'Toate',
   'addressBook.noContacts': 'Nu s-au găsit contacte',
   'addressBook.loading': 'Se încarcă contactele...',
   'addressBook.permissions.admin': 'Poți crea, edita și șterge contacte direct',

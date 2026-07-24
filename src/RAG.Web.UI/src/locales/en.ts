@@ -677,6 +677,8 @@ export const en: TranslationKeys = {
   'addressBook.tabs.proposals': 'Proposals',
   'addressBook.addContact': 'Add Contact',
   'addressBook.search': 'Search contacts...',
+  'addressBook.filters.status': 'Filter by status',
+  'addressBook.filters.statusAll': 'All',
   'addressBook.noContacts': 'No contacts found',
   'addressBook.loading': 'Loading contacts...',
   'addressBook.permissions.admin': 'You can create, edit, and delete contacts directly',

@@ -88,6 +88,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
   ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [showColumnConfig, setShowColumnConfig] = useState(false)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
@@ -231,8 +232,16 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
     [canModify, isAuthenticated, onEdit, onDelete, onProposeChange, t]
   )
 
+  const filteredContacts = useMemo(
+    () =>
+      statusFilter === 'all'
+        ? contacts
+        : contacts.filter((contact) => contact.isActive === (statusFilter === 'active')),
+    [contacts, statusFilter]
+  )
+
   const table = useReactTable({
-    data: contacts,
+    data: filteredContacts,
     columns,
     state: {
       sorting,
@@ -284,6 +293,19 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
           placeholder={t('addressBook.search')}
           className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-500 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary-500 lg:flex-1 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100 dark:placeholder:text-slate-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
         />
+        {canModify && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+            className="form-select h-10 w-full lg:w-44 text-sm"
+            aria-label={t('addressBook.filters.status')}
+            title={t('addressBook.filters.status')}
+          >
+            <option value="all">{t('addressBook.filters.statusAll')}</option>
+            <option value="active">{t('addressBook.table.active')}</option>
+            <option value="inactive">{t('addressBook.table.inactive')}</option>
+          </select>
+        )}
         <div className="relative">
           <button
             onClick={() => setShowColumnConfig(!showColumnConfig)}

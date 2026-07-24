@@ -622,6 +622,8 @@ export const hu: TranslationKeys = {
   'addressBook.tabs.proposals': 'Javaslatok',
   'addressBook.addContact': 'Kapcsolat hozzáadása',
   'addressBook.search': 'Kapcsolatok keresése...',
+  'addressBook.filters.status': 'Szűrés állapot szerint',
+  'addressBook.filters.statusAll': 'Összes',
   'addressBook.noContacts': 'Nem találhatók kapcsolatok',
   'addressBook.loading': 'Kapcsolatok betöltése...',
   'addressBook.permissions.admin': 'közvetlenül hozhat létre, szerkeszthet és törölhet kapcsolatokat',

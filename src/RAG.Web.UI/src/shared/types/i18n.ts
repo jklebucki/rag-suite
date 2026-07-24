@@ -697,6 +697,8 @@ export interface TranslationKeys {
   'addressBook.tabs.proposals': string;
   'addressBook.addContact': string;
   'addressBook.search': string;
+  'addressBook.filters.status': string;
+  'addressBook.filters.statusAll': string;
   'addressBook.noContacts': string;
   'addressBook.loading': string;
   'addressBook.permissions.admin': string;
