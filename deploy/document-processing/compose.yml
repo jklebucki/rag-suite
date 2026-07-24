@@ -1,0 +1,53 @@
+services:
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:v1.27.0
+    restart: unless-stopped
+    environment:
+      DOCLING_SERVE_API_KEY: ${DOCLING_API_KEY}
+      DOCLING_SERVE_MAX_FILE_SIZE: ${DOCLING_MAX_FILE_SIZE_BYTES:-26214400}
+      DOCLING_SERVE_MAX_NUM_PAGES: ${DOCLING_MAX_PAGE_COUNT:-100}
+      DOCLING_SERVE_ENG_LOC_NUM_WORKERS: ${DOCLING_WORKERS:-2}
+      DOCLING_SERVE_ENG_LOC_SHARE_MODELS: "true"
+      DOCLING_SERVE_ARTIFACTS_PATH: /opt/docling/artifacts
+      DOCLING_DEVICE: cpu
+      DOCLING_NUM_THREADS: ${DOCLING_CPU_THREADS:-4}
+      UVICORN_HOST: 0.0.0.0
+      UVICORN_PORT: 5001
+    volumes:
+      - docling-artifacts:/opt/docling/artifacts
+    networks:
+      - document-processing
+
+  document-processing-api:
+    image: rag-suite/document-processing-api:0.1.0
+    build:
+      context: ../..
+      dockerfile: src/RAG.DocumentProcessing.Api/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      DocumentProcessing__ApiKey: ${DOCUMENT_PROCESSING_API_KEY}
+      DocumentProcessing__MaxFileSizeBytes: ${DOCLING_MAX_FILE_SIZE_BYTES:-26214400}
+      DocumentProcessing__MaxPageCount: ${DOCLING_MAX_PAGE_COUNT:-100}
+      DocumentProcessing__MaxConcurrentJobs: ${DOCUMENT_PROCESSING_MAX_CONCURRENT_JOBS:-2}
+      DocumentProcessing__MaxQueuedJobs: ${DOCUMENT_PROCESSING_MAX_QUEUED_JOBS:-20}
+      DocumentProcessing__JobTimeoutSeconds: ${DOCUMENT_PROCESSING_TIMEOUT_SECONDS:-300}
+      Docling__Endpoint: http://docling:5001
+      Docling__ApiKey: ${DOCLING_API_KEY}
+      Docling__PollIntervalMilliseconds: ${DOCLING_POLL_INTERVAL_MS:-1000}
+    ports:
+      - "${DOCUMENT_PROCESSING_PORT:-5080}:8080"
+    volumes:
+      - document-processing-data:/app/App_Data
+    depends_on:
+      - docling
+    networks:
+      - document-processing
+
+networks:
+  document-processing:
+    driver: bridge
+
+volumes:
+  docling-artifacts:
+  document-processing-data:

@@ -311,3 +311,6 @@ docker-compose -f docker-compose.prod.yml up -d
 ✅ Manager środowiska  
 
 **Projekt RAG Suite jest teraz w pełni zintegrowany z LLM! 🎉**
+# Document processing containers
+
+Deployment scripts for the CPU and NVIDIA GPU variants are in [document-processing](document-processing/). See the [deployment guide](../deploy/document-processing/README.md) before using them.
