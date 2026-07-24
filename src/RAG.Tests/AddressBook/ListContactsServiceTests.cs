@@ -1,14 +1,17 @@
 using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using RAG.AddressBook.Data;
 using RAG.AddressBook.Domain;
 using RAG.AddressBook.Features.ListContacts;
+using RAG.AddressBook.Services;
 
 namespace RAG.Tests.AddressBook;
 
 public class ListContactsServiceTests : IDisposable
 {
     private readonly AddressBookDbContext _context;
+    private readonly Mock<IAddressBookAuthorizationService> _mockAuthService;
     private readonly ListContactsService _service;
 
     public ListContactsServiceTests()
@@ -18,7 +21,9 @@ public class ListContactsServiceTests : IDisposable
             .Options;
 
         _context = new AddressBookDbContext(options);
-        _service = new ListContactsService(_context);
+        _mockAuthService = new Mock<IAddressBookAuthorizationService>();
+        _mockAuthService.Setup(s => s.IsAdminOrPowerUser()).Returns(true);
+        _service = new ListContactsService(_context, _mockAuthService.Object);
     }
 
     public void Dispose()
@@ -74,6 +79,32 @@ public class ListContactsServiceTests : IDisposable
         result.Should().NotBeNull();
         result.Contacts.Should().HaveCount(2);
         result.TotalCount.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task ListAsync_WithIncludeInactiveWithoutPrivilegedRole_ReturnsOnlyActiveContacts()
+    {
+        // Arrange
+        _mockAuthService.Setup(s => s.IsAdminOrPowerUser()).Returns(false);
+
+        var active = new Contact { FirstName = "Active", LastName = "One", IsActive = true };
+        var inactive = new Contact { FirstName = "Inactive", LastName = "Two", IsActive = false };
+
+        _context.Contacts.AddRange(active, inactive);
+        await _context.SaveChangesAsync();
+
+        var request = new ListContactsRequest
+        {
+            IncludeInactive = true
+        };
+
+        // Act
+        var result = await _service.ListAsync(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Contacts.Should().HaveCount(1);
+        result.Contacts.Should().OnlyContain(c => c.IsActive);
     }
 
     [Fact]

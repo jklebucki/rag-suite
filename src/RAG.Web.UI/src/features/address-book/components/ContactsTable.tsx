@@ -385,7 +385,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
                 <React.Fragment key={row.id}>
                   <tr
                     data-contact-id={row.original.id}
-                    className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                    className={`hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors ${row.original.isActive ? '' : 'opacity-50'}`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-3 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">

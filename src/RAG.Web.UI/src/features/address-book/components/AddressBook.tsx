@@ -55,10 +55,11 @@ export function AddressBook() {
   const canModify = !!(isAuthenticated && (user?.roles?.includes('Admin') || user?.roles?.includes('PowerUser')))
   const isAdmin = !!(isAuthenticated && user?.roles?.includes('Admin'))
 
-  // Load contacts on mount
+  // Load contacts on mount and when permissions change (Admin/PowerUser see inactive entries too)
   useEffect(() => {
     loadContacts()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canModify])
 
   // Load proposals when switching to proposals tab
   useEffect(() => {
@@ -71,7 +72,8 @@ export function AddressBook() {
     setLoading(true)
     setError(null)
     try {
-      const response = await addressBookService.listContacts({ includeInactive: false })
+      // Admin/PowerUser manage the full address book, so they must see inactive entries as well
+      const response = await addressBookService.listContacts({ includeInactive: canModify })
       setContacts(response.contacts)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load contacts')

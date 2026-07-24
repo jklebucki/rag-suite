@@ -1,15 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using RAG.AddressBook.Data;
+using RAG.AddressBook.Services;
 
 namespace RAG.AddressBook.Features.ListContacts;
 
 public class ListContactsService
 {
     private readonly AddressBookDbContext _context;
+    private readonly IAddressBookAuthorizationService _authService;
 
-    public ListContactsService(AddressBookDbContext context)
+    public ListContactsService(AddressBookDbContext context, IAddressBookAuthorizationService authService)
     {
         _context = context;
+        _authService = authService;
     }
 
     public async Task<ListContactsResponse> ListAsync(
@@ -18,8 +21,9 @@ public class ListContactsService
     {
         var query = _context.Contacts.AsQueryable();
 
-        // Apply filters
-        if (!request.IncludeInactive)
+        // Inactive contacts are visible only to Admin/PowerUser, regardless of the requested flag
+        var includeInactive = request.IncludeInactive && _authService.IsAdminOrPowerUser();
+        if (!includeInactive)
         {
             query = query.Where(c => c.IsActive);
         }

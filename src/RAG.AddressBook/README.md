@@ -90,6 +90,7 @@ Tags for categorizing contacts:
 **Endpoint:** `GET /api/addressbook`
 - Lists all contacts
 - Optional filters: `IncludeInactive`, `Department`, `Location`
+- `IncludeInactive` is honored only for Admin/PowerUser; other callers always get active contacts only
 - Returns contacts ordered by LastName, FirstName
 - Available to all authenticated users
 
