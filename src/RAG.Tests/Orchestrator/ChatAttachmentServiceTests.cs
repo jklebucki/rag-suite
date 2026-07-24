@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using RAG.DocumentProcessing.Abstractions;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
 using RAG.Orchestrator.Api.Models;
@@ -71,16 +72,17 @@ public class ChatAttachmentServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task UploadAsync_WithUnsupportedExtension_RejectsWithoutSaving()
+    public async Task UploadAsync_WithPdf_QueuesDocumentProcessingAndReturnsQueuedDraft()
     {
-        var store = CreateStoreMock();
+        var drafts = new List<ChatAttachmentDraft>();
+        var store = CreateStoreMock(drafts);
         var service = CreateService(store, tokenCount: 5);
 
-        var exception = await Assert.ThrowsAsync<ChatAttachmentException>(() =>
-            service.UploadAsync(UserId, SessionId, Files(CreateFormFile("manual.pdf", "not really a pdf"))));
+        var response = await service.UploadAsync(UserId, SessionId, Files(CreateFormFile("manual.pdf", "pdf bytes")));
 
-        Assert.Equal("UNSUPPORTED_FILE_TYPE", exception.Code);
-        store.Verify(s => s.SaveBatchAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<ChatAttachmentFile>>(), It.IsAny<CancellationToken>()), Times.Never);
+        var attachment = Assert.Single(response.ContextUsage.Attachments);
+        Assert.Equal("queued", attachment.Status);
+        Assert.Equal(0, attachment.TokenCount);
     }
 
     [Fact]
@@ -171,7 +173,12 @@ public class ChatAttachmentServiceTests : IDisposable
             .Setup(counter => counter.CountTokens(It.IsAny<string>(), It.IsAny<string?>()))
             .Returns((string text, string? _) => tokenCountSelector(text));
 
-        return new ChatAttachmentService(_context, settingsService.Object, tokenCounter.Object, store.Object);
+        var documentClient = new Mock<IDocumentProcessingClient>();
+        documentClient
+            .Setup(client => client.SubmitAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new DocumentJobAccepted("job-1", DocumentJobState.Queued, DateTimeOffset.UtcNow));
+
+        return new ChatAttachmentService(_context, settingsService.Object, tokenCounter.Object, store.Object, documentClient.Object);
     }
 
     private static Mock<IChatAttachmentStore> CreateStoreMock(List<ChatAttachmentDraft>? draftState = null)
@@ -197,7 +204,13 @@ public class ChatAttachmentServiceTests : IDisposable
                     file.ContentType,
                     file.SizeBytes,
                     file.TokenCount,
-                    DateTimeOffset.UtcNow)));
+                    DateTimeOffset.UtcNow,
+                    file.Status,
+                    file.Progress,
+                    file.PageCount,
+                    file.Provider,
+                    file.ErrorCode,
+                    file.DocumentJobId)));
             })
             .Returns(Task.CompletedTask);
 
