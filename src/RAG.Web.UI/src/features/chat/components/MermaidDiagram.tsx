@@ -73,7 +73,11 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
     )
   }
 
-  const diagramClasses = 'w-full overflow-auto [&_svg]:!h-auto [&_svg]:!w-full [&_svg]:!max-w-none'
+  // Inline preview: keep the box full-width, but let Mermaid's own responsive sizing govern the
+  // diagram. Mermaid sets `max-width: <natural>px` on the SVG (useMaxWidth); we deliberately do NOT
+  // override width/max-width here, so small diagrams render at their natural size and large ones
+  // scale down to fit — instead of being stretched to fill the whole container.
+  const diagramClasses = 'w-full overflow-x-auto text-center [&_svg]:!mx-auto [&_svg]:!h-auto'
 
   return (
     <>
