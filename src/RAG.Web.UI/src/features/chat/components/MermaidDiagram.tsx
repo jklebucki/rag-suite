@@ -101,12 +101,15 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         onClose={() => setIsExpanded(false)}
         title="Mermaid diagram"
         size="screen"
+        subtleHeader
       >
         {/* min-h-full (not h-full) lets tall diagrams grow past the viewport so the modal's own
-            vertical scroll can reach the TOP; items-center still centers diagrams that fit. */}
+            vertical scroll can reach the TOP; items-center still centers diagrams that fit. Like the
+            inline preview, we don't override the SVG width/max-width, so the diagram keeps its natural
+            size (scaling down only to fit) instead of being stretched to fill the modal. */}
         <div className="flex min-h-full w-full items-center justify-center bg-white p-4 dark:bg-slate-950 sm:p-6">
           <div
-            className="w-full [&_svg]:!h-auto [&_svg]:!w-full [&_svg]:!max-w-none"
+            className="[&_svg]:!mx-auto [&_svg]:!h-auto"
             role="img"
             aria-label="Expanded Mermaid diagram"
             // Mermaid returns sanitized SVG when securityLevel is set to strict.

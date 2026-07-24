@@ -38,13 +38,13 @@ describe('MarkdownMessage', () => {
     expect(screen.getByText('not a diagram')).toBeInTheDocument()
   })
 
-  it('opens the diagram in an 80 percent viewport modal', async () => {
+  it('opens the diagram in a near-fullscreen modal', async () => {
     render(<MarkdownMessage content={'```mermaid\nflowchart LR\n  A --> B\n```'} />)
 
     fireEvent.click(await screen.findByRole('button', { name: 'Open Mermaid diagram in a larger view' }))
 
     const dialog = screen.getByRole('dialog')
-    expect(dialog).toHaveClass('!w-[80vw]', 'h-[80vh]')
+    expect(dialog).toHaveClass('!w-[80vw]', 'h-[95vh]')
     expect(screen.getByRole('img', { name: 'Expanded Mermaid diagram' })).toBeInTheDocument()
   })
 })
