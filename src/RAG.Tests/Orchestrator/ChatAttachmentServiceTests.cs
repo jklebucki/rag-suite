@@ -125,15 +125,16 @@ public class ChatAttachmentServiceTests : IDisposable
     }
 
     [Fact]
-    public void BuildAttachmentsPromptBlock_IncludesSafetyInstructionAndFileMetadata()
+    public void BuildAttachmentsPromptBlock_IncludesDelimiterAndFileMetadata()
     {
         var block = ChatAttachmentService.BuildAttachmentsPromptBlock(new[]
         {
             new ChatAttachmentFile("file-1", "notes.md", "text/markdown", 32, 7, "# Notes")
         });
 
+        // The untrusted-input safety instruction now lives in the system_*.md files; the code
+        // emits only the delimited data block that the instruction refers to.
         Assert.Contains("=== USER ATTACHED FILES ===", block);
-        Assert.Contains("untrusted context", block);
         Assert.Contains("--- FILE: notes.md ---", block);
         Assert.Contains("Content-Type: text/markdown", block);
         Assert.Contains("Estimated tokens: 7", block);

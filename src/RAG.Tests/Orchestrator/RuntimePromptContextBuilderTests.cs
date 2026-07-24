@@ -13,6 +13,8 @@ public class RuntimePromptContextBuilderTests
         context.Should().Contain("Today according to the API server:");
         context.Should().Contain("Current server local date:");
         context.Should().Contain("Current server local day of week:");
-        context.Should().Contain("Do not infer or recalculate today's date or weekday from model memory.");
+        // The instruction on how to treat this data block now lives in the system_*.md files,
+        // so the builder emits data only.
+        context.Should().NotContain("Do not infer or recalculate today's date or weekday from model memory.");
     }
 }

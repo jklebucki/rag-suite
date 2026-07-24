@@ -14,14 +14,11 @@ public class LlmService : ILlmService
     private readonly ConcurrentDictionary<string, string> _systemMessageCache = new();
     private readonly string[] _supportedLanguages = { "pl", "en", "hu", "nl", "ro" };
 
+    // Absolute last-resort identity, used ONLY if no system_{lang}.md file (not even English)
+    // can be read. It deliberately contains NO formatting/Mermaid/title contract — that behavior
+    // lives exclusively in the Markdown files under Localization/ and must never be hardcoded here.
     private const string DefaultSystemMessage = """
-        I am Ctronex's AI assistant, specializing in the RAG Suite system - an advanced tool for organizational knowledge management. I can assist in finding information in the organizational knowledge base, answering questions about procedures, policies, and technical documentation.
-
-        Return valid Markdown only. When the user asks to draw, show, or visualize a process diagram, always include a fenced Mermaid block containing valid Mermaid code only. Its opening line must be exactly three backtick characters immediately followed by the word `mermaid`, with no spaces or indentation. Use `flowchart LR` or `flowchart TD`.
-        Make the diagram clear and highly technical: include relevant components or services, process steps, labeled decisions, data stores, interfaces or protocols, queues, validation, and supported error or retry paths. Do not invent unsupported elements.
-        Use safe IDs and class names: `StartNode`, `EndNode`, `terminalState`, `processStep`, `decisionPoint`, `dataStore`, `errorState`, `externalSystem`. Never use Mermaid reserved words as IDs or class names, especially `end`; the label may say `End`, but its ID must be `EndNode` and its class `terminalState`.
-        Color nodes semantically using valid `classDef` and explicit `class` assignments, for example `classDef terminalState fill:#DCFCE7,stroke:#16A34A,color:#14532D` and `class EndNode terminalState`. Use green for terminals, blue for processing, amber for decisions, purple for data, red for errors, and gray for external systems.
-        Do not use HTML or Markdown inside the Mermaid block, `click` directives, external links, or initialization directives. Validate Mermaid syntax before sending.
+        I am Citronex's AI assistant for the RAG Suite system, helping find information in the organizational knowledge base and answering questions about procedures, policies, and technical documentation.
         """;
 
     public LlmService(HttpClient httpClient, IGlobalSettingsCache globalSettingsCache, ILogger<LlmService> logger)
@@ -540,36 +537,63 @@ public class LlmService : ILlmService
         LlmUserContext? userContext,
         CancellationToken cancellationToken)
     {
-        var fileName = $"system_{targetLanguage}.md";
+        var systemMessage = await ReadSystemMessageFileAsync(targetLanguage, cancellationToken);
+
+        // Fall back to the canonical English Markdown file before the in-code identity, so the
+        // behavioral/format contract always originates from Markdown, never from hardcoded strings.
+        if (string.IsNullOrWhiteSpace(systemMessage)
+            && !string.Equals(targetLanguage, "en", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning("Falling back to English system message file for language: {Language}", targetLanguage);
+            systemMessage = await ReadSystemMessageFileAsync("en", cancellationToken);
+        }
+
+        if (string.IsNullOrWhiteSpace(systemMessage))
+        {
+            _logger.LogWarning("No system message Markdown file available; using minimal in-code identity fallback");
+            systemMessage = DefaultSystemMessage;
+        }
+
+        return ApplyUserContext(systemMessage, userContext);
+    }
+
+    private async Task<string?> ReadSystemMessageFileAsync(string language, CancellationToken cancellationToken)
+    {
+        var fileName = $"system_{language}.md";
         var filePath = Path.Combine(AppContext.BaseDirectory, "Localization", fileName);
 
         if (!File.Exists(filePath))
         {
-            _logger.LogWarning("System message file not found: {FilePath}. Using fallback.", filePath);
-            return DefaultSystemMessage;
+            _logger.LogWarning("System message file not found: {FilePath}", filePath);
+            return null;
         }
 
         var systemMessage = await File.ReadAllTextAsync(filePath, cancellationToken);
 
-        if (string.IsNullOrEmpty(systemMessage))
+        if (string.IsNullOrWhiteSpace(systemMessage))
         {
             _logger.LogWarning("Empty system message in file: {FilePath}", filePath);
-            return DefaultSystemMessage;
+            return null;
         }
 
-        if (userContext != null)
-        {
-            systemMessage = systemMessage
-                .Replace("{FirstName}", userContext.FirstName ?? string.Empty)
-                .Replace("{LastName}", userContext.LastName ?? string.Empty)
-                .Replace("{Email}", userContext.Email ?? string.Empty)
-                .Replace("{UserName}", userContext.UserName ?? string.Empty)
-                .Replace("{Role}", userContext.Roles.FirstOrDefault() ?? string.Empty)
-                .Replace("{Roles}", string.Join(", ", userContext.Roles));
-        }
-
-        _logger.LogDebug("Loaded system message for language: {Language}", targetLanguage);
+        _logger.LogDebug("Loaded system message for language: {Language}", language);
         return systemMessage;
+    }
+
+    private static string ApplyUserContext(string systemMessage, LlmUserContext? userContext)
+    {
+        if (userContext == null)
+        {
+            return systemMessage;
+        }
+
+        return systemMessage
+            .Replace("{FirstName}", userContext.FirstName ?? string.Empty)
+            .Replace("{LastName}", userContext.LastName ?? string.Empty)
+            .Replace("{Email}", userContext.Email ?? string.Empty)
+            .Replace("{UserName}", userContext.UserName ?? string.Empty)
+            .Replace("{Role}", userContext.Roles.FirstOrDefault() ?? string.Empty)
+            .Replace("{Roles}", string.Join(", ", userContext.Roles));
     }
 
     private static string AppendRuntimeServerContext(string systemMessage)
@@ -609,9 +633,8 @@ public class LlmService : ILlmService
         builder.AppendLine($"- First name: {FormatContextValue(userContext.FirstName)}");
         builder.AppendLine($"- Last name: {FormatContextValue(userContext.LastName)}");
         builder.AppendLine($"- Email: {FormatContextValue(userContext.Email)}");
-        builder.AppendLine($"- Roles: {FormatRoles(userContext.Roles)}");
-        builder.AppendLine("- Use this authenticated user context when interpreting mentions of the current user in documents, permissions, ownership, assignments, or organizational references.");
-        builder.Append("- Do not reveal unrelated private profile data unless directly relevant to the user's request.");
+        // Data only: the instructions on how to use this block and on privacy live in the system_*.md files.
+        builder.Append($"- Roles: {FormatRoles(userContext.Roles)}");
         return builder.ToString();
     }
 

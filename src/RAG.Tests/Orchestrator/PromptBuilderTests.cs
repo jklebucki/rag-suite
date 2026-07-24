@@ -437,31 +437,23 @@ public class PromptBuilderTests
         result.Should().Contain("[source1]");
     }
 
-    [Theory]
-    [InlineData("en")]
-    [InlineData("pl")]
-    [InlineData("hu")]
-    [InlineData("nl")]
-    [InlineData("ro")]
-    public void BuildContextualPrompt_ForSupportedLanguage_IncludesMermaidProcessDiagramContract(string language)
+    [Fact]
+    public void BuildContextualPrompt_DoesNotInjectMermaidOrTitleContract()
     {
+        // The response-format contract (Markdown/Mermaid rules + CHAT_TITLE marker) now lives
+        // exclusively in the localized system_*.md files, not in the per-turn prompt built here.
         var context = new PromptContext
         {
             UserMessage = "Draw a process diagram",
             SearchResults = Array.Empty<SearchResult>(),
-            ResponseLanguage = language,
+            ResponseLanguage = "en",
             UseDocumentSearch = false
         };
 
         var result = _promptBuilder.BuildContextualPrompt(context);
 
-        result.Should().Contain("mermaid");
-        result.Should().Contain("flowchart LR");
-        result.Should().Contain("flowchart TD");
-        result.Should().Contain("classDef");
-        result.Should().Contain("click");
-        result.Should().Contain("EndNode");
-        result.Should().Contain("terminalState");
-        result.Should().Contain("errorState");
+        result.Should().NotContain("mermaid");
+        result.Should().NotContain("flowchart");
+        result.Should().NotContain("CHAT_TITLE");
     }
 }

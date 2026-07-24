@@ -25,8 +25,8 @@ public static class RuntimePromptContextBuilder
             .AppendLine($"- Current UTC day of week: {utcDayOfWeek}")
             .AppendLine($"- Current server local datetime: {localNow:yyyy-MM-dd HH:mm:ss zzz}")
             .AppendLine($"- Server timezone: {serverTimeZone.Id} ({GetTimeZoneDisplayName(serverTimeZone, localNow.DateTime)})")
-            .AppendLine($"- API server region: {GetRegionDisplayName()}")
-            .Append("- Treat this as authoritative current date/time. Do not infer or recalculate today's date or weekday from model memory.")
+            // Data only: the instruction on how to treat this block lives in the system_*.md files.
+            .Append($"- API server region: {GetRegionDisplayName()}")
             .ToString();
     }
 
