@@ -104,6 +104,7 @@ export interface CreateContactRequest {
   email?: string | null
   notes?: string | null
   photoUrl?: string | null
+  isActive: boolean
   tags?: string[]
 }
 

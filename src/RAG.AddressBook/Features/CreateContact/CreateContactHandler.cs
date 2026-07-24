@@ -35,6 +35,7 @@ public class CreateContactHandler
             Email = request.Email,
             Notes = request.Notes,
             PhotoUrl = request.PhotoUrl,
+            IsActive = request.IsActive,
             CreatedByUserId = userId,
             CreatedAt = DateTime.UtcNow
         };

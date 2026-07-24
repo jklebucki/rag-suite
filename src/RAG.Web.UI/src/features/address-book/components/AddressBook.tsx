@@ -111,7 +111,7 @@ export function AddressBook() {
           location: data.location,
           email: data.email,
           mobilePhone: data.mobilePhone,
-          isActive: true,
+          isActive: data.isActive,
         }
 
         // Add contact locally (at the beginning, will be sorted by table if needed)

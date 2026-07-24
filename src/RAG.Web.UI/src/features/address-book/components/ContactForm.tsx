@@ -161,6 +161,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             email,
             notes,
             photoUrl,
+            isActive: isActiveValue,
             tags: parsedTags.length > 0 ? parsedTags : undefined
           }
           await onSubmit(createData)
@@ -602,21 +603,19 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   )}
                 </div>
 
-                {/* Status (Edit mode only) */}
-                {isEditMode && (
-                  <div className="mt-4">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="isActive"
-                        checked={isActive}
-                        onChange={(e) => setIsActive(e.target.checked)}
-                        className="form-checkbox"
-                      />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addressBook.form.isActive')}</span>
-                    </label>
-                  </div>
-                )}
+                {/* Status */}
+                <div className="mt-4">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      checked={isActive}
+                      onChange={(e) => setIsActive(e.target.checked)}
+                      className="form-checkbox"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addressBook.form.isActive')}</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

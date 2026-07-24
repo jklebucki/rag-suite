@@ -77,6 +77,49 @@ public class CreateContactHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task HandleAsync_DefaultRequest_CreatesActiveContact()
+    {
+        // Arrange
+        _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
+
+        var request = new CreateContactRequest
+        {
+            FirstName = "Jane",
+            LastName = "Doe"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        var contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Id == result.Id);
+        contact.Should().NotBeNull();
+        contact!.IsActive.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task HandleAsync_IsActiveFalse_CreatesInactiveContact()
+    {
+        // Arrange
+        _mockUserContext.Setup(u => u.GetCurrentUserId()).Returns("user123");
+
+        var request = new CreateContactRequest
+        {
+            FirstName = "Jane",
+            LastName = "Doe",
+            IsActive = false
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        var contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Id == result.Id);
+        contact.Should().NotBeNull();
+        contact!.IsActive.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task HandleAsync_NoUserId_UsesSystem()
     {
         // Arrange

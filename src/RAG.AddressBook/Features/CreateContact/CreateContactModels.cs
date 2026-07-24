@@ -14,6 +14,7 @@ public record CreateContactRequest
     public string? Email { get; init; }
     public string? Notes { get; init; }
     public string? PhotoUrl { get; init; }
+    public bool IsActive { get; init; } = true;
     public List<string>? Tags { get; init; }
 }
 
