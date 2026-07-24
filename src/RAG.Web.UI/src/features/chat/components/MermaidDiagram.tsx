@@ -98,9 +98,11 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         title="Mermaid diagram"
         size="screen"
       >
-        <div className="flex h-full w-full items-center justify-center overflow-auto bg-white p-4 dark:bg-slate-950 sm:p-6">
+        {/* min-h-full (not h-full) lets tall diagrams grow past the viewport so the modal's own
+            vertical scroll can reach the TOP; items-center still centers diagrams that fit. */}
+        <div className="flex min-h-full w-full items-center justify-center bg-white p-4 dark:bg-slate-950 sm:p-6">
           <div
-            className={diagramClasses}
+            className="w-full [&_svg]:!h-auto [&_svg]:!w-full [&_svg]:!max-w-none"
             role="img"
             aria-label="Expanded Mermaid diagram"
             // Mermaid returns sanitized SVG when securityLevel is set to strict.
