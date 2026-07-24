@@ -27,7 +27,7 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         {
             var entries = GetEntries(CacheKey(userId, sessionId), createIfMissing: false);
             var drafts = entries
-                .Select(entry => entry.Draft)
+                .Select(entry => ToDraft(entry.File))
                 .OrderBy(draft => draft.UploadedAt)
                 .ToArray();
             return Task.FromResult(drafts);
@@ -50,21 +50,17 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         lock (_lock)
         {
             entries = GetEntries(CacheKey(userId, sessionId), createIfMissing: false)
-                .Where(entry => requestedIds.Contains(entry.Draft.Id, StringComparer.OrdinalIgnoreCase))
+                .Where(entry => requestedIds.Contains(entry.File.Id, StringComparer.OrdinalIgnoreCase))
                 .ToArray();
         }
 
         var files = new List<ChatAttachmentFile>();
         foreach (var entry in entries)
         {
-            var content = await File.ReadAllTextAsync(entry.TempPath, Encoding.UTF8, cancellationToken);
-            files.Add(new ChatAttachmentFile(
-                entry.Draft.Id,
-                entry.Draft.FileName,
-                entry.Draft.ContentType,
-                entry.Draft.SizeBytes,
-                entry.Draft.TokenCount,
-                content));
+            var content = entry.TempPath == null
+                ? entry.File.Content
+                : await File.ReadAllTextAsync(entry.TempPath, Encoding.UTF8, cancellationToken);
+            files.Add(entry.File with { Content = content });
         }
 
         return files.ToArray();
@@ -86,17 +82,14 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         {
             foreach (var file in filesToSave)
             {
-                var tempPath = Path.Combine(sessionPath, $"{file.Id}.txt");
-                await File.WriteAllTextAsync(tempPath, file.Content, Encoding.UTF8, cancellationToken);
-                storedFiles.Add(new StoredAttachment(
-                    new ChatAttachmentDraft(
-                        file.Id,
-                        file.FileName,
-                        file.ContentType,
-                        file.SizeBytes,
-                        file.TokenCount,
-                        DateTimeOffset.UtcNow),
-                    tempPath));
+                string? tempPath = null;
+                if (!string.IsNullOrEmpty(file.Content))
+                {
+                    tempPath = Path.Combine(sessionPath, $"{file.Id}.txt");
+                    await File.WriteAllTextAsync(tempPath, file.Content, Encoding.UTF8, cancellationToken);
+                }
+
+                storedFiles.Add(new StoredAttachment(file with { UploadedAt = file.UploadedAt ?? DateTimeOffset.UtcNow }, tempPath));
             }
 
             lock (_lock)
@@ -109,10 +102,43 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         {
             foreach (var storedFile in storedFiles)
             {
-                DeleteFileQuietly(storedFile.TempPath);
+                if (storedFile.TempPath != null)
+                {
+                    DeleteFileQuietly(storedFile.TempPath);
+                }
             }
 
             throw;
+        }
+    }
+
+    public async Task UpdateAsync(string userId, string sessionId, ChatAttachmentFile file, CancellationToken cancellationToken = default)
+    {
+        StoredAttachment? entry;
+        lock (_lock)
+        {
+            entry = GetEntries(CacheKey(userId, sessionId), createIfMissing: false)
+                .FirstOrDefault(candidate => string.Equals(candidate.File.Id, file.Id, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (entry == null)
+        {
+            return;
+        }
+
+        var tempPath = entry.TempPath;
+        if (!string.IsNullOrEmpty(file.Content))
+        {
+            var sessionPath = GetSessionPath(userId, sessionId);
+            Directory.CreateDirectory(sessionPath);
+            tempPath ??= Path.Combine(sessionPath, $"{file.Id}.txt");
+            await File.WriteAllTextAsync(tempPath, file.Content, Encoding.UTF8, cancellationToken);
+        }
+
+        lock (_lock)
+        {
+            entry.File = file with { UploadedAt = file.UploadedAt ?? entry.File.UploadedAt };
+            entry.TempPath = tempPath;
         }
     }
 
@@ -127,7 +153,7 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         lock (_lock)
         {
             var entries = GetEntries(CacheKey(userId, sessionId), createIfMissing: false);
-            removed = entries.FirstOrDefault(entry => string.Equals(entry.Draft.Id, attachmentId, StringComparison.OrdinalIgnoreCase));
+            removed = entries.FirstOrDefault(entry => string.Equals(entry.File.Id, attachmentId, StringComparison.OrdinalIgnoreCase));
             if (removed != null)
             {
                 entries.Remove(removed);
@@ -139,7 +165,10 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
             return Task.FromResult(false);
         }
 
-        DeleteFileQuietly(removed.TempPath);
+        if (removed.TempPath != null)
+        {
+            DeleteFileQuietly(removed.TempPath);
+        }
         return Task.FromResult(true);
     }
 
@@ -183,7 +212,10 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
 
             foreach (var entry in evictedEntries)
             {
-                DeleteFileQuietly(entry.TempPath);
+                if (entry.TempPath != null)
+                {
+                    DeleteFileQuietly(entry.TempPath);
+                }
             }
         });
 
@@ -217,5 +249,33 @@ public class MemoryChatAttachmentStore : IChatAttachmentStore
         }
     }
 
-    private record StoredAttachment(ChatAttachmentDraft Draft, string TempPath);
+    private static ChatAttachmentDraft ToDraft(ChatAttachmentFile file)
+    {
+        return new ChatAttachmentDraft(
+            file.Id,
+            file.FileName,
+            file.ContentType,
+            file.SizeBytes,
+            file.TokenCount,
+            file.UploadedAt ?? DateTimeOffset.UtcNow,
+            file.Status,
+            file.Progress,
+            file.PageCount,
+            file.Provider,
+            file.ErrorCode,
+            file.DocumentJobId);
+    }
+
+    private sealed class StoredAttachment
+    {
+        public StoredAttachment(ChatAttachmentFile file, string? tempPath)
+        {
+            File = file;
+            TempPath = tempPath;
+        }
+
+        public ChatAttachmentFile File { get; set; }
+
+        public string? TempPath { get; set; }
+    }
 }

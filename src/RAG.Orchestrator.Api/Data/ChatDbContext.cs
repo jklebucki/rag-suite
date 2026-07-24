@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RAG.Orchestrator.Api.Features.Chat.Artifacts;
 using RAG.Orchestrator.Api.Models;
 
 namespace RAG.Orchestrator.Api.Data;
@@ -14,6 +15,7 @@ public class ChatDbContext : DbContext
     public DbSet<GlobalSetting> GlobalSettings { get; set; }
     public DbSet<Feedback> FeedbackEntries { get; set; }
     public DbSet<FeedbackAttachment> FeedbackAttachments { get; set; }
+    public DbSet<GeneratedArtifactEntity> GeneratedArtifacts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -228,6 +230,27 @@ public class ChatDbContext : DbContext
 
             entity.HasIndex(e => e.FeedbackId)
                 .HasDatabaseName("ix_feedback_attachments_feedback_id");
+        });
+
+        modelBuilder.Entity<GeneratedArtifactEntity>(entity =>
+        {
+            entity.ToTable("generated_artifacts");
+            entity.HasKey(item => item.Id);
+
+            entity.Property(item => item.Id).HasMaxLength(32).IsRequired();
+            entity.Property(item => item.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(item => item.SessionId).HasMaxLength(36).IsRequired();
+            entity.Property(item => item.AssistantMessageId).HasMaxLength(36).IsRequired();
+            entity.Property(item => item.FileName).HasMaxLength(255).IsRequired();
+            entity.Property(item => item.ContentType).HasMaxLength(255).IsRequired();
+            entity.Property(item => item.StorageKey).HasMaxLength(1024).IsRequired();
+            entity.Property(item => item.SizeBytes).IsRequired();
+            entity.Property(item => item.CreatedAt).IsRequired();
+            entity.Property(item => item.ExpiresAt).IsRequired();
+
+            entity.HasIndex(item => item.UserId).HasDatabaseName("ix_generated_artifacts_user_id");
+            entity.HasIndex(item => item.SessionId).HasDatabaseName("ix_generated_artifacts_session_id");
+            entity.HasIndex(item => item.ExpiresAt).HasDatabaseName("ix_generated_artifacts_expires_at");
         });
     }
 }

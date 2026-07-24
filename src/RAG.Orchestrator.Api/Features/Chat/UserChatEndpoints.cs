@@ -205,7 +205,7 @@ public static class UserChatEndpoints
         return ex.Code switch
         {
             "SESSION_NOT_FOUND" => Results.NotFound(response),
-            "SESSION_CONTEXT_LIMIT_EXCEEDED" or "ATTACHMENT_CONTEXT_LIMIT_EXCEEDED" => Results.Json(response, statusCode: StatusCodes.Status409Conflict),
+            "SESSION_CONTEXT_LIMIT_EXCEEDED" or "ATTACHMENT_CONTEXT_LIMIT_EXCEEDED" or "ATTACHMENT_NOT_READY" => Results.Json(response, statusCode: StatusCodes.Status409Conflict),
             _ => Results.BadRequest(response)
         };
     }

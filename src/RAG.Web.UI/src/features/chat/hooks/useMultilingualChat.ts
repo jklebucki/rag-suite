@@ -44,6 +44,13 @@ export function useMultilingualChat() {
     queryKey: ['chat-context', currentSessionId],
     queryFn: ({ signal }) => (currentSessionId ? chatService.getChatContext(currentSessionId, { signal }) : null),
     enabled: !!currentSessionId,
+    refetchInterval: (query) => {
+      const usage = query.state.data
+      const hasPendingDocument = usage?.attachments.some(
+        attachment => attachment.status === 'queued' || attachment.status === 'processing',
+      )
+      return hasPendingDocument ? 1500 : false
+    },
   })
 
   // Merge server messages with pending messages for display
@@ -188,6 +195,11 @@ export function useMultilingualChat() {
 
     if (contextUsage?.isLimitExceeded) {
       showError('Context limit reached', 'Start a new chat to continue the conversation.')
+      return
+    }
+
+    if ((contextUsage?.attachments ?? []).some(attachment => attachment.status !== 'ready')) {
+      showError('Attachments still processing', 'Wait until every attachment is ready or remove the failed attachment.')
       return
     }
 

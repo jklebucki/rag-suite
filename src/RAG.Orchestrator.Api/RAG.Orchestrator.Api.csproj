@@ -13,6 +13,8 @@
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <PackageReference Include="Markdig" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +29,8 @@
     <ProjectReference Include="..\RAG.Abstractions\RAG.Abstractions.csproj" />
     <ProjectReference Include="..\RAG.AddressBook\RAG.AddressBook.csproj" />
     <ProjectReference Include="..\RAG.Forum\RAG.Forum.csproj" />
+    <ProjectReference Include="..\RAG.DocumentProcessing.Abstractions\RAG.DocumentProcessing.Abstractions.csproj" />
+    <ProjectReference Include="..\RAG.DocumentProcessing.Client\RAG.DocumentProcessing.Client.csproj" />
   </ItemGroup>
 
 </Project>

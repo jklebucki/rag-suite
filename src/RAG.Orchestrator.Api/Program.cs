@@ -8,6 +8,7 @@ using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Extensions;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
+using RAG.Orchestrator.Api.Features.Chat.Artifacts;
 using RAG.Orchestrator.Api.Features.Feedback;
 using RAG.Orchestrator.Api.Features.FileDownload;
 using RAG.Orchestrator.Api.Features.Health;
@@ -168,6 +169,7 @@ app.MapControllers();
 // Map feature endpoints
 //app.MapChatEndpoints();
 app.MapUserChatEndpoints();
+app.MapArtifactEndpoints();
 app.MapSearchEndpoints();
 app.MapHealthEndpoints();
 app.MapPluginEndpoints();
