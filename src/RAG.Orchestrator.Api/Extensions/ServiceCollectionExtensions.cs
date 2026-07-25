@@ -8,6 +8,7 @@ using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Analytics;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
+using RAG.Orchestrator.Api.Features.Chat.Artifacts;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Features.Chat.Validation;
@@ -28,6 +29,8 @@ using RAG.Orchestrator.Api.Models;
 using RAG.Orchestrator.Api.Models.Configuration;
 using RAG.Orchestrator.Api.Models.Validation;
 using RAG.Orchestrator.Api.Services;
+using RAG.DocumentProcessing.Abstractions;
+using RAG.DocumentProcessing.Client;
 
 namespace RAG.Orchestrator.Api.Extensions;
 
@@ -90,6 +93,12 @@ public static class ServiceCollectionExtensions
         // Add HttpClient factory
         services.AddHttpClient();
         services.AddMemoryCache();
+        services.AddDocumentProcessingClient(configuration);
+
+        services.AddOptions<GeneratedArtifactOptions>()
+            .Bind(configuration.GetSection(GeneratedArtifactOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Configure LLM endpoint configuration  
         services.AddOptions<LlmEndpointConfig>()
@@ -158,6 +167,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IContextTokenCounter, ContextTokenCounter>();
         services.AddSingleton<IChatAttachmentStore, MemoryChatAttachmentStore>();
         services.AddScoped<IChatAttachmentService, ChatAttachmentService>();
+        services.AddScoped<LocalTemporaryArtifactStore>();
+        services.AddScoped<ITemporaryArtifactStore>(provider => provider.GetRequiredService<LocalTemporaryArtifactStore>());
+        services.AddScoped<IArtifactDownloadService>(provider => provider.GetRequiredService<LocalTemporaryArtifactStore>());
+        services.AddScoped<IArtifactSessionCleanupService>(provider => provider.GetRequiredService<LocalTemporaryArtifactStore>());
+        services.AddScoped<IArtifactContentRenderer, MarkdownArtifactContentRenderer>();
+        services.AddScoped<IGeneratedArtifactService, GeneratedArtifactService>();
+        services.AddHostedService<ExpiredArtifactCleanupService>();
         services.AddScoped<IIndexManagementService, IndexManagementService>();
         services.AddScoped<RAG.Abstractions.Search.ISearchService, SearchService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();

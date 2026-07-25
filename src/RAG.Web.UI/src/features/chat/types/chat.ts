@@ -33,6 +33,12 @@ export interface ChatAttachmentDraft {
   sizeBytes: number
   tokenCount: number
   uploadedAt: string
+  status: 'queued' | 'processing' | 'ready' | 'failed'
+  progress: number
+  pageCount?: number | null
+  provider?: string | null
+  errorCode?: string | null
+  documentJobId?: string | null
 }
 
 export interface ChatContextUsage {
@@ -73,4 +79,3 @@ export interface MultilingualChatResponse {
   processingTimeMs: number
   metadata?: Record<string, unknown>
 }
-

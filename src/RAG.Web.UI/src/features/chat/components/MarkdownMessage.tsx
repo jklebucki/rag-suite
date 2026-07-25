@@ -5,6 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { Components } from 'react-markdown'
 import { MermaidDiagram } from './MermaidDiagram'
+import { apiHttpClient } from '@/shared/services/api/httpClients'
 
 interface MarkdownMessageProps {
   content: string
@@ -105,18 +106,33 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     },
 
     // Links
-    a: ({ node: _node, children, ...props }) => (
-      <a
+    a: ({ node: _node, children, ...props }) => {
+      const isArtifactDownload = !isUserMessage && /^\/api\/user-chat\/artifacts\/[^/]+\/download$/.test(props.href ?? '')
+      return (
+        <a
                 className={`underline hover:no-underline ${
                   isUserMessage ? 'text-blue-100' : 'text-blue-600 dark:text-blue-300'
                 }`}
-        target="_blank"
-        rel="noopener noreferrer"
+          target={isArtifactDownload ? undefined : '_blank'}
+          rel={isArtifactDownload ? undefined : 'noopener noreferrer'}
+          onClick={isArtifactDownload ? async (event) => {
+            event.preventDefault()
+            const response = await apiHttpClient.get(props.href!, { responseType: 'blob' })
+            const objectUrl = URL.createObjectURL(response.data)
+            const anchor = document.createElement('a')
+            anchor.href = objectUrl
+            anchor.download = getArtifactFileName(response.headers['content-disposition'])
+            document.body.appendChild(anchor)
+            anchor.click()
+            anchor.remove()
+            URL.revokeObjectURL(objectUrl)
+          } : undefined}
         {...props}
       >
         {children || props.href}
       </a>
-    ),
+      )
+    },
 
     // Blockquotes
     blockquote: ({ node: _node, ...props }) => (
@@ -171,4 +187,9 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
       </ReactMarkdown>
     </div>
   )
+}
+
+function getArtifactFileName(contentDisposition: string | undefined): string {
+  const match = /filename="?([^";]+)"?/i.exec(contentDisposition ?? '')
+  return match?.[1] ?? 'artifact'
 }

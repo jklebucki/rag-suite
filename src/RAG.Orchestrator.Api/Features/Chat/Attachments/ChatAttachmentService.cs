@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RAG.DocumentProcessing.Abstractions;
 using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Models;
@@ -11,7 +12,7 @@ namespace RAG.Orchestrator.Api.Features.Chat.Attachments;
 public class ChatAttachmentService : IChatAttachmentService
 {
     private const int MaxDraftAttachments = 5;
-    private const int MaxFileSizeBytes = 1024 * 1024;
+    private const int MaxTextFileSizeBytes = 1024 * 1024;
 
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -23,17 +24,20 @@ public class ChatAttachmentService : IChatAttachmentService
     private readonly IGlobalSettingsService _globalSettingsService;
     private readonly IContextTokenCounter _tokenCounter;
     private readonly IChatAttachmentStore _attachmentStore;
+    private readonly IDocumentProcessingClient _documentProcessingClient;
 
     public ChatAttachmentService(
         ChatDbContext chatDbContext,
         IGlobalSettingsService globalSettingsService,
         IContextTokenCounter tokenCounter,
-        IChatAttachmentStore attachmentStore)
+        IChatAttachmentStore attachmentStore,
+        IDocumentProcessingClient documentProcessingClient)
     {
         _chatDbContext = chatDbContext;
         _globalSettingsService = globalSettingsService;
         _tokenCounter = tokenCounter;
         _attachmentStore = attachmentStore;
+        _documentProcessingClient = documentProcessingClient;
     }
 
     public async Task<ChatContextUsageResponse?> GetContextAsync(string userId, string sessionId, CancellationToken cancellationToken = default)
@@ -43,6 +47,7 @@ public class ChatAttachmentService : IChatAttachmentService
             return null;
         }
 
+        await RefreshDocumentProcessingAsync(userId, sessionId, cancellationToken);
         return await BuildContextUsageAsync(userId, sessionId, includeDraftAttachments: true, cancellationToken);
     }
 
@@ -58,6 +63,7 @@ public class ChatAttachmentService : IChatAttachmentService
             throw new ChatAttachmentException("NO_FILES", "Select at least one file.");
         }
 
+        await RefreshDocumentProcessingAsync(userId, sessionId, cancellationToken);
         var currentDrafts = await _attachmentStore.GetDraftsAsync(userId, sessionId, cancellationToken);
         if (currentDrafts.Length + files.Count > MaxDraftAttachments)
         {
@@ -66,12 +72,12 @@ public class ChatAttachmentService : IChatAttachmentService
 
         var limits = await GetLimitsAsync();
         var preparedFiles = new List<ChatAttachmentFile>();
-        foreach (var file in files)
+        foreach (var file in files.Where(file => !IsPdf(file)))
         {
-            preparedFiles.Add(await ValidateAndPrepareFileAsync(file, limits.Model, cancellationToken));
+            preparedFiles.Add(await ValidateAndPrepareTextFileAsync(file, limits.Model, cancellationToken));
         }
 
-        var currentDraftTokens = currentDrafts.Sum(attachment => attachment.TokenCount);
+        var currentDraftTokens = currentDrafts.Where(IsReady).Sum(attachment => attachment.TokenCount);
         var newTokens = preparedFiles.Sum(file => file.TokenCount);
         if (currentDraftTokens + newTokens > limits.AttachmentContextLimitTokens)
         {
@@ -87,6 +93,11 @@ public class ChatAttachmentService : IChatAttachmentService
             throw new ChatAttachmentException(
                 "SESSION_CONTEXT_LIMIT_EXCEEDED",
                 $"These files do not fit in the remaining session context. Remaining: {remainingSessionTokens} tokens.");
+        }
+
+        foreach (var file in files.Where(IsPdf))
+        {
+            preparedFiles.Add(await SubmitPdfAsync(file, cancellationToken));
         }
 
         await _attachmentStore.SaveBatchAsync(userId, sessionId, preparedFiles, cancellationToken);
@@ -111,11 +122,20 @@ public class ChatAttachmentService : IChatAttachmentService
             throw new ChatAttachmentException("SESSION_NOT_FOUND", "Session not found or access denied.");
         }
 
+        await RefreshDocumentProcessingAsync(userId, sessionId, cancellationToken);
         var selectedIds = NormalizeAttachmentIds(attachmentIds);
         var selectedFiles = await _attachmentStore.GetFilesAsync(userId, sessionId, selectedIds, cancellationToken);
         if (selectedIds.Length != selectedFiles.Length)
         {
             throw new ChatAttachmentException("ATTACHMENT_NOT_FOUND", "One or more selected attachments no longer exist.");
+        }
+
+        var nonReady = selectedFiles.FirstOrDefault(file => !IsReady(file));
+        if (nonReady != null)
+        {
+            throw new ChatAttachmentException(
+                "ATTACHMENT_NOT_READY",
+                $"Attachment '{nonReady.FileName}' is {nonReady.Status} and cannot be sent yet.");
         }
 
         var limits = await GetLimitsAsync();
@@ -153,7 +173,7 @@ public class ChatAttachmentService : IChatAttachmentService
             ? await _attachmentStore.GetDraftsAsync(userId, sessionId, cancellationToken)
             : Array.Empty<ChatAttachmentDraft>();
 
-        var attachmentTokens = attachments.Sum(attachment => attachment.TokenCount);
+        var attachmentTokens = attachments.Where(IsReady).Sum(attachment => attachment.TokenCount);
         var usedTokens = persistedTokens + attachmentTokens;
         var percent = limits.SessionContextLimitTokens <= 0
             ? 100
@@ -191,7 +211,7 @@ public class ChatAttachmentService : IChatAttachmentService
         return total;
     }
 
-    private async Task<ChatAttachmentFile> ValidateAndPrepareFileAsync(IFormFile file, string model, CancellationToken cancellationToken)
+    private async Task<ChatAttachmentFile> ValidateAndPrepareTextFileAsync(IFormFile file, string model, CancellationToken cancellationToken)
     {
         var fileName = Path.GetFileName(file.FileName);
         if (string.IsNullOrWhiteSpace(fileName))
@@ -210,9 +230,9 @@ public class ChatAttachmentService : IChatAttachmentService
             throw new ChatAttachmentException("EMPTY_FILE", $"File '{fileName}' is empty.");
         }
 
-        if (file.Length > MaxFileSizeBytes)
+        if (file.Length > MaxTextFileSizeBytes)
         {
-            throw new ChatAttachmentException("FILE_TOO_LARGE", $"File '{fileName}' is larger than 1 MB.");
+            throw new ChatAttachmentException("FILE_TOO_LARGE", $"Text file '{fileName}' is larger than 1 MB.");
         }
 
         byte[] bytes;
@@ -251,6 +271,150 @@ public class ChatAttachmentService : IChatAttachmentService
             file.Length,
             tokenCount,
             content);
+    }
+
+    private async Task<ChatAttachmentFile> SubmitPdfAsync(IFormFile file, CancellationToken cancellationToken)
+    {
+        var fileName = Path.GetFileName(file.FileName);
+        if (string.IsNullOrWhiteSpace(fileName) || !string.Equals(Path.GetExtension(fileName), ".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ChatAttachmentException("UNSUPPORTED_FILE_TYPE", "Only PDF documents are supported by document processing.");
+        }
+
+        if (file.Length <= 0)
+        {
+            throw new ChatAttachmentException("EMPTY_FILE", $"File '{fileName}' is empty.");
+        }
+
+        var contentType = "application/pdf";
+        try
+        {
+            await using var content = file.OpenReadStream();
+            var job = await _documentProcessingClient.SubmitAsync(content, fileName, contentType, cancellationToken);
+            return new ChatAttachmentFile(
+                Guid.NewGuid().ToString(),
+                fileName,
+                contentType,
+                file.Length,
+                0,
+                string.Empty,
+                Status: ToStatusValue(job.Status),
+                Progress: 0,
+                DocumentJobId: job.JobId);
+        }
+        catch (DocumentProcessingException ex)
+        {
+            throw new ChatAttachmentException(ex.Code, ex.Message);
+        }
+    }
+
+    private async Task RefreshDocumentProcessingAsync(string userId, string sessionId, CancellationToken cancellationToken)
+    {
+        var drafts = await _attachmentStore.GetDraftsAsync(userId, sessionId, cancellationToken);
+        var pendingIds = drafts
+            .Where(draft => !string.IsNullOrWhiteSpace(draft.DocumentJobId))
+            .Select(draft => draft.Id)
+            .ToArray();
+        if (pendingIds.Length == 0)
+        {
+            return;
+        }
+
+        var files = await _attachmentStore.GetFilesAsync(userId, sessionId, pendingIds, cancellationToken);
+        var limits = await GetLimitsAsync();
+        var persistedTokens = await CountPersistedSessionTokensAsync(sessionId, limits.Model, cancellationToken);
+        var readyTokens = drafts.Where(IsReady).Sum(draft => draft.TokenCount);
+
+        foreach (var file in files)
+        {
+            if (string.IsNullOrWhiteSpace(file.DocumentJobId))
+            {
+                continue;
+            }
+
+            try
+            {
+                var job = await _documentProcessingClient.GetStatusAsync(file.DocumentJobId, cancellationToken);
+                var status = ToStatusValue(job.Status);
+                if (job.Status is DocumentJobState.Queued or DocumentJobState.Processing)
+                {
+                    await _attachmentStore.UpdateAsync(
+                        userId,
+                        sessionId,
+                        file with
+                        {
+                            Status = status,
+                            Progress = job.Progress,
+                            PageCount = job.PageCount,
+                            Provider = job.Provider,
+                            ErrorCode = null
+                        },
+                        cancellationToken);
+                    continue;
+                }
+
+                if (job.Status == DocumentJobState.Failed)
+                {
+                    await _attachmentStore.UpdateAsync(
+                        userId,
+                        sessionId,
+                        file with
+                        {
+                            Status = status,
+                            Progress = job.Progress,
+                            PageCount = job.PageCount,
+                            Provider = job.Provider,
+                            ErrorCode = job.ErrorCode ?? "PROCESSING_FAILED",
+                            DocumentJobId = null
+                        },
+                        cancellationToken);
+                    continue;
+                }
+
+                var result = await _documentProcessingClient.GetResultAsync(file.DocumentJobId, cancellationToken);
+                var tokenCount = CountAttachmentTokens(file.FileName, file.ContentType, file.SizeBytes, result.Markdown, limits.Model);
+                var exceedsAttachmentLimit = readyTokens + tokenCount > limits.AttachmentContextLimitTokens;
+                var exceedsSessionLimit = persistedTokens + readyTokens + tokenCount > limits.SessionContextLimitTokens;
+                if (exceedsAttachmentLimit || exceedsSessionLimit)
+                {
+                    await _attachmentStore.UpdateAsync(
+                        userId,
+                        sessionId,
+                        file with
+                        {
+                            Status = "failed",
+                            Progress = 100,
+                            PageCount = result.PageCount > 0 ? result.PageCount : job.PageCount,
+                            Provider = result.Provider,
+                            ErrorCode = exceedsAttachmentLimit ? "ATTACHMENT_CONTEXT_LIMIT_EXCEEDED" : "SESSION_CONTEXT_LIMIT_EXCEEDED",
+                            DocumentJobId = null
+                        },
+                        cancellationToken);
+                    continue;
+                }
+
+                readyTokens += tokenCount;
+                await _attachmentStore.UpdateAsync(
+                    userId,
+                    sessionId,
+                    file with
+                    {
+                        Content = result.Markdown,
+                        TokenCount = tokenCount,
+                        Status = "ready",
+                        Progress = 100,
+                        PageCount = result.PageCount > 0 ? result.PageCount : job.PageCount,
+                        Provider = result.Provider,
+                        ErrorCode = null,
+                        DocumentJobId = null
+                    },
+                    cancellationToken);
+            }
+            catch (DocumentProcessingException)
+            {
+                // Keep the current draft state. A temporary service outage must not erase the document result.
+            }
+        }
     }
 
     private int CountAttachmentTokens(string fileName, string contentType, long sizeBytes, string content, string model)
@@ -325,6 +489,26 @@ public class ChatAttachmentService : IChatAttachmentService
             .Where(id => !string.IsNullOrWhiteSpace(id))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
+    }
+
+    private static bool IsPdf(IFormFile file)
+    {
+        return string.Equals(Path.GetExtension(file.FileName), ".pdf", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsReady(ChatAttachmentDraft attachment)
+    {
+        return string.Equals(attachment.Status, "ready", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsReady(ChatAttachmentFile attachment)
+    {
+        return string.Equals(attachment.Status, "ready", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ToStatusValue(DocumentJobState status)
+    {
+        return status.ToString().ToLowerInvariant();
     }
 
     private static bool LooksBinary(byte[] bytes)

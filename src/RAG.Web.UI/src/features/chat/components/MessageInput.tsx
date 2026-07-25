@@ -18,9 +18,9 @@ interface MessageInputProps {
   isUploadingAttachments?: boolean
 }
 
-const TEXT_ATTACHMENT_ACCEPT = [
+const CHAT_ATTACHMENT_ACCEPT = [
   '.txt', '.md', '.markdown', '.csv', '.tsv', '.json', '.yaml', '.yml', '.xml', '.log', '.ini', '.env',
-  '.sql', '.html', '.htm', '.css', '.js', '.jsx', '.ts', '.tsx', '.cs', '.py', '.sh', '.ps1'
+  '.sql', '.html', '.htm', '.css', '.js', '.jsx', '.ts', '.tsx', '.cs', '.py', '.sh', '.ps1', '.pdf'
 ].join(',')
 
 export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputProps>(({
@@ -42,6 +42,8 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
   const actualRef = (ref as React.RefObject<HTMLTextAreaElement>) || textareaRef
   const isContextLimitExceeded = contextUsage?.isLimitExceeded ?? false
   const isInputDisabled = isSending || isContextLimitExceeded
+  const hasNonReadyAttachments = attachments.some(attachment => attachment.status !== 'ready')
+  const isSendDisabled = isInputDisabled || isUploadingAttachments || hasNonReadyAttachments
 
   // Use shared hook to auto-grow the textarea starting from 3 rows up to 10 rows
   // After hitting 10 rows the textarea will show an internal scrollbar
@@ -108,12 +110,16 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
               <div
                 key={attachment.id}
                 className="inline-flex max-w-full items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs text-gray-700 dark:text-gray-200"
-                title={`${attachment.fileName} · ${formatTokenCount(attachment.tokenCount)} tokens`}
+                title={`${attachment.fileName} · ${attachment.status === 'ready' ? `${formatTokenCount(attachment.tokenCount)} tokens` : `${attachment.status} ${attachment.progress}%`}`}
               >
                 <FileText className="h-3.5 w-3.5 shrink-0 text-primary-600 dark:text-primary-300" />
                 <span className="max-w-[12rem] truncate font-medium">{attachment.fileName}</span>
                 <span className="shrink-0 text-gray-500 dark:text-gray-400">
-                  {formatTokenCount(attachment.tokenCount)}
+                  {attachment.status === 'ready'
+                    ? formatTokenCount(attachment.tokenCount)
+                    : attachment.status === 'failed'
+                      ? 'failed'
+                      : `${attachment.status} ${attachment.progress}%`}
                 </span>
                 <button
                   type="button"
@@ -147,7 +153,7 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
               ref={fileInputRef}
               type="file"
               multiple
-              accept={TEXT_ATTACHMENT_ACCEPT}
+              accept={CHAT_ATTACHMENT_ACCEPT}
               onChange={handleFileChange}
               className="hidden"
               disabled={isInputDisabled || isUploadingAttachments}
@@ -182,7 +188,7 @@ export const MessageInput = React.forwardRef<HTMLTextAreaElement, MessageInputPr
 
           <button
             type="submit"
-            disabled={!message.trim() || isInputDisabled}
+            disabled={!message.trim() || isSendDisabled}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 px-3 py-2 md:px-4 shrink-0"
             aria-label={t('chat.send')}
             title={t('chat.send')}

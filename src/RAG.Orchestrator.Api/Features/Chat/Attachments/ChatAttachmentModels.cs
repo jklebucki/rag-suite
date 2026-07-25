@@ -6,7 +6,13 @@ public record ChatAttachmentDraft(
     string ContentType,
     long SizeBytes,
     int TokenCount,
-    DateTimeOffset UploadedAt
+    DateTimeOffset UploadedAt,
+    string Status = "ready",
+    int Progress = 100,
+    int? PageCount = null,
+    string? Provider = null,
+    string? ErrorCode = null,
+    string? DocumentJobId = null
 );
 
 public record ChatContextUsageResponse(
@@ -27,7 +33,14 @@ public record ChatAttachmentFile(
     string ContentType,
     long SizeBytes,
     int TokenCount,
-    string Content
+    string Content,
+    string Status = "ready",
+    int Progress = 100,
+    int? PageCount = null,
+    string? Provider = null,
+    string? ErrorCode = null,
+    string? DocumentJobId = null,
+    DateTimeOffset? UploadedAt = null
 );
 
 public record PreparedChatAttachments(

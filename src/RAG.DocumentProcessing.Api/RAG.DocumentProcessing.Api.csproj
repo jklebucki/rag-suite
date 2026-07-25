@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\RAG.DocumentProcessing.Core\RAG.DocumentProcessing.Core.csproj" />
+    <ProjectReference Include="..\RAG.DocumentProcessing.Providers.Docling\RAG.DocumentProcessing.Providers.Docling.csproj" />
+  </ItemGroup>
+</Project>

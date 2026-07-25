@@ -38,6 +38,8 @@
     <ProjectReference Include="..\RAG.Collector\RAG.Collector.csproj" />
     <ProjectReference Include="..\RAG.Orchestrator.Api\RAG.Orchestrator.Api.csproj" />
     <ProjectReference Include="..\RAG.Forum\RAG.Forum.csproj" />
+    <ProjectReference Include="..\RAG.DocumentProcessing.Core\RAG.DocumentProcessing.Core.csproj" />
+    <ProjectReference Include="..\RAG.DocumentProcessing.Providers.Docling\RAG.DocumentProcessing.Providers.Docling.csproj" />
   </ItemGroup>
 
 </Project>

@@ -103,6 +103,8 @@ describe('MessageInput', () => {
             sizeBytes: 128,
             tokenCount: 42,
             uploadedAt: new Date().toISOString(),
+            status: 'ready',
+            progress: 100,
           },
         ]}
         onRemoveAttachment={onRemoveAttachment}
@@ -138,5 +140,29 @@ describe('MessageInput', () => {
     expect(screen.getByPlaceholderText('chat.context_limit_reached')).toBeDisabled()
     expect(screen.getByRole('button', { name: 'chat.send' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'chat.attachments.add' })).toBeDisabled()
+  })
+
+  it('blocks sending while a PDF attachment is being processed', () => {
+    render(
+      <MessageInput
+        {...defaultProps}
+        message="summarize it"
+        attachments={[
+          {
+            id: 'attachment-pdf',
+            fileName: 'scan.pdf',
+            contentType: 'application/pdf',
+            sizeBytes: 512,
+            tokenCount: 0,
+            uploadedAt: new Date().toISOString(),
+            status: 'processing',
+            progress: 50,
+          },
+        ]}
+      />
+    )
+
+    expect(screen.getByText('processing 50%')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'chat.send' })).toBeDisabled()
   })
 })

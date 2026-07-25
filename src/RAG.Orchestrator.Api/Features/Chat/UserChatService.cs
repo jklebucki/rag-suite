@@ -4,6 +4,7 @@ using RAG.Abstractions.Search;
 using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
+using RAG.Orchestrator.Api.Features.Chat.Artifacts;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Localization;
@@ -28,6 +29,8 @@ public class UserChatService : IUserChatService
     private readonly ISessionManager _sessionManager;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IChatAttachmentService _chatAttachmentService;
+    private readonly IGeneratedArtifactService _generatedArtifactService;
+    private readonly IArtifactSessionCleanupService _artifactSessionCleanupService;
 
     public UserChatService(
         ChatDbContext chatDbContext,
@@ -41,7 +44,9 @@ public class UserChatService : IUserChatService
         IGlobalSettingsService globalSettingsService,
         ISessionManager sessionManager,
         IPromptBuilder promptBuilder,
-        IChatAttachmentService chatAttachmentService)
+        IChatAttachmentService chatAttachmentService,
+        IGeneratedArtifactService generatedArtifactService,
+        IArtifactSessionCleanupService artifactSessionCleanupService)
     {
         _chatDbContext = chatDbContext;
         _securityDbContext = securityDbContext;
@@ -55,6 +60,8 @@ public class UserChatService : IUserChatService
         _sessionManager = sessionManager;
         _promptBuilder = promptBuilder;
         _chatAttachmentService = chatAttachmentService;
+        _generatedArtifactService = generatedArtifactService;
+        _artifactSessionCleanupService = artifactSessionCleanupService;
     }
 
     private async Task<LlmUserContext?> GetUserInfoAsync(string userId, CancellationToken cancellationToken)
@@ -366,6 +373,14 @@ public class UserChatService : IUserChatService
 
             // Use cleaned response (without the title marker line) for saving
             aiResponseContent = cleanedResponse;
+            var assistantMessageId = Guid.NewGuid().ToString();
+            var artifactResult = await _generatedArtifactService.ProcessAsync(
+                aiResponseContent,
+                userId,
+                sessionId,
+                assistantMessageId,
+                cancellationToken);
+            aiResponseContent = artifactResult.Response;
 
             if (!string.IsNullOrWhiteSpace(extractedTitle))
             {
@@ -387,7 +402,7 @@ public class UserChatService : IUserChatService
             // Save AI response to database
             var aiDbMessage = new ChatMessage
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = assistantMessageId,
                 SessionId = sessionId,
                 Role = ChatRoles.Assistant,
                 Content = aiResponseContent,
@@ -398,6 +413,7 @@ public class UserChatService : IUserChatService
                     ["responseLanguage"] = normalizedResponseLanguage,
                     ["documentsUsed"] = searchResults.Results.Length,
                     ["useDocumentSearch"] = request.UseDocumentSearch,
+                    ["generatedArtifact"] = artifactResult.ArtifactCreated,
                     ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0
                         ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName)
                             ? r.FileName
@@ -483,6 +499,7 @@ public class UserChatService : IUserChatService
         if (deleted)
         {
             await _chatAttachmentService.ClearSessionAsync(userId, sessionId, cancellationToken);
+            await _artifactSessionCleanupService.DeleteForSessionAsync(userId, sessionId, cancellationToken);
         }
 
         return deleted;
