@@ -36,7 +36,7 @@ DOCLING_OCR_PRESET=tesseract
 DOCLING_OCR_LANGUAGES=pol,eng
 ```
 
-To są kody ISO 639-3 Tesseract, a nie dwuliterowe kody EasyOCR. Obraz zawiera `ces`, `dan`, `deu`, `eng`, `fin`, `fra`, `hun`, `ita`, `nld`, `nor`, `pol`, `por`, `ron`, `rus`, `slk`, `spa`, `swe`, `tur` i `ukr`. Przykładowo dokument niemiecko-angielski ustaw jako `deu,eng`, a ukraińsko-polski jako `ukr,pol`. Nie dodawaj wszystkich języków bez potrzeby: mniejszy, właściwy zestaw daje lepszą dokładność i krótszy czas.
+To są trzyliterowe kody Tesseract (zgodne z jego listą języków), a nie dwuliterowe kody EasyOCR. Obraz zawiera `ces`, `dan`, `deu`, `eng`, `fin`, `fra`, `hun`, `ita`, `nld`, `nor`, `pol`, `por`, `ron`, `rus`, `slk`, `spa`, `swe`, `tur` i `ukr`. Przykładowo dokument niemiecko-angielski ustaw jako `deu,eng`, a ukraińsko-polski jako `ukr,pol`. Nie dodawaj wszystkich języków bez potrzeby: mniejszy, właściwy zestaw daje lepszą dokładność i krótszy czas.
 
 Główny tekst jest oceniany również pod kątem gęstości, znaków zastępczych i nadmiaru osieroconych jedno-/dwuliterowych fragmentów. Wynik podejrzany jest ponawiany z pełnostronicowym OCR. Ponieważ na dokumentach mieszanych Tesseract lepiej odtwarza tekst i diakrytykę, a RapidOCR bywa lepszy dla komórek tabel, niekompletna tabela jest opcjonalnie przeliczana presetem `auto`; aplikacja podmienia wyłącznie lepszy blok tabeli, zachowując tekst Tesseract.
 

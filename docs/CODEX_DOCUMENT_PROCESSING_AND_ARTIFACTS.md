@@ -127,7 +127,7 @@ table_mode=accurate
 image_export_mode=placeholder
 ```
 
-Nie używaj presetu `auto` jako głównego OCR dla tekstu wielojęzycznego. W obrazie `docling-serve` `v1.27.0` wybiera on RapidOCR, który nie stosuje przekazanej listy języków. Obraz pochodny musi zawierać dane językowe Tesseract, a lista języków ma być konfigurowana przez `Docling:OcrLanguages` w kodach ISO 639-3, np. `pol,eng`.
+Nie używaj presetu `auto` jako głównego OCR dla tekstu wielojęzycznego. W obrazie `docling-serve` `v1.27.0` wybiera on RapidOCR, który nie stosuje przekazanej listy języków. Obraz pochodny musi zawierać dane językowe Tesseract, a lista języków ma być konfigurowana przez `Docling:OcrLanguages` w trzyliterowych kodach Tesseract, np. `pol,eng`.
 
 Jeżeli wynik jest pusty, ma bardzo mało znaków na stronę, niski wynik jakości leksykalnej albo zawiera błąd ekstrakcji, wykonaj jeden retry z `force_ocr=true`. Jeżeli tabela głównego wyniku ma puste lub niespójne komórki, wykonaj dodatkową konwersję presetem `auto` i podmień wyłącznie lepszy blok tabeli Markdown; nie zastępuj nim poprawnego tekstu Tesseract. Znormalizuj wynik do `DocumentProcessingResult`.
 
