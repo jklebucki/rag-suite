@@ -4,4 +4,5 @@ elastic/logs/
 elastic/snapshots/
 **/.env
 **/*.env
+**/.env.development
 **/secrets/*

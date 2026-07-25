@@ -27,7 +27,30 @@ Ten katalog uruchamia wewnętrzną usługę `RAG.DocumentProcessing.Api` oraz lo
 
 3. Nie publikuj portu `5080` w Internecie. Najbezpieczniej ograniczyć go regułami sieciowymi do Orchestratora albo usunąć sekcję `ports` i uruchamiać oba kontenery w tej samej prywatnej sieci Compose.
 
-## CPU (domyślnie)
+## Development lokalny
+
+W repozytorium jest gotowy, odseparowany profil CPU dla lokalnego `dotnet run`. Zużywa jeden worker Doclinga z dwoma wątkami, maksymalnie 4 vCPU i 6 GiB RAM. API publikuje port wyłącznie pod `127.0.0.1:5080`, dlatego nie jest dostępne z lokalnej sieci.
+
+W bieżącym klonie zostały utworzone ignorowane pliki lokalne `.env.development` oraz `appsettings.Development.local.json`, zawierające zgodne klucze deweloperskie. Dla nowego klonu przygotuj je z wersji przykładowych, ustawiając **identyczną** wartość klucza API w obu plikach:
+
+```bash
+cp deploy/document-processing/.env.development.example deploy/document-processing/.env.development
+cp src/RAG.Orchestrator.Api/appsettings.Development.local.example.json \
+  src/RAG.Orchestrator.Api/appsettings.Development.local.json
+```
+
+Uruchom kontenery, zaczekaj na pobranie modeli przy pierwszym starcie, a następnie uruchom Orchestrator z profilem `Development`:
+
+```bash
+./scripts/document-processing/up-dev.sh
+export OCR_LOCAL_API_KEY='ta-sama-wartosc-co-DOCUMENT_PROCESSING_API_KEY-w-.env.development'
+curl -H "X-Api-Key: $OCR_LOCAL_API_KEY" http://localhost:5080/health
+dotnet run --project src/RAG.Orchestrator.Api --launch-profile http
+```
+
+Do zatrzymania lokalnego stosu użyj `./scripts/document-processing/down-dev.sh`. Nie kopiuj tych kluczy ani plików do środowiska produkcyjnego.
+
+## CPU (produkcja)
 
 Wymagany jest Docker Engine z Docker Compose v2. Profil w `.env.example` został dobrany dla hosta `llm-cuda-srv`: Intel i5-14600K (20 logicznych CPU), 46 GiB RAM i działające usługi embeddingu, rerankera oraz Ollama. Ustawia dwa workery po cztery wątki, limit 8 vCPU i 10 GiB RAM dla Doclinga oraz 1 vCPU i 1 GiB RAM dla API. To pozostawia zapas dla istniejących kontenerów.
 

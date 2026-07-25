@@ -40,7 +40,7 @@ services:
     cpus: "${DOCUMENT_PROCESSING_CPU_LIMIT:-1.0}"
     mem_limit: ${DOCUMENT_PROCESSING_MEMORY_LIMIT:-1g}
     ports:
-      - "${DOCUMENT_PROCESSING_PORT:-5080}:8080"
+      - "${DOCUMENT_PROCESSING_BIND_ADDRESS:-0.0.0.0}:${DOCUMENT_PROCESSING_PORT:-5080}:8080"
     volumes:
       - document-processing-data:/app/App_Data
     depends_on:

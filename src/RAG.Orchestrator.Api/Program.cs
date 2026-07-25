@@ -75,6 +75,14 @@ try
 Log.Information("Starting RAG Orchestrator API");
 
 var builder = WebApplication.CreateBuilder(args);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile(
+        "appsettings.Development.local.json",
+        optional: true,
+        reloadOnChange: false);
+}
+
 builder.Configuration.AddJsonFile(
     $"appsettings.{builder.Environment.EnvironmentName}.secrets.json",
     optional: true,
