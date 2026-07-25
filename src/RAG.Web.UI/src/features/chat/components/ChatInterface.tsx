@@ -1,11 +1,9 @@
 import React, { useRef, useEffect } from 'react'
-import { Bot, User, Loader2 } from 'lucide-react'
+import { Bot, Loader2 } from 'lucide-react'
 import { useMultilingualChat } from '@/features/chat/hooks/useMultilingualChat'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { ChatSidebar } from './ChatSidebar'
 import { MessageInput } from './MessageInput'
-import { MessageSources } from './MessageSources'
-import { MarkdownMessage } from './MarkdownMessage'
 import { MessageItem } from './MessageItem'
 import { ActionModal } from '@/shared/components/ui/ActionModal'
 import { formatDateTime } from '@/utils/date'
@@ -84,6 +82,7 @@ export function ChatInterface() {
                 <MessageItem
                   key={msg.id}
                   message={msg}
+                  sessionId={currentSession.id}
                   currentLanguage={currentLanguage}
                   lastMessageLanguage={lastMessageLanguage}
                   translationStatus={translationStatus as 'translated' | 'original' | undefined}

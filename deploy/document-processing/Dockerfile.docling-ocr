@@ -1,0 +1,28 @@
+ARG DOCLING_BASE_IMAGE=quay.io/docling-project/docling-serve-cpu:v1.27.0
+FROM ${DOCLING_BASE_IMAGE}
+
+USER 0
+
+RUN dnf install --assumeyes --setopt=install_weak_deps=False \
+        tesseract-langpack-ces-4.1.0-3.el9 \
+        tesseract-langpack-dan-4.1.0-3.el9 \
+        tesseract-langpack-deu-4.1.0-3.el9 \
+        tesseract-langpack-fin-4.1.0-3.el9 \
+        tesseract-langpack-fra-4.1.0-3.el9 \
+        tesseract-langpack-hun-4.1.0-3.el9 \
+        tesseract-langpack-ita-4.1.0-3.el9 \
+        tesseract-langpack-nld-4.1.0-3.el9 \
+        tesseract-langpack-nor-4.1.0-3.el9 \
+        tesseract-langpack-pol-4.1.0-3.el9 \
+        tesseract-langpack-por-4.1.0-3.el9 \
+        tesseract-langpack-ron-4.1.0-3.el9 \
+        tesseract-langpack-rus-4.1.0-3.el9 \
+        tesseract-langpack-slk-4.1.0-3.el9 \
+        tesseract-langpack-spa-4.1.0-3.el9 \
+        tesseract-langpack-swe-4.1.0-3.el9 \
+        tesseract-langpack-tur-4.1.0-3.el9 \
+        tesseract-langpack-ukr-4.1.0-3.el9 \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+USER 1001

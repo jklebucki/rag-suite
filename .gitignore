@@ -37,3 +37,4 @@ appsettings.Local.json
 appsettings.Development.local.json
 # Build output for production deployment
 build/
+src/RAG.Orchestrator.Api/App_Data/generated-artifacts/

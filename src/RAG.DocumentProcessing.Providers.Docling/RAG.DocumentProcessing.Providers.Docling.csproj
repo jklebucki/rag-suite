@@ -5,4 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RAG.DocumentProcessing.Abstractions\RAG.DocumentProcessing.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="RAG.Tests" />
+  </ItemGroup>
 </Project>

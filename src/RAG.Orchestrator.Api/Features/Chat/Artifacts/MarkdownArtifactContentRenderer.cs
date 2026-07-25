@@ -15,6 +15,10 @@ namespace RAG.Orchestrator.Api.Features.Chat.Artifacts;
 
 public sealed class MarkdownArtifactContentRenderer : IArtifactContentRenderer
 {
+    private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
+        .UsePipeTables()
+        .Build();
+
     public byte[] Render(GeneratedArtifactFormat format, string markdown)
     {
         return format switch
@@ -40,7 +44,7 @@ public sealed class MarkdownArtifactContentRenderer : IArtifactContentRenderer
             var mainPart = wordDocument.AddMainDocumentPart();
             var body = new W.Body();
             mainPart.Document = new W.Document(body);
-            var document = Markdown.Parse(markdown);
+            var document = Markdown.Parse(markdown, MarkdownPipeline);
             foreach (var block in document)
             {
                 AppendBlock(body, block);
@@ -122,7 +126,7 @@ public sealed class MarkdownArtifactContentRenderer : IArtifactContentRenderer
             var wordRow = new W.TableRow();
             foreach (var cell in row.OfType<MarkdownTableCell>())
             {
-                wordRow.Append(new W.TableCell(CreateParagraph(ExtractContainerText(cell))));
+                wordRow.Append(new W.TableCell(CreateParagraph(ExtractContainerText(cell), bold: row.IsHeader)));
             }
 
             wordTable.Append(wordRow);
@@ -131,7 +135,12 @@ public sealed class MarkdownArtifactContentRenderer : IArtifactContentRenderer
         return wordTable;
     }
 
-    private static W.Paragraph CreateParagraph(string value, int? headingLevel = null, bool code = false, bool quote = false)
+    private static W.Paragraph CreateParagraph(
+        string value,
+        int? headingLevel = null,
+        bool code = false,
+        bool quote = false,
+        bool bold = false)
     {
         var properties = new W.ParagraphProperties();
         if (headingLevel.HasValue)
@@ -144,9 +153,20 @@ public sealed class MarkdownArtifactContentRenderer : IArtifactContentRenderer
             properties.Indentation = new W.Indentation { Left = "720" };
         }
 
-        var runProperties = code
-            ? new W.RunProperties(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" })
-            : null;
+        W.RunProperties? runProperties = null;
+        if (code || bold)
+        {
+            runProperties = new W.RunProperties();
+            if (code)
+            {
+                runProperties.Append(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" });
+            }
+
+            if (bold)
+            {
+                runProperties.Append(new W.Bold());
+            }
+        }
         var run = new W.Run();
         if (runProperties != null)
         {

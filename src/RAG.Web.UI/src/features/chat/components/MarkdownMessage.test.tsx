@@ -95,4 +95,10 @@ describe('MarkdownMessage', () => {
 
     expect(screen.getByTestId('markdown-code-block')).toHaveClass('max-w-full', 'overflow-x-auto')
   })
+
+  it('keeps wide Markdown tables inside a horizontal scroll container', () => {
+    render(<MarkdownMessage content={'| First | Second |\n| --- | --- |\n| ' + 'x'.repeat(1000) + ' | value |'} />)
+
+    expect(screen.getByTestId('markdown-table-container')).toHaveClass('max-w-full', 'overflow-x-auto')
+  })
 })

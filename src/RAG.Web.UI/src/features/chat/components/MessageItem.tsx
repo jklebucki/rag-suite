@@ -9,12 +9,14 @@ import React from 'react'
 import { Bot, User } from 'lucide-react'
 import { MarkdownMessage } from './MarkdownMessage'
 import { MessageSources } from './MessageSources'
+import { OcrDocumentResult } from './OcrDocumentResult'
 import { formatDateTime, formatRelativeTime } from '@/utils/date'
-import type { ChatMessage } from '@/features/chat/types/chat'
+import type { ChatDocumentSummary, ChatMessage } from '@/features/chat/types/chat'
 import type { LanguageCode } from '@/shared/types/i18n'
 
 interface MessageItemProps {
   message: ChatMessage
+  sessionId: string
   currentLanguage: LanguageCode
   lastMessageLanguage?: string | null
   translationStatus?: 'translated' | 'original'
@@ -23,11 +25,14 @@ interface MessageItemProps {
 
 export const MessageItem = React.memo<MessageItemProps>(({
   message,
+  sessionId,
   currentLanguage,
   lastMessageLanguage,
   translationStatus,
   isLastMessage,
 }) => {
+  const ocrDocuments = getOcrDocuments(message.metadata)
+
   return (
     <div className={`flex min-w-0 w-full items-start gap-2 md:gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
       <div className={`p-1.5 md:p-2 rounded-full shrink-0 shadow-sm ${message.role === 'user' ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
@@ -45,6 +50,10 @@ export const MessageItem = React.memo<MessageItemProps>(({
         }`}
       >
         <MarkdownMessage content={message.content} isUserMessage={message.role === 'user'} />
+
+        {message.role === 'assistant' && ocrDocuments.map(document => (
+          <OcrDocumentResult key={document.id} document={document} sessionId={sessionId} />
+        ))}
 
         {/* Sources for assistant messages */}
         {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
@@ -86,6 +95,7 @@ export const MessageItem = React.memo<MessageItemProps>(({
     prevProps.message.id === nextProps.message.id &&
     prevProps.message.content === nextProps.message.content &&
     prevProps.message.timestamp === nextProps.message.timestamp &&
+    prevProps.sessionId === nextProps.sessionId &&
     prevProps.currentLanguage === nextProps.currentLanguage &&
     prevProps.lastMessageLanguage === nextProps.lastMessageLanguage &&
     prevProps.translationStatus === nextProps.translationStatus &&
@@ -94,3 +104,24 @@ export const MessageItem = React.memo<MessageItemProps>(({
 })
 
 MessageItem.displayName = 'MessageItem'
+
+function getOcrDocuments(metadata: ChatMessage['metadata']): ChatDocumentSummary[] {
+  const value = metadata?.ocrDocuments
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter(isChatDocumentSummary)
+}
+
+function isChatDocumentSummary(value: unknown): value is ChatDocumentSummary {
+  if (typeof value !== 'object' || value == null) {
+    return false
+  }
+
+  const document = value as Record<string, unknown>
+  return typeof document.id === 'string' &&
+         typeof document.fileName === 'string' &&
+         typeof document.contentType === 'string' &&
+         typeof document.sizeBytes === 'number'
+}

@@ -12,6 +12,7 @@ public class ChatDbContext : DbContext
 
     public DbSet<ChatSession> ChatSessions { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<ChatDocument> ChatDocuments { get; set; }
     public DbSet<GlobalSetting> GlobalSettings { get; set; }
     public DbSet<Feedback> FeedbackEntries { get; set; }
     public DbSet<FeedbackAttachment> FeedbackAttachments { get; set; }
@@ -131,6 +132,48 @@ public class ChatDbContext : DbContext
             // Composite index for session + timestamp (most common query)
             entity.HasIndex(e => new { e.SessionId, e.Timestamp })
                 .HasDatabaseName("ix_chat_messages_session_timestamp");
+        });
+
+        modelBuilder.Entity<ChatDocument>(entity =>
+        {
+            entity.ToTable("chat_documents");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsRequired();
+
+            entity.Property(e => e.UserMessageId)
+                .HasMaxLength(36)
+                .IsRequired();
+
+            entity.Property(e => e.FileName)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.ContentType)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.Markdown)
+                .IsRequired();
+
+            entity.Property(e => e.Provider)
+                .HasMaxLength(100);
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.HasOne(e => e.UserMessage)
+                .WithMany()
+                .HasForeignKey(e => e.UserMessageId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.UserMessageId)
+                .HasDatabaseName("ix_chat_documents_user_message_id");
+
+            entity.HasIndex(e => e.CreatedAt)
+                .HasDatabaseName("ix_chat_documents_created_at");
         });
 
         // Global Setting configuration

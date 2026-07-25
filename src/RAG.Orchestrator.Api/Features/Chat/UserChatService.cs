@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SemanticKernel;
 using RAG.Abstractions.Search;
+using RAG.DocumentProcessing.Abstractions;
 using RAG.Orchestrator.Api.Common.Constants;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
 using RAG.Orchestrator.Api.Features.Chat.Artifacts;
+using RAG.Orchestrator.Api.Features.Chat.Documents;
 using RAG.Orchestrator.Api.Features.Chat.Prompting;
 using RAG.Orchestrator.Api.Features.Chat.SessionManagement;
 using RAG.Orchestrator.Api.Localization;
@@ -101,10 +103,20 @@ public class UserChatService : IUserChatService
         }
     }
 
-    // Helper method to convert UserChatMessage history to LlmChatMessage format
-    private List<LlmChatMessage> ConvertToLlmChatMessages(IEnumerable<UserChatMessage> messages)
+    private static List<LlmChatMessage> ConvertToLlmChatMessages(
+        IEnumerable<UserChatMessage> messages,
+        ILookup<string, ChatDocument> documentsByUserMessage)
     {
-        return ChatHelper.ConvertToLlmChatMessages(messages);
+        return messages
+            .Where(message => message.Role is ChatRoles.User or ChatRoles.Assistant)
+            .Select(message => new LlmChatMessage
+            {
+                Role = message.Role,
+                Content = message.Role == ChatRoles.User
+                    ? ChatDocumentMarkdown.AppendToMessage(message.Content, documentsByUserMessage[message.Id])
+                    : message.Content
+            })
+            .ToList();
     }
 
 
@@ -179,11 +191,35 @@ public class UserChatService : IUserChatService
             ))
             .ToListAsync(cancellationToken);
 
+        var persistedDocuments = await _chatDbContext.ChatDocuments
+            .AsNoTracking()
+            .Where(document => document.UserMessage.SessionId == sessionId)
+            .OrderBy(document => document.CreatedAt)
+            .ToListAsync(cancellationToken);
+
         var userMetadata = new Dictionary<string, object>
         {
             ["detectedLanguage"] = detectedLanguage ?? "unknown",
             ["originalLanguage"] = detectedLanguage ?? "unknown"
         };
+
+        var userMessageId = Guid.NewGuid().ToString();
+        var currentDocuments = preparedAttachments.Files
+            .Where(file => !string.IsNullOrWhiteSpace(file.Content))
+            .Select(file => new ChatDocument
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserMessageId = userMessageId,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                Markdown = file.Content,
+                SizeBytes = file.SizeBytes,
+                TokenCount = file.TokenCount,
+                PageCount = file.PageCount,
+                Provider = file.Provider,
+                CreatedAt = DateTime.UtcNow
+            })
+            .ToArray();
 
         if (preparedAttachments.Files.Length > 0)
         {
@@ -200,10 +236,15 @@ public class UserChatService : IUserChatService
             userMetadata["attachmentsTokenCount"] = preparedAttachments.TokenCount;
         }
 
+        if (currentDocuments.Length > 0)
+        {
+            userMetadata["ocrDocuments"] = BuildDocumentMetadata(currentDocuments);
+        }
+
         // Add user message to database
         var userDbMessage = new ChatMessage
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = userMessageId,
             SessionId = sessionId,
             Role = ChatRoles.User,
             Content = request.Message,
@@ -212,6 +253,7 @@ public class UserChatService : IUserChatService
         };
 
         _chatDbContext.ChatMessages.Add(userDbMessage);
+        _chatDbContext.ChatDocuments.AddRange(currentDocuments);
         await _chatDbContext.SaveChangesAsync(cancellationToken);
 
         // Add to conversation history for prompt building
@@ -229,10 +271,41 @@ public class UserChatService : IUserChatService
         // First exchange in the session (only the just-added user message) — used for the title fallback.
         var isFirstExchange = conversationHistory.Count == 1;
 
+        var documentsByUserMessage = persistedDocuments.ToLookup(document => document.UserMessageId);
+        var requestedExportFormat = ChatDocumentRequestClassifier.GetRequestedExportFormat(request.Message);
+        var requestsDirectCanonicalResponse = ChatDocumentRequestClassifier.RequestsDirectCanonicalResponse(request.Message);
+        var directResponseDocuments = currentDocuments.Length > 0 ? currentDocuments : persistedDocuments.ToArray();
+        var createsLlmDocumentArtifact = directResponseDocuments.Length > 0 &&
+                                         requestedExportFormat != null &&
+                                         !requestsDirectCanonicalResponse;
+        var userMessageForLlm = createsLlmDocumentArtifact
+            ? BuildDocumentTransformationMessage(
+                request.Message,
+                requestedExportFormat!.Value,
+                currentDocuments.Length == 0 ? directResponseDocuments : Array.Empty<ChatDocument>())
+            : request.Message;
+
         var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
 
         try
         {
+            if (directResponseDocuments.Length > 0 && requestsDirectCanonicalResponse)
+            {
+                return await CreateCanonicalDocumentResponseAsync(
+                    directResponseDocuments,
+                    requestedExportFormat,
+                    userId,
+                    sessionId,
+                    userDbMessage,
+                    dbSession,
+                    request,
+                    normalizedResponseLanguage,
+                    detectedLanguage,
+                    isFirstExchange,
+                    preparedAttachments,
+                    cancellationToken);
+            }
+
             // Search for relevant context only if document search is enabled
             SearchResponse searchResults;
             if (request.UseDocumentSearch)
@@ -279,11 +352,11 @@ public class UserChatService : IUserChatService
             if (llmSettings != null && llmSettings.IsOllama)
             {
                 // Inject documents into user message if document search is enabled and results found
-                string enhancedUserMessage = request.Message;
+                string enhancedUserMessage = userMessageForLlm;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
                 {
                     var documentsContext = _promptBuilder.BuildDocumentsContext(searchResults.Results, normalizedResponseLanguage);
-                    enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
+                    enhancedUserMessage = $"{documentsContext}\n\n{userMessageForLlm}";
 
                     _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}",
                         searchResults.Results.Length, enhancedUserMessage.Length);
@@ -292,7 +365,7 @@ public class UserChatService : IUserChatService
                 {
                     var promptContext = new PromptContext
                     {
-                        UserMessage = request.Message,
+                        UserMessage = userMessageForLlm,
                         SearchResults = Array.Empty<SearchResult>(),
                         ConversationHistory = Array.Empty<MessageContext>(),
                         ResponseLanguage = normalizedResponseLanguage,
@@ -323,7 +396,7 @@ public class UserChatService : IUserChatService
 
 
                 // Build message history (system message will be added by ChatService if needed)
-                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1)); // Exclude the just-added user message
+                var messageHistory = ConvertToLlmChatMessages(conversationHistory.SkipLast(1), documentsByUserMessage); // Exclude the just-added user message
 
                 // Use new Chat API with system message handled by ChatService
                 aiResponseContent = await _llmService.ChatWithHistoryAsync(
@@ -341,8 +414,8 @@ public class UserChatService : IUserChatService
             else
             {
                 var userMessageForPrompt = !string.IsNullOrWhiteSpace(attachmentsContext)
-                    ? $"{attachmentsContext}\n\n{request.Message}"
-                    : request.Message;
+                    ? $"{attachmentsContext}\n\n{userMessageForLlm}"
+                    : userMessageForLlm;
 
                 // Fallback to Semantic Kernel for non-Ollama providers
                 var promptContext = new PromptContext
@@ -352,7 +425,9 @@ public class UserChatService : IUserChatService
                     ConversationHistory = conversationHistory.Select(m => new MessageContext
                     {
                         Role = m.Role,
-                        Content = m.Content
+                        Content = m.Role == ChatRoles.User
+                            ? ChatDocumentMarkdown.AppendToMessage(m.Content, documentsByUserMessage[m.Id])
+                            : m.Content
                     }).ToList(),
                     ResponseLanguage = normalizedResponseLanguage,
                     DetectedLanguage = detectedLanguage ?? SupportedLanguages.English,
@@ -374,13 +449,34 @@ public class UserChatService : IUserChatService
             // Use cleaned response (without the title marker line) for saving
             aiResponseContent = cleanedResponse;
             var assistantMessageId = Guid.NewGuid().ToString();
-            var artifactResult = await _generatedArtifactService.ProcessAsync(
-                aiResponseContent,
-                userId,
-                sessionId,
-                assistantMessageId,
-                cancellationToken);
-            aiResponseContent = artifactResult.Response;
+            ArtifactGenerationResult artifactResult;
+            if (createsLlmDocumentArtifact)
+            {
+                var transformedDocumentMarkdown = ExtractTransformedDocumentMarkdown(aiResponseContent);
+                artifactResult = await _generatedArtifactService.CreateAsync(
+                    requestedExportFormat!.Value,
+                    ChatDocumentMarkdown.GetExportFileName(directResponseDocuments, requestedExportFormat.Value),
+                    transformedDocumentMarkdown,
+                    userId,
+                    sessionId,
+                    assistantMessageId,
+                    cancellationToken);
+                aiResponseContent = transformedDocumentMarkdown;
+                if (artifactResult.ArtifactCreated)
+                {
+                    aiResponseContent = $"{aiResponseContent.Trim()}\n\n{artifactResult.Response}";
+                }
+            }
+            else
+            {
+                artifactResult = await _generatedArtifactService.ProcessAsync(
+                    aiResponseContent,
+                    userId,
+                    sessionId,
+                    assistantMessageId,
+                    cancellationToken);
+                aiResponseContent = artifactResult.Response;
+            }
 
             if (!string.IsNullOrWhiteSpace(extractedTitle))
             {
@@ -408,20 +504,12 @@ public class UserChatService : IUserChatService
                 Content = aiResponseContent,
                 Timestamp = DateTime.UtcNow,
                 Sources = searchResults.Results.Length > 0 && request.UseDocumentSearch ? searchResults.Results : null,
-                Metadata = new Dictionary<string, object>
-                {
-                    ["responseLanguage"] = normalizedResponseLanguage,
-                    ["documentsUsed"] = searchResults.Results.Length,
-                    ["useDocumentSearch"] = request.UseDocumentSearch,
-                    ["generatedArtifact"] = artifactResult.ArtifactCreated,
-                    ["sourcesUsed"] = request.UseDocumentSearch && searchResults.Results.Length > 0
-                        ? searchResults.Results.Select(r => !string.IsNullOrEmpty(r.FileName)
-                            ? r.FileName
-                            : !string.IsNullOrEmpty(r.FilePath)
-                                ? Path.GetFileName(r.FilePath)
-                                : r.Source ?? "Unknown").Distinct().ToArray()
-                        : new string[0]
-                },
+                Metadata = CreateAssistantMetadata(
+                    normalizedResponseLanguage,
+                    searchResults.Results,
+                    request.UseDocumentSearch,
+                    artifactResult.ArtifactCreated,
+                    currentDocuments),
                 OllamaContext = newOllamaContext  // Save Ollama context for future token cache usage
             };
 
@@ -491,6 +579,171 @@ public class UserChatService : IUserChatService
                 }
             };
         }
+    }
+
+    private async Task<MultilingualChatResponse> CreateCanonicalDocumentResponseAsync(
+        ChatDocument[] documents,
+        GeneratedArtifactFormat? exportFormat,
+        string userId,
+        string sessionId,
+        ChatMessage userDbMessage,
+        ChatSession dbSession,
+        MultilingualChatRequest request,
+        string responseLanguage,
+        string? detectedLanguage,
+        bool isFirstExchange,
+        PreparedChatAttachments preparedAttachments,
+        CancellationToken cancellationToken)
+    {
+        var assistantMessageId = Guid.NewGuid().ToString();
+        ArtifactGenerationResult artifactResult;
+        string response;
+
+        if (exportFormat == null)
+        {
+            response = ChatDocumentMarkdown.BuildDisplayResponse(documents);
+            artifactResult = new ArtifactGenerationResult(response, false);
+        }
+        else
+        {
+            artifactResult = await _generatedArtifactService.CreateAsync(
+                exportFormat.Value,
+                ChatDocumentMarkdown.GetExportFileName(documents, exportFormat.Value),
+                ChatDocumentMarkdown.BuildExportMarkdown(documents),
+                userId,
+                sessionId,
+                assistantMessageId,
+                cancellationToken);
+            response = artifactResult.ArtifactCreated
+                ? $"## Eksport OCR\n\n{artifactResult.Response}"
+                : "Nie udało się przygotować pliku OCR. Wynik Markdown pozostaje dostępny w historii czatu.";
+        }
+
+        if (isFirstExchange)
+        {
+            var fallbackTitle = ChatTitleExtractor.BuildFallbackTitle(request.Message);
+            if (!string.IsNullOrWhiteSpace(fallbackTitle))
+            {
+                dbSession.Title = fallbackTitle;
+            }
+        }
+
+        var assistantMessage = new ChatMessage
+        {
+            Id = assistantMessageId,
+            SessionId = sessionId,
+            Role = ChatRoles.Assistant,
+            Content = response,
+            Timestamp = DateTime.UtcNow,
+            Metadata = CreateAssistantMetadata(
+                responseLanguage,
+                Array.Empty<SearchResult>(),
+                useDocumentSearch: false,
+                artifactResult.ArtifactCreated,
+                documents)
+        };
+
+        _chatDbContext.ChatMessages.Add(assistantMessage);
+        dbSession.UpdatedAt = DateTime.UtcNow;
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+        await _chatAttachmentService.CommitMessageAttachmentsAsync(userId, sessionId, request.AttachmentIds, cancellationToken);
+        var contextUsage = await _chatAttachmentService.GetContextAsync(userId, sessionId, cancellationToken);
+
+        return new MultilingualChatResponse
+        {
+            Response = assistantMessage.Content,
+            SessionId = sessionId,
+            UserMessageId = userDbMessage.Id,
+            AssistantMessageId = assistantMessage.Id,
+            DetectedLanguage = detectedLanguage ?? "unknown",
+            ResponseLanguage = responseLanguage,
+            WasTranslated = false,
+            Sources = null,
+            ProcessingTimeMs = 0,
+            Metadata = new Dictionary<string, object>
+            {
+                ["attachmentsUsed"] = preparedAttachments.Files.Length,
+                ["generatedArtifact"] = artifactResult.ArtifactCreated,
+                ["contextUsage"] = contextUsage ?? preparedAttachments.ContextUsage
+            }
+        };
+    }
+
+    private static Dictionary<string, object> CreateAssistantMetadata(
+        string responseLanguage,
+        SearchResult[] searchResults,
+        bool useDocumentSearch,
+        bool artifactCreated,
+        IEnumerable<ChatDocument> documents)
+    {
+        var documentArray = documents.ToArray();
+        var metadata = new Dictionary<string, object>
+        {
+            ["responseLanguage"] = responseLanguage,
+            ["documentsUsed"] = searchResults.Length,
+            ["useDocumentSearch"] = useDocumentSearch,
+            ["generatedArtifact"] = artifactCreated,
+            ["sourcesUsed"] = useDocumentSearch && searchResults.Length > 0
+                ? searchResults.Select(result => !string.IsNullOrEmpty(result.FileName)
+                    ? result.FileName
+                    : !string.IsNullOrEmpty(result.FilePath)
+                        ? Path.GetFileName(result.FilePath)
+                        : result.Source ?? "Unknown").Distinct().ToArray()
+                : Array.Empty<string>()
+        };
+
+        if (documentArray.Length > 0)
+        {
+            metadata["ocrDocuments"] = BuildDocumentMetadata(documentArray);
+        }
+
+        return metadata;
+    }
+
+    private static string BuildDocumentTransformationMessage(
+        string message,
+        GeneratedArtifactFormat format,
+        IEnumerable<ChatDocument> documents)
+    {
+        var documentContext = ChatDocumentMarkdown.AppendToMessage(string.Empty, documents);
+        var formatLabel = format == GeneratedArtifactFormat.Docx ? "DOCX" : "TXT";
+        var instruction = $"""
+            {message}
+
+            === SERVER DOCUMENT OUTPUT INSTRUCTION ===
+            Transform the canonical OCR document according to the user's request. Return only the complete transformed document in Markdown, without commentary, code fences, or generated_artifact tags. Preserve all relevant sections, headings, lists, and tables unless the user explicitly asks to change them. The server will save this exact Markdown as {formatLabel}.
+            === END SERVER DOCUMENT OUTPUT INSTRUCTION ===
+            """;
+
+        return string.IsNullOrWhiteSpace(documentContext)
+            ? instruction
+            : $"{documentContext}\n\n{instruction}";
+    }
+
+    private static string ExtractTransformedDocumentMarkdown(string response)
+    {
+        try
+        {
+            var artifact = GeneratedArtifactBlockParser.Extract(response, out _);
+            return artifact?.Markdown ?? response.Trim();
+        }
+        catch (DocumentProcessingException)
+        {
+            return response.Trim();
+        }
+    }
+
+    private static object[] BuildDocumentMetadata(IEnumerable<ChatDocument> documents)
+    {
+        return documents.Select(document => (object)new
+        {
+            document.Id,
+            document.FileName,
+            document.ContentType,
+            document.SizeBytes,
+            document.PageCount,
+            document.Provider
+        }).ToArray();
     }
 
     public async Task<bool> DeleteUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default)

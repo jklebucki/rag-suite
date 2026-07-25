@@ -1,6 +1,6 @@
 # Przetwarzanie dokumentów: wdrożenie kontenerowe
 
-Ten katalog uruchamia wewnętrzną usługę `RAG.DocumentProcessing.Api` oraz lokalny `docling-serve`. Domyślny wariant używa CPU; wariant GPU jest nakładką Docker Compose dla NVIDIA CUDA 12.8. Żaden obraz nie używa tagu `latest`: obrazy Docling są przypięte do wydania `v1.27.0`.
+Ten katalog uruchamia wewnętrzną usługę `RAG.DocumentProcessing.Api` oraz lokalny `docling-serve`. Domyślny wariant używa CPU; wariant GPU jest nakładką Docker Compose dla NVIDIA CUDA 12.8. Żaden obraz nie używa tagu `latest`: bazowe obrazy Docling są przypięte do wydania `v1.27.0`, a `Dockerfile.docling-ocr` dodaje przypięte pakiety językowe Tesseract.
 
 ## Konfiguracja wspólna
 
@@ -26,6 +26,21 @@ Ten katalog uruchamia wewnętrzną usługę `RAG.DocumentProcessing.Api` oraz lo
    ```
 
 3. Nie publikuj portu `5080` w Internecie. Najbezpieczniej ograniczyć go regułami sieciowymi do Orchestratora albo usunąć sekcję `ports` i uruchamiać oba kontenery w tej samej prywatnej sieci Compose.
+
+## Języki i jakość OCR
+
+Czysty skan nie zawiera tekstu, na podstawie którego można wiarygodnie ustalić język przed pierwszym rozpoznaniem. Dlatego produkcyjny profil jawnie uruchamia Tesseract z językami oczekiwanymi w dokumencie:
+
+```dotenv
+DOCLING_OCR_PRESET=tesseract
+DOCLING_OCR_LANGUAGES=pol,eng
+```
+
+To są trzyliterowe kody Tesseract (zgodne z jego listą języków), a nie dwuliterowe kody EasyOCR. Obraz zawiera `ces`, `dan`, `deu`, `eng`, `fin`, `fra`, `hun`, `ita`, `nld`, `nor`, `pol`, `por`, `ron`, `rus`, `slk`, `spa`, `swe`, `tur` i `ukr`. Przykładowo dokument niemiecko-angielski ustaw jako `deu,eng`, a ukraińsko-polski jako `ukr,pol`. Nie dodawaj wszystkich języków bez potrzeby: mniejszy, właściwy zestaw daje lepszą dokładność i krótszy czas.
+
+Główny tekst jest oceniany również pod kątem gęstości, znaków zastępczych i nadmiaru osieroconych jedno-/dwuliterowych fragmentów. Wynik podejrzany jest ponawiany z pełnostronicowym OCR. Ponieważ na dokumentach mieszanych Tesseract lepiej odtwarza tekst i diakrytykę, a RapidOCR bywa lepszy dla komórek tabel, niekompletna tabela jest opcjonalnie przeliczana presetem `auto`; aplikacja podmienia wyłącznie lepszy blok tabeli, zachowując tekst Tesseract.
+
+Progi i fallback są konfigurowalne przez `DOCLING_MINIMUM_TEXT_QUALITY`, `DOCLING_ENABLE_TABLE_FALLBACK`, `DOCLING_TABLE_FALLBACK_OCR_PRESET` oraz `DOCLING_MINIMUM_TABLE_COMPLETENESS`.
 
 ## Development lokalny
 
@@ -71,7 +86,7 @@ Wymagane są zgodny sterownik NVIDIA (co najmniej `550.54.14`) oraz `nvidia-cont
 ./scripts/document-processing/up-gpu.sh
 ```
 
-Skrypt łączy `compose.yml` z `compose.gpu.yml`, podmienia obraz Docling na `docling-serve-cu128:v1.27.0`, rezerwuje GPU i zmniejsza liczbę workerów oraz zadań do jednego. Docker nie potrafi narzucić twardego limitu VRAM, dlatego skrypt przed startem wymaga co najmniej `DOCLING_GPU_MIN_FREE_MIB=6144` MiB wolnej pamięci.
+Skrypt łączy `compose.yml` z `compose.gpu.yml`, buduje obraz `rag-suite/docling-serve-cu128:v1.27.0-ocr.1` na bazie `docling-serve-cu128:v1.27.0`, rezerwuje GPU i zmniejsza liczbę workerów oraz zadań do jednego. Docker nie potrafi narzucić twardego limitu VRAM, dlatego skrypt przed startem wymaga co najmniej `DOCLING_GPU_MIN_FREE_MIB=6144` MiB wolnej pamięci.
 
 Na zbadanym hoście jest RTX 5060 Ti z 16 GiB VRAM, ale `gpt-oss:20b` w Ollama zajmuje około 15 GiB. Te obciążenia nie mogą bezpiecznie działać jednocześnie. Przed wariantem GPU zatrzymaj model, sprawdź wynik `nvidia-smi`, a po zakończeniu konwersji możesz go ponownie uruchomić:
 

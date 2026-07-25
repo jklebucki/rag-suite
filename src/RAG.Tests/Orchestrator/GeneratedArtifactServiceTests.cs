@@ -52,4 +52,30 @@ public class GeneratedArtifactServiceTests
         Assert.DoesNotContain("/api/user-chat/artifacts/", result.Response, StringComparison.Ordinal);
         Assert.DoesNotContain("<generated_artifact", result.Response, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public async Task CreateAsync_WhenMarkdownComesFromOcr_PreservesTableForDeterministicExport()
+    {
+        const string markdown = "| Product | Seats |\n| --- | ---: |\n| ERP | 13 |";
+        var renderer = new Mock<IArtifactContentRenderer>();
+        renderer.Setup(item => item.Render(GeneratedArtifactFormat.Docx, markdown)).Returns([1, 2, 3]);
+        renderer.Setup(item => item.GetContentType(GeneratedArtifactFormat.Docx)).Returns("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        var store = new Mock<ITemporaryArtifactStore>();
+        store.Setup(item => item.SaveAsync(It.IsAny<GeneratedArtifact>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new StoredArtifact("artifact-1", "ocr-result.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 3, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddHours(12)));
+        var service = new GeneratedArtifactService(renderer.Object, store.Object, NullLogger<GeneratedArtifactService>.Instance);
+
+        var result = await service.CreateAsync(
+            GeneratedArtifactFormat.Docx,
+            "ocr-result.docx",
+            markdown,
+            "user-1",
+            "session-1",
+            "assistant-1",
+            CancellationToken.None);
+
+        Assert.True(result.ArtifactCreated);
+        Assert.Contains("/api/user-chat/artifacts/artifact-1/download", result.Response, StringComparison.Ordinal);
+        renderer.Verify(item => item.Render(GeneratedArtifactFormat.Docx, markdown), Times.Once);
+    }
 }

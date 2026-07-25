@@ -55,6 +55,15 @@ export interface ChatAttachmentUploadResponse {
   contextUsage: ChatContextUsage
 }
 
+export interface ChatDocumentSummary {
+  id: string
+  fileName: string
+  contentType: string
+  sizeBytes: number
+  pageCount?: number | null
+  provider?: string | null
+}
+
 export interface MultilingualChatRequest {
   message: string
   sessionId?: string
