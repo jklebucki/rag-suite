@@ -34,31 +34,104 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
         DocumentProcessingRequest request,
         CancellationToken cancellationToken)
     {
-        var initial = await ProcessOnceAsync(request, forceOcr: request.ForceOcr, cancellationToken);
-        if (request.ForceOcr || !RequiresForcedOcr(initial))
+        var primaryLanguages = _options.GetOcrLanguages();
+        var result = await ProcessOnceAsync(
+            request,
+            forceOcr: request.ForceOcr,
+            _options.OcrPreset,
+            primaryLanguages,
+            cancellationToken);
+        if (!request.ForceOcr && RequiresForcedOcr(result))
         {
-            return initial;
+            ResetContent(request);
+            _logger.LogInformation(
+                "Retrying document {FileName} with force_ocr=true and OCR preset {OcrPreset}",
+                request.Document.FileName,
+                _options.OcrPreset);
+            var retried = await ProcessOnceAsync(
+                request,
+                forceOcr: true,
+                _options.OcrPreset,
+                primaryLanguages,
+                cancellationToken);
+            result = SelectHigherQualityResult(result, retried) with
+            {
+                Warnings = MergeWarnings(
+                    result.Warnings,
+                    retried.Warnings,
+                    "The initial extraction was retried with force_ocr=true because its text quality was low.")
+            };
         }
 
-        if (request.Content.CanSeek)
+        if (!_options.EnableTableFallback ||
+            !MarkdownTableRescuer.NeedsFallback(result.Markdown, _options.MinimumTableCompleteness))
         {
-            request.Content.Position = 0;
+            return result;
         }
 
-        _logger.LogInformation("Retrying document {FileName} with force_ocr=true", request.Document.FileName);
-        var retried = await ProcessOnceAsync(request, forceOcr: true, cancellationToken);
-        return retried with
+        try
         {
-            Warnings = retried.Warnings.Append("The initial extraction was retried with force_ocr=true.").ToArray()
-        };
+            ResetContent(request);
+            _logger.LogInformation(
+                "Retrying tables in document {FileName} with OCR preset {OcrPreset}",
+                request.Document.FileName,
+                _options.TableFallbackOcrPreset);
+            var fallback = await ProcessOnceAsync(
+                request,
+                forceOcr: request.ForceOcr,
+                _options.TableFallbackOcrPreset,
+                _options.GetTableFallbackOcrLanguages(),
+                cancellationToken);
+            var mergedMarkdown = MarkdownTableRescuer.MergeBetterTables(
+                result.Markdown,
+                fallback.Markdown,
+                _options.MinimumTableCompleteness,
+                out var replacementCount);
+            if (replacementCount == 0)
+            {
+                return result;
+            }
+
+            var mergedPlainText = MarkdownTableRescuer.MergeBetterTables(
+                result.PlainText,
+                fallback.PlainText,
+                _options.MinimumTableCompleteness,
+                out _);
+            return result with
+            {
+                Markdown = mergedMarkdown,
+                PlainText = mergedPlainText,
+                QualityScore = OcrTextQualityEvaluator.Calculate(mergedMarkdown, mergedPlainText, result.PageCount),
+                Warnings = MergeWarnings(
+                    result.Warnings,
+                    fallback.Warnings,
+                    $"Replaced {replacementCount} incomplete Markdown table(s) using OCR preset '{_options.TableFallbackOcrPreset}'.")
+            };
+        }
+        catch (DocumentProcessingException exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Table fallback failed for document {FileName}; returning the primary OCR result",
+                request.Document.FileName);
+            return result with
+            {
+                Warnings = MergeWarnings(
+                    result.Warnings,
+                    Array.Empty<string>(),
+                    $"The table fallback preset '{_options.TableFallbackOcrPreset}' was unavailable.")
+            };
+        }
     }
 
     private async Task<DocumentProcessingResult> ProcessOnceAsync(
         DocumentProcessingRequest request,
         bool forceOcr,
+        string ocrPreset,
+        IReadOnlyList<string> ocrLanguages,
         CancellationToken cancellationToken)
     {
-        var taskId = await SubmitAsync(request, forceOcr, cancellationToken);
+        var taskId = await SubmitAsync(request, forceOcr, ocrPreset, ocrLanguages, cancellationToken);
         JsonDocument? statusDocument = null;
         try
         {
@@ -95,7 +168,7 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
         var plainText = GetString(resultDocument.RootElement, "text_content") ?? markdown;
         var pageCount = GetArrayLength(resultDocument.RootElement, "pages");
         var warnings = GetStringValues(resultDocument.RootElement, "errors");
-        var qualityScore = CalculateQuality(markdown, plainText, pageCount);
+        var qualityScore = OcrTextQualityEvaluator.Calculate(markdown, plainText, pageCount);
         return new DocumentProcessingResult(
             markdown,
             plainText,
@@ -106,7 +179,12 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
             warnings);
     }
 
-    private async Task<string> SubmitAsync(DocumentProcessingRequest request, bool forceOcr, CancellationToken cancellationToken)
+    private async Task<string> SubmitAsync(
+        DocumentProcessingRequest request,
+        bool forceOcr,
+        string ocrPreset,
+        IReadOnlyList<string> ocrLanguages,
+        CancellationToken cancellationToken)
     {
         using var form = new MultipartFormDataContent();
         using var fileContent = new StreamContent(new NonDisposingStream(request.Content));
@@ -117,8 +195,12 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
         form.Add(new StringContent("json"), "to_formats");
         form.Add(new StringContent("true"), "do_ocr");
         form.Add(new StringContent(forceOcr ? "true" : "false"), "force_ocr");
-        form.Add(new StringContent("pl"), "ocr_lang");
-        form.Add(new StringContent("en"), "ocr_lang");
+        form.Add(new StringContent(ocrPreset), "ocr_preset");
+        foreach (var ocrLanguage in ocrLanguages)
+        {
+            form.Add(new StringContent(ocrLanguage), "ocr_lang");
+        }
+
         form.Add(new StringContent("accurate"), "table_mode");
         form.Add(new StringContent("placeholder"), "image_export_mode");
 
@@ -173,14 +255,38 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
         var charactersPerPage = Math.Max(result.Markdown.Length, result.PlainText.Length) / pages;
         return string.IsNullOrWhiteSpace(result.Markdown) ||
                charactersPerPage < _options.MinimumCharactersPerPage ||
+               result.QualityScore < _options.MinimumTextQuality ||
                result.Warnings.Count > 0;
     }
 
-    private static double CalculateQuality(string markdown, string plainText, int pageCount)
+    private static DocumentProcessingResult SelectHigherQualityResult(
+        DocumentProcessingResult initial,
+        DocumentProcessingResult retried)
     {
-        var characters = Math.Max(markdown.Trim().Length, plainText.Trim().Length);
-        var pages = Math.Max(1, pageCount);
-        return Math.Clamp(characters / (pages * 500d), 0d, 1d);
+        return retried.QualityScore >= initial.QualityScore ? retried : initial;
+    }
+
+    private static IReadOnlyList<string> MergeWarnings(
+        IReadOnlyList<string> primary,
+        IReadOnlyList<string> secondary,
+        string additionalWarning)
+    {
+        return primary.Concat(secondary)
+            .Append(additionalWarning)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static void ResetContent(DocumentProcessingRequest request)
+    {
+        if (!request.Content.CanSeek)
+        {
+            throw new DocumentProcessingException(
+                "DOCUMENT_STREAM_NOT_SEEKABLE",
+                "The document stream cannot be reset for an OCR retry.");
+        }
+
+        request.Content.Position = 0;
     }
 
     private static string GetError(JsonElement root)
