@@ -144,13 +144,13 @@ if [ "$NODE_AVAILABLE" = true ]; then
     # Sprawdź czy node_modules istnieje
     if [ ! -d "node_modules" ]; then
         echo -e "${YELLOW}Instalowanie zależności npm...${NC}"
-        if ! npm install; then
+        if ! npm ci; then
             echo -e "${YELLOW}⚠ Błąd instalacji npm - pomijam budowanie Web UI${NC}"
             NODE_AVAILABLE=false
         fi
     else
         echo -e "${YELLOW}Aktualizowanie zależności npm...${NC}"
-        if ! npm install; then
+        if ! npm ci; then
             echo -e "${YELLOW}⚠ Błąd aktualizacji npm - próbuję budować z istniejącymi zależnościami${NC}"
         fi
     fi
@@ -168,7 +168,7 @@ if [ "$NODE_AVAILABLE" = true ]; then
             
             # Build aplikacji React w temp
             echo -e "${YELLOW}Budowanie aplikacji React w /tmp...${NC}"
-            if npm install && npm run build; then
+            if npm ci && npm run build; then
                 if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
                     # Wyczyść stary build
                     rm -rf /var/www/rag-suite/build/web/*
