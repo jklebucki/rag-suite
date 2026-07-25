@@ -26,6 +26,7 @@ public class DoclingDocumentProcessingProviderTests
 
         Assert.Equal("OCR result", result.Markdown);
         Assert.Equal("docling", result.Provider);
+        Assert.Equal(1, result.PageCount);
         Assert.Equal(2, handler.Submissions);
         Assert.Contains(handler.SubmissionBodies, body => body.Contains("force_ocr\r\n\r\ntrue", StringComparison.Ordinal));
         Assert.Contains(result.Warnings, warning => warning.Contains("force_ocr", StringComparison.Ordinal));
@@ -54,12 +55,12 @@ public class DoclingDocumentProcessingProviderTests
 
             if (path == "/v1/result/task-1")
             {
-                return Json("{\"status\":\"success\",\"document\":{\"md_content\":\"\",\"text_content\":\"\",\"json_content\":{\"pages\":[{}]}}}");
+                return Json("{\"status\":\"success\",\"document\":{\"md_content\":\"\",\"text_content\":\"\",\"json_content\":{\"pages\":{\"1\":{}}}}}");
             }
 
             if (path == "/v1/result/task-2")
             {
-                return Json("{\"status\":\"success\",\"document\":{\"md_content\":\"OCR result\",\"text_content\":\"OCR result\",\"json_content\":{\"pages\":[{}]}}}");
+                return Json("{\"status\":\"success\",\"document\":{\"md_content\":\"OCR result\",\"text_content\":\"OCR result\",\"json_content\":{\"pages\":{\"1\":{}}}}}");
             }
 
             throw new InvalidOperationException($"Unexpected Docling request: {request.Method} {path}");

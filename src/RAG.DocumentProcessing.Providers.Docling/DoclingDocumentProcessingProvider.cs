@@ -227,9 +227,14 @@ public sealed class DoclingDocumentProcessingProvider : IDocumentProcessingProvi
         {
             foreach (var property in element.EnumerateObject())
             {
-                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase) && property.Value.ValueKind == JsonValueKind.Array)
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
                 {
-                    return property.Value.GetArrayLength();
+                    return property.Value.ValueKind switch
+                    {
+                        JsonValueKind.Array => property.Value.GetArrayLength(),
+                        JsonValueKind.Object => property.Value.EnumerateObject().Count(),
+                        _ => 0
+                    };
                 }
 
                 var nested = GetArrayLength(property.Value, propertyName);
