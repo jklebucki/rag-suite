@@ -122,6 +122,21 @@ sudo ./deploy.sh
 
 ## Konfiguracja
 
+### Sekret połączenia z OCR
+
+Gdy backend działa na osobnym hoście niż kontenery OCR, utwórz na hoście backendu nieśledzony plik sekretów przed pierwszym wdrożeniem:
+
+```bash
+cd /var/www/rag-suite
+cp src/RAG.Orchestrator.Api/appsettings.Production.secrets.example.json \
+  src/RAG.Orchestrator.Api/appsettings.Production.secrets.json
+chmod 600 src/RAG.Orchestrator.Api/appsettings.Production.secrets.json
+```
+
+Wstaw w nim wartość `DOCUMENT_PROCESSING_API_KEY` z `deploy/document-processing/.env` hosta OCR. Adres usługi pozostaje w `appsettings.Production.json`, np. `http://192.168.21.14:5080`.
+
+`appsettings.Production.secrets.json` jest ignorowany przez Git. `deploy.sh` sprawdza jego obecność i poprawność klucza **przed** zatrzymaniem API, a po `dotnet publish` kopiuje go do `build/api` z uprawnieniami `600` dla użytkownika `www-data`. Dzięki temu ponowny deploy nie usuwa dostępu backendu do OCR.
+
 ### Konfiguracja zewnętrznych serwisów
 
 Edytuj plik `/var/www/rag-suite/build/api/appsettings.Production.json`:

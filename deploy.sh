@@ -17,6 +17,8 @@ APP_NAME="rag-suite"
 APP_USER="www-data"
 APP_DIR="/var/www/rag-suite"
 GIT_BRANCH="${1:-main}"
+PRODUCTION_SECRETS_SOURCE="$APP_DIR/src/RAG.Orchestrator.Api/appsettings.Production.secrets.json"
+PRODUCTION_SECRETS_TARGET="$APP_DIR/build/api/appsettings.Production.secrets.json"
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}    RAG Suite Deployment${NC}"
@@ -35,6 +37,22 @@ fi
 if [ ! -d "$APP_DIR" ]; then
     echo -e "${RED}Katalog aplikacji nie istnieje: $APP_DIR${NC}"
     echo -e "${YELLOW}Uruchom najpierw: production-setup.sh${NC}"
+    exit 1
+fi
+
+if [ ! -f "$PRODUCTION_SECRETS_SOURCE" ]; then
+    echo -e "${RED}Brak wymaganego pliku sekretów OCR: $PRODUCTION_SECRETS_SOURCE${NC}"
+    echo -e "${YELLOW}Skopiuj appsettings.Production.secrets.example.json, ustaw Services:DocumentProcessing:ApiKey i uruchom deploy ponownie.${NC}"
+    exit 1
+fi
+
+if ! command -v jq >/dev/null 2>&1 || ! jq -e '
+    .Services.DocumentProcessing.ApiKey
+    | strings
+    | select(length > 0)
+    | select(startswith("replace-with-") | not)
+' "$PRODUCTION_SECRETS_SOURCE" >/dev/null; then
+    echo -e "${RED}Plik sekretów OCR nie zawiera prawidłowego Services:DocumentProcessing:ApiKey.${NC}"
     exit 1
 fi
 
@@ -116,6 +134,9 @@ dotnet restore
 # Zbuduj aplikację w trybie Release
 echo -e "${YELLOW}Budowanie aplikacji .NET...${NC}"
 dotnet publish -c Release -o ../../build/api
+
+echo -e "${YELLOW}Kopiowanie sekretów OCR do publikowanej aplikacji...${NC}"
+install -m 600 "$PRODUCTION_SECRETS_SOURCE" "$PRODUCTION_SECRETS_TARGET"
 
 # Sprawdź czy build się powiódł
 if [ -f "../../build/api/RAG.Orchestrator.Api.dll" ]; then
@@ -300,6 +321,10 @@ find build/api -type d -exec chmod 755 {} \;
 
 # Ustaw uprawnienia wykonania dla głównego pliku API
 chmod +x build/api/RAG.Orchestrator.Api.dll
+
+# Sekret OCR musi być odczytywalny wyłącznie przez konto uruchamiające API.
+chown $APP_USER:$APP_USER "$PRODUCTION_SECRETS_TARGET"
+chmod 600 "$PRODUCTION_SECRETS_TARGET"
 
 # Ustaw uprawnienia dla plików Web
 find build/web -type f -exec chmod 644 {} \;
