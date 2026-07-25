@@ -1,6 +1,11 @@
 services:
   docling:
-    image: quay.io/docling-project/docling-serve-cpu:v1.27.0
+    image: rag-suite/docling-serve-cpu:v1.27.0-ocr.1
+    build:
+      context: ../..
+      dockerfile: deploy/document-processing/Dockerfile.docling-ocr
+      args:
+        DOCLING_BASE_IMAGE: quay.io/docling-project/docling-serve-cpu:v1.27.0
     restart: unless-stopped
     environment:
       DOCLING_SERVE_API_KEY: ${DOCLING_API_KEY}
@@ -37,6 +42,13 @@ services:
       Docling__Endpoint: http://docling:5001
       Docling__ApiKey: ${DOCLING_API_KEY}
       Docling__PollIntervalMilliseconds: ${DOCLING_POLL_INTERVAL_MS:-1000}
+      Docling__OcrPreset: ${DOCLING_OCR_PRESET:-tesseract}
+      Docling__OcrLanguages: ${DOCLING_OCR_LANGUAGES:-pol,eng}
+      Docling__MinimumTextQuality: ${DOCLING_MINIMUM_TEXT_QUALITY:-0.6}
+      Docling__EnableTableFallback: ${DOCLING_ENABLE_TABLE_FALLBACK:-true}
+      Docling__TableFallbackOcrPreset: ${DOCLING_TABLE_FALLBACK_OCR_PRESET:-auto}
+      Docling__TableFallbackOcrLanguages: ${DOCLING_TABLE_FALLBACK_OCR_LANGUAGES:-}
+      Docling__MinimumTableCompleteness: ${DOCLING_MINIMUM_TABLE_COMPLETENESS:-0.85}
     cpus: "${DOCUMENT_PROCESSING_CPU_LIMIT:-1.0}"
     mem_limit: ${DOCUMENT_PROCESSING_MEMORY_LIMIT:-1g}
     ports:

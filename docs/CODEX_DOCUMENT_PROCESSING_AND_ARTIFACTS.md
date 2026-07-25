@@ -121,12 +121,15 @@ Domyślne opcje:
 to_formats=md,text,json
 do_ocr=true
 force_ocr=false
-ocr_lang=pl,en
+ocr_preset=tesseract
+ocr_lang=pol,eng
 table_mode=accurate
 image_export_mode=placeholder
 ```
 
-Jeżeli wynik jest pusty, ma bardzo mało znaków na stronę albo zawiera błąd ekstrakcji, wykonaj jeden retry z `force_ocr=true`. Znormalizuj wynik do `DocumentProcessingResult`.
+Nie używaj presetu `auto` jako głównego OCR dla tekstu wielojęzycznego. W obrazie `docling-serve` `v1.27.0` wybiera on RapidOCR, który nie stosuje przekazanej listy języków. Obraz pochodny musi zawierać dane językowe Tesseract, a lista języków ma być konfigurowana przez `Docling:OcrLanguages` w kodach ISO 639-3, np. `pol,eng`.
+
+Jeżeli wynik jest pusty, ma bardzo mało znaków na stronę, niski wynik jakości leksykalnej albo zawiera błąd ekstrakcji, wykonaj jeden retry z `force_ocr=true`. Jeżeli tabela głównego wyniku ma puste lub niespójne komórki, wykonaj dodatkową konwersję presetem `auto` i podmień wyłącznie lepszy blok tabeli Markdown; nie zastępuj nim poprawnego tekstu Tesseract. Znormalizuj wynik do `DocumentProcessingResult`.
 
 Dodaj:
 
@@ -241,6 +244,8 @@ Reactowy renderer Markdown musi przechwycić ten link i pobrać plik przez istni
 
 - PDF tekstowy, skanowany i mieszany;
 - retry `force_ocr`;
+- polskie znaki diakrytyczne i odrzucenie wyniku z nadmiarem osieroconych liter;
+- selektywny fallback tabel bez podmiany poprawnego tekstu;
 - błędny/za duży PDF;
 - statusy oraz blokada wysłania;
 - TXT UTF-8;

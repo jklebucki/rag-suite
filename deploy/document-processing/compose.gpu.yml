@@ -1,6 +1,9 @@
 services:
   docling:
-    image: quay.io/docling-project/docling-serve-cu128:v1.27.0
+    image: rag-suite/docling-serve-cu128:v1.27.0-ocr.1
+    build:
+      args:
+        DOCLING_BASE_IMAGE: quay.io/docling-project/docling-serve-cu128:v1.27.0
     environment:
       DOCLING_DEVICE: cuda
       DOCLING_SERVE_ENG_LOC_NUM_WORKERS: ${DOCLING_GPU_WORKERS:-1}

@@ -8,8 +8,10 @@ Ten rejestr opisuje minimalny zestaw modeli wymagany przez standardowy potok PDF
 | --- | --- | --- | --- | --- |
 | Analiza układu strony | [`docling-project/docling-layout-old`](https://huggingface.co/docling-project/docling-layout-old) | `b5b4bd59ad2b69aab715e9b1f1dfd74394c45fd4` | Apache-2.0 | Standardowy model układu `DOCLING_LAYOUT_V2` w `docling-slim 2.113.0`. |
 | Struktura tabel | [`docling-project/docling-models`](https://huggingface.co/docling-project/docling-models) | `2199320848bb9a8a519d22e4b528185a4f9a6f64` | Apache-2.0 oraz CDLA-Permissive-2.0 | TableFormer w trybie `accurate`; CDLA-Permissive-2.0 jest licencją permissive. |
+| Rozpoznawanie tekstu | [Tesseract `tessdata`](https://github.com/tesseract-ocr/tessdata) przez pakiety CentOS Stream 9 | `tesseract-langpack-*-4.1.0-3.el9` | Apache-2.0 | Jawny profil językowy; domyślnie `pol,eng`. Obraz zawiera zestaw języków wymieniony w instrukcji wdrożenia. |
+| Ratowanie tabel | RapidOCR dołączony do obrazu `docling-serve` | `rapidocr 3.9.1` | Apache-2.0 | Preset `auto` jest używany wyłącznie dla niekompletnej tabeli; nie zastępuje głównego tekstu. |
 
-Nie włączamy modeli do opisu obrazów, VLM, wzorów, kodu ani klasyfikacji obrazów. Nie jest używana zewnętrzna usługa OCR ani zewnętrzny model zdalny. Wywołanie API ustawia `do_ocr=true`, `force_ocr=false` dla pierwszej próby, języki `pl` i `en` oraz ponawia konwersję tylko wtedy, gdy wynik jest pusty, zbyt krótki lub zawiera ostrzeżenia.
+Nie włączamy modeli do opisu obrazów, VLM, wzorów, kodu ani klasyfikacji obrazów. Nie jest używana zewnętrzna usługa OCR ani zewnętrzny model zdalny. Wywołanie API ustawia `do_ocr=true`, `force_ocr=false` dla pierwszej próby oraz preset Tesseract z językami `pol` i `eng`. Konwersja jest ponawiana pełnostronicowo po wykryciu pustego, zbyt krótkiego, leksykalnie uszkodzonego lub ostrzegawczego wyniku. RapidOCR może uzupełnić wyłącznie tabelę o jakości poniżej progu.
 
 ## Reprodukowalność artefaktów
 

@@ -29,6 +29,22 @@ export OCR_API_KEY='wartosc-pobrana-z-magazynu-sekretow'
 
 Port `5080` powinien pozostawać dostępny wyłącznie z zaufanej sieci prywatnej. Jeżeli aplikacja kliencka działa poza nią, należy najpierw uzgodnić bezpieczny reverse proxy/VPN i reguły firewalla — nie należy wystawiać tego portu bezpośrednio do Internetu.
 
+## Profil językowy
+
+Produkcja jest domyślnie zoptymalizowana dla dokumentów polskich z możliwymi fragmentami angielskimi: `DOCLING_OCR_LANGUAGES=pol,eng`. Silnik Tesseract dostaje tę listę przed OCR, dzięki czemu zachowuje `ą`, `ć`, `ę`, `ł`, `ń`, `ó`, `ś`, `ź` i `ż`. Preset `auto` Doclinga nie jest używany dla głównego tekstu, ponieważ w obrazie `v1.27.0` wybiera RapidOCR i nie stosuje listy języków; może jedynie uzupełnić niekompletną tabelę.
+
+Publiczny endpoint nie przyjmuje obecnie języka per zadanie. Jeżeli osobna aplikacja przetwarza inny, znany profil dokumentów, administrator ustawia właściwe kody Tesseract w `.env` i odtwarza kontenery, np.:
+
+```dotenv
+# niemiecki + angielski
+DOCLING_OCR_LANGUAGES=deu,eng
+
+# ukraiński + polski
+DOCLING_OCR_LANGUAGES=ukr,pol
+```
+
+Dostępne w obrazie są: `ces`, `dan`, `deu`, `eng`, `fin`, `fra`, `hun`, `ita`, `nld`, `nor`, `pol`, `por`, `ron`, `rus`, `slk`, `spa`, `swe`, `tur` i `ukr`. Dla trwale wielojęzycznych kolejek lepiej uruchomić osobne instancje API z małymi profilami językowymi niż przekazywać wszystkie modele jednocześnie. Czysty skan nie daje wiarygodnej informacji o języku przed pierwszym OCR, więc nie należy deklarować pozornej autodetekcji.
+
 ## Przepływ asynchroniczny
 
 Przetwarzanie jest asynchroniczne. Aplikacja przesyła PDF, dostaje identyfikator zadania, cyklicznie sprawdza jego status, a po stanie `Ready` pobiera wynik.
