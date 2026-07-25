@@ -75,6 +75,10 @@ try
 Log.Information("Starting RAG Orchestrator API");
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile(
+    $"appsettings.{builder.Environment.EnvironmentName}.secrets.json",
+    optional: true,
+    reloadOnChange: false);
 
 // Route all ILogger<T> output through Serilog (console + rolling file).
 builder.Host.UseSerilog();
