@@ -34,4 +34,9 @@ if (( available_free_mib < minimum_free_mib )); then
   exit 1
 fi
 
-docker compose --env-file "${environment_file}" -f "${deployment_directory}/compose.yml" -f "${deployment_directory}/compose.gpu.yml" up --detach --build
+docker compose \
+  --project-name rag-document-processing \
+  --env-file "${environment_file}" \
+  -f "${deployment_directory}/compose.yml" \
+  -f "${deployment_directory}/compose.gpu.yml" \
+  up --detach --build
