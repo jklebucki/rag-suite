@@ -273,14 +273,23 @@ public class UserChatService : IUserChatService
 
         var documentsByUserMessage = persistedDocuments.ToLookup(document => document.UserMessageId);
         var requestedExportFormat = ChatDocumentRequestClassifier.GetRequestedExportFormat(request.Message);
-        var isCanonicalContentRequest = ChatDocumentRequestClassifier.RequestsCanonicalContent(request.Message);
+        var requestsDirectCanonicalResponse = ChatDocumentRequestClassifier.RequestsDirectCanonicalResponse(request.Message);
         var directResponseDocuments = currentDocuments.Length > 0 ? currentDocuments : persistedDocuments.ToArray();
+        var createsLlmDocumentArtifact = directResponseDocuments.Length > 0 &&
+                                         requestedExportFormat != null &&
+                                         !requestsDirectCanonicalResponse;
+        var userMessageForLlm = createsLlmDocumentArtifact
+            ? BuildDocumentTransformationMessage(
+                request.Message,
+                requestedExportFormat!.Value,
+                currentDocuments.Length == 0 ? directResponseDocuments : Array.Empty<ChatDocument>())
+            : request.Message;
 
         var llmSettings = await _globalSettingsService.GetLlmSettingsAsync();
 
         try
         {
-            if (directResponseDocuments.Length > 0 && (isCanonicalContentRequest || requestedExportFormat != null))
+            if (directResponseDocuments.Length > 0 && requestsDirectCanonicalResponse)
             {
                 return await CreateCanonicalDocumentResponseAsync(
                     directResponseDocuments,
@@ -343,11 +352,11 @@ public class UserChatService : IUserChatService
             if (llmSettings != null && llmSettings.IsOllama)
             {
                 // Inject documents into user message if document search is enabled and results found
-                string enhancedUserMessage = request.Message;
+                string enhancedUserMessage = userMessageForLlm;
                 if (request.UseDocumentSearch && searchResults.Results.Length > 0)
                 {
                     var documentsContext = _promptBuilder.BuildDocumentsContext(searchResults.Results, normalizedResponseLanguage);
-                    enhancedUserMessage = $"{documentsContext}\n\n{request.Message}";
+                    enhancedUserMessage = $"{documentsContext}\n\n{userMessageForLlm}";
 
                     _logger.LogDebug("Enhanced multilingual user message with {DocumentCount} documents, total length: {MessageLength}",
                         searchResults.Results.Length, enhancedUserMessage.Length);
@@ -356,7 +365,7 @@ public class UserChatService : IUserChatService
                 {
                     var promptContext = new PromptContext
                     {
-                        UserMessage = request.Message,
+                        UserMessage = userMessageForLlm,
                         SearchResults = Array.Empty<SearchResult>(),
                         ConversationHistory = Array.Empty<MessageContext>(),
                         ResponseLanguage = normalizedResponseLanguage,
@@ -405,8 +414,8 @@ public class UserChatService : IUserChatService
             else
             {
                 var userMessageForPrompt = !string.IsNullOrWhiteSpace(attachmentsContext)
-                    ? $"{attachmentsContext}\n\n{request.Message}"
-                    : request.Message;
+                    ? $"{attachmentsContext}\n\n{userMessageForLlm}"
+                    : userMessageForLlm;
 
                 // Fallback to Semantic Kernel for non-Ollama providers
                 var promptContext = new PromptContext
@@ -440,13 +449,34 @@ public class UserChatService : IUserChatService
             // Use cleaned response (without the title marker line) for saving
             aiResponseContent = cleanedResponse;
             var assistantMessageId = Guid.NewGuid().ToString();
-            var artifactResult = await _generatedArtifactService.ProcessAsync(
-                aiResponseContent,
-                userId,
-                sessionId,
-                assistantMessageId,
-                cancellationToken);
-            aiResponseContent = artifactResult.Response;
+            ArtifactGenerationResult artifactResult;
+            if (createsLlmDocumentArtifact)
+            {
+                var transformedDocumentMarkdown = ExtractTransformedDocumentMarkdown(aiResponseContent);
+                artifactResult = await _generatedArtifactService.CreateAsync(
+                    requestedExportFormat!.Value,
+                    ChatDocumentMarkdown.GetExportFileName(directResponseDocuments, requestedExportFormat.Value),
+                    transformedDocumentMarkdown,
+                    userId,
+                    sessionId,
+                    assistantMessageId,
+                    cancellationToken);
+                aiResponseContent = transformedDocumentMarkdown;
+                if (artifactResult.ArtifactCreated)
+                {
+                    aiResponseContent = $"{aiResponseContent.Trim()}\n\n{artifactResult.Response}";
+                }
+            }
+            else
+            {
+                artifactResult = await _generatedArtifactService.ProcessAsync(
+                    aiResponseContent,
+                    userId,
+                    sessionId,
+                    assistantMessageId,
+                    cancellationToken);
+                aiResponseContent = artifactResult.Response;
+            }
 
             if (!string.IsNullOrWhiteSpace(extractedTitle))
             {
@@ -668,6 +698,39 @@ public class UserChatService : IUserChatService
         }
 
         return metadata;
+    }
+
+    private static string BuildDocumentTransformationMessage(
+        string message,
+        GeneratedArtifactFormat format,
+        IEnumerable<ChatDocument> documents)
+    {
+        var documentContext = ChatDocumentMarkdown.AppendToMessage(string.Empty, documents);
+        var formatLabel = format == GeneratedArtifactFormat.Docx ? "DOCX" : "TXT";
+        var instruction = $"""
+            {message}
+
+            === SERVER DOCUMENT OUTPUT INSTRUCTION ===
+            Transform the canonical OCR document according to the user's request. Return only the complete transformed document in Markdown, without commentary, code fences, or generated_artifact tags. Preserve all relevant sections, headings, lists, and tables unless the user explicitly asks to change them. The server will save this exact Markdown as {formatLabel}.
+            === END SERVER DOCUMENT OUTPUT INSTRUCTION ===
+            """;
+
+        return string.IsNullOrWhiteSpace(documentContext)
+            ? instruction
+            : $"{documentContext}\n\n{instruction}";
+    }
+
+    private static string ExtractTransformedDocumentMarkdown(string response)
+    {
+        try
+        {
+            var artifact = GeneratedArtifactBlockParser.Extract(response, out _);
+            return artifact?.Markdown ?? response.Trim();
+        }
+        catch (DocumentProcessingException)
+        {
+            return response.Trim();
+        }
     }
 
     private static object[] BuildDocumentMetadata(IEnumerable<ChatDocument> documents)

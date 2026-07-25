@@ -6,6 +6,35 @@ namespace RAG.Orchestrator.Api.Features.Chat.Documents;
 
 public static class ChatDocumentRequestClassifier
 {
+    private static readonly string[] TransformationPhrases =
+    [
+        "popraw",
+        "skoryguj",
+        "korekt",
+        "edytuj",
+        "przeredaguj",
+        "zredaguj",
+        "przetlumacz",
+        "tlumacz",
+        "podsumuj",
+        "stresc",
+        "zmien",
+        "zastap",
+        "usun",
+        "dodaj",
+        "correct",
+        "proofread",
+        "edit",
+        "rewrite",
+        "translate",
+        "summarize",
+        "summarise",
+        "change",
+        "replace",
+        "remove",
+        "add"
+    ];
+
     private static readonly string[] CanonicalContentPhrases =
     [
         "pokaż zawartość",
@@ -55,6 +84,13 @@ public static class ChatDocumentRequestClassifier
                normalized.Contains("text file", StringComparison.Ordinal)
             ? GeneratedArtifactFormat.Txt
             : null;
+    }
+
+    public static bool RequestsDirectCanonicalResponse(string message)
+    {
+        var normalized = Normalize(message);
+        return !TransformationPhrases.Any(phrase => normalized.Contains(phrase, StringComparison.Ordinal)) &&
+               (RequestsCanonicalContent(message) || GetRequestedExportFormat(message) != null);
     }
 
     private static string Normalize(string value)

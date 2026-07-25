@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using Moq;
 using RAG.Abstractions.Search;
+using RAG.DocumentProcessing.Abstractions;
 using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Features.Chat;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
@@ -77,6 +78,57 @@ public class UserChatServiceDocumentTests : IDisposable
         Assert.Equal(response.UserMessageId, document.UserMessageId);
         Assert.DoesNotContain(llmService.Invocations, invocation => invocation.Method.Name == nameof(ILlmService.ChatWithHistoryAsync));
         attachments.Verify(service => service.CommitMessageAttachmentsAsync(UserId, SessionId, It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task SendUserMultilingualMessageAsync_WhenUserCorrectsOcrDocumentAndRequestsDocx_UsesLlmResultForArtifact()
+    {
+        const string ocrMarkdown = "# Contract\n\nTeh custmer has 13 seats.";
+        const string correctedMarkdown = "# Contract\n\nThe customer has 13 seats.";
+        const string llmResponse = "<generated_artifact format=\"docx\" filename=\"corrected-contract.docx\"># Contract\n\nThe customer has 13 seats.</generated_artifact>";
+        const string downloadLink = "[Download corrected-contract.docx](/api/user-chat/artifacts/artifact-1/download)";
+        var attachments = CreateAttachmentService(CreatePreparedAttachments(ocrMarkdown));
+        var llmService = new Mock<ILlmService>(MockBehavior.Strict);
+        llmService
+            .Setup(service => service.ChatWithHistoryAsync(
+                It.IsAny<IEnumerable<LlmChatMessage>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<LlmUserContext?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(llmResponse);
+        var artifactService = new Mock<IGeneratedArtifactService>(MockBehavior.Strict);
+        artifactService
+            .Setup(service => service.CreateAsync(
+                GeneratedArtifactFormat.Docx,
+                "contract.docx",
+                correctedMarkdown,
+                UserId,
+                SessionId,
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ArtifactGenerationResult(downloadLink, true));
+        var service = CreateService(attachments.Object, llmService.Object, artifactService.Object, isOllama: true);
+
+        var response = await service.SendUserMultilingualMessageAsync(
+            UserId,
+            SessionId,
+            new MultilingualChatRequest
+            {
+                Message = "Popraw tekst wynikający z załącznika, bo ma błędy językowe, i zapisz do DOCX.",
+                Language = "pl",
+                ResponseLanguage = "pl",
+                UseDocumentSearch = false,
+                AttachmentIds = ["draft-1"]
+            });
+
+        Assert.Contains(correctedMarkdown, response.Response, StringComparison.Ordinal);
+        Assert.Contains(downloadLink, response.Response, StringComparison.Ordinal);
+        Assert.DoesNotContain("<generated_artifact", response.Response, StringComparison.OrdinalIgnoreCase);
+        var invocation = Assert.Single(llmService.Invocations);
+        Assert.Contains(ocrMarkdown, Assert.IsType<string>(invocation.Arguments[1]), StringComparison.Ordinal);
+        Assert.Contains("Return only the complete transformed document in Markdown", Assert.IsType<string>(invocation.Arguments[1]), StringComparison.Ordinal);
+        artifactService.VerifyAll();
     }
 
     [Fact]
@@ -157,7 +209,9 @@ public class UserChatServiceDocumentTests : IDisposable
         settingsService.Setup(service => service.GetLlmSettingsAsync()).ReturnsAsync(new LlmSettings { IsOllama = isOllama });
 
         var promptBuilder = new Mock<IPromptBuilder>();
-        promptBuilder.Setup(service => service.BuildMultilingualContextualPrompt(It.IsAny<PromptContext>())).Returns("prompt");
+        promptBuilder
+            .Setup(service => service.BuildMultilingualContextualPrompt(It.IsAny<PromptContext>()))
+            .Returns<PromptContext>(context => context.UserMessage);
 
         return new UserChatService(
             _chatDbContext,

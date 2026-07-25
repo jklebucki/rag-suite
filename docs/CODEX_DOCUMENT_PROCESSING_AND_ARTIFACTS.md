@@ -163,6 +163,14 @@ Wymagania:
 - po zakończeniu licz tokeny z gotowego Markdown i dopiero wtedy sprawdzaj limit kontekstu;
 - do istniejącego `BuildAttachmentsPromptBlock()` przekazuj gotowy Markdown.
 
+### OCR: eksport wierny a transformacja przez LLM
+
+- Kanoniczny Markdown OCR zapisuj wraz z wiadomością użytkownika i zawsze przekazuj go do modelu jako dane załącznika.
+- Polecenia typu „pokaż pełną treść” albo „zwróć wynik w DOCX” obsługuj bez modelu: eksport ma być wierną kopią OCR.
+- Jeżeli polecenie zawiera transformację (np. korektę językową, tłumaczenie, redakcję lub streszczenie) oraz format `.txt` albo `.docx`, nie omijaj modelu. Model otrzymuje pełny Markdown OCR i zwraca kompletny przetworzony dokument w Markdown.
+- Backend zapisuje dokładnie ten przetworzony Markdown jako artefakt w żądanym formacie, wyświetla go w odpowiedzi czatu i zachowuje w historii rozmowy do kolejnych poleceń.
+- Model może nadal zwrócić standardowy blok `<generated_artifact>` wymagany przez globalny prompt; dla transformacji OCR backend pobiera z niego wyłącznie Markdown i sam tworzy jeden artefakt w formacie wskazanym przez użytkownika.
+
 ## Generowanie TXT/DOCX przez LLM
 
 Dodaj do kontraktu odpowiedzi LLM opcjonalny blok:

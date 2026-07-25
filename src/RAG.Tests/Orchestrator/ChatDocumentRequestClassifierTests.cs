@@ -27,4 +27,14 @@ public class ChatDocumentRequestClassifierTests
     {
         Assert.Null(ChatDocumentRequestClassifier.GetRequestedExportFormat("Explain this word from the document."));
     }
+
+    [Theory]
+    [InlineData("Zwróć wynik w DOCX", true)]
+    [InlineData("Pokaż pełną treść dokumentu", true)]
+    [InlineData("Popraw tekst wynikający z załącznika, bo ma błędy językowe, i zapisz do DOCX.", false)]
+    [InlineData("Translate the document and save it as DOCX.", false)]
+    public void RequestsDirectCanonicalResponse_ReturnsExpectedValue(string message, bool expected)
+    {
+        Assert.Equal(expected, ChatDocumentRequestClassifier.RequestsDirectCanonicalResponse(message));
+    }
 }
