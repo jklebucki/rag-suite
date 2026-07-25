@@ -59,7 +59,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
           {children}
         </code>
       ) : (
-        <div className="my-3 rounded-md overflow-hidden">
+        <div className="my-3 max-w-full overflow-x-auto rounded-md" data-testid="markdown-code-block">
           {language && (
             <div
               className={`text-xs px-3 py-1.5 font-medium flex items-center justify-between ${
@@ -108,29 +108,33 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     // Links
     a: ({ node: _node, children, ...props }) => {
       const isArtifactDownload = !isUserMessage && /^\/api\/user-chat\/artifacts\/[^/]+\/download$/.test(props.href ?? '')
+      const linkClassName = `underline hover:no-underline ${
+        isUserMessage ? 'text-blue-100' : 'text-blue-600 dark:text-blue-300'
+      }`
+
+      if (isArtifactDownload) {
+        return (
+          <button
+            type="button"
+            className={linkClassName}
+            onClick={() => {
+              void downloadArtifact(props.href!)
+            }}
+          >
+            {children || props.href}
+          </button>
+        )
+      }
+
       return (
         <a
-                className={`underline hover:no-underline ${
-                  isUserMessage ? 'text-blue-100' : 'text-blue-600 dark:text-blue-300'
-                }`}
-          target={isArtifactDownload ? undefined : '_blank'}
-          rel={isArtifactDownload ? undefined : 'noopener noreferrer'}
-          onClick={isArtifactDownload ? async (event) => {
-            event.preventDefault()
-            const response = await apiHttpClient.get(props.href!, { responseType: 'blob' })
-            const objectUrl = URL.createObjectURL(response.data)
-            const anchor = document.createElement('a')
-            anchor.href = objectUrl
-            anchor.download = getArtifactFileName(response.headers['content-disposition'])
-            document.body.appendChild(anchor)
-            anchor.click()
-            anchor.remove()
-            URL.revokeObjectURL(objectUrl)
-          } : undefined}
-        {...props}
-      >
-        {children || props.href}
-      </a>
+          className={linkClassName}
+          target="_blank"
+          rel="noopener noreferrer"
+          {...props}
+        >
+          {children || props.href}
+        </a>
       )
     },
 
@@ -148,7 +152,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 
     // Tables
     table: ({ node: _node, ...props }) => (
-      <div className="overflow-x-auto my-3">
+      <div className="my-3 max-w-full overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-300 dark:border-slate-700" {...props} />
       </div>
     ),
@@ -176,7 +180,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 
   return (
     <div
-      className={`prose prose-sm md:prose-base max-w-none transition-colors ${
+      className={`prose prose-sm md:prose-base min-w-0 max-w-full transition-colors ${
         isUserMessage
           ? 'prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-blue-100 prose-pre:bg-blue-600/20'
           : 'prose-headings:text-gray-900 prose-p:text-gray-700 prose-code:text-blue-600 prose-pre:bg-gray-800 dark:prose-invert dark:prose-headings:text-gray-100 dark:prose-p:text-gray-200 dark:prose-code:text-blue-300 dark:prose-pre:bg-slate-900'
@@ -192,4 +196,20 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 function getArtifactFileName(contentDisposition: string | undefined): string {
   const match = /filename="?([^";]+)"?/i.exec(contentDisposition ?? '')
   return match?.[1] ?? 'artifact'
+}
+
+function toApiRelativePath(path: string): string {
+  return path.startsWith('/api/') ? path.slice('/api'.length) : path
+}
+
+async function downloadArtifact(href: string): Promise<void> {
+  const response = await apiHttpClient.get(toApiRelativePath(href), { responseType: 'blob' })
+  const objectUrl = URL.createObjectURL(response.data)
+  const anchor = document.createElement('a')
+  anchor.href = objectUrl
+  anchor.download = getArtifactFileName(response.headers['content-disposition'])
+  document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(objectUrl)
 }

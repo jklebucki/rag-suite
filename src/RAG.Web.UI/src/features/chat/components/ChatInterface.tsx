@@ -75,11 +75,11 @@ export function ChatInterface() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0 bg-gray-50 dark:bg-slate-950 transition-colors">
+      <div className="flex-1 flex min-h-0 min-w-0 flex-col bg-gray-50 dark:bg-slate-950 transition-colors">
         {currentSession ? (
           <>
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 scrollbar-hide">
+            <div className="flex-1 min-w-0 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 scrollbar-hide">
               {currentSession.messages.map((msg: ChatMessage, index: number) => (
                 <MessageItem
                   key={msg.id}
