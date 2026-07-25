@@ -36,7 +36,7 @@ Wymagany jest Docker Engine z Docker Compose v2. Profil w `.env.example` został
 curl -H "X-Api-Key: $DOCUMENT_PROCESSING_API_KEY" http://localhost:5080/health
 ```
 
-Pierwsze uruchomienie pobiera modele Docling do wolumenu `docling-artifacts`; następne starty wykorzystują cache. Dla aktualizacji przypnij nowy tag oraz digest po jego zweryfikowaniu w rejestrze, a następnie odtwórz kontenery.
+Pierwsze uruchomienie pobiera modele Docling do wolumenu `docling-artifacts`, zamontowanego pod domyślną ścieżką cache obrazu `/opt/app-root/src/.cache/docling/models`; następne starty wykorzystują cache. Nie ustawiaj `DOCLING_SERVE_ARTIFACTS_PATH` dla pustego wolumenu — ta zmienna jest przeznaczona dla uprzednio przygotowanych artefaktów. Dla aktualizacji przypnij nowy tag oraz digest po jego zweryfikowaniu w rejestrze, a następnie odtwórz kontenery.
 
 Źródła, rewizje i licencje modeli dopuszczonych w tej konfiguracji są zapisane w [MODEL_PROVENANCE.md](MODEL_PROVENANCE.md). Przed wdrożeniem o podwyższonych wymaganiach powtarzalności przygotuj i zachowaj obraz wolumenu `docling-artifacts` zgodny z tym rejestrem; świeży wolumen pobiera artefakty przy pierwszym starcie.
 

@@ -13,7 +13,7 @@ Nie włączamy modeli do opisu obrazów, VLM, wzorów, kodu ani klasyfikacji obr
 
 ## Reprodukowalność artefaktów
 
-Docling pozwala wskazać lokalny katalog modeli przez `DOCLING_SERVE_ARTIFACTS_PATH`; Compose montuje go jako wolumen `docling-artifacts`. Wersja `docling-slim 2.113.0` deklaruje domyślną nazwę rewizji modeli jako `main`, dlatego sam tag kontenera nie zastępuje blokady wag.
+Docling pozwala wskazać lokalny katalog modeli przez `DOCLING_SERVE_ARTIFACTS_PATH`; zmienna jest przeznaczona dla wcześniej przygotowanego katalogu artefaktów. Dla świeżego wdrożenia Compose montuje wolumen `docling-artifacts` w domyślnej ścieżce cache obrazu `/opt/app-root/src/.cache/docling/models` i nie ustawia tej zmiennej, dzięki czemu Docling pobiera brakujące modele. Wersja `docling-slim 2.113.0` deklaruje domyślną nazwę rewizji modeli jako `main`, dlatego sam tag kontenera nie zastępuje blokady wag.
 
 W środowisku produkcyjnym należy jednorazowo przygotować artefakty z powyższych rewizji, zweryfikować ich sumy kontrolne, zachować immutowalną kopię wolumenu `docling-artifacts` i montować ją tylko do odczytu. Wdrożenie z nowym, pustym wolumenem jest dozwolone dla środowisk rozwojowych, lecz pobiera modele podczas pierwszego startu i wymaga następnie utrwalenia tej kopii. To zapewnia audytowalność bez wymuszania nieudokumentowanych zmiennych środowiskowych Docling.
 

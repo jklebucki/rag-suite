@@ -8,7 +8,6 @@ services:
       DOCLING_SERVE_MAX_NUM_PAGES: ${DOCLING_MAX_PAGE_COUNT:-100}
       DOCLING_SERVE_ENG_LOC_NUM_WORKERS: ${DOCLING_CPU_WORKERS:-2}
       DOCLING_SERVE_ENG_LOC_SHARE_MODELS: "true"
-      DOCLING_SERVE_ARTIFACTS_PATH: /opt/docling/artifacts
       DOCLING_DEVICE: cpu
       DOCLING_NUM_THREADS: ${DOCLING_CPU_THREADS:-4}
       UVICORN_HOST: 0.0.0.0
@@ -17,7 +16,7 @@ services:
     mem_limit: ${DOCLING_MEMORY_LIMIT:-10g}
     shm_size: ${DOCLING_SHM_SIZE:-2g}
     volumes:
-      - docling-artifacts:/opt/docling/artifacts
+      - docling-artifacts:/opt/app-root/src/.cache/docling/models
     networks:
       - document-processing
 
