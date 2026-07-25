@@ -1,7 +1,11 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using RAG.Abstractions.Common.Api;
+using RAG.DocumentProcessing.Abstractions;
 using RAG.Orchestrator.Api.Common.Api;
 using RAG.Orchestrator.Api.Features.Chat.Attachments;
+using RAG.Orchestrator.Api.Features.Chat.Artifacts;
+using RAG.Orchestrator.Api.Data;
 using RAG.Orchestrator.Api.Models;
 using System.Security.Claims;
 
@@ -128,6 +132,78 @@ public static class UserChatEndpoints
         .WithSummary("Get chat session context usage")
         .WithDescription("Returns session context usage and temporary draft attachments for the authenticated user.");
 
+        group.MapGet("/sessions/{sessionId}/documents/{documentId}/markdown", async (
+            string sessionId,
+            string documentId,
+            ClaimsPrincipal user,
+            ChatDbContext chatDbContext,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var document = await GetAuthorizedDocumentAsync(
+                chatDbContext,
+                userId,
+                sessionId,
+                documentId,
+                cancellationToken);
+            return document == null
+                ? Results.NotFound()
+                : Results.Text(document.Markdown, "text/markdown; charset=utf-8");
+        })
+        .WithName("GetUserChatDocumentMarkdown")
+        .WithSummary("Get canonical Markdown generated for a chat document")
+        .WithDescription("Returns the immutable OCR Markdown for an attached document owned by the current user.");
+
+        group.MapGet("/sessions/{sessionId}/documents/{documentId}/export/{format}", async (
+            string sessionId,
+            string documentId,
+            string format,
+            ClaimsPrincipal user,
+            ChatDbContext chatDbContext,
+            IArtifactContentRenderer renderer,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var artifactFormat = format.ToLowerInvariant() switch
+            {
+                "txt" => GeneratedArtifactFormat.Txt,
+                "docx" => GeneratedArtifactFormat.Docx,
+                _ => (GeneratedArtifactFormat?)null
+            };
+            if (artifactFormat == null)
+            {
+                return Results.BadRequest(new ApiResponse<object>(default!, false, "Unsupported document export format.", new[] { "UNSUPPORTED_EXPORT_FORMAT" }));
+            }
+
+            var document = await GetAuthorizedDocumentAsync(
+                chatDbContext,
+                userId,
+                sessionId,
+                documentId,
+                cancellationToken);
+            if (document == null)
+            {
+                return Results.NotFound();
+            }
+
+            var fileName = ArtifactFileNameSanitizer.Sanitize(document.FileName, artifactFormat.Value);
+            var content = renderer.Render(artifactFormat.Value, document.Markdown);
+            return Results.File(content, renderer.GetContentType(artifactFormat.Value), fileName);
+        })
+        .WithName("ExportUserChatDocument")
+        .WithSummary("Export canonical OCR Markdown as TXT or DOCX")
+        .WithDescription("Creates a deterministic export directly from the stored OCR Markdown without using the chat model.");
+
         group.MapPost("/sessions/{sessionId}/attachments", async (
             string sessionId,
             HttpRequest httpRequest,
@@ -208,5 +284,21 @@ public static class UserChatEndpoints
             "SESSION_CONTEXT_LIMIT_EXCEEDED" or "ATTACHMENT_CONTEXT_LIMIT_EXCEEDED" or "ATTACHMENT_NOT_READY" => Results.Json(response, statusCode: StatusCodes.Status409Conflict),
             _ => Results.BadRequest(response)
         };
+    }
+
+    private static Task<ChatDocument?> GetAuthorizedDocumentAsync(
+        ChatDbContext chatDbContext,
+        string userId,
+        string sessionId,
+        string documentId,
+        CancellationToken cancellationToken)
+    {
+        return chatDbContext.ChatDocuments
+            .AsNoTracking()
+            .SingleOrDefaultAsync(
+                document => document.Id == documentId &&
+                            document.UserMessage.SessionId == sessionId &&
+                            document.UserMessage.Session.UserId == userId,
+                cancellationToken);
     }
 }

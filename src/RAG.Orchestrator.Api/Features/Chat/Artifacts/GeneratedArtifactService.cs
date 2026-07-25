@@ -42,14 +42,36 @@ public sealed class GeneratedArtifactService : IGeneratedArtifactService
             return new ArtifactGenerationResult(response, false);
         }
 
+        var artifactResult = await CreateAsync(
+            block.Format,
+            block.FileName,
+            block.Markdown,
+            userId,
+            sessionId,
+            assistantMessageId,
+            cancellationToken);
+        return artifactResult.ArtifactCreated
+            ? artifactResult with { Response = $"{cleanResponse}\n\n{artifactResult.Response}".Trim() }
+            : artifactResult with { Response = AppendFailureNotice(cleanResponse) };
+    }
+
+    public async Task<ArtifactGenerationResult> CreateAsync(
+        GeneratedArtifactFormat format,
+        string fileName,
+        string markdown,
+        string userId,
+        string sessionId,
+        string assistantMessageId,
+        CancellationToken cancellationToken)
+    {
         try
         {
-            var fileName = ArtifactFileNameSanitizer.Sanitize(block.FileName, block.Format);
-            var content = _renderer.Render(block.Format, block.Markdown);
+            var sanitizedFileName = ArtifactFileNameSanitizer.Sanitize(fileName, format);
+            var content = _renderer.Render(format, markdown);
             var artifact = new GeneratedArtifact(
-                block.Format,
-                fileName,
-                _renderer.GetContentType(block.Format),
+                format,
+                sanitizedFileName,
+                _renderer.GetContentType(format),
                 content,
                 userId,
                 sessionId,
@@ -58,12 +80,12 @@ public sealed class GeneratedArtifactService : IGeneratedArtifactService
             var expiry = ToWarsaw(stored.ExpiresAt);
             var link = $"[Pobierz {stored.FileName}](/api/user-chat/artifacts/{stored.Id}/download)";
             var expiresAt = $"_Link ważny do: {expiry:yyyy-MM-dd HH:mm} Europe/Warsaw._";
-            return new ArtifactGenerationResult($"{cleanResponse}\n\n{link}\n\n{expiresAt}".Trim(), true);
+            return new ArtifactGenerationResult($"{link}\n\n{expiresAt}", true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to save generated artifact for user {UserId}", userId);
-            return new ArtifactGenerationResult(AppendFailureNotice(cleanResponse), false);
+            return new ArtifactGenerationResult(string.Empty, false);
         }
     }
 
