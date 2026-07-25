@@ -5,6 +5,7 @@ import type {
   ChatRequest,
   ChatMessage,
   ChatAttachmentUploadResponse,
+  ChatDocumentSummary,
   ChatContextUsage,
   MultilingualChatRequest,
   MultilingualChatResponse,
@@ -112,6 +113,33 @@ export async function deleteChatAttachment(sessionId: string, attachmentId: stri
   await apiHttpClient.delete(`/user-chat/sessions/${sessionId}/attachments/${attachmentId}`)
 }
 
+export async function getChatDocumentMarkdown(
+  sessionId: string,
+  documentId: string,
+  options: RequestOptions = {},
+): Promise<string> {
+  const response = await apiHttpClient.get<string>(
+    `/user-chat/sessions/${sessionId}/documents/${documentId}/markdown`,
+    {
+      signal: options.signal,
+      responseType: 'text',
+    },
+  )
+  return response.data
+}
+
+export async function downloadChatDocumentExport(
+  sessionId: string,
+  document: ChatDocumentSummary,
+  format: 'txt' | 'docx',
+): Promise<Blob> {
+  const response = await apiHttpClient.get<Blob>(
+    `/user-chat/sessions/${sessionId}/documents/${document.id}/export/${format}`,
+    { responseType: 'blob' },
+  )
+  return response.data
+}
+
 const chatService = {
   sendMessage,
   sendMultilingualMessage,
@@ -122,6 +150,8 @@ const chatService = {
   getChatContext,
   uploadChatAttachments,
   deleteChatAttachment,
+  getChatDocumentMarkdown,
+  downloadChatDocumentExport,
 }
 
 export default chatService

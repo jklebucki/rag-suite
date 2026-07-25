@@ -29,7 +29,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
     h6: ({ node: _node, ...props }) => <h6 className="text-xs md:text-sm font-semibold mt-2 mb-1" {...props} />,
 
     // Paragraphs
-    p: ({ node: _node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
+    p: ({ node: _node, ...props }) => <p className="mb-2 break-words last:mb-0 leading-relaxed" {...props} />,
 
     // Lists
     ul: ({ node: _node, ...props }) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
@@ -152,19 +152,20 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 
     // Tables
     table: ({ node: _node, ...props }) => (
-      <div className="my-3 max-w-full overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300 dark:border-slate-700" {...props} />
+      <div className="my-4 max-w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950" data-testid="markdown-table-container">
+        <table className="min-w-full w-max border-collapse text-left text-sm leading-6" {...props} />
       </div>
     ),
+    thead: ({ node: _node, ...props }) => <thead className="border-b border-gray-300 dark:border-slate-700" {...props} />,
     th: ({ node: _node, ...props }) => (
       <th
-        className={`border border-gray-300 dark:border-slate-700 px-3 py-2 text-left font-semibold ${
+        className={`whitespace-normal border-b border-r border-gray-200 px-3 py-2.5 align-top text-left font-semibold last:border-r-0 dark:border-slate-700 ${
           isUserMessage ? 'bg-blue-600/20' : 'bg-gray-100 dark:bg-slate-800'
         }`}
         {...props}
       />
     ),
-    td: ({ node: _node, ...props }) => <td className="border border-gray-300 dark:border-slate-800 px-3 py-2" {...props} />,
+    td: ({ node: _node, ...props }) => <td className="max-w-[28rem] break-words whitespace-normal border-b border-r border-gray-200 px-3 py-2 align-top last:border-r-0 last:border-b-0 dark:border-slate-800" {...props} />,
 
     // Horizontal rule
     hr: ({ node: _node, ...props }) => (
@@ -180,7 +181,7 @@ export function MarkdownMessage({ content, isUserMessage = false }: MarkdownMess
 
   return (
     <div
-      className={`prose prose-sm md:prose-base min-w-0 max-w-full transition-colors ${
+      className={`prose prose-sm md:prose-base min-w-0 max-w-full break-words transition-colors ${
         isUserMessage
           ? 'prose-invert prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-blue-100 prose-pre:bg-blue-600/20'
           : 'prose-headings:text-gray-900 prose-p:text-gray-700 prose-code:text-blue-600 prose-pre:bg-gray-800 dark:prose-invert dark:prose-headings:text-gray-100 dark:prose-p:text-gray-200 dark:prose-code:text-blue-300 dark:prose-pre:bg-slate-900'

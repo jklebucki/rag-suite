@@ -41,6 +41,7 @@ describe('MessageItem', () => {
 
   const defaultProps = {
     message: mockMessage,
+    sessionId: 'session-1',
     currentLanguage: 'en' as LanguageCode,
     isLastMessage: false,
   }
@@ -136,4 +137,3 @@ describe('MessageItem', () => {
     expect(screen.getByText('Test message')).toBeInTheDocument()
   })
 })
-
