@@ -356,6 +356,11 @@ export interface TranslationKeys {
   'settings.user.filters.clear': string;
   'settings.user.filters.days': string;
   'settings.user.summary': string;
+  'settings.user.pagination.rows_per_page': string;
+  'settings.user.pagination.results': string;
+  'settings.user.pagination.previous': string;
+  'settings.user.pagination.next': string;
+  'settings.user.pagination.page': string;
   'settings.user.loading': string;
   'settings.user.error.loading': string;
   'settings.user.table.user': string;

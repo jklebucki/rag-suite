@@ -1,7 +1,7 @@
 // All code comments must be written in English, regardless of the conversation language.
 
-import React, { useState } from 'react'
-import { User, Shield } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { ChevronLeft, ChevronRight, User, Shield } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authService } from '@/features/auth/services/auth.service'
 import type { User as UserType } from '@/features/auth/types/auth'
@@ -26,6 +26,8 @@ export function UserSettings() {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false)
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [pageSize, setPageSize] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Fetch users
   const { data: users = [], isLoading, error: fetchError } = useQuery({
@@ -49,6 +51,21 @@ export function UserSettings() {
     clearFilters,
     applyDatePreset
   } = useUserFilters(users)
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize))
+  const pageStart = (currentPage - 1) * pageSize
+  const paginatedUsers = useMemo(
+    () => filteredUsers.slice(pageStart, pageStart + pageSize),
+    [filteredUsers, pageSize, pageStart]
+  )
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filters, pageSize])
+
+  useEffect(() => {
+    setCurrentPage(page => Math.min(page, totalPages))
+  }, [totalPages])
 
   // Assign role mutation
   const assignRoleMutation = useMutation({
@@ -217,10 +234,10 @@ export function UserSettings() {
         )}
 
         {/* Results Summary */}
-        <div className="px-6 py-3 surface-muted border-b border-gray-200 dark:border-slate-700">
+        <div className="px-4 py-2 surface-muted border-b border-gray-200 dark:border-slate-700">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             {t('settings.user.summary', {
-              current: filteredUsers.length.toString(),
+              current: paginatedUsers.length.toString(),
               total: users.length.toString()
             })}
           </p>
@@ -240,25 +257,25 @@ export function UserSettings() {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
               <thead className="bg-gray-50 dark:bg-slate-800/70">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {t('settings.user.table.user')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {t('settings.user.table.email')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {t('settings.user.table.roles')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {t('settings.user.table.created')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {t('settings.user.table.actions')}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-800">
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <UserTableRow
                     key={user.id || user.email || Math.random()}
                     user={user}
@@ -275,6 +292,53 @@ export function UserSettings() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!isLoading && !fetchError && filteredUsers.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 px-4 py-2 dark:border-slate-700">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              {t('settings.user.pagination.rows_per_page')}
+              <select
+                value={pageSize}
+                onChange={(event) => setPageSize(Number(event.target.value))}
+                className="form-input h-8 py-0 text-sm"
+              >
+                {[10, 20, 50].map(size => <option key={size} value={size}>{size}</option>)}
+              </select>
+            </label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t('settings.user.pagination.results', {
+                  from: (pageStart + 1).toString(),
+                  to: Math.min(pageStart + pageSize, filteredUsers.length).toString(),
+                  total: filteredUsers.length.toString()
+                })}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage(page => page - 1)}
+                disabled={currentPage === 1}
+                aria-label={t('settings.user.pagination.previous')}
+                title={t('settings.user.pagination.previous')}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-gray-300 dark:hover:bg-slate-800"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="min-w-12 text-center text-sm text-gray-700 dark:text-gray-300">
+                {t('settings.user.pagination.page', { current: currentPage.toString(), total: totalPages.toString() })}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage(page => page + 1)}
+                disabled={currentPage === totalPages}
+                aria-label={t('settings.user.pagination.next')}
+                title={t('settings.user.pagination.next')}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-gray-300 dark:hover:bg-slate-800"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>
