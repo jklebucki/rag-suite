@@ -70,6 +70,11 @@ vi.mock('@/features/auth/hooks/useRegisterValidation', () => ({
     requireUppercase: true,
     requireNonAlphanumeric: false,
   }),
+  useUserNameRequirements: () => [
+    'Between 3 and 50 characters',
+    'Only letters (a-z), digits (0-9) and -._@+',
+    'No spaces and no accented characters',
+  ],
 }))
 
 const renderRegisterForm = () => {

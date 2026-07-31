@@ -1,4 +1,7 @@
 import { useConfiguration, usePasswordValidation } from '@/shared/contexts/ConfigurationContext'
+import { useI18n } from '@/shared/contexts/I18nContext'
+import type { TranslationKeys } from '@/shared/types/i18n'
+import { ALLOWED_USER_NAME_CHARACTERS, validateUserNameCharacters } from '@/utils/usernameSuggestion'
 
 interface RegisterFormData {
   firstName: string
@@ -29,107 +32,119 @@ export interface ValidationRule<TValue> {
 export function useRegisterValidation() {
   const { configuration } = useConfiguration()
   const { validatePassword } = usePasswordValidation()
+  const { t } = useI18n()
 
   if (!configuration) {
     return null
   }
 
-  const { userFieldRequirements, passwordRequirements } = configuration
+  const { userFieldRequirements } = configuration
+
+  const firstNameMaxLength = userFieldRequirements.firstName.maxLength || 100
+  const lastNameMaxLength = userFieldRequirements.lastName.maxLength || 100
+  const userNameMinLength = userFieldRequirements.userName.minLength || 3
+  const userNameMaxLength = userFieldRequirements.userName.maxLength || 50
+  const emailMaxLength = userFieldRequirements.email.maxLength || 256
 
   const validationRules: { [K in keyof RegisterFormData]: ValidationRule<RegisterFormData[K]> } = {
     firstName: {
-      required: 'First name is required',
+      required: t('auth.validation.first_name_required'),
       maxLength: {
-        value: userFieldRequirements.firstName.maxLength || 100,
-        message: `First name cannot exceed ${userFieldRequirements.firstName.maxLength || 100} characters`,
+        value: firstNameMaxLength,
+        message: t('auth.validation.first_name_max_length', { max: String(firstNameMaxLength) }),
       },
       validate: {
         noWhitespace: (value: string, _formValues: RegisterFormData) =>
-          value.trim().length > 0 || 'First name cannot be only whitespace',
+          value.trim().length > 0 || t('auth.validation.first_name_whitespace'),
       },
     },
 
     lastName: {
-      required: 'Last name is required',
+      required: t('auth.validation.last_name_required'),
       maxLength: {
-        value: userFieldRequirements.lastName.maxLength || 100,
-        message: `Last name cannot exceed ${userFieldRequirements.lastName.maxLength || 100} characters`,
+        value: lastNameMaxLength,
+        message: t('auth.validation.last_name_max_length', { max: String(lastNameMaxLength) }),
       },
       validate: {
         noWhitespace: (value: string, _formValues: RegisterFormData) =>
-          value.trim().length > 0 || 'Last name cannot be only whitespace',
+          value.trim().length > 0 || t('auth.validation.last_name_whitespace'),
       },
     },
 
     userName: {
-      required: 'Username is required',
+      required: t('auth.validation.username_required'),
       minLength: {
-        value: userFieldRequirements.userName.minLength || 3,
-        message: `Username must be at least ${userFieldRequirements.userName.minLength || 3} characters`,
+        value: userNameMinLength,
+        message: t('auth.validation.username_min_length', { min: String(userNameMinLength) }),
       },
       maxLength: {
-        value: userFieldRequirements.userName.maxLength || 50,
-        message: `Username cannot exceed ${userFieldRequirements.userName.maxLength || 50} characters`,
+        value: userNameMaxLength,
+        message: t('auth.validation.username_max_length', { max: String(userNameMaxLength) }),
       },
       validate: {
         noWhitespace: (value: string, _formValues: RegisterFormData) =>
-          value.trim().length > 0 || 'Username cannot be only whitespace',
+          value.trim().length > 0 || t('auth.validation.username_whitespace'),
+        // Mirrors ASP.NET Identity's AllowedUserNameCharacters, which otherwise
+        // rejects the account server-side with an opaque 400.
+        allowedCharacters: (value: string, _formValues: RegisterFormData) => {
+          const result = validateUserNameCharacters(value)
+          if (result.isValid) return true
+
+          // Invisible characters (most often a space) need a readable label.
+          const invalid = result.invalidCharacters
+            .map((char) => (char === ' ' ? t('auth.validation.username_char_space') : `"${char}"`))
+            .join(', ')
+
+          return invalid.length > 0
+            ? t('auth.validation.username_invalid_chars_found', {
+                allowed: ALLOWED_USER_NAME_CHARACTERS,
+                invalid,
+              })
+            : t('auth.validation.username_invalid_chars', { allowed: ALLOWED_USER_NAME_CHARACTERS })
+        },
       },
     },
 
     email: {
-      required: 'Email is required',
+      required: t('auth.validation.email_required'),
       pattern: {
         value: userFieldRequirements.email.pattern
           ? new RegExp(userFieldRequirements.email.pattern)
           : /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-        message: 'Invalid email address',
+        message: t('auth.validation.email_invalid'),
       },
       maxLength: {
-        value: userFieldRequirements.email.maxLength || 256,
-        message: `Email cannot exceed ${userFieldRequirements.email.maxLength || 256} characters`,
+        value: emailMaxLength,
+        message: t('auth.validation.email_max_length', { max: String(emailMaxLength) }),
       },
     },
 
     password: {
-      required: 'Password is required',
+      required: t('auth.validation.password_required'),
       validate: {
         dynamicValidation: (value: string, _formValues: RegisterFormData) => {
           const result = validatePassword(value)
           if (result.isValid) return true
 
-          // Map first validation error to user-friendly message
-          const errorKey = result.errors[0]
-
-          if (errorKey.includes('password_min_length')) {
-            return `Password must be at least ${passwordRequirements.requiredLength} characters`
-          } else if (errorKey.includes('password_require_digit')) {
-            return 'Password must contain at least one digit'
-          } else if (errorKey.includes('password_require_uppercase')) {
-            return 'Password must contain at least one uppercase letter'
-          } else if (errorKey.includes('password_require_lowercase')) {
-            return 'Password must contain at least one lowercase letter'
-          } else if (errorKey.includes('password_require_special')) {
-            return 'Password must contain at least one special character'
-          }
-
-          return `Password must be at least ${passwordRequirements.requiredLength} characters`
+          // Errors are emitted as 'translation.key#param' by the configuration context.
+          const [errorKey, param] = result.errors[0].split('#')
+          return t(errorKey as keyof TranslationKeys, param ? { min: param } : undefined)
         },
       },
     },
 
     confirmPassword: {
-      required: 'Please confirm your password',
+      required: t('auth.validation.confirm_password_required'),
       validate: {
         passwordMatch: (value: string, formValues: RegisterFormData) =>
-          value === formValues.password || 'Passwords do not match',
+          value === formValues.password || t('auth.validation.passwords_do_not_match'),
       },
     },
 
     acceptTerms: {
       validate: {
         mustAccept: (value: boolean, _formValues: RegisterFormData) =>
-          value === true || 'You must accept the terms and conditions',
+          value === true || t('auth.validation.terms_required'),
       },
     },
   }
@@ -142,6 +157,7 @@ export function useRegisterValidation() {
  */
 export function usePasswordRequirements() {
   const { configuration } = useConfiguration()
+  const { t } = useI18n()
 
   if (!configuration) {
     return []
@@ -150,23 +166,48 @@ export function usePasswordRequirements() {
   const { passwordRequirements } = configuration
   const requirements: string[] = []
 
-  requirements.push(`At least ${passwordRequirements.requiredLength} characters`)
+  requirements.push(
+    t('auth.requirements.password_length', { min: String(passwordRequirements.requiredLength) })
+  )
 
   if (passwordRequirements.requireDigit) {
-    requirements.push('One digit (0-9)')
+    requirements.push(t('auth.requirements.password_digit'))
   }
 
   if (passwordRequirements.requireUppercase) {
-    requirements.push('One uppercase letter (A-Z)')
+    requirements.push(t('auth.requirements.password_uppercase'))
   }
 
   if (passwordRequirements.requireLowercase) {
-    requirements.push('One lowercase letter (a-z)')
+    requirements.push(t('auth.requirements.password_lowercase'))
   }
 
   if (passwordRequirements.requireNonAlphanumeric) {
-    requirements.push('One special character (!@#$%^&*)')
+    requirements.push(t('auth.requirements.password_special'))
   }
 
   return requirements
+}
+
+/**
+ * Gets username requirement hints for display to the user
+ */
+export function useUserNameRequirements() {
+  const { configuration } = useConfiguration()
+  const { t } = useI18n()
+
+  if (!configuration) {
+    return []
+  }
+
+  const { userName } = configuration.userFieldRequirements
+
+  return [
+    t('auth.requirements.username_length', {
+      min: String(userName.minLength || 3),
+      max: String(userName.maxLength || 50),
+    }),
+    t('auth.requirements.username_allowed_chars', { allowed: ALLOWED_USER_NAME_CHARACTERS }),
+    t('auth.requirements.username_no_spaces'),
+  ]
 }

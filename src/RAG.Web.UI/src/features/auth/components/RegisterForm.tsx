@@ -1,11 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, User, Mail, Lock, Check } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useToast } from '@/shared/contexts/ToastContext'
-import { useRegisterValidation, usePasswordRequirements } from '@/features/auth/hooks/useRegisterValidation'
+import {
+  useRegisterValidation,
+  usePasswordRequirements,
+  useUserNameRequirements,
+} from '@/features/auth/hooks/useRegisterValidation'
+import { suggestUserName } from '@/utils/usernameSuggestion'
 import { SubmitButton } from '@/shared/components/ui/SubmitButton'
 
 interface RegisterFormData {
@@ -24,6 +29,7 @@ export function RegisterForm() {
   const { addToast } = useToast()
   const validationRules = useRegisterValidation()
   const passwordRequirements = usePasswordRequirements()
+  const userNameRequirements = useUserNameRequirements()
 
   const {
     register,
@@ -31,6 +37,7 @@ export function RegisterForm() {
     formState: { errors, isSubmitting },
     reset,
     watch,
+    setValue,
   } = useForm<RegisterFormData>({
     mode: 'onBlur',
     defaultValues: {
@@ -48,7 +55,30 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const password = watch('password')
+  const firstName = watch('firstName')
+  const lastName = watch('lastName')
+  const userName = watch('userName')
   const baseInputClasses = 'form-input'
+
+  // Keep the username in sync with the name fields until the user edits it by hand.
+  const userNameEditedRef = useRef(false)
+  const suggestedUserName = suggestUserName(firstName, lastName)
+
+  useEffect(() => {
+    if (userNameEditedRef.current) {
+      return
+    }
+
+    setValue('userName', suggestedUserName, { shouldValidate: false })
+  }, [suggestedUserName, setValue])
+
+  const applySuggestedUserName = () => {
+    userNameEditedRef.current = false
+    setValue('userName', suggestedUserName, { shouldValidate: true })
+  }
+
+  const userNameField = register('userName', validationRules?.userName)
+  const canApplySuggestion = suggestedUserName.length > 0 && suggestedUserName !== userName
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -68,12 +98,13 @@ export function RegisterForm() {
         message: t('auth.register.success_message'),
       })
 
+      userNameEditedRef.current = false
       reset()
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.'
+      const errorMessage = error instanceof Error ? error.message : t('auth.register.error_message')
       addToast({
         type: 'error',
-        title: 'Registration Error',
+        title: t('auth.register.error_title'),
         message: errorMessage,
       })
     }
@@ -82,7 +113,7 @@ export function RegisterForm() {
   if (!validationRules) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-300">Loading configuration...</div>
+        <div className="text-gray-600 dark:text-gray-300">{t('auth.register.loading_configuration')}</div>
       </div>
     )
   }
@@ -160,13 +191,43 @@ export function RegisterForm() {
                 <input
                   id="userName"
                   type="text"
-                  {...register('userName', validationRules.userName)}
+                  autoComplete="username"
+                  {...userNameField}
+                  onChange={(event) => {
+                    // An empty field falls back to the generated suggestion again.
+                    userNameEditedRef.current = event.target.value.length > 0
+                    userNameField.onChange(event)
+                  }}
                   className={`${baseInputClasses} pl-10 pr-3 ${errors.userName ? 'form-input-error' : ''}`}
                   placeholder={t('auth.placeholders.username')}
                 />
               </div>
               {errors.userName && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.userName.message}</p>
+              )}
+              {canApplySuggestion && (
+                <p className="mt-1 text-xs text-gray-600 dark:text-gray-300">
+                  {t('auth.register.username_suggestion')}{' '}
+                  <button
+                    type="button"
+                    onClick={applySuggestedUserName}
+                    className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                  >
+                    {suggestedUserName}
+                  </button>
+                </p>
+              )}
+              {userName && userNameRequirements.length > 0 && (
+                <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800/80 rounded text-xs text-gray-600 dark:text-gray-300">
+                  <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
+                    {t('auth.requirements.username_title')}
+                  </p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {userNameRequirements.map((requirement, index) => (
+                      <li key={index}>{requirement}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
 
@@ -227,7 +288,9 @@ export function RegisterForm() {
               )}
               {password && passwordRequirements.length > 0 && (
                 <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800/80 rounded text-xs text-gray-600 dark:text-gray-300">
-                  <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">Password must contain:</p>
+                  <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
+                    {t('auth.requirements.password_title')}
+                  </p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {passwordRequirements.map((req, index) => (
                       <li key={index}>{req}</li>

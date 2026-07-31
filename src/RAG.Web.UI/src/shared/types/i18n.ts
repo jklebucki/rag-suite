@@ -190,6 +190,10 @@ export interface TranslationKeys {
   'auth.register.sign_in': string;
   'auth.register.success_title': string;
   'auth.register.success_message': string;
+  'auth.register.error_title': string;
+  'auth.register.error_message': string;
+  'auth.register.loading_configuration': string;
+  'auth.register.username_suggestion': string;
 
   'auth.reset.title': string;
   'auth.reset.subtitle': string;
@@ -249,6 +253,27 @@ export interface TranslationKeys {
   'auth.validation.username_required': string;
   'auth.validation.username_min_length': string;
   'auth.validation.terms_required': string;
+  'auth.validation.email_max_length': string;
+  'auth.validation.first_name_max_length': string;
+  'auth.validation.last_name_max_length': string;
+  'auth.validation.username_max_length': string;
+  'auth.validation.first_name_whitespace': string;
+  'auth.validation.last_name_whitespace': string;
+  'auth.validation.username_whitespace': string;
+  'auth.validation.username_invalid_chars': string;
+  'auth.validation.username_invalid_chars_found': string;
+  'auth.validation.username_char_space': string;
+
+  'auth.requirements.password_title': string;
+  'auth.requirements.password_length': string;
+  'auth.requirements.password_digit': string;
+  'auth.requirements.password_uppercase': string;
+  'auth.requirements.password_lowercase': string;
+  'auth.requirements.password_special': string;
+  'auth.requirements.username_title': string;
+  'auth.requirements.username_length': string;
+  'auth.requirements.username_allowed_chars': string;
+  'auth.requirements.username_no_spaces': string;
 
   'auth.logout.title': string;
   'auth.logout.confirm': string;
