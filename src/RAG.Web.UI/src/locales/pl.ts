@@ -206,6 +206,8 @@ export const pl: TranslationKeys = {
   'auth.change_password.changing': 'Zmiana...',
   'auth.change_password.success_title': 'Hasło zmienione!',
   'auth.change_password.success_message': 'Twoje hasło zostało zmienione pomyślnie.',
+  'auth.change_password.error_title': 'Błąd zmiany hasła',
+  'auth.change_password.error_message': 'Nie udało się zmienić hasła. Spróbuj ponownie.',
 
   'auth.fields.email': 'Email',
   'auth.fields.password': 'Hasło',
@@ -251,6 +253,8 @@ export const pl: TranslationKeys = {
   'auth.validation.username_invalid_chars': 'Nazwa użytkownika może zawierać tylko litery (a-z), cyfry (0-9) oraz {allowed}',
   'auth.validation.username_invalid_chars_found': 'Nazwa użytkownika może zawierać tylko litery (a-z), cyfry (0-9) oraz {allowed}. Usuń: {invalid}',
   'auth.validation.username_char_space': 'spacja',
+  'auth.validation.current_password_required': 'Aktualne hasło jest wymagane',
+  'auth.validation.password_must_differ': 'Nowe hasło musi różnić się od aktualnego',
 
   'auth.requirements.password_title': 'Hasło musi zawierać:',
   'auth.requirements.password_length': 'Co najmniej {min} znaków',

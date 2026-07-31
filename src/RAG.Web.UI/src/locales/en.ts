@@ -206,6 +206,8 @@ export const en: TranslationKeys = {
   'auth.change_password.changing': 'Changing...',
   'auth.change_password.success_title': 'Password changed!',
   'auth.change_password.success_message': 'Your password has been changed successfully.',
+  'auth.change_password.error_title': 'Password Change Error',
+  'auth.change_password.error_message': 'Failed to change password. Please try again.',
 
   'auth.fields.email': 'Email',
   'auth.fields.password': 'Password',
@@ -251,6 +253,8 @@ export const en: TranslationKeys = {
   'auth.validation.username_invalid_chars': 'Username can only contain letters (a-z), digits (0-9) and {allowed}',
   'auth.validation.username_invalid_chars_found': 'Username can only contain letters (a-z), digits (0-9) and {allowed}. Remove: {invalid}',
   'auth.validation.username_char_space': 'space',
+  'auth.validation.current_password_required': 'Current password is required',
+  'auth.validation.password_must_differ': 'The new password must be different from the current one',
 
   'auth.requirements.password_title': 'Password must contain:',
   'auth.requirements.password_length': 'At least {min} characters',

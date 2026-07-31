@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare, List } from 'lucide-react'
+import { Menu, User, LogOut, ChevronDown, Settings, Globe, LogIn, MessageSquare, List, KeyRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LanguageSelector } from '@/shared/components/ui/LanguageSelector'
 import { ThemeToggle } from '@/shared/components/ui/ThemeToggle'
 import { SessionExpiredModal } from '@/shared/components/ui/SessionExpiredModal'
 import { FeedbackModal } from '@/features/feedback/components/FeedbackModal'
 import { MyFeedbackModal } from '@/features/feedback/components/MyFeedbackModal'
+import { ChangePasswordModal } from '@/features/auth/components/ChangePasswordModal'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { logger } from '@/utils/logger'
@@ -24,6 +25,7 @@ export function TopBar({ onToggleSidebar, onOpenAccountModal }: TopBarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [isMyFeedbackModalOpen, setIsMyFeedbackModalOpen] = useState(false)
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const myFeedbackRefetchInterval = 5 * 60 * 1000
@@ -71,6 +73,11 @@ export function TopBar({ onToggleSidebar, onOpenAccountModal }: TopBarProps) {
 
   const handleAccountClick = () => {
     onOpenAccountModal()
+    setIsUserMenuOpen(false)
+  }
+
+  const handleChangePasswordClick = () => {
+    setIsChangePasswordModalOpen(true)
     setIsUserMenuOpen(false)
   }
 
@@ -222,7 +229,14 @@ export function TopBar({ onToggleSidebar, onOpenAccountModal }: TopBarProps) {
                     <Settings className="h-4 w-4" />
                     {t('account.manage_account')}
                   </button>
-                  
+                  <button
+                    onClick={handleChangePasswordClick}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    {t('auth.change_password.title')}
+                  </button>
+
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -245,6 +259,11 @@ export function TopBar({ onToggleSidebar, onOpenAccountModal }: TopBarProps) {
       <MyFeedbackModal
         isOpen={isMyFeedbackModalOpen}
         onClose={() => setIsMyFeedbackModalOpen(false)}
+      />
+
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
       />
 
       {/* Session Expired Modal */}

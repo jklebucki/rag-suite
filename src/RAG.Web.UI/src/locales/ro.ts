@@ -311,6 +311,8 @@ export const ro: TranslationKeys = {
   'auth.change_password.changing': 'Se schimbă...',
   'auth.change_password.success_title': 'Parolă schimbată!',
   'auth.change_password.success_message': 'Parola ta a fost schimbată cu succes.',
+  'auth.change_password.error_title': 'Eroare la schimbarea parolei',
+  'auth.change_password.error_message': 'Schimbarea parolei a eșuat. Încearcă din nou.',
 
   'auth.fields.email': 'Email',
   'auth.fields.password': 'Parolă',
@@ -356,6 +358,8 @@ export const ro: TranslationKeys = {
   'auth.validation.username_invalid_chars': 'Numele de utilizator poate conține doar litere (a-z), cifre (0-9) și {allowed}',
   'auth.validation.username_invalid_chars_found': 'Numele de utilizator poate conține doar litere (a-z), cifre (0-9) și {allowed}. Elimină: {invalid}',
   'auth.validation.username_char_space': 'spațiu',
+  'auth.validation.current_password_required': 'Parola actuală este obligatorie',
+  'auth.validation.password_must_differ': 'Noua parolă trebuie să fie diferită de cea actuală',
 
   'auth.requirements.password_title': 'Parola trebuie să conțină:',
   'auth.requirements.password_length': 'Cel puțin {min} caractere',

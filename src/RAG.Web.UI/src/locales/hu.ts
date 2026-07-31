@@ -310,6 +310,8 @@ export const hu: TranslationKeys = {
   'auth.change_password.changing': 'Módosítás...',
   'auth.change_password.success_title': 'Jelszó módosítva!',
   'auth.change_password.success_message': 'A jelszavad sikeresen módosítva lett.',
+  'auth.change_password.error_title': 'Hiba a jelszó módosításakor',
+  'auth.change_password.error_message': 'A jelszó módosítása sikertelen. Próbáld újra.',
 
   'auth.fields.email': 'Email',
   'auth.fields.password': 'Jelszó',
@@ -355,6 +357,8 @@ export const hu: TranslationKeys = {
   'auth.validation.username_invalid_chars': 'A felhasználónév csak betűket (a-z), számjegyeket (0-9) és a következőket tartalmazhatja: {allowed}',
   'auth.validation.username_invalid_chars_found': 'A felhasználónév csak betűket (a-z), számjegyeket (0-9) és a következőket tartalmazhatja: {allowed}. Távolítsd el: {invalid}',
   'auth.validation.username_char_space': 'szóköz',
+  'auth.validation.current_password_required': 'A jelenlegi jelszó megadása kötelező',
+  'auth.validation.password_must_differ': 'Az új jelszónak különböznie kell a jelenlegitől',
 
   'auth.requirements.password_title': 'A jelszónak tartalmaznia kell:',
   'auth.requirements.password_length': 'Legalább {min} karaktert',

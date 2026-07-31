@@ -218,6 +218,8 @@ export interface TranslationKeys {
   'auth.change_password.changing': string;
   'auth.change_password.success_title': string;
   'auth.change_password.success_message': string;
+  'auth.change_password.error_title': string;
+  'auth.change_password.error_message': string;
 
   'auth.fields.email': string;
   'auth.fields.password': string;
@@ -263,6 +265,8 @@ export interface TranslationKeys {
   'auth.validation.username_invalid_chars': string;
   'auth.validation.username_invalid_chars_found': string;
   'auth.validation.username_char_space': string;
+  'auth.validation.current_password_required': string;
+  'auth.validation.password_must_differ': string;
 
   'auth.requirements.password_title': string;
   'auth.requirements.password_length': string;

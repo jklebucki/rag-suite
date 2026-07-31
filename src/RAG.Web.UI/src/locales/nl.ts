@@ -310,6 +310,8 @@ export const nl: TranslationKeys = {
   'auth.change_password.changing': 'Wijzigen...',
   'auth.change_password.success_title': 'Wachtwoord gewijzigd!',
   'auth.change_password.success_message': 'Je wachtwoord is succesvol gewijzigd.',
+  'auth.change_password.error_title': 'Fout bij wachtwoord wijzigen',
+  'auth.change_password.error_message': 'Wachtwoord wijzigen mislukt. Probeer het opnieuw.',
 
   'auth.fields.email': 'E-mail',
   'auth.fields.password': 'Wachtwoord',
@@ -355,6 +357,8 @@ export const nl: TranslationKeys = {
   'auth.validation.username_invalid_chars': 'Gebruikersnaam mag alleen letters (a-z), cijfers (0-9) en {allowed} bevatten',
   'auth.validation.username_invalid_chars_found': 'Gebruikersnaam mag alleen letters (a-z), cijfers (0-9) en {allowed} bevatten. Verwijder: {invalid}',
   'auth.validation.username_char_space': 'spatie',
+  'auth.validation.current_password_required': 'Huidig wachtwoord is verplicht',
+  'auth.validation.password_must_differ': 'Het nieuwe wachtwoord moet verschillen van het huidige',
 
   'auth.requirements.password_title': 'Wachtwoord moet bevatten:',
   'auth.requirements.password_length': 'Minimaal {min} tekens',
