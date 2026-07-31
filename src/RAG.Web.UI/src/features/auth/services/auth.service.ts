@@ -266,7 +266,13 @@ class AuthService {
 
   async changePassword(request: ChangePasswordRequest): Promise<void> {
     try {
-      await this.client.post<ApiResponse<void>>('/change-password', request)
+      // The backend DTO names the confirmation field ConfirmNewPassword; sending
+      // the form's `confirmPassword` verbatim leaves it null and fails [Required].
+      await this.client.post<ApiResponse<void>>('/change-password', {
+        CurrentPassword: request.currentPassword,
+        NewPassword: request.newPassword,
+        ConfirmNewPassword: request.confirmPassword
+      })
     } catch (error) {
       throw new Error(getApiErrorMessage(error, 'Failed to change password'))
     }
