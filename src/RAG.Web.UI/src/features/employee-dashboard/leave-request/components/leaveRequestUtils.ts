@@ -39,9 +39,7 @@ export function leaveTypeLabel(
   const map: Record<LeaveType, string> = {
     annual: t('employeeDashboard.leave.type.annual'),
     onDemand: t('employeeDashboard.leave.type.onDemand'),
-    occasional: t('employeeDashboard.leave.type.occasional'),
     childCare: t('employeeDashboard.leave.type.childCare'),
-    homeOffice: t('employeeDashboard.leave.type.homeOffice'),
     delegation: t('employeeDashboard.leave.type.delegation'),
   }
   return map[type] ?? type

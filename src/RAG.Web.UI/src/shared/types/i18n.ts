@@ -761,9 +761,7 @@ export interface TranslationKeys {
   // Employee Dashboard – leave requests module: leave types
   'employeeDashboard.leave.type.annual': string;
   'employeeDashboard.leave.type.onDemand': string;
-  'employeeDashboard.leave.type.occasional': string;
   'employeeDashboard.leave.type.childCare': string;
-  'employeeDashboard.leave.type.homeOffice': string;
   'employeeDashboard.leave.type.delegation': string;
 
   // Employee Dashboard – leave requests module: statuses
@@ -923,13 +921,6 @@ export interface TranslationKeys {
   'employeeDashboard.notifications.category.training': string;
   'employeeDashboard.notifications.category.general': string;
 
-  // Employee Dashboard – overview: upcoming events
-  'employeeDashboard.events.title': string;
-  'employeeDashboard.events.empty': string;
-  'employeeDashboard.events.today': string;
-  'employeeDashboard.events.daysLeft': string;
-  'employeeDashboard.events.eventsCount': string;
-
   // Employee Dashboard – overview: quick actions
   'employeeDashboard.quickActions.title': string;
   'employeeDashboard.quickActions.submitLeave': string;
@@ -976,55 +967,6 @@ export interface TranslationKeys {
   'employeeDashboard.personal.emergencyContact.fullName': string;
   'employeeDashboard.personal.emergencyContact.relationship': string;
   'employeeDashboard.personal.emergencyContact.phone': string;
-
-  // Employee Dashboard – personal data: change request modal
-  'employeeDashboard.personal.changeRequest.buttonLabel': string;
-  'employeeDashboard.personal.changeRequest.modalTitle': string;
-  'employeeDashboard.personal.changeRequest.changeType': string;
-  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': string;
-  'employeeDashboard.personal.changeRequest.justification': string;
-  'employeeDashboard.personal.changeRequest.justificationPlaceholder': string;
-  'employeeDashboard.personal.changeRequest.attachment': string;
-  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': string;
-  'employeeDashboard.personal.changeRequest.submit': string;
-  'employeeDashboard.personal.changeRequest.cancel': string;
-  'employeeDashboard.personal.changeRequest.submitting': string;
-  'employeeDashboard.personal.changeRequest.successMessage': string;
-
-  // Change request types
-  'employeeDashboard.personal.changeType.residenceAddress': string;
-  'employeeDashboard.personal.changeType.correspondenceAddress': string;
-  'employeeDashboard.personal.changeType.privatePhone': string;
-  'employeeDashboard.personal.changeType.privateEmail': string;
-  'employeeDashboard.personal.changeType.lastName': string;
-  'employeeDashboard.personal.changeType.emergencyContact': string;
-  'employeeDashboard.personal.changeType.other': string;
-
-  // Change request form – dynamic fields
-  'employeeDashboard.personal.changeForm.newPhone': string;
-  'employeeDashboard.personal.changeForm.newEmail': string;
-  'employeeDashboard.personal.changeForm.newLastName': string;
-  'employeeDashboard.personal.changeForm.street': string;
-  'employeeDashboard.personal.changeForm.buildingNumber': string;
-  'employeeDashboard.personal.changeForm.apartmentNumber': string;
-  'employeeDashboard.personal.changeForm.postalCode': string;
-  'employeeDashboard.personal.changeForm.city': string;
-  'employeeDashboard.personal.changeForm.contactFullName': string;
-  'employeeDashboard.personal.changeForm.contactRelationship': string;
-  'employeeDashboard.personal.changeForm.contactPhone': string;
-  'employeeDashboard.personal.changeForm.description': string;
-  'employeeDashboard.personal.changeForm.descriptionPlaceholder': string;
-
-  // Employee Dashboard – personal data: request history table
-  'employeeDashboard.personal.history.title': string;
-  'employeeDashboard.personal.history.empty': string;
-  'employeeDashboard.personal.history.date': string;
-  'employeeDashboard.personal.history.changeType': string;
-  'employeeDashboard.personal.history.status': string;
-  'employeeDashboard.personal.history.comment': string;
-  'employeeDashboard.personal.history.status.pending': string;
-  'employeeDashboard.personal.history.status.approved': string;
-  'employeeDashboard.personal.history.status.rejected': string;
 
   // Address Book
   'addressBook.title': string;

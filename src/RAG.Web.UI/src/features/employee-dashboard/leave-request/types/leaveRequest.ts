@@ -14,9 +14,7 @@
 export type LeaveType =
   | 'annual'
   | 'onDemand'
-  | 'occasional'
   | 'childCare'
-  | 'homeOffice'
   | 'delegation'
 
 export type LeaveRequestStatus =

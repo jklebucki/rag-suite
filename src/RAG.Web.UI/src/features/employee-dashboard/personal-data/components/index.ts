@@ -5,6 +5,3 @@ export {
   EmergencyContactSection,
   EmploymentInfoSection,
 } from './PersonalDataSections'
-export { ChangeRequestModal } from './ChangeRequestModal'
-export { RequestHistoryTable } from './RequestHistoryTable'
-export { SuccessBanner } from './SuccessBanner'

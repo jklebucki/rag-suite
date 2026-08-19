@@ -751,11 +751,6 @@ export const pl: TranslationKeys = {
   'employeeDashboard.notifications.category.training': 'Szkolenie',
   'employeeDashboard.notifications.category.general': 'Ogólne',
 
-  'employeeDashboard.events.title': 'Następne zdarzenia',
-  'employeeDashboard.events.empty': 'Brak nadchodzących zdarzeń',
-  'employeeDashboard.events.today': 'Dzisiaj',
-  'employeeDashboard.events.daysLeft': 'dni',
-  'employeeDashboard.events.eventsCount': 'zdarzeń',
 
   'employeeDashboard.quickActions.title': 'Szybkie akcje',
   'employeeDashboard.quickActions.submitLeave': 'Złóż wniosek urlopowy',
@@ -802,55 +797,6 @@ export const pl: TranslationKeys = {
   'employeeDashboard.personal.emergencyContact.fullName': 'Imię i nazwisko',
   'employeeDashboard.personal.emergencyContact.relationship': 'Relacja',
   'employeeDashboard.personal.emergencyContact.phone': 'Numer telefonu',
-
-  // Employee Dashboard – Moje dane osobowe: modal wniosku o zmianę danych
-  'employeeDashboard.personal.changeRequest.buttonLabel': 'Wniosek o zmianę danych',
-  'employeeDashboard.personal.changeRequest.modalTitle': 'Wniosek o zmianę danych',
-  'employeeDashboard.personal.changeRequest.changeType': 'Rodzaj zmiany',
-  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': 'Wybierz rodzaj zmiany...',
-  'employeeDashboard.personal.changeRequest.justification': 'Uzasadnienie',
-  'employeeDashboard.personal.changeRequest.justificationPlaceholder': 'Opisz powód zmiany danych...',
-  'employeeDashboard.personal.changeRequest.attachment': 'Załącznik',
-  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': 'Dodawanie załączników będzie dostępne wkrótce',
-  'employeeDashboard.personal.changeRequest.submit': 'Wyślij wniosek',
-  'employeeDashboard.personal.changeRequest.cancel': 'Anuluj',
-  'employeeDashboard.personal.changeRequest.submitting': 'Wysyłanie...',
-  'employeeDashboard.personal.changeRequest.successMessage': 'Wniosek o zmianę danych został przesłany do działu HR.',
-
-  // Rodzaje zmian
-  'employeeDashboard.personal.changeType.residenceAddress': 'Adres zamieszkania',
-  'employeeDashboard.personal.changeType.correspondenceAddress': 'Adres korespondencyjny',
-  'employeeDashboard.personal.changeType.privatePhone': 'Telefon prywatny',
-  'employeeDashboard.personal.changeType.privateEmail': 'Email prywatny',
-  'employeeDashboard.personal.changeType.lastName': 'Nazwisko',
-  'employeeDashboard.personal.changeType.emergencyContact': 'Dane osoby kontaktowej',
-  'employeeDashboard.personal.changeType.other': 'Inne',
-
-  // Formularz zmiany – pola dynamiczne
-  'employeeDashboard.personal.changeForm.newPhone': 'Nowy numer telefonu',
-  'employeeDashboard.personal.changeForm.newEmail': 'Nowy adres email',
-  'employeeDashboard.personal.changeForm.newLastName': 'Nowe nazwisko',
-  'employeeDashboard.personal.changeForm.street': 'Ulica',
-  'employeeDashboard.personal.changeForm.buildingNumber': 'Numer domu',
-  'employeeDashboard.personal.changeForm.apartmentNumber': 'Numer lokalu',
-  'employeeDashboard.personal.changeForm.postalCode': 'Kod pocztowy',
-  'employeeDashboard.personal.changeForm.city': 'Miasto',
-  'employeeDashboard.personal.changeForm.contactFullName': 'Imię i nazwisko',
-  'employeeDashboard.personal.changeForm.contactRelationship': 'Relacja',
-  'employeeDashboard.personal.changeForm.contactPhone': 'Numer telefonu',
-  'employeeDashboard.personal.changeForm.description': 'Opis zmiany',
-  'employeeDashboard.personal.changeForm.descriptionPlaceholder': 'Opisz szczegółowo, co ma zostać zmienione...',
-
-  // Employee Dashboard – Moje dane osobowe: historia wniosków
-  'employeeDashboard.personal.history.title': 'Historia wniosków o zmianę danych',
-  'employeeDashboard.personal.history.empty': 'Brak historii wniosków',
-  'employeeDashboard.personal.history.date': 'Data',
-  'employeeDashboard.personal.history.changeType': 'Typ zmiany',
-  'employeeDashboard.personal.history.status': 'Status',
-  'employeeDashboard.personal.history.comment': 'Komentarz',
-  'employeeDashboard.personal.history.status.pending': 'Oczekuje',
-  'employeeDashboard.personal.history.status.approved': 'Zaakceptowano',
-  'employeeDashboard.personal.history.status.rejected': 'Odrzucono',
 
   // Address Book
   'addressBook.title': 'Książka Adresowa',
@@ -1107,9 +1053,7 @@ export const pl: TranslationKeys = {
   // Employee Dashboard – Wnioski urlopowe: typy urlopu
   'employeeDashboard.leave.type.annual': 'Urlop wypoczynkowy',
   'employeeDashboard.leave.type.onDemand': 'Urlop na żądanie',
-  'employeeDashboard.leave.type.occasional': 'Urlop okolicznościowy',
   'employeeDashboard.leave.type.childCare': 'Opieka nad dzieckiem',
-  'employeeDashboard.leave.type.homeOffice': 'Home Office',
   'employeeDashboard.leave.type.delegation': 'Delegacja',
 
   // Employee Dashboard – Wnioski urlopowe: statusy

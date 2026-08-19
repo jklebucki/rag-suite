@@ -140,47 +140,6 @@ const MOCK_DATA: EmployeeDashboardData = {
       isRead: true,
     },
   ],
-
-  upcomingEvents: [
-    {
-      id: 'event-1',
-      type: 'leave',
-      title: 'Urlop wypoczynkowy',
-      startDate: '2025-06-15',
-      endDate: '2025-06-22',
-      description: '8 dni urlopu wypoczynkowego',
-    },
-    {
-      id: 'event-2',
-      type: 'medical',
-      title: 'Badania okresowe',
-      startDate: '2025-07-18',
-      description: 'Wizyta w MedCenter, ul. Zdrowa 5, Warszawa',
-    },
-    {
-      id: 'event-3',
-      type: 'bhp_training',
-      title: 'Szkolenie BHP',
-      startDate: '2025-08-05',
-      endDate: '2025-08-05',
-      description: 'Szkolenie odświeżające BHP – sesja online o godz. 10:00',
-    },
-    {
-      id: 'event-4',
-      type: 'delegation',
-      title: 'Delegacja – Kraków',
-      startDate: '2025-06-25',
-      endDate: '2025-06-26',
-      description: 'Wizyta u klienta w siedzibie TechCorp',
-    },
-    {
-      id: 'event-5',
-      type: 'organization',
-      title: 'Spotkanie ogólnofirmowe',
-      startDate: '2025-07-01',
-      description: 'Kwartalne spotkanie całej firmy – siedziba Warszawa, 2. piętro',
-    },
-  ],
 }
 
 // ---------------------------------------------------------------------------

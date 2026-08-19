@@ -14,6 +14,5 @@ export {
   HrRequestsTile,
   EmployeeProfileCard,
   NotificationsCenter,
-  UpcomingEvents,
   QuickActions,
 } from '../dashboard/components'

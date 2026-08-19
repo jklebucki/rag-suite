@@ -6,7 +6,6 @@ import { LastPayslipTile } from './LastPayslipTile'
 import { ExpiringDocumentsTile } from './ExpiringDocumentsTile'
 import { EmployeeProfileCard } from './EmployeeProfileCard'
 import { NotificationsCenter } from './NotificationsCenter'
-import { UpcomingEvents } from './UpcomingEvents'
 import { QuickActions } from './QuickActions'
 
 export function EmployeeDashboard() {
@@ -45,8 +44,6 @@ export function EmployeeDashboard() {
         <EmployeeProfileCard profile={data.profile} />
         <NotificationsCenter notifications={data.notifications} />
       </div>
-
-      <UpcomingEvents events={data.upcomingEvents} />
     </div>
   )
 }

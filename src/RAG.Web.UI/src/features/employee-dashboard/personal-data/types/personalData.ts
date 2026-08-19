@@ -61,29 +61,9 @@ export interface EmployeePersonalData {
   emergencyContact: EmergencyContact
 }
 
-export type ChangeRequestType =
-  | 'residenceAddress'
-  | 'correspondenceAddress'
-  | 'privatePhone'
-  | 'privateEmail'
-  | 'lastName'
-  | 'emergencyContact'
-  | 'other'
-
-export type ChangeRequestStatus = 'pending' | 'approved' | 'rejected'
-
-export interface DataChangeRequest {
-  id: string
-  date: string          // ISO datetime string
-  changeType: ChangeRequestType
-  status: ChangeRequestStatus
-  comment?: string
-}
-
 // ---------------------------------------------------------------------------
 // Aggregated DTO for the Personal Data page
 // ---------------------------------------------------------------------------
 export interface PersonalDataPageData {
   personalData: EmployeePersonalData
-  changeRequests: DataChangeRequest[]
 }

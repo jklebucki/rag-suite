@@ -8,6 +8,4 @@ export type {
   LeaveBalance,
   NotificationCategory,
   NotificationSeverity,
-  UpcomingEvent,
-  UpcomingEventType,
 } from './types/employeeDashboard'

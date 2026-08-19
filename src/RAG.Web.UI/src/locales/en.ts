@@ -740,9 +740,7 @@ export const en: TranslationKeys = {
   // Employee Dashboard – leave requests module: leave types
   'employeeDashboard.leave.type.annual': 'Annual leave',
   'employeeDashboard.leave.type.onDemand': 'On-demand leave',
-  'employeeDashboard.leave.type.occasional': 'Occasional leave',
   'employeeDashboard.leave.type.childCare': 'Child care',
-  'employeeDashboard.leave.type.homeOffice': 'Home Office',
   'employeeDashboard.leave.type.delegation': 'Business trip',
 
   // Employee Dashboard – leave requests module: statuses
@@ -897,11 +895,6 @@ export const en: TranslationKeys = {
   'employeeDashboard.notifications.category.training': 'Training',
   'employeeDashboard.notifications.category.general': 'General',
 
-  'employeeDashboard.events.title': 'Upcoming Events',
-  'employeeDashboard.events.empty': 'No upcoming events',
-  'employeeDashboard.events.today': 'Today',
-  'employeeDashboard.events.daysLeft': 'days left',
-  'employeeDashboard.events.eventsCount': 'events',
 
   'employeeDashboard.quickActions.title': 'Quick Actions',
   'employeeDashboard.quickActions.submitLeave': 'Submit leave request',
@@ -948,55 +941,6 @@ export const en: TranslationKeys = {
   'employeeDashboard.personal.emergencyContact.fullName': 'Full name',
   'employeeDashboard.personal.emergencyContact.relationship': 'Relationship',
   'employeeDashboard.personal.emergencyContact.phone': 'Phone number',
-
-  // Employee Dashboard – personal data: change request modal
-  'employeeDashboard.personal.changeRequest.buttonLabel': 'Request data change',
-  'employeeDashboard.personal.changeRequest.modalTitle': 'Request data change',
-  'employeeDashboard.personal.changeRequest.changeType': 'Change type',
-  'employeeDashboard.personal.changeRequest.changeTypePlaceholder': 'Select change type...',
-  'employeeDashboard.personal.changeRequest.justification': 'Justification',
-  'employeeDashboard.personal.changeRequest.justificationPlaceholder': 'Describe the reason for the data change...',
-  'employeeDashboard.personal.changeRequest.attachment': 'Attachment',
-  'employeeDashboard.personal.changeRequest.attachmentPlaceholder': 'File attachments will be available soon',
-  'employeeDashboard.personal.changeRequest.submit': 'Submit request',
-  'employeeDashboard.personal.changeRequest.cancel': 'Cancel',
-  'employeeDashboard.personal.changeRequest.submitting': 'Submitting...',
-  'employeeDashboard.personal.changeRequest.successMessage': 'Your data change request has been submitted to the HR department.',
-
-  // Change request types
-  'employeeDashboard.personal.changeType.residenceAddress': 'Residence address',
-  'employeeDashboard.personal.changeType.correspondenceAddress': 'Correspondence address',
-  'employeeDashboard.personal.changeType.privatePhone': 'Private phone',
-  'employeeDashboard.personal.changeType.privateEmail': 'Private email',
-  'employeeDashboard.personal.changeType.lastName': 'Last name',
-  'employeeDashboard.personal.changeType.emergencyContact': 'Emergency contact',
-  'employeeDashboard.personal.changeType.other': 'Other',
-
-  // Change request form – dynamic fields
-  'employeeDashboard.personal.changeForm.newPhone': 'New phone number',
-  'employeeDashboard.personal.changeForm.newEmail': 'New email address',
-  'employeeDashboard.personal.changeForm.newLastName': 'New last name',
-  'employeeDashboard.personal.changeForm.street': 'Street',
-  'employeeDashboard.personal.changeForm.buildingNumber': 'Building number',
-  'employeeDashboard.personal.changeForm.apartmentNumber': 'Apartment number',
-  'employeeDashboard.personal.changeForm.postalCode': 'Postal code',
-  'employeeDashboard.personal.changeForm.city': 'City',
-  'employeeDashboard.personal.changeForm.contactFullName': 'Full name',
-  'employeeDashboard.personal.changeForm.contactRelationship': 'Relationship',
-  'employeeDashboard.personal.changeForm.contactPhone': 'Phone number',
-  'employeeDashboard.personal.changeForm.description': 'Change description',
-  'employeeDashboard.personal.changeForm.descriptionPlaceholder': 'Describe in detail what needs to be changed...',
-
-  // Employee Dashboard – personal data: request history table
-  'employeeDashboard.personal.history.title': 'Data Change Request History',
-  'employeeDashboard.personal.history.empty': 'No request history',
-  'employeeDashboard.personal.history.date': 'Date',
-  'employeeDashboard.personal.history.changeType': 'Change type',
-  'employeeDashboard.personal.history.status': 'Status',
-  'employeeDashboard.personal.history.comment': 'Comment',
-  'employeeDashboard.personal.history.status.pending': 'Pending',
-  'employeeDashboard.personal.history.status.approved': 'Approved',
-  'employeeDashboard.personal.history.status.rejected': 'Rejected',
 
   // Address Book
   'addressBook.title': 'Address Book',

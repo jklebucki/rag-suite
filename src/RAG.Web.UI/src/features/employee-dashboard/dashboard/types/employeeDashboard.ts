@@ -76,22 +76,6 @@ export interface DashboardNotification {
   isRead: boolean
 }
 
-export type UpcomingEventType =
-  | 'leave'
-  | 'medical'
-  | 'bhp_training'
-  | 'delegation'
-  | 'organization'
-
-export interface UpcomingEvent {
-  id: string
-  type: UpcomingEventType
-  title: string
-  startDate: string       // ISO date string
-  endDate?: string        // ISO date string (optional, for multi-day events)
-  description?: string
-}
-
 // ---------------------------------------------------------------------------
 // Aggregated DTO returned by the service / API endpoint
 // ---------------------------------------------------------------------------
@@ -102,5 +86,4 @@ export interface EmployeeDashboardData {
   hrRequestsSummary: HrRequestsSummary
   expiringDocuments: ExpiringDocument[]
   notifications: DashboardNotification[]
-  upcomingEvents: UpcomingEvent[]
 }

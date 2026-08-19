@@ -15,9 +15,7 @@ import { countWorkingDays, leaveTypeLabel } from './leaveRequestUtils'
 const LEAVE_TYPES: LeaveType[] = [
   'annual',
   'onDemand',
-  'occasional',
   'childCare',
-  'homeOffice',
   'delegation',
 ]
 

@@ -74,30 +74,6 @@ const MOCK_DATA: PersonalDataPageData = {
       phone: '+48 500 000 001',
     },
   },
-
-  changeRequests: [
-    {
-      id: 'cr-001',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-      changeType: 'privatePhone',
-      status: 'approved',
-      comment: 'Zmiana zaakceptowana przez dział HR.',
-    },
-    {
-      id: 'cr-002',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
-      changeType: 'residenceAddress',
-      status: 'pending',
-      comment: undefined,
-    },
-    {
-      id: 'cr-003',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(),
-      changeType: 'emergencyContact',
-      status: 'rejected',
-      comment: 'Brak wymaganych dokumentów potwierdzających zmianę.',
-    },
-  ],
 }
 
 // ---------------------------------------------------------------------------
