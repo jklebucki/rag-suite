@@ -46,7 +46,7 @@ export function QuickActions() {
     },
     {
       icon: FolderOpen,
-      labelKey: 'employeeDashboard.quickActions.documents',
+      labelKey: 'employeeDashboard.quickActions.pit11',
       colorClass: 'text-amber-700 dark:text-amber-300',
       bgClass: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40',
       onClick: () => navigate('/employee-dashboard/documents'),

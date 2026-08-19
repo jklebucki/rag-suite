@@ -677,7 +677,17 @@ export interface TranslationKeys {
   'employeeDashboard.personalData': string;
   'employeeDashboard.leaveRequest': string;
   'employeeDashboard.salary': string;
-  'employeeDashboard.documents': string;
+  'employeeDashboard.pit11.title': string;
+  'employeeDashboard.pit11.subtitle': string;
+  'employeeDashboard.pit11.documentName': string;
+  'employeeDashboard.pit11.taxYear': string;
+  'employeeDashboard.pit11.generatedAt': string;
+  'employeeDashboard.pit11.actions': string;
+  'employeeDashboard.pit11.download': string;
+  'employeeDashboard.pit11.downloading': string;
+  'employeeDashboard.pit11.empty': string;
+  'employeeDashboard.pit11.error.loadFailed': string;
+  'employeeDashboard.quickActions.pit11': string;
   'employeeDashboard.employmentContext.label': string;
   'employeeDashboard.employmentContext.menuTitle': string;
   'employeeDashboard.employmentContext.mockNotice': string;
@@ -688,47 +698,6 @@ export interface TranslationKeys {
   'employeeDashboard.employmentContext.status.suspended': string;
   'employeeDashboard.employmentContext.error.loadFailed': string;
   'employeeDashboard.employmentContext.error.noData': string;
-  'employeeDashboard.documents.subtitle': string;
-  'employeeDashboard.documents.error.loadFailed': string;
-  'employeeDashboard.documents.error.noData': string;
-  'employeeDashboard.documents.error.noAccess': string;
-  'employeeDashboard.documents.status.available': string;
-  'employeeDashboard.documents.status.new': string;
-  'employeeDashboard.documents.status.updated': string;
-  'employeeDashboard.documents.status.archived': string;
-  'employeeDashboard.documents.category.hr': string;
-  'employeeDashboard.documents.category.hr.description': string;
-  'employeeDashboard.documents.category.tax': string;
-  'employeeDashboard.documents.category.tax.description': string;
-  'employeeDashboard.documents.category.company': string;
-  'employeeDashboard.documents.category.company.description': string;
-  'employeeDashboard.documents.category.unknown': string;
-  'employeeDashboard.documents.list.title': string;
-  'employeeDashboard.documents.list.recordsCount': string;
-  'employeeDashboard.documents.version': string;
-  'employeeDashboard.documents.addedAt': string;
-  'employeeDashboard.documents.details.category': string;
-  'employeeDashboard.documents.details.addedAt': string;
-  'employeeDashboard.documents.details.version': string;
-  'employeeDashboard.documents.details.owner': string;
-  'employeeDashboard.documents.readOnly': string;
-  'employeeDashboard.documents.preview.title': string;
-  'employeeDashboard.documents.preview.placeholderTitle': string;
-  'employeeDashboard.documents.preview.placeholderDescription': string;
-  'employeeDashboard.documents.download.title': string;
-  'employeeDashboard.documents.download.button': string;
-  'employeeDashboard.documents.download.preparing': string;
-  'employeeDashboard.documents.download.auditNotice': string;
-  'employeeDashboard.documents.download.closeMessage': string;
-  'employeeDashboard.documents.download.backendPlaceholder': string;
-  'employeeDashboard.documents.history.title': string;
-  'employeeDashboard.documents.history.col.downloadedAt': string;
-  'employeeDashboard.documents.history.col.documentName': string;
-  'employeeDashboard.documents.history.col.category': string;
-  'employeeDashboard.documents.history.col.user': string;
-  'employeeDashboard.documents.history.col.action': string;
-  'employeeDashboard.documents.audit.action.download': string;
-  'employeeDashboard.documents.audit.action.preview': string;
 
   // Employee Dashboard – overview: summary header
   'employeeDashboard.overview.lastLogin': string;
@@ -926,7 +895,6 @@ export interface TranslationKeys {
   'employeeDashboard.quickActions.submitLeave': string;
   'employeeDashboard.quickActions.downloadPayslip': string;
   'employeeDashboard.quickActions.hrHistory': string;
-  'employeeDashboard.quickActions.documents': string;
   'employeeDashboard.quickActions.updatePersonalData': string;
 
   // Employee Dashboard – personal data: section headers

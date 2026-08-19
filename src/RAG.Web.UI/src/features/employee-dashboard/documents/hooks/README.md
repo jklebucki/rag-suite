@@ -1,1 +1,1 @@
-Documents hooks belong here when this section receives stateful client logic.
+PIT-11 hooks belong here when this section receives stateful client logic.

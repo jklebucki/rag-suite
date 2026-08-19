@@ -1,33 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import {
-  downloadDocumentFile,
-  getDocumentsPageData,
-  saveDocumentAuditLog,
+  downloadPit11File,
+  getPit11Documents,
 } from '../services/documentsMockData'
-import type { DocumentsPageData, EmployeeDocument } from '../types/documentsTypes'
+import type { Pit11Document } from '../types/documentsTypes'
 
 interface UseDocumentsDataResult {
-  data: DocumentsPageData | null
-  selectedDocument: EmployeeDocument | null
-  selectedDocumentId: string | null
+  documents: Pit11Document[]
   isLoading: boolean
-  isDownloading: boolean
+  downloadingDocumentId: string | null
   error: string | null
-  downloadMessage: string | null
-  selectDocument: (document: EmployeeDocument) => Promise<void>
   downloadDocument: (documentId: string) => Promise<void>
-  clearDownloadMessage: () => void
 }
 
 export function useDocumentsData(): UseDocumentsDataResult {
   const { user } = useAuth()
-  const [data, setData] = useState<DocumentsPageData | null>(null)
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
+  const [documents, setDocuments] = useState<Pit11Document[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadingDocumentId, setDownloadingDocumentId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [downloadMessage, setDownloadMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -36,17 +28,16 @@ export function useDocumentsData(): UseDocumentsDataResult {
     setIsLoading(true)
     setError(null)
 
-    getDocumentsPageData(user.id)
+    getPit11Documents(user.id)
       .then((result) => {
         if (cancelled) return
 
-        setData(result)
-        setSelectedDocumentId(result.documents[0]?.id ?? null)
+        setDocuments(result)
         setIsLoading(false)
       })
       .catch(() => {
         if (!cancelled) {
-          setError('employeeDashboard.documents.error.loadFailed')
+          setError('employeeDashboard.pit11.error.loadFailed')
           setIsLoading(false)
         }
       })
@@ -56,97 +47,32 @@ export function useDocumentsData(): UseDocumentsDataResult {
     }
   }, [user])
 
-  const selectedDocument = useMemo(() => {
-    if (!data) return null
-    return data.documents.find((document) => document.id === selectedDocumentId) ?? data.documents[0] ?? null
-  }, [data, selectedDocumentId])
-
-  const appendLog = useCallback((log: DocumentsPageData['downloadLogs'][number]) => {
-    setData((current) => {
-      if (!current) return current
-      return {
-        ...current,
-        downloadLogs: [log, ...current.downloadLogs],
-      }
-    })
-  }, [])
-
-  const auditUserName = user?.fullName || user?.userName || user?.email || 'Current user'
-
-  const findDocumentWithCategory = useCallback(
-    (documentId: string) => {
-      if (!data) return null
-
-      const document = data.documents.find((item) => item.id === documentId)
-      if (!document) return null
-
-      const category = data.categories.find((item) => item.id === document.categoryId)
-      if (!category) return null
-
-      return { document, category }
-    },
-    [data]
-  )
-
-  const selectDocument = useCallback(
-    async (document: EmployeeDocument) => {
-      setSelectedDocumentId(document.id)
-
-      if (!user || !data) return
-
-      const category = data.categories.find((item) => item.id === document.categoryId)
-      if (!category) return
-
-      const log = await saveDocumentAuditLog(
-        user.id,
-        document,
-        category,
-        'preview',
-        auditUserName
-      )
-      appendLog(log)
-    },
-    [appendLog, auditUserName, data, user]
-  )
-
   const downloadDocument = useCallback(
     async (documentId: string) => {
       if (!user) return
 
-      const documentWithCategory = findDocumentWithCategory(documentId)
-      if (!documentWithCategory) return
-
-      setIsDownloading(true)
-      setDownloadMessage(null)
+      setDownloadingDocumentId(documentId)
 
       try {
-        await downloadDocumentFile(user.id, documentId)
-        const log = await saveDocumentAuditLog(
-          user.id,
-          documentWithCategory.document,
-          documentWithCategory.category,
-          'download',
-          auditUserName
-        )
-        appendLog(log)
-        setDownloadMessage('employeeDashboard.documents.download.backendPlaceholder')
+        const file = await downloadPit11File(user.id, documentId)
+        const url = URL.createObjectURL(file.blob)
+        const link = window.document.createElement('a')
+        link.href = url
+        link.download = file.fileName
+        link.click()
+        URL.revokeObjectURL(url)
       } finally {
-        setIsDownloading(false)
+        setDownloadingDocumentId(null)
       }
     },
-    [appendLog, auditUserName, findDocumentWithCategory, user]
+    [user]
   )
 
   return {
-    data,
-    selectedDocument,
-    selectedDocumentId,
+    documents,
     isLoading,
-    isDownloading,
+    downloadingDocumentId,
     error,
-    downloadMessage,
-    selectDocument,
     downloadDocument,
-    clearDownloadMessage: () => setDownloadMessage(null),
   }
 }
