@@ -609,7 +609,6 @@ export const pl: TranslationKeys = {
   'employeeDashboard.pit11.generatedAt': 'Data wygenerowania',
   'employeeDashboard.pit11.actions': 'Akcje',
   'employeeDashboard.pit11.download': 'Pobierz',
-  'employeeDashboard.pit11.downloading': 'Pobieranie...',
   'employeeDashboard.pit11.empty': 'Brak dostępnych formularzy PIT-11.',
   'employeeDashboard.pit11.error.loadFailed': 'Nie udało się załadować formularzy PIT-11.',
   'employeeDashboard.quickActions.pit11': 'PIT-11',

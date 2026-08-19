@@ -610,7 +610,6 @@ export const ro: TranslationKeys = {
   'employeeDashboard.pit11.generatedAt': 'Data generării',
   'employeeDashboard.pit11.actions': 'Acțiuni',
   'employeeDashboard.pit11.download': 'Descarcă',
-  'employeeDashboard.pit11.downloading': 'Se descarcă...',
   'employeeDashboard.pit11.empty': 'Nu există formulare PIT-11 disponibile.',
   'employeeDashboard.pit11.error.loadFailed': 'Formularele PIT-11 nu au putut fi încărcate.',
   'employeeDashboard.quickActions.pit11': 'PIT-11',

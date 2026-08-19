@@ -609,7 +609,6 @@ export const hu: TranslationKeys = {
   'employeeDashboard.pit11.generatedAt': 'Létrehozás dátuma',
   'employeeDashboard.pit11.actions': 'Műveletek',
   'employeeDashboard.pit11.download': 'Letöltés',
-  'employeeDashboard.pit11.downloading': 'Letöltés...',
   'employeeDashboard.pit11.empty': 'Nincsenek elérhető PIT-11 nyomtatványok.',
   'employeeDashboard.pit11.error.loadFailed': 'Nem sikerült betölteni a PIT-11 nyomtatványokat.',
   'employeeDashboard.quickActions.pit11': 'PIT-11',

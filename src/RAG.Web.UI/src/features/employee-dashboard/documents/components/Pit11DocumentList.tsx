@@ -5,8 +5,6 @@ import type { Pit11Document } from '../types/documentsTypes'
 
 interface Pit11DocumentListProps {
   documents: Pit11Document[]
-  downloadingDocumentId: string | null
-  onDownload: (documentId: string) => void
 }
 
 function formatDate(value: string): string {
@@ -17,11 +15,7 @@ function formatDate(value: string): string {
   }).format(new Date(value))
 }
 
-export function Pit11DocumentList({
-  documents,
-  downloadingDocumentId,
-  onDownload,
-}: Pit11DocumentListProps) {
+export function Pit11DocumentList({ documents }: Pit11DocumentListProps) {
   const { t } = useI18n()
 
   return (
@@ -53,10 +47,7 @@ export function Pit11DocumentList({
               </tr>
             </thead>
             <tbody>
-              {documents.map((document) => {
-                const isDownloading = downloadingDocumentId === document.id
-
-                return (
+              {documents.map((document) => (
                   <tr
                     key={document.id}
                     className="border-b border-gray-50 last:border-0 dark:border-slate-800"
@@ -82,18 +73,14 @@ export function Pit11DocumentList({
                         type="button"
                         variant="outline"
                         size="sm"
-                        disabled={downloadingDocumentId !== null}
-                        onClick={() => onDownload(document.id)}
+                        disabled
                       >
                         <Download className="mr-2 h-4 w-4" />
-                        {isDownloading
-                          ? t('employeeDashboard.pit11.downloading')
-                          : t('employeeDashboard.pit11.download')}
+                        {t('employeeDashboard.pit11.download')}
                       </Button>
                     </td>
                   </tr>
-                )
-              })}
+              ))}
             </tbody>
           </table>
         </div>

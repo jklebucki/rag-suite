@@ -9,9 +9,7 @@ export function Documents() {
   const {
     documents,
     isLoading,
-    downloadingDocumentId,
     error,
-    downloadDocument,
   } = useDocumentsData()
 
   if (isLoading) {
@@ -45,11 +43,7 @@ export function Documents() {
         </div>
       </div>
 
-      <Pit11DocumentList
-        documents={documents}
-        downloadingDocumentId={downloadingDocumentId}
-        onDownload={downloadDocument}
-      />
+      <Pit11DocumentList documents={documents} />
     </div>
   )
 }

@@ -684,7 +684,6 @@ export interface TranslationKeys {
   'employeeDashboard.pit11.generatedAt': string;
   'employeeDashboard.pit11.actions': string;
   'employeeDashboard.pit11.download': string;
-  'employeeDashboard.pit11.downloading': string;
   'employeeDashboard.pit11.empty': string;
   'employeeDashboard.pit11.error.loadFailed': string;
   'employeeDashboard.quickActions.pit11': string;

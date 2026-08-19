@@ -664,7 +664,6 @@ export const en: TranslationKeys = {
   'employeeDashboard.pit11.generatedAt': 'Generated on',
   'employeeDashboard.pit11.actions': 'Actions',
   'employeeDashboard.pit11.download': 'Download',
-  'employeeDashboard.pit11.downloading': 'Downloading...',
   'employeeDashboard.pit11.empty': 'No PIT-11 forms available.',
   'employeeDashboard.pit11.error.loadFailed': 'Failed to load PIT-11 forms.',
   'employeeDashboard.quickActions.pit11': 'PIT-11',

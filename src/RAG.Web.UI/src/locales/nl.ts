@@ -609,7 +609,6 @@ export const nl: TranslationKeys = {
   'employeeDashboard.pit11.generatedAt': 'Gegenereerd op',
   'employeeDashboard.pit11.actions': 'Acties',
   'employeeDashboard.pit11.download': 'Downloaden',
-  'employeeDashboard.pit11.downloading': 'Downloaden...',
   'employeeDashboard.pit11.empty': 'Geen PIT-11-formulieren beschikbaar.',
   'employeeDashboard.pit11.error.loadFailed': 'PIT-11-formulieren konden niet worden geladen.',
   'employeeDashboard.quickActions.pit11': 'PIT-11',
