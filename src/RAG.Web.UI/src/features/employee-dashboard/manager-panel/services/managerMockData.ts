@@ -7,6 +7,8 @@ import type {
   TeamMember,
 } from '../types/managerTypes'
 
+const leaveRequestTypes = new Set(['annual', 'onDemand', 'occasional', 'childCare'])
+
 const teamMembers: TeamMember[] = [
   {
     id: 'emp-001',
@@ -197,11 +199,13 @@ let delegations: ApprovalDelegation[] = [
 
 function buildStatistics() {
   return {
-    directReports: 18,
+    directReports: teamMembers.length,
     pendingRequests: approvalRequests.filter((request) => request.status === 'pending').length,
-    absentToday: 2,
+    absentToday: teamMembers.filter((member) => member.presenceStatus === 'vacation').length,
     absentNextSevenDays: 5,
-    vacationConflicts: approvalRequests.filter((request) => request.hasConflict && request.status === 'pending').length,
+    vacationConflicts: approvalRequests.filter(
+      (request) => leaveRequestTypes.has(request.leaveType) && request.hasConflict
+    ).length,
   }
 }
 

@@ -1,29 +1,130 @@
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnFiltersState,
+  type FilterFn,
+  type SortingState,
+} from '@tanstack/react-table'
 import { Mail, Phone, Search, UserRound } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import type { TeamMember } from '../types/managerTypes'
+import removeAccents from 'remove-accents'
+import type { TeamMember, TeamMemberPresenceStatus } from '../types/managerTypes'
+import { presenceStatusLabel } from './managerPanelUtils'
 import { ManagerStatusBadge } from './ManagerStatusBadge'
 import { useManagerT } from './managerTranslations'
 
 interface TeamMembersTableProps {
   members: TeamMember[]
+  initialStatusFilter?: TeamMemberPresenceStatus
 }
 
-export function TeamMembersTable({ members }: TeamMembersTableProps) {
-  const t = useManagerT()
-  const [selectedMemberId, setSelectedMemberId] = useState(members[0]?.id ?? '')
-  const [query, setQuery] = useState('')
-  const selectedMember = members.find((member) => member.id === selectedMemberId) ?? members[0]
+const columnHelper = createColumnHelper<TeamMember>()
 
-  const filteredMembers = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    if (!normalizedQuery) return members
-    return members.filter((member) =>
-      [member.fullName, member.position, member.department]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedQuery)
-    )
-  }, [members, query])
+const diacriticsInsensitiveFilter: FilterFn<TeamMember> = (row, columnId, filterValue) => {
+  const value = row.getValue(columnId)
+  if (value == null) return false
+  return removeAccents(String(value)).toLowerCase().includes(
+    removeAccents(String(filterValue)).toLowerCase()
+  )
+}
+
+const globalFilter: FilterFn<TeamMember> = (row, _columnId, filterValue) => {
+  const searchable = [
+    row.original.fullName,
+    row.original.position,
+    row.original.department,
+    row.original.seniority,
+    row.original.currentProject,
+  ].join(' ')
+  return removeAccents(searchable).toLowerCase().includes(
+    removeAccents(String(filterValue)).toLowerCase()
+  )
+}
+
+export function TeamMembersTable({ members, initialStatusFilter }: TeamMembersTableProps) {
+  const t = useManagerT()
+  const [selectedMemberId, setSelectedMemberId] = useState(
+    () => members.find((member) => member.presenceStatus === initialStatusFilter)?.id ?? members[0]?.id ?? ''
+  )
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'employee', desc: false }])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
+    initialStatusFilter
+      ? [{ id: 'status', value: presenceStatusLabel(initialStatusFilter, t) }]
+      : []
+  )
+  const [query, setQuery] = useState('')
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('fullName', {
+        id: 'employee',
+        header: t('team.col.employee'),
+        filterFn: diacriticsInsensitiveFilter,
+        cell: (info) => (
+          <span className="font-medium text-gray-900 dark:text-gray-100">{info.getValue()}</span>
+        ),
+      }),
+      columnHelper.accessor('position', {
+        header: t('team.col.position'),
+        filterFn: diacriticsInsensitiveFilter,
+      }),
+      columnHelper.accessor('seniority', {
+        header: t('team.col.seniority'),
+        filterFn: diacriticsInsensitiveFilter,
+      }),
+      columnHelper.accessor((member) => presenceStatusLabel(member.presenceStatus, t), {
+        id: 'status',
+        header: t('team.col.status'),
+        filterFn: diacriticsInsensitiveFilter,
+        cell: ({ row }) => (
+          <ManagerStatusBadge type="presence" status={row.original.presenceStatus} />
+        ),
+      }),
+      columnHelper.accessor('remainingLeaveDays', {
+        id: 'leave',
+        header: t('team.col.leave'),
+        filterFn: diacriticsInsensitiveFilter,
+        cell: (info) => (
+          <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">
+            {info.getValue()}
+          </span>
+        ),
+      }),
+      columnHelper.accessor('absenceDaysThisYear', {
+        id: 'absences',
+        header: t('team.col.absences'),
+        filterFn: diacriticsInsensitiveFilter,
+        cell: (info) => <span className="tabular-nums">{info.getValue()}</span>,
+      }),
+    ],
+    [t]
+  )
+
+  const table = useReactTable({
+    data: members,
+    columns,
+    state: { sorting, columnFilters, globalFilter: query },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setQuery,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    globalFilterFn: globalFilter,
+  })
+
+  const visibleMembers = table.getRowModel().rows.map((row) => row.original)
+  const selectedMember = visibleMembers.find((member) => member.id === selectedMemberId) ?? visibleMembers[0]
+
+  useEffect(() => {
+    if (selectedMember && selectedMember.id !== selectedMemberId) {
+      setSelectedMemberId(selectedMember.id)
+    }
+  }, [selectedMember, selectedMemberId])
 
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -36,7 +137,7 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
             <div>
               <h2 className="font-semibold text-gray-900 dark:text-gray-100">{t('team.title')}</h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('team.count', { count: members.length })}
+                {t('team.count', { count: visibleMembers.length })}
               </p>
             </div>
           </div>
@@ -54,62 +155,81 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
         <div className="hidden overflow-x-auto lg:block">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50 dark:border-slate-800 dark:bg-slate-900/50">
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.employee')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.position')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.seniority')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.status')}
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.leave')}
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {t('team.col.absences')}
-                </th>
-              </tr>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <React.Fragment key={headerGroup.id}>
+                  <tr className="border-b border-gray-100 bg-gray-50 dark:border-slate-800 dark:bg-slate-900/50">
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 transition-colors dark:text-gray-400 ${
+                          header.column.getCanSort()
+                            ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-slate-700/60'
+                            : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getCanSort() && (
+                            <span className="text-gray-400 dark:text-gray-500">
+                              {{ asc: '↑', desc: '↓' }[header.column.getIsSorted() as string] ?? '↕'}
+                            </span>
+                          )}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                  <tr>
+                    {headerGroup.headers.map((header) => (
+                      <th key={`filter-${header.id}`} className="bg-gray-100 px-3 py-2 dark:bg-slate-800/60">
+                        {header.column.getCanFilter() && (
+                          <input
+                            type="text"
+                            value={(header.column.getFilterValue() ?? '') as string}
+                            onChange={(event) => header.column.setFilterValue(event.target.value)}
+                            placeholder={`${t('table.searchIn')} ${String(header.column.columnDef.header).toLowerCase()}...`}
+                            className="form-input w-full py-1 text-xs"
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                </React.Fragment>
+              ))}
             </thead>
             <tbody>
-              {filteredMembers.map((member) => (
-                <tr
-                  key={member.id}
-                  onClick={() => setSelectedMemberId(member.id)}
-                  className={`cursor-pointer border-b border-gray-50 transition-colors last:border-0 dark:border-slate-800 ${
-                    selectedMember?.id === member.id
-                      ? 'bg-primary-50/80 dark:bg-primary-900/20'
-                      : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
-                  }`}
-                >
-                  <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-gray-100">
-                    {member.fullName}
-                  </td>
-                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300">{member.position}</td>
-                  <td className="whitespace-nowrap px-4 py-3.5 text-gray-600 dark:text-gray-300">
-                    {member.seniority}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <ManagerStatusBadge type="presence" status={member.presenceStatus} />
-                  </td>
-                  <td className="px-4 py-3.5 text-center font-semibold tabular-nums text-gray-900 dark:text-gray-100">
-                    {member.remainingLeaveDays}
-                  </td>
-                  <td className="px-4 py-3.5 text-center tabular-nums text-gray-600 dark:text-gray-300">
-                    {member.absenceDaysThisYear}
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
+                    {t('table.noResults')}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    onClick={() => setSelectedMemberId(row.original.id)}
+                    className={`cursor-pointer border-b border-gray-50 transition-colors last:border-0 dark:border-slate-800 ${
+                      selectedMember?.id === row.original.id
+                        ? 'bg-primary-50/80 dark:bg-primary-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-3.5 text-gray-600 dark:text-gray-300">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         <div className="divide-y divide-gray-100 dark:divide-slate-800 lg:hidden">
-          {filteredMembers.map((member) => (
+          {visibleMembers.map((member) => (
             <button
               key={member.id}
               type="button"
@@ -130,6 +250,11 @@ export function TeamMembersTable({ members }: TeamMembersTableProps) {
               </div>
             </button>
           ))}
+          {visibleMembers.length === 0 && (
+            <p className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-300">
+              {t('table.noResults')}
+            </p>
+          )}
         </div>
       </div>
 

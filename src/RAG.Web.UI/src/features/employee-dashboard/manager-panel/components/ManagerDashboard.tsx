@@ -1,14 +1,24 @@
 import { AlertTriangle, ClipboardList, HeartPulse, Users, UserX } from 'lucide-react'
-import type { ManagerPanelData } from '../types/managerTypes'
+import type {
+  ManagerApprovalStatus,
+  ManagerPanelData,
+  TeamMemberPresenceStatus,
+} from '../types/managerTypes'
 import { AuditLogTable } from './AuditLogTable'
 import { TeamStatisticsCard } from './TeamStatisticsCard'
 import { useManagerT } from './managerTranslations'
 
 interface ManagerDashboardProps {
   data: ManagerPanelData
+  onNavigate: (target: ManagerDashboardTarget) => void
 }
 
-export function ManagerDashboard({ data }: ManagerDashboardProps) {
+export type ManagerDashboardTarget =
+  | { tab: 'team'; presenceStatus?: TeamMemberPresenceStatus }
+  | { tab: 'requests'; status?: ManagerApprovalStatus }
+  | { tab: 'leaveRequests'; conflictsOnly?: boolean }
+
+export function ManagerDashboard({ data, onNavigate }: ManagerDashboardProps) {
   const t = useManagerT()
   const stats = data.statistics
   const sickLeaves = data.teamMembers.filter(
@@ -23,6 +33,7 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
           value={stats.directReports}
           icon={Users}
           description={t('dashboard.directReportsDesc')}
+          onClick={() => onNavigate({ tab: 'team' })}
         />
         <TeamStatisticsCard
           title={t('dashboard.pendingRequests')}
@@ -30,12 +41,14 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
           icon={ClipboardList}
           description={t('dashboard.pendingRequestsDesc')}
           tone="warning"
+          onClick={() => onNavigate({ tab: 'requests', status: 'pending' })}
         />
         <TeamStatisticsCard
           title={t('dashboard.absentToday')}
           value={stats.absentToday}
           icon={UserX}
           description={t('dashboard.absentTodayDesc')}
+          onClick={() => onNavigate({ tab: 'team', presenceStatus: 'vacation' })}
         />
         <TeamStatisticsCard
           title={t('dashboard.sickLeaves')}
@@ -43,6 +56,7 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
           icon={HeartPulse}
           description={t('dashboard.sickLeavesDesc')}
           tone="muted"
+          onClick={() => onNavigate({ tab: 'team', presenceStatus: 'absence' })}
         />
         <TeamStatisticsCard
           title={t('dashboard.vacationConflicts')}
@@ -50,6 +64,7 @@ export function ManagerDashboard({ data }: ManagerDashboardProps) {
           icon={AlertTriangle}
           description={t('dashboard.vacationConflictsDesc')}
           tone={stats.vacationConflicts > 0 ? 'danger' : 'neutral'}
+          onClick={() => onNavigate({ tab: 'leaveRequests', conflictsOnly: true })}
         />
       </div>
 

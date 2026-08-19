@@ -2,10 +2,14 @@ import { useState } from 'react'
 import { Briefcase, XCircle } from 'lucide-react'
 import { useI18n } from '@/shared/contexts/I18nContext'
 import { useManagerPanel } from '../hooks/useManagerPanel'
-import type { ApprovalRequest } from '../types/managerTypes'
+import type {
+  ApprovalRequest,
+  ManagerApprovalStatus,
+  TeamMemberPresenceStatus,
+} from '../types/managerTypes'
 import { ApprovalRequestDetails } from './ApprovalRequestDetails'
 import { DelegationSettings } from './DelegationSettings'
-import { ManagerDashboard } from './ManagerDashboard'
+import { ManagerDashboard, type ManagerDashboardTarget } from './ManagerDashboard'
 import { ManagerTabs, type ManagerPanelTab } from './ManagerTabs'
 import { PendingRequestsTable } from './PendingRequestsTable'
 import { RejectionReasonModal } from './RejectionReasonModal'
@@ -16,6 +20,9 @@ export function ManagerPanel() {
   const { data, isLoading, isMutating, error, approveRequest, rejectRequest, saveDelegation } =
     useManagerPanel()
   const [activeTab, setActiveTab] = useState<ManagerPanelTab>('dashboard')
+  const [teamStatusFilter, setTeamStatusFilter] = useState<TeamMemberPresenceStatus>()
+  const [requestStatusFilter, setRequestStatusFilter] = useState<ManagerApprovalStatus>()
+  const [leaveConflictsOnly, setLeaveConflictsOnly] = useState(false)
   const [detailRequest, setDetailRequest] = useState<ApprovalRequest | null>(null)
   const [rejectionRequest, setRejectionRequest] = useState<ApprovalRequest | null>(null)
 
@@ -28,6 +35,20 @@ export function ManagerPanel() {
     await rejectRequest(requestId, reason)
     setRejectionRequest(null)
     setDetailRequest(null)
+  }
+
+  function handleDashboardNavigation(target: ManagerDashboardTarget) {
+    setTeamStatusFilter(target.tab === 'team' ? target.presenceStatus : undefined)
+    setRequestStatusFilter(target.tab === 'requests' ? target.status : undefined)
+    setLeaveConflictsOnly(target.tab === 'leaveRequests' && target.conflictsOnly === true)
+    setActiveTab(target.tab)
+  }
+
+  function handleTabChange(tab: ManagerPanelTab) {
+    setTeamStatusFilter(undefined)
+    setRequestStatusFilter(undefined)
+    setLeaveConflictsOnly(false)
+    setActiveTab(tab)
   }
 
   if (isLoading) {
@@ -61,11 +82,15 @@ export function ManagerPanel() {
         </div>
       </div>
 
-      <ManagerTabs active={activeTab} onChange={setActiveTab} />
+      <ManagerTabs active={activeTab} onChange={handleTabChange} />
 
-      {activeTab === 'dashboard' && <ManagerDashboard data={data} />}
+      {activeTab === 'dashboard' && (
+        <ManagerDashboard data={data} onNavigate={handleDashboardNavigation} />
+      )}
 
-      {activeTab === 'team' && <TeamMembersTable members={data.teamMembers} />}
+      {activeTab === 'team' && (
+        <TeamMembersTable members={data.teamMembers} initialStatusFilter={teamStatusFilter} />
+      )}
 
       {activeTab === 'requests' && (
         <PendingRequestsTable
@@ -74,6 +99,19 @@ export function ManagerPanel() {
           onViewDetails={setDetailRequest}
           onApprove={handleApprove}
           onReject={setRejectionRequest}
+          initialStatusFilter={requestStatusFilter}
+        />
+      )}
+
+      {activeTab === 'leaveRequests' && (
+        <PendingRequestsTable
+          requests={data.approvalRequests}
+          isMutating={isMutating}
+          onViewDetails={setDetailRequest}
+          onApprove={handleApprove}
+          onReject={setRejectionRequest}
+          leaveOnly
+          initialConflictsOnly={leaveConflictsOnly}
         />
       )}
 

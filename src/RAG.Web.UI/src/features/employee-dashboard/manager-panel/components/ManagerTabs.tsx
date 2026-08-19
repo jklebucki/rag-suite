@@ -1,8 +1,8 @@
 import type { ComponentType } from 'react'
-import { BarChart3, CalendarSync, ClipboardCheck, Users } from 'lucide-react'
+import { BarChart3, CalendarDays, CalendarSync, ClipboardCheck, Users } from 'lucide-react'
 import { useManagerT } from './managerTranslations'
 
-export type ManagerPanelTab = 'dashboard' | 'team' | 'requests' | 'delegation'
+export type ManagerPanelTab = 'dashboard' | 'team' | 'requests' | 'leaveRequests' | 'delegation'
 
 interface ManagerTabsProps {
   active: ManagerPanelTab
@@ -17,6 +17,7 @@ const tabs: Array<{
   { id: 'dashboard', label: 'tabs.dashboard', icon: BarChart3 },
   { id: 'team', label: 'tabs.team', icon: Users },
   { id: 'requests', label: 'tabs.requests', icon: ClipboardCheck },
+  { id: 'leaveRequests', label: 'tabs.leaveRequests', icon: CalendarDays },
   { id: 'delegation', label: 'tabs.delegation', icon: CalendarSync },
 ]
 
@@ -25,7 +26,7 @@ export function ManagerTabs({ active, onChange }: ManagerTabsProps) {
 
   return (
     <div className="surface p-1">
-      <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 xl:grid-cols-5">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const selected = active === tab.id

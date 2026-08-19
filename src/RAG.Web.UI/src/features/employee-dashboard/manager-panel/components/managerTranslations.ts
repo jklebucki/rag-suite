@@ -5,6 +5,7 @@ type ManagerTranslationKey =
   | 'tabs.dashboard'
   | 'tabs.team'
   | 'tabs.requests'
+  | 'tabs.leaveRequests'
   | 'tabs.delegation'
   | 'dashboard.directReports'
   | 'dashboard.directReportsDesc'
@@ -42,6 +43,8 @@ type ManagerTranslationKey =
   | 'team.mobile.leave'
   | 'team.mobile.absences'
   | 'requests.title'
+  | 'requests.leaveTitle'
+  | 'requests.onlyConflicts'
   | 'requests.summary'
   | 'requests.col.employee'
   | 'requests.col.type'
@@ -72,6 +75,8 @@ type ManagerTranslationKey =
   | 'rejection.required'
   | 'common.cancel'
   | 'common.days'
+  | 'table.searchIn'
+  | 'table.noResults'
   | 'delegation.formTitle'
   | 'delegation.formSubtitle'
   | 'delegation.substitute'
@@ -112,6 +117,7 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'tabs.dashboard': 'Team dashboard',
     'tabs.team': 'My employees',
     'tabs.requests': 'Requests for approval',
+    'tabs.leaveRequests': 'Leave requests',
     'tabs.delegation': 'Approval delegation',
     'dashboard.directReports': 'My team',
     'dashboard.directReportsDesc': 'Direct reports',
@@ -149,6 +155,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'team.mobile.leave': 'Leave',
     'team.mobile.absences': 'Absences',
     'requests.title': 'Requests for approval',
+    'requests.leaveTitle': 'Leave requests',
+    'requests.onlyConflicts': 'Conflicts only',
     'requests.summary': '{pending} pending out of {total} total',
     'requests.col.employee': 'Employee',
     'requests.col.type': 'Request type',
@@ -179,6 +187,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'rejection.required': 'Enter a rejection reason',
     'common.cancel': 'Cancel',
     'common.days': 'days',
+    'table.searchIn': 'Search in',
+    'table.noResults': 'No matching results',
     'delegation.formTitle': 'Delegate configuration',
     'delegation.formSubtitle': 'Select the person who will take over request approvals in the chosen period.',
     'delegation.substitute': 'Delegate',
@@ -218,6 +228,7 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'tabs.dashboard': 'Dashboard zespołu',
     'tabs.team': 'Moi pracownicy',
     'tabs.requests': 'Wnioski do akceptacji',
+    'tabs.leaveRequests': 'Wnioski urlopowe',
     'tabs.delegation': 'Zastępstwo akceptacyjne',
     'dashboard.directReports': 'Mój zespół',
     'dashboard.directReportsDesc': 'Podlegli pracownicy',
@@ -255,6 +266,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'team.mobile.leave': 'Urlop',
     'team.mobile.absences': 'Absencje',
     'requests.title': 'Wnioski do akceptacji',
+    'requests.leaveTitle': 'Wnioski urlopowe',
+    'requests.onlyConflicts': 'Tylko konflikty',
     'requests.summary': '{pending} oczekujące z {total} wszystkich',
     'requests.col.employee': 'Pracownik',
     'requests.col.type': 'Typ wniosku',
@@ -285,6 +298,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'rejection.required': 'Podaj powód odrzucenia',
     'common.cancel': 'Anuluj',
     'common.days': 'dni',
+    'table.searchIn': 'Szukaj w',
+    'table.noResults': 'Brak wyników spełniających filtry',
     'delegation.formTitle': 'Konfiguracja zastępcy',
     'delegation.formSubtitle': 'Ustaw osobę, która przejmie akceptację wniosków w wybranym okresie.',
     'delegation.substitute': 'Zastępca',
@@ -324,6 +339,7 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'tabs.dashboard': 'Dashboard echipă',
     'tabs.team': 'Angajații mei',
     'tabs.requests': 'Cereri de aprobat',
+    'tabs.leaveRequests': 'Cereri de concediu',
     'tabs.delegation': 'Delegare aprobare',
     'dashboard.directReports': 'Echipa mea',
     'dashboard.directReportsDesc': 'Angajați subordonați',
@@ -361,6 +377,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'team.mobile.leave': 'Concediu',
     'team.mobile.absences': 'Absențe',
     'requests.title': 'Cereri de aprobat',
+    'requests.leaveTitle': 'Cereri de concediu',
+    'requests.onlyConflicts': 'Doar conflicte',
     'requests.summary': '{pending} în așteptare din {total} total',
     'requests.col.employee': 'Angajat',
     'requests.col.type': 'Tip cerere',
@@ -391,6 +409,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'rejection.required': 'Introdu motivul respingerii',
     'common.cancel': 'Anulează',
     'common.days': 'zile',
+    'table.searchIn': 'Caută în',
+    'table.noResults': 'Niciun rezultat care să corespundă filtrelor',
     'delegation.formTitle': 'Configurare delegat',
     'delegation.formSubtitle': 'Alege persoana care va prelua aprobările cererilor în perioada selectată.',
     'delegation.substitute': 'Delegat',
@@ -430,6 +450,7 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'tabs.dashboard': 'Csapat dashboard',
     'tabs.team': 'Munkatársaim',
     'tabs.requests': 'Jóváhagyandó kérelmek',
+    'tabs.leaveRequests': 'Szabadságkérelmek',
     'tabs.delegation': 'Jóváhagyási helyettesítés',
     'dashboard.directReports': 'Csapatom',
     'dashboard.directReportsDesc': 'Közvetlen beosztottak',
@@ -467,6 +488,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'team.mobile.leave': 'Szabadság',
     'team.mobile.absences': 'Távollétek',
     'requests.title': 'Jóváhagyandó kérelmek',
+    'requests.leaveTitle': 'Szabadságkérelmek',
+    'requests.onlyConflicts': 'Csak ütközések',
     'requests.summary': '{pending} függő a(z) {total} összesből',
     'requests.col.employee': 'Munkatárs',
     'requests.col.type': 'Kérelem típusa',
@@ -497,6 +520,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'rejection.required': 'Add meg az elutasítás okát',
     'common.cancel': 'Mégse',
     'common.days': 'nap',
+    'table.searchIn': 'Keresés itt:',
+    'table.noResults': 'Nincs a szűrőknek megfelelő találat',
     'delegation.formTitle': 'Helyettes konfigurálása',
     'delegation.formSubtitle': 'Válaszd ki, ki veszi át a kérelmek jóváhagyását a megadott időszakban.',
     'delegation.substitute': 'Helyettes',
@@ -536,6 +561,7 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'tabs.dashboard': 'Teamdashboard',
     'tabs.team': 'Mijn medewerkers',
     'tabs.requests': 'Aanvragen ter goedkeuring',
+    'tabs.leaveRequests': 'Verlofaanvragen',
     'tabs.delegation': 'Goedkeuringsvervanging',
     'dashboard.directReports': 'Mijn team',
     'dashboard.directReportsDesc': 'Directe medewerkers',
@@ -573,6 +599,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'team.mobile.leave': 'Verlof',
     'team.mobile.absences': 'Afwezigheden',
     'requests.title': 'Aanvragen ter goedkeuring',
+    'requests.leaveTitle': 'Verlofaanvragen',
+    'requests.onlyConflicts': 'Alleen conflicten',
     'requests.summary': '{pending} openstaand van {total} totaal',
     'requests.col.employee': 'Medewerker',
     'requests.col.type': 'Aanvraagtype',
@@ -603,6 +631,8 @@ const translations: Record<LanguageCode, Record<ManagerTranslationKey, string>> 
     'rejection.required': 'Voer een reden voor afwijzing in',
     'common.cancel': 'Annuleren',
     'common.days': 'dagen',
+    'table.searchIn': 'Zoeken in',
+    'table.noResults': 'Geen resultaten die aan de filters voldoen',
     'delegation.formTitle': 'Vervanger configureren',
     'delegation.formSubtitle': 'Kies wie de aanvraaggoedkeuringen overneemt in de geselecteerde periode.',
     'delegation.substitute': 'Vervanger',

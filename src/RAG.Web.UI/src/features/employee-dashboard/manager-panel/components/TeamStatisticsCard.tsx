@@ -6,6 +6,7 @@ interface TeamStatisticsCardProps {
   icon: ComponentType<{ className?: string }>
   tone?: 'neutral' | 'warning' | 'danger' | 'muted'
   description?: string
+  onClick: () => void
 }
 
 export function TeamStatisticsCard({
@@ -14,6 +15,7 @@ export function TeamStatisticsCard({
   icon: Icon,
   tone = 'neutral',
   description,
+  onClick,
 }: TeamStatisticsCardProps) {
   const toneClasses = {
     neutral: {
@@ -36,7 +38,11 @@ export function TeamStatisticsCard({
   const classes = toneClasses[tone]
 
   return (
-    <div className="surface flex h-full min-h-[172px] p-5">
+    <button
+      type="button"
+      onClick={onClick}
+      className="surface flex h-full min-h-[172px] w-full p-5 text-left transition-colors hover:border-primary-200 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:border-primary-800 dark:hover:bg-slate-800/50"
+    >
       <div className="flex w-full flex-col">
         <div className="flex min-h-10 items-center gap-3">
           <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ring-1 ${classes.icon}`}>
@@ -61,6 +67,6 @@ export function TeamStatisticsCard({
           </p>
         )}
       </div>
-    </div>
+    </button>
   )
 }
