@@ -599,6 +599,7 @@ export const pl: TranslationKeys = {
   // Employee Dashboard
   'employeeDashboard.dashboard': 'Dashboard',
   'employeeDashboard.managerPanel': 'Panel przełożonego',
+  'employeeDashboard.hrAbsenceManagement': 'Nieobecności HR',
   'employeeDashboard.personalData': 'Moje dane osobowe',
   'employeeDashboard.leaveRequest': 'Wniosek urlopowy',
   'employeeDashboard.salary': 'Wynagrodzenie',

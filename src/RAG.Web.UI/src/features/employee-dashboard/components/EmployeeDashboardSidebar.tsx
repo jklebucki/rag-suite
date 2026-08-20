@@ -1,5 +1,13 @@
 import React from 'react'
-import { BarChart3, Briefcase, User, CalendarDays, Banknote, FileText } from 'lucide-react'
+import {
+  BarChart3,
+  Briefcase,
+  User,
+  CalendarDays,
+  Banknote,
+  FileText,
+  CalendarRange,
+} from 'lucide-react'
 import { PanelSidebar, type PanelSidebarItem } from '@/shared/components/layout'
 import { useAuth } from '@/shared/contexts/AuthContext'
 import { useI18n } from '@/shared/contexts/I18nContext'
@@ -16,6 +24,7 @@ export function EmployeeDashboardSidebar({ isActiveRoute }: Props) {
   const { user } = useAuth()
   const roles = user?.roles || []
   const isManagerOrAdmin = roles.includes('Admin') || roles.includes('Manager')
+  const isHrOrAdmin = roles.includes('Admin') || roles.includes('HR')
   const { t } = useI18n()
 
   // Employee dashboard navigation: routes, labels, icons, and role visibility stay local to this feature.
@@ -31,6 +40,12 @@ export function EmployeeDashboardSidebar({ isActiveRoute }: Props) {
       icon: Briefcase,
       label: t('employeeDashboard.managerPanel'),
       visible: isManagerOrAdmin,
+    },
+    {
+      to: '/employee-dashboard/hr-absence-management',
+      icon: CalendarRange,
+      label: t('employeeDashboard.hrAbsenceManagement'),
+      visible: isHrOrAdmin,
     },
     {
       to: '/employee-dashboard/personal',

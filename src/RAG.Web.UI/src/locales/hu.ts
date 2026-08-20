@@ -599,6 +599,7 @@ export const hu: TranslationKeys = {
   // Employee Dashboard
   'employeeDashboard.dashboard': 'Dashboard',
   'employeeDashboard.managerPanel': 'Vezető panel',
+  'employeeDashboard.hrAbsenceManagement': 'HR távollétek',
   'employeeDashboard.personalData': 'Személyes adataim',
   'employeeDashboard.leaveRequest': 'Szabadságkérelem',
   'employeeDashboard.salary': 'Fizetés',

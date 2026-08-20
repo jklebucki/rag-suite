@@ -599,6 +599,7 @@ export const nl: TranslationKeys = {
   // Employee Dashboard
   'employeeDashboard.dashboard': 'Dashboard',
   'employeeDashboard.managerPanel': 'Managerspaneel',
+  'employeeDashboard.hrAbsenceManagement': 'HR-afwezigheden',
   'employeeDashboard.personalData': 'Mijn persoonlijke gegevens',
   'employeeDashboard.leaveRequest': 'Verlofaanvraag',
   'employeeDashboard.salary': 'Salaris',

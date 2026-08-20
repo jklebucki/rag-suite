@@ -600,6 +600,7 @@ export const ro: TranslationKeys = {
   // Employee Dashboard
   'employeeDashboard.dashboard': 'Dashboard',
   'employeeDashboard.managerPanel': 'Panoul managerului',
+  'employeeDashboard.hrAbsenceManagement': 'Absențe HR',
   'employeeDashboard.personalData': 'Datele mele personale',
   'employeeDashboard.leaveRequest': 'Cerere de concediu',
   'employeeDashboard.salary': 'Salariu',

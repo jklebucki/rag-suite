@@ -34,6 +34,7 @@ const ThreadDetailPagePromise = import('@/features/forum/components/ThreadDetail
 const EmployeeDashboardPromise = import('@/features/employee-dashboard/dashboard').then(module => ({ default: module.EmployeeDashboard }))
 const EmployeeDashboardLayoutPromise = import('@/features/employee-dashboard/components/EmployeeDashboardLayout').then(module => ({ default: module.EmployeeDashboardLayout }))
 const ManagerPanelPromise = import('@/features/employee-dashboard/manager-panel').then(module => ({ default: module.ManagerPanel }))
+const HrAbsenceManagementPromise = import('@/features/employee-dashboard/hr-absence-management').then(module => ({ default: module.HrAbsenceManagement }))
 const PersonalDataPromise = import('@/features/employee-dashboard/personal-data').then(module => ({ default: module.PersonalData }))
 const LeaveRequestPromise = import('@/features/employee-dashboard/leave-request').then(module => ({ default: module.LeaveRequest }))
 const SalaryPromise = import('@/features/employee-dashboard/payroll').then(module => ({ default: module.PayrollPage }))
@@ -148,6 +149,11 @@ function EmployeeDashboardLoader() {
 function ManagerPanelLoader() {
   const ManagerPanel = useAsyncComponent(ManagerPanelPromise)
   return <ManagerPanel />
+}
+
+function HrAbsenceManagementLoader() {
+  const HrAbsenceManagement = useAsyncComponent(HrAbsenceManagementPromise)
+  return <HrAbsenceManagement />
 }
 
 function PersonalDataLoader() {
@@ -280,6 +286,16 @@ export function createAppRouter() {
                   <RouteSuspense>
                     <RoleProtectedRoute allowedRoles={['Admin', 'Manager']}>
                       <ManagerPanelLoader />
+                    </RoleProtectedRoute>
+                  </RouteSuspense>
+                ),
+              },
+              {
+                path: 'hr-absence-management',
+                element: (
+                  <RouteSuspense>
+                    <RoleProtectedRoute allowedRoles={['Admin', 'HR']}>
+                      <HrAbsenceManagementLoader />
                     </RoleProtectedRoute>
                   </RouteSuspense>
                 ),

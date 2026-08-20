@@ -1,0 +1,1 @@
+export { HrAbsenceManagement } from './components'

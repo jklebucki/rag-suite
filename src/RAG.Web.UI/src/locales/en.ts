@@ -654,6 +654,7 @@ export const en: TranslationKeys = {
   // Employee Dashboard
   'employeeDashboard.dashboard': 'Dashboard',
   'employeeDashboard.managerPanel': 'Manager Panel',
+  'employeeDashboard.hrAbsenceManagement': 'HR Absence Management',
   'employeeDashboard.personalData': 'My Personal Data',
   'employeeDashboard.leaveRequest': 'Leave Request',
   'employeeDashboard.salary': 'Salary',

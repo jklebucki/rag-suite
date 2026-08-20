@@ -674,6 +674,7 @@ export interface TranslationKeys {
   // Employee Dashboard – navigation
   'employeeDashboard.dashboard': string;
   'employeeDashboard.managerPanel': string;
+  'employeeDashboard.hrAbsenceManagement': string;
   'employeeDashboard.personalData': string;
   'employeeDashboard.leaveRequest': string;
   'employeeDashboard.salary': string;
