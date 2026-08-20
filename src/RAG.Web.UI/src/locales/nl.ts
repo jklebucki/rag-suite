@@ -47,7 +47,7 @@ export const nl: TranslationKeys = {
   'about.flow.processes': 'Procesondersteuning',
   'about.roadmap.eyebrow': 'Productontwikkeling',
   'about.roadmap.title': 'Hoe RAG Suite zich ontwikkelt',
-  'about.roadmap.description': 'Een helder beeld van het huidige platform, de verbeterde gebieden en toekomstige richtingen — zonder kunstmatige deadlines of beloften.',
+  'about.roadmap.description': 'Een overzicht van beschikbare functies, gebieden die momenteel worden ontwikkeld en de verdere ontwikkelrichting van het platform.',
   'about.roadmap.available.title': 'Vandaag beschikbaar',
   'about.roadmap.available.description': 'Fundamenten en modules die al in RAG Suite aanwezig zijn.',
   'about.roadmap.available.item1': 'RAG-chat en semantisch zoeken in documenten met antwoordbronnen',

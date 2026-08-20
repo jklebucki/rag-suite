@@ -47,7 +47,7 @@ export const hu: TranslationKeys = {
   'about.flow.processes': 'Folyamattámogatás',
   'about.roadmap.eyebrow': 'Termékfejlesztés',
   'about.roadmap.title': 'Hogyan fejlődik a RAG Suite',
-  'about.roadmap.description': 'Áttekintés a jelenlegi platformról, a fejlesztett területekről és a további irányokról — mesterséges határidők és ígéretek nélkül.',
+  'about.roadmap.description': 'A rendelkezésre álló funkciók, a jelenleg fejlesztett területek és a platform további fejlődési irányainak áttekintése.',
   'about.roadmap.available.title': 'Ma elérhető',
   'about.roadmap.available.description': 'A RAG Suite-ban már jelen lévő alapok és modulok.',
   'about.roadmap.available.item1': 'RAG chat és szemantikus dokumentumkeresés válaszforrásokkal',

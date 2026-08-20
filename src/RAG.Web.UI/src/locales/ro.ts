@@ -47,7 +47,7 @@ export const ro: TranslationKeys = {
   'about.flow.processes': 'Sprijin pentru procese',
   'about.roadmap.eyebrow': 'Dezvoltarea produsului',
   'about.roadmap.title': 'Cum evoluează RAG Suite',
-  'about.roadmap.description': 'O imagine clară a platformei actuale, a zonelor îmbunătățite și a direcțiilor de dezvoltare — fără termene sau promisiuni artificiale.',
+  'about.roadmap.description': 'O prezentare a funcționalităților disponibile, a domeniilor aflate în dezvoltare și a direcțiilor viitoare ale platformei.',
   'about.roadmap.available.title': 'Disponibil astăzi',
   'about.roadmap.available.description': 'Fundamente și module deja prezente în RAG Suite.',
   'about.roadmap.available.item1': 'Chat RAG și căutare semantică în documente, cu surse pentru răspunsuri',

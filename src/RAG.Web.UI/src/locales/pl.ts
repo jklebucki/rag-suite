@@ -47,7 +47,7 @@ export const pl: TranslationKeys = {
   'about.flow.processes': 'Wsparcie procesów',
   'about.roadmap.eyebrow': 'Rozwój produktu',
   'about.roadmap.title': 'Jak rozwija się RAG Suite',
-  'about.roadmap.description': 'Czytelny obraz obecnej platformy, ulepszanych obszarów i kierunków dalszego rozwoju — bez sztucznych terminów i obietnic.',
+  'about.roadmap.description': 'Przegląd dostępnych funkcji, aktualnie rozwijanych obszarów oraz kierunków dalszego rozwoju platformy.',
   'about.roadmap.available.title': 'Dostępne dzisiaj',
   'about.roadmap.available.description': 'Fundamenty i moduły, które są już obecne w RAG Suite.',
   'about.roadmap.available.item1': 'Czat RAG i semantyczne wyszukiwanie dokumentów ze źródłami odpowiedzi',
