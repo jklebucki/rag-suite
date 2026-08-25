@@ -22,7 +22,7 @@ Dankzij Retrieval-Augmented Generation (RAG) en een semantische zoekmachine kunn
 
 Het is een digitale kennisassistent — altijd actueel, veilig en beschikbaar voor de hele organisatie.
 
-## BELANGRIJKSTE FUNCTIES {#key-features}
+## WAT KAN RAG SUITE? {#key-features}
 
 ### Functies die werk stroomlijnen, processen automatiseren en kennis centraliseren op één plek {#subtitle-key-features}
 
@@ -44,40 +44,40 @@ Het is een digitale kennisassistent — altijd actueel, veilig en beschikbaar vo
 - Alerts en beleidsregels voor naleving van standaarden (ISO/NIS2)
 - Inzichten en aanbevelingen ter ondersteuning van bedrijfsprocessen
 
-## ROADMAP {#roadmap}
+## HOE RAG SUITE ZICH ONTWIKKELT {#roadmap}
 
 ### Strategisch ontwikkelingspad voor AI-functies, beveiliging en kennisanalyse in de organisatie {#subtitle-roadmap}
 
-### GEREALISEERD {#done}
+### VANDAAG BESCHIKBAAR {#done}
 - RAG-prototype: stabiele architectuur en gebruiksklare gebruikersinterface.
 - CyberSec-quizzen: interactieve kennistests voor medewerkers.
 - Integratie met IFS Cloud — automatisering van procesinstructies met een GPT-OSS-model.
 - Meertalig: ondersteuning voor meerdere talen in chat, documenten en interface.
 
-### IN UITVOERING {#inprogress}
+### NU IN ONTWIKKELING {#inprogress}
 - Uitbreiding van CyberPanel
 - Training van het taalmodel op cyberbeveiliging
 - UX-verbeteringen
 - Hogere relevantie van modelantwoorden
 
-### PLAN {#plan}
+### VERDERE ONTWIKKELRICHTING {#plan}
 - Integraties met het adresboek
 - Medewerkerdashboard en integratie met IFS CLOUD
 - Taalmodellen trainen in bedrijfsprocessen ter ondersteuning van onboarding van nieuwe medewerkers
 - Opbouw van bedrijfsbrede beveiligingsprocedures
 
-## VOORDELEN VOOR HET BEDRIJF {#benefits}
+## WAAROM HEBBEN WE RAG SUITE NODIG? {#benefits}
 
 ### AI die kennis organiseert, processen stroomlijnt en de efficiëntie van de hele organisatie verhoogt {#subtitle-benefits}
 
-- **SNELLERE PROCESSEN**: Tot 80–90% kortere tijd tot informatie dankzij centrale chat en slimme documentzoekfunctie.
-- **CONSISTENTE ANTWOORDEN**: Volledige standaardisatie van kennis en eliminatie van fouten door verschillende interpretaties van instructies.
-- **KENNISAUTOMATISERING**: Documenten, instructies en bedrijfsbeleid worden automatisch verwerkt en via interactieve dialoog beschikbaar gemaakt.
-- **ONBOARDING VAN NIEUWE MEDEWERKERS**: Razendsnelle onboarding met contextuele antwoorden en quizzen over beveiligingsregels en IFS-procedures.
-- **MODERN BEDRIJFSIMAGO**: Het gebruik van AI in dagelijks kennismanagement verhoogt innovatie en concurrentievermogen.
-- **GEEN VERSNIPPERING**: Alle kerngegevens, procedures en instructies zijn gecentraliseerd op één plek, toegankelijk via één platform.
+- **ÉÉN PLEK IN PLAATS VAN VERSPREIDE BRONNEN**: Belangrijke gegevens, procedures en instructies zijn beschikbaar via één veilig platform.
+- **MINDER TERUGKERENDE VRAGEN**: Medewerkers kunnen zelfstandig geverifieerde informatie in de kennisbank vinden.
+- **ANTWOORD MET BRONVERMELDING**: Antwoorden bevatten context en verwijzingen, zodat ze eenvoudig te controleren zijn.
+- **EENVOUDIGERE ONBOARDING**: Nieuwe medewerkers leren sneller de regels, procedures en kennis die nodig zijn voor hun dagelijkse werk.
+- **KENNIS BLIJFT IN DE ORGANISATIE**: Informatie blijft geordend en toegankelijk, onafhankelijk van individuele personen of teams.
+- **BETERE KENNISKWALITEIT**: Gedeelde bronnen verminderen verschillen en helpen informatie actueel te houden.
 
-## AUTEURS VAN HET PROJECT {#authors}
+## PROJECTTEAM {#authors}
 
 ### Mensen verantwoordelijk voor de ontwikkeling en het onderhoud van RAG Suite {#subtitle-authors}
 

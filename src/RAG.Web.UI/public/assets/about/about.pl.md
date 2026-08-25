@@ -22,7 +22,7 @@ Dzięki mechanizmom RAG (Retrieval-Augmented Generation) i silnikowi semantyczne
 
 To cyfrowy asystent wiedzy — zawsze aktualny, bezpieczny i dostępny dla całej firmy.
 
-## KLUCZOWE FUNKCJE {#key-features}
+## CO POTRAFI RAG SUITE? {#key-features}
 
 ### Funkcje, które usprawniają pracę, automatyzują procesy i centralizują wiedzę w jednym miejscu {#subtitle-key-features}
 
@@ -44,40 +44,40 @@ To cyfrowy asystent wiedzy — zawsze aktualny, bezpieczny i dostępny dla całe
 - Alerty i polityki zgodności z normami (ISO/NIS2)
 - Wnioski i rekomendacje wspierające procesy w Twojej firmie
 
-## ROADMAP {#roadmap}
+## JAK ROZWIJA SIĘ RAG SUITE {#roadmap}
 
 ### Strategiczna ścieżka rozwoju funkcji AI, bezpieczeństwa i analizy wiedzy w organizacji {#subtitle-roadmap}
 
-### ZREALIZOWANE {#done}
+### DOSTĘPNE DZISIAJ {#done}
 - Prototyp RAG, czyli stabilna architektura i gotowy interfejs użytkownika.
 - Quizy CyberSec, interaktywne testy wiedzy dla pracowników.
 - Integracja z IFS Cloud automatyzacja instrukcji procesowych z modelem GPT-OSS.
 - Multilingual obsługa wielu języków czatu, dokumentów i interfejsu.
 
-### W TOKU {#inprogress}
+### ROZWIJAMY TERAZ {#inprogress}
 - Rozbudowa CyberPanelu
 - Proces nauczania modelu językowego w zakresie cyberbezpieczeństwa
 - Poprawa w zakresie UX
 - Zwiększanie trafności odpowiedzi modeli językowych
 
-### PLAN {#plan}
+### KIERUNEK DALSZEGO ROZWOJU {#plan}
 - Integracje z książką adresową
 - Utworzenie pulpitu pracownika i integracja z IFS CLOUD
 - Uczenie modeli językowych procesów biznesowych wspomagających we wdrożeniu nowych pracowników
 - Zbudowanie procedur bezpieczeństwa obowiązujących w firmie
 
-## BENEFITY DLA FIRMY {#benefits}
+## PO CO NAM RAG SUITE? {#benefits}
 
 ### AI, która porządkuje wiedzę, skraca procesy i wzmacnia efektywność całej organizacji {#subtitle-benefits}
 
-- **SZYBSZE PROCESY**: Nawet 80–90% krótszy czas dotarcia do informacji, dzięki centralnemu czatowi i inteligentnemu wyszukiwaniu dokumentów.
-- **SPÓJNE ODPOWIEDZI**: Pełna standaryzacja wiedzy i eliminacja błędów wynikających z różnych interpretacji instrukcji.
-- **AUTOMATYZACJA WIEDZY**: Dokumenty, instrukcje i polityki firmowe są automatycznie przetwarzane i dostępne w formie interaktywnego dialogu.
-- **WDROŻENIE NOWYCH PRACOWNIKÓW**: Błyskawiczny onboarding dzięki kontekstowym odpowiedziom i quizom z zasad bezpieczeństwa oraz procedur IFS.
-- **NOWOCZESNY WIZERUNEK ORGANIZACJI**: Wykorzystanie AI w codziennym zarządzaniu wiedzą podnosi innowacyjność i konkurencyjność firmy.
-- **BRAK ROZRPOSZENIA**: Wszystkie kluczowe dane, procedury i instrukcje są scentralizowane w jednym miejscu, dostępne z poziomu jednej platformy.
+- **JEDNO MIEJSCE ZAMIAST WIELU ROZPROSZONYCH ŹRÓDEŁ**: Kluczowe dane, procedury i instrukcje są dostępne w jednej, bezpiecznej platformie.
+- **MNIEJ POWTARZALNYCH PYTAŃ**: Pracownicy mogą samodzielnie odnajdywać sprawdzone informacje w bazie wiedzy.
+- **ODPOWIEDŹ RAZEM ZE ŹRÓDŁEM**: Odpowiedzi zawierają kontekst i odwołania, które ułatwiają ich weryfikację.
+- **ŁATWIEJSZY ONBOARDING**: Nowe osoby szybciej poznają zasady, procedury i wiedzę potrzebną w codziennej pracy.
+- **WIEDZA ZOSTAJE W ORGANIZACJI**: Informacje są porządkowane i dostępne niezależnie od pojedynczych osób czy zespołów.
+- **LEPSZA JAKOŚĆ WIEDZY**: Wspólne źródła ograniczają rozbieżności i pomagają utrzymać aktualne informacje.
 
-## AUTORZY PROJEKTU {#authors}
+## ZESPÓŁ PROJEKTU {#authors}
 
 ### Osoby odpowiedzialne za rozwój i utrzymanie RAG Suite {#subtitle-authors}
 

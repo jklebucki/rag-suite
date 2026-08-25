@@ -22,7 +22,7 @@ A RAG (Retrieval-Augmented Generation) mechanizmusoknak és a szemantikus keres�
 
 Ez egy digitális tudásasszisztens — mindig naprakész, biztonságos és az egész vállalat számára elérhető.
 
-## FŐBB JELLEMZŐK {#key-features}
+## MIRE KÉPES A RAG SUITE? {#key-features}
 
 ### Funkciók, amelyek egyszerűsítik a munkát, automatizálják a folyamatokat és egy helyen központosítják a tudást {#subtitle-key-features}
 
@@ -44,40 +44,40 @@ Ez egy digitális tudásasszisztens — mindig naprakész, biztonságos és az e
 - Riasztások és megfelelőségi szabályzatok (ISO/NIS2)
 - Ajánlások és következtetések a vállalati folyamatok támogatására
 
-## ROADMAP {#roadmap}
+## HOGYAN FEJLŐDIK A RAG SUITE? {#roadmap}
 
 ### Stratégiai fejlesztési út az AI funkciók, biztonság és tudáselemzés terén a szervezetben {#subtitle-roadmap}
 
-### MEGVALÓSÍTOTT {#done}
+### MA ELÉRHETŐ {#done}
 - RAG prototípus — stabil architektúra és kész felhasználói felület
 - CyberSec kvízek — interaktív tudástesztek dolgozók számára
 - IFS Cloud integráció — folyamatutasítások automatizálása GPT-OSS modellel
 - Többnyelvű chat, dokumentum és felhasználói felület támogatás
 
-### FOLYAMATBAN {#inprogress}
+### JELENLEGI FEJLESZTÉSEK {#inprogress}
 - CyberPanel bővítése
 - Nyelvi modellek képzése kiberbiztonsági területeken
 - Felhasználói élmény (UX) javítása
 - A nyelvi modellek válaszpontosságának növelése
 
-### TERVEZÉS {#plan}
+### TOVÁBBI FEJLESZTÉSI IRÁNY {#plan}
 - Integráció a vállalati címtárral
 - Dolgozói irányítópult és IFS CLOUD integráció
 - Üzleti folyamatok betanítása a modellek számára az új munkatársak támogatásához
 - A vállalaton belüli biztonsági eljárások kialakítása
 
-## A VÁLLALAT ELŐNYEI {#benefits}
+## MIÉRT VAN SZÜKSÉGÜNK A RAG SUITE-RA? {#benefits}
 
 ### AI, amely rendszerezi a tudást, egyszerűsíti a folyamatokat és növeli az egész szervezet hatékonyságát {#subtitle-benefits}
 
-- **GYORSABB FOLYAMATOK**: Akár 80–90%-kal rövidebb információ-elérési idő az egységes chatnek és intelligens keresésnek köszönhetően.
-- **KONZISZTENS VÁLASZOK**: A tudás egységesítése kiküszöböli a félreértelmezéseket.
-- **TUDÁS AUTOMATIZÁLÁS**: A dokumentumok, szabályzatok és eljárások interaktív párbeszéddé alakulnak.
-- **GYORS BETANULÁS**: Azonnali tudásátadás kontextusfüggő válaszokkal és biztonsági kvízekkel.
-- **MODERN VÁLLALATI KÉP**: Az AI alkalmazása növeli az innovációt és a versenyképességet.
-- **KÖZPONTOSÍTOTT TUDÁS**: Minden kulcsfontosságú adat, eljárás és útmutató egy helyen, biztonságosan elérhető.
+- **EGY HELY A SOK SZÉTSZÓRT FORRÁS HELYETT**: A legfontosabb adatok, eljárások és útmutatók egyetlen biztonságos platformon érhetők el.
+- **KEVESEBB ISMÉTLŐDŐ KÉRDÉS**: A munkatársak önállóan találhatják meg az ellenőrzött információkat a tudásbázisban.
+- **VÁLASZ A FORRÁSSAL EGYÜTT**: A válaszok kontextust és hivatkozásokat tartalmaznak, így könnyebben ellenőrizhetők.
+- **EGYSZERŰBB BETANULÁS**: Az új munkatársak gyorsabban megismerhetik a napi munkához szükséges szabályokat, eljárásokat és tudást.
+- **A TUDÁS A SZERVEZETBEN MARAD**: Az információk rendezettek és egyes személyektől vagy csapatoktól függetlenül elérhetők.
+- **JOBB TUDÁSMINŐSÉG**: A közös források csökkentik az eltéréseket és segítenek naprakészen tartani az információkat.
 
-## AUTORZY PROJEKTU {#authors}
+## PROJEKTCSAPAT {#authors}
 
 ### A RAG Suite fejlesztéséért és karbantartásáért felelős személyek {#subtitle-authors}
 

@@ -22,7 +22,7 @@ Thanks to Retrieval-Augmented Generation (RAG) mechanisms and a semantic search 
 
 It is a digital knowledge assistant — always up to date, secure, and available to the entire company.
 
-## KEY FEATURES {#key-features}
+## WHAT CAN RAG SUITE DO? {#key-features}
 
 ### Features that streamline work, automate processes, and centralize knowledge in one place {#subtitle-key-features}
 
@@ -44,40 +44,40 @@ It is a digital knowledge assistant — always up to date, secure, and available
 - Alerts and compliance policies with standards (ISO/NIS2)
 - Insights and recommendations supporting your company's processes
 
-## ROADMAP {#roadmap}
+## HOW RAG SUITE IS EVOLVING {#roadmap}
 
 ### Strategic development path for AI features, security, and knowledge analytics in the organization {#subtitle-roadmap}
 
-### DELIVERED {#done}
+### AVAILABLE TODAY {#done}
 - RAG prototype: stable architecture and a ready user interface.
 - CyberSec quizzes: interactive knowledge tests for employees.
 - Integration with IFS Cloud — automation of process instructions with a GPT-OSS model.
 - Multilingual: support for multiple languages in chat, documents, and the interface.
 
-### IN PROGRESS {#inprogress}
+### IN DEVELOPMENT {#inprogress}
 - Expanding CyberPanel
 - Training the language model in cybersecurity
 - UX improvements
 - Increasing the relevance of language model answers
 
-### PLAN {#plan}
+### FUTURE DIRECTION {#plan}
 - Integrations with the address book
 - Creating an employee dashboard and integration with IFS CLOUD
 - Training language models on business processes to support onboarding of new employees
 - Building company-wide security procedures
 
-## COMPANY BENEFITS {#benefits}
+## WHY DO WE NEED RAG SUITE? {#benefits}
 
 ### AI that organizes knowledge, streamlines processes, and enhances the efficiency of the entire organization {#subtitle-benefits}
 
-- **FASTER PROCESSES**: Up to 80–90% shorter time to information, thanks to a central chat and intelligent document search.
-- **CONSISTENT ANSWERS**: Full standardization of knowledge and elimination of errors caused by different interpretations of instructions.
-- **KNOWLEDGE AUTOMATION**: Company documents, instructions, and policies are automatically processed and available through interactive dialogue.
-- **ONBOARDING NEW EMPLOYEES**: Lightning-fast onboarding with contextual answers and quizzes on security rules and IFS procedures.
-- **MODERN COMPANY IMAGE**: Using AI in everyday knowledge management increases the company's innovation and competitiveness.
-- **NO FRAGMENTATION**: All key data, procedures, and instructions are centralized in one place, available from a single platform.
+- **ONE PLACE INSTEAD OF MANY SCATTERED SOURCES**: Key data, procedures and instructions are available through one secure platform.
+- **FEWER REPEATED QUESTIONS**: Employees can independently find verified information in the knowledge base.
+- **ANSWERS WITH THEIR SOURCES**: Answers include context and references that make them easier to verify.
+- **EASIER ONBOARDING**: New employees can learn the rules, procedures and knowledge needed for daily work more quickly.
+- **KNOWLEDGE STAYS IN THE ORGANIZATION**: Information remains organized and accessible beyond individual people or teams.
+- **BETTER KNOWLEDGE QUALITY**: Shared sources reduce inconsistencies and help keep information up to date.
 
-## PROJECT AUTHORS {#authors}
+## PROJECT TEAM {#authors}
 
 ### People responsible for the development and maintenance of RAG Suite {#subtitle-authors}
 

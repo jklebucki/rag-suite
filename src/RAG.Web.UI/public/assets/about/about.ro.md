@@ -22,7 +22,7 @@ Datorită mecanismelor RAG (Retrieval-Augmented Generation) și motorului de că
 
 Este un asistent digital al cunoașterii — mereu actualizat, sigur și disponibil pentru întreaga companie.
 
-## CARACTERISTICI PRINCIPALE {#key-features}
+## CE POATE FACE RAG SUITE? {#key-features}
 
 ### Funcții care simplifică munca, automatizează procesele și centralizează cunoștințele într-un singur loc {#subtitle-key-features}
 
@@ -44,40 +44,40 @@ Este un asistent digital al cunoașterii — mereu actualizat, sigur și disponi
 - Alerte și politici pentru conformitatea cu standardele (ISO/NIS2)
 - Concluzii și recomandări care susțin procesele companiei
 
-## ROADMAP {#roadmap}
+## CUM EVOLUEAZĂ RAG SUITE {#roadmap}
 
 ### Cale strategică de dezvoltare pentru funcții AI, securitate și analiză cunoștințe în organizație {#subtitle-roadmap}
 
-### REALIZAT {#done}
+### DISPONIBIL ASTĂZI {#done}
 - Prototip RAG: arhitectură stabilă și interfață utilizator pregătită.
 - Chestionare CyberSec: teste interactive de cunoștințe pentru angajați.
 - Integrare cu IFS Cloud — automatizarea instrucțiunilor de proces cu modelul GPT-OSS.
 - Multilingual: suport pentru mai multe limbi în chat, documente și interfață.
 
-### ÎN CURS {#inprogress}
+### DEZVOLTĂM ACUM {#inprogress}
 - Extinderea CyberPanel
 - Instruirea modelului lingvistic în domeniul securității cibernetice
 - Îmbunătățiri de UX
 - Creșterea relevanței răspunsurilor modelelor lingvistice
 
-### PLAN {#plan}
+### DIRECȚIA DE DEZVOLTARE {#plan}
 - Integrări cu agenda/adresarul
 - Crearea unui dashboard al angajatului și integrare cu IFS CLOUD
 - Instruirea modelelor lingvistice pe procesele de business pentru onboarding-ul noilor angajați
 - Construirea procedurilor de securitate la nivel de companie
 
-## BENEFICII PENTRU COMPANIE {#benefits}
+## DE CE AVEM NEVOIE DE RAG SUITE? {#benefits}
 
 ### AI care organizează cunoștințele, simplifică procesele și îmbunătățește eficiența întregii organizații {#subtitle-benefits}
 
-- **PROCESE MAI RAPIDE**: Până la 80–90% mai puțin timp pentru a ajunge la informații, datorită chat-ului central și căutării inteligente în documente.
-- **RĂSPUNSURI CONSISTENTE**: Standardizare completă a cunoștințelor și eliminarea erorilor cauzate de interpretări diferite ale instrucțiunilor.
-- **AUTOMATIZAREA CUNOȘTINȚELOR**: Documentele, instrucțiunile și politicile companiei sunt procesate automat și disponibile prin dialog interactiv.
-- **INTEGRAREA ANGAJAȚILOR NOI**: Onboarding rapid cu răspunsuri contextuale și chestionare despre regulile de securitate și procedurile IFS.
-- **IMAGINE MODERNĂ A ORGANIZAȚIEI**: Utilizarea AI în managementul zilnic al cunoștințelor crește inovația și competitivitatea.
-- **FĂRĂ FRAGMENTARE**: Toate datele, procedurile și instrucțiunile cheie sunt centralizate într-un singur loc, accesibile dintr-o singură platformă.
+- **UN SINGUR LOC ÎN LOCUL MAI MULTOR SURSE DISPERSATE**: Datele, procedurile și instrucțiunile esențiale sunt disponibile într-o singură platformă sigură.
+- **MAI PUȚINE ÎNTREBĂRI REPETITIVE**: Angajații pot găsi singuri informații verificate în baza de cunoștințe.
+- **RĂSPUNS ÎMPREUNĂ CU SURSA**: Răspunsurile includ context și referințe care facilitează verificarea.
+- **ONBOARDING MAI UȘOR**: Noii angajați învață mai repede regulile, procedurile și cunoștințele necesare activității zilnice.
+- **CUNOȘTINȚELE RĂMÂN ÎN ORGANIZAȚIE**: Informațiile sunt organizate și accesibile independent de anumite persoane sau echipe.
+- **O CALITATE MAI BUNĂ A CUNOȘTINȚELOR**: Sursele comune reduc neconcordanțele și ajută la menținerea informațiilor actualizate.
 
-## AUTORI PROIECT {#authors}
+## ECHIPA PROIECTULUI {#authors}
 
 ### Persoane responsabile pentru dezvoltarea și menținerea RAG Suite {#subtitle-authors}
 
