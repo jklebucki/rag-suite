@@ -776,6 +776,7 @@ export const en: TranslationKeys = {
   'addressBook.subtitle.guestSuffix': '(log in to propose changes)',
   'addressBook.tabs.contacts': 'Contacts',
   'addressBook.tabs.import': 'Import',
+  'addressBook.tabs.export': 'Export',
   'addressBook.tabs.proposals': 'Proposals',
   'addressBook.addContact': 'Add Contact',
   'addressBook.search': 'Search contacts...',
@@ -916,6 +917,13 @@ export const en: TranslationKeys = {
   'addressBook.import.deleteWithoutPhoto.confirmButton': 'Delete all',
   'addressBook.import.deleteWithoutPhoto.success': 'Deleted contacts without photos: {count}',
   'addressBook.import.deleteWithoutPhoto.error': 'Failed to delete contacts without photos',
+  'addressBook.export.title': 'Export Contacts to CSV',
+  'addressBook.export.format': 'CSV Export Format',
+  'addressBook.export.formatDesc': 'The exported file uses the same format as the import (semicolon-separated columns):',
+  'addressBook.export.compatibilityNote': 'The exported file can be imported back using the Import tab with the same encoding.',
+  'addressBook.export.contactsCount': 'Contacts to export: {count}',
+  'addressBook.export.scopeNote': 'Admins and power users export the full list, including inactive contacts.',
+  'addressBook.export.exportContacts': 'Export contacts',
   'addressBook.form.title.proposeFor': 'Propose Change for {firstName} {lastName}',
 
   // Proposals

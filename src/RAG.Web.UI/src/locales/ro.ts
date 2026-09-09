@@ -724,6 +724,7 @@ export const ro: TranslationKeys = {
   'addressBook.subtitle.guestSuffix': '(autentifică-te pentru a propune modificări)',
   'addressBook.tabs.contacts': 'Contacte',
   'addressBook.tabs.import': 'Import',
+  'addressBook.tabs.export': 'Export',
   'addressBook.tabs.proposals': 'Propuneri',
   'addressBook.addContact': 'Adaugă Contact',
   'addressBook.search': 'Caută contacte...',
@@ -864,6 +865,13 @@ export const ro: TranslationKeys = {
   'addressBook.import.deleteWithoutPhoto.confirmButton': 'Șterge toate',
   'addressBook.import.deleteWithoutPhoto.success': 'Contacte fără fotografii șterse: {count}',
   'addressBook.import.deleteWithoutPhoto.error': 'Ștergerea contactelor fără fotografii a eșuat',
+  'addressBook.export.title': 'Exportă Contactele în CSV',
+  'addressBook.export.format': 'Format Export CSV',
+  'addressBook.export.formatDesc': 'Fișierul exportat folosește același format ca importul (coloane separate prin punct și virgulă):',
+  'addressBook.export.compatibilityNote': 'Fișierul exportat poate fi reimportat din fila Import folosind aceeași codificare.',
+  'addressBook.export.contactsCount': 'Contacte de exportat: {count}',
+  'addressBook.export.scopeNote': 'Administratorii și utilizatorii avansați exportă lista completă, inclusiv contactele inactive.',
+  'addressBook.export.exportContacts': 'Exportă contactele',
   'addressBook.form.title.proposeFor': 'Propune Schimbare pentru {firstName} {lastName}',
 
   // Proposals

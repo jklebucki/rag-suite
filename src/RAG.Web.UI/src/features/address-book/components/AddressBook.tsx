@@ -6,6 +6,7 @@ import addressBookService from '@/features/address-book/services/addressBook.ser
 import { ContactsTable } from './ContactsTable'
 import { ContactForm } from './ContactForm'
 import { ContactImport } from './ContactImport'
+import { ContactExport } from './ContactExport'
 import { ProposalsList } from './ProposalsList'
 import type {
   Contact,
@@ -19,7 +20,7 @@ import { logger } from '@/utils/logger'
 import { ActionModal, ActionModalVariant } from '@/shared/components/ui/ActionModal'
 import { DeleteConfirmationModal } from '@/shared/components/common/DeleteConfirmationModal'
 
-type TabType = 'contacts' | 'import' | 'proposals'
+type TabType = 'contacts' | 'import' | 'export' | 'proposals'
 
 interface AlertState {
   title: React.ReactNode
@@ -371,6 +372,16 @@ export function AddressBook() {
                 {t('addressBook.tabs.import')}
               </button>
               <button
+                onClick={() => setActiveTab('export')}
+                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'export'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-300'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-slate-600'
+                }`}
+              >
+                {t('addressBook.tabs.export')}
+              </button>
+              <button
                 onClick={() => setActiveTab('proposals')}
                 className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors relative ${
                   activeTab === 'proposals'
@@ -451,6 +462,13 @@ export function AddressBook() {
             </div>
           )}
           <ContactImport onImport={handleImport} onClose={() => setActiveTab('contacts')} />
+        </div>
+      )}
+
+      {activeTab === 'export' && canModify && (
+        <div className="max-w-3xl space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('addressBook.export.title')}</h2>
+          <ContactExport contacts={contacts} />
         </div>
       )}
 

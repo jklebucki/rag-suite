@@ -797,6 +797,7 @@ export interface TranslationKeys {
   'addressBook.subtitle.guestSuffix': string;
   'addressBook.tabs.contacts': string;
   'addressBook.tabs.import': string;
+  'addressBook.tabs.export': string;
   'addressBook.tabs.proposals': string;
   'addressBook.addContact': string;
   'addressBook.search': string;
@@ -929,6 +930,13 @@ export interface TranslationKeys {
   'addressBook.import.deleteWithoutPhoto.confirmButton': string;
   'addressBook.import.deleteWithoutPhoto.success': string;
   'addressBook.import.deleteWithoutPhoto.error': string;
+  'addressBook.export.title': string;
+  'addressBook.export.format': string;
+  'addressBook.export.formatDesc': string;
+  'addressBook.export.compatibilityNote': string;
+  'addressBook.export.contactsCount': string;
+  'addressBook.export.scopeNote': string;
+  'addressBook.export.exportContacts': string;
   'addressBook.form.title.proposeFor': string;
   'addressBook.proposals.title': string;
   'addressBook.proposals.noProposals': string;

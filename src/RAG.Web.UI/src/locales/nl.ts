@@ -723,6 +723,7 @@ export const nl: TranslationKeys = {
   'addressBook.subtitle.guestSuffix': '(log in om wijzigingen voor te stellen)',
   'addressBook.tabs.contacts': 'Contacten',
   'addressBook.tabs.import': 'Importeren',
+  'addressBook.tabs.export': 'Exporteren',
   'addressBook.tabs.proposals': 'Voorstellen',
   'addressBook.addContact': 'Contact Toevoegen',
   'addressBook.search': 'Contacten zoeken...',
@@ -863,6 +864,13 @@ export const nl: TranslationKeys = {
   'addressBook.import.deleteWithoutPhoto.confirmButton': 'Alles verwijderen',
   'addressBook.import.deleteWithoutPhoto.success': 'Contacten zonder foto verwijderd: {count}',
   'addressBook.import.deleteWithoutPhoto.error': 'Verwijderen van contacten zonder foto mislukt',
+  'addressBook.export.title': 'Contacten exporteren naar CSV',
+  'addressBook.export.format': 'CSV-exportformaat',
+  'addressBook.export.formatDesc': 'Het geëxporteerde bestand gebruikt hetzelfde formaat als de import (puntkomma-gescheiden kolommen):',
+  'addressBook.export.compatibilityNote': 'Het geëxporteerde bestand kan via het tabblad Importeren met dezelfde codering opnieuw worden geïmporteerd.',
+  'addressBook.export.contactsCount': 'Te exporteren contacten: {count}',
+  'addressBook.export.scopeNote': 'Beheerders en hoofdgebruikers exporteren de volledige lijst, inclusief inactieve contacten.',
+  'addressBook.export.exportContacts': 'Contacten exporteren',
   'addressBook.form.title.proposeFor': 'Wijziging Voorstellen voor {firstName} {lastName}',
 
   // Proposals
